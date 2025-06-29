@@ -1,7 +1,9 @@
-1. check `/guidelines/categories/ethereum.md`. Each category has specific topic selection criteria and style guidelines. Also check `/content/zh-TW/ethereum/*.json. Be aware of the `status == 
-2. Find valid candidates from `sources.md` which happens at $ARGUMENTS
-3. use `zen` to find more candidates which happens at $ARGUMENTS
-4. Write conversational Traditional Chinese explainer in 得到/樊登讀書會 style
-5. Content Format: Content follows the structured JSON schema defined in `schema.json`. See the schema file for complete format specification and validation rules.
-6. Saves to `/content/zh-TW/ethereum/$ARGUMENTS-topic-name.json`
-7. Sets `source_reviewed: false` for human review
+1.	Check `/guidelines/categories/ethereum.md`. Each category has specific topic selection criteria and style guidelines. Also check `/content/zh-TW/ethereum/*.json`. Be aware of the `metadata.translation_status.rejection.rejected == true` when reviewing existing files.
+2.	Find valid candidates from sources.md that are relevant to $ARGUMENTS.
+3.	Use zen to find more candidates related to $ARGUMENTS.
+4. Use `gemini -p` to do fact-checking
+5. Use claude to do fact-checking again
+6.	Write 3 valid candidates as conversational Traditional Chinese explainers in the style of 得到/樊登讀書會.
+7.	Content format: The content must follow the structured JSON schema defined in `schema.json`. Refer to the schema file for the complete format specification and validation rules.
+8.	Save the file to `/content/zh-TW/ethereum/$ARGUMENTS-topic-name.json`.
+9.	Set source_reviewed: false to indicate that human review is needed.
