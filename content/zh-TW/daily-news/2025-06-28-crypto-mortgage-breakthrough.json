@@ -19,7 +19,8 @@
       "source_reviewed": true,
       "translated_to": [
         "en",
-        "en-US"
+        "en-US",
+        "ja-JP"
       ],
       "rejection": {
         "rejected": false,
@@ -39,6 +40,6 @@
       }
     },
     "created_at": "2025-06-28T00:00:00Z",
-    "updated_at": "2025-06-29T07:17:14.486Z"
+    "updated_at": "2025-06-29T07:36:28.167Z"
   }
 }

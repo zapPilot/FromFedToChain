@@ -3,8 +3,9 @@
 import fs from "fs/promises";
 import path from "path";
 import chalk from "chalk";
-import { execSync } from "child_process";
-import { LANGUAGES, CATEGORIES, PATHS } from '../config/languages.js';
+import cliProgress from "cli-progress";
+import { LANGUAGES, CATEGORIES, PATHS, getTargetLanguages } from '../config/languages.js';
+import { TranslationService } from './translate.js';
 
 async function showPendingTranslations() {
   console.log(chalk.blue.bold('🌐 Translation Workflow Dashboard'));
@@ -24,7 +25,7 @@ async function showPendingTranslations() {
           const content = await fs.readFile(filePath, 'utf-8');
           const data = JSON.parse(content);
           
-          if (data.metadata?.translation_status?.source_reviewed === true) {
+          if (data.metadata?.translation_status?.source_reviewed === true && data.metadata?.translation_status?.rejection?.rejected === false) {
             const translatedTo = data.metadata.translation_status.translated_to || [];
             const availableTargets = LANGUAGES.SUPPORTED.filter(lang => 
               lang !== LANGUAGES.PRIMARY && !translatedTo.includes(lang)
@@ -77,14 +78,8 @@ async function translateFile(fileId, targetLang = 'en-US') {
   console.log(chalk.blue(`🔄 Starting translation: ${fileId} → ${targetLang}`));
   
   try {
-    // Use the existing translate script
-    const command = `node scripts/translate.js ${fileId} --target_lang=${targetLang}`;
-    console.log(chalk.gray(`Running: ${command}`));
-    
-    execSync(command, { 
-      stdio: 'inherit',
-      cwd: process.cwd()
-    });
+    const translationService = new TranslationService();
+    await translationService.translateFile(fileId, targetLang, false); // No progress bar in batch mode
     
     console.log(chalk.green(`✅ Translation completed: ${fileId} → ${targetLang}`));
     return true;
@@ -94,15 +89,105 @@ async function translateFile(fileId, targetLang = 'en-US') {
   }
 }
 
+async function translateToAllLanguages() {
+  console.log(chalk.blue.bold('🌐 Translating All Content to All Languages'));
+  console.log(chalk.gray('='.repeat(50)));
+  
+  const targetLanguages = getTargetLanguages(); // ['en-US', 'ja-JP']
+  const pendingFiles = await showPendingTranslations();
+  
+  if (!pendingFiles || pendingFiles.length === 0) {
+    return;
+  }
+  
+  // Create a list of all translation tasks
+  const translationTasks = [];
+  for (const file of pendingFiles) {
+    for (const targetLang of targetLanguages) {
+      if (file.availableTargets.includes(targetLang)) {
+        translationTasks.push({
+          fileId: file.id,
+          targetLang,
+          title: file.title
+        });
+      }
+    }
+  }
+  
+  if (translationTasks.length === 0) {
+    console.log(chalk.green('✅ All content already translated to all languages!'));
+    return;
+  }
+  
+  console.log(chalk.yellow(`📝 Found ${translationTasks.length} translation tasks across ${targetLanguages.length} languages`));
+  
+  // Show summary
+  const summary = {};
+  targetLanguages.forEach(lang => {
+    summary[lang] = translationTasks.filter(task => task.targetLang === lang).length;
+  });
+  
+  console.log(chalk.cyan('\n📊 Translation Summary:'));
+  Object.entries(summary).forEach(([lang, count]) => {
+    if (count > 0) {
+      console.log(`  ${lang}: ${count} files`);
+    }
+  });
+  
+  const progressBar = new cliProgress.SingleBar({
+    format: chalk.cyan('{bar}') + ' {percentage}% | {value}/{total} tasks | {current_task}',
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
+    hideCursor: true
+  }, cliProgress.Presets.rect);
+
+  progressBar.start(translationTasks.length, 0, { current_task: 'Starting...' });
+  
+  const results = { success: 0, failed: 0 };
+  
+  for (let i = 0; i < translationTasks.length; i++) {
+    const task = translationTasks[i];
+    progressBar.update(i, { current_task: `${task.targetLang}: ${task.fileId}` });
+    
+    const success = await translateFile(task.fileId, task.targetLang);
+    if (success) {
+      results.success++;
+    } else {
+      results.failed++;
+    }
+  }
+  
+  progressBar.update(translationTasks.length, { current_task: 'Complete!' });
+  progressBar.stop();
+  
+  console.log(chalk.green.bold(`\n🎉 Multi-language translation completed!`));
+  console.log(`${chalk.green('✅ Success:')} ${results.success}`);
+  console.log(`${chalk.red('❌ Failed:')} ${results.failed}`);
+  
+  if (results.success > 0) {
+    console.log(chalk.gray(`\nNext steps:`));
+    console.log(chalk.gray(`- Run "npm run tts" to generate audio files`));
+    console.log(chalk.gray(`- Review translations in ./content/[language]/`));
+  }
+}
+
 async function batchTranslate(fileIds, targetLang = 'en-US') {
   console.log(chalk.blue.bold(`🚀 Batch Translation: ${fileIds.length} files → ${targetLang}`));
   console.log(chalk.gray('='.repeat(50)));
   
   const results = { success: 0, failed: 0 };
+  const progressBar = new cliProgress.SingleBar({
+    format: chalk.cyan('{bar}') + ' {percentage}% | {value}/{total} files | {current_file}',
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
+    hideCursor: true
+  }, cliProgress.Presets.rect);
+
+  progressBar.start(fileIds.length, 0, { current_file: 'Starting...' });
   
   for (let i = 0; i < fileIds.length; i++) {
     const fileId = fileIds[i];
-    console.log(chalk.blue(`\n[${i + 1}/${fileIds.length}] Translating: ${fileId}`));
+    progressBar.update(i, { current_file: fileId });
     
     const success = await translateFile(fileId, targetLang);
     if (success) {
@@ -111,6 +196,9 @@ async function batchTranslate(fileIds, targetLang = 'en-US') {
       results.failed++;
     }
   }
+  
+  progressBar.update(fileIds.length, { current_file: 'Complete!' });
+  progressBar.stop();
   
   console.log(chalk.green.bold(`\n🎉 Batch translation completed!`));
   console.log(`${chalk.green('✅ Success:')} ${results.success}`);
@@ -127,10 +215,40 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
   
+  // If no command provided, translate all files to ALL target languages
+  if (!command) {
+    const targetLang = args.find(arg => arg.startsWith('--target='))?.split('=')[1];
+    
+    if (targetLang) {
+      // If specific target language provided, translate to that language only
+      const pendingFiles = await showPendingTranslations();
+      
+      if (!pendingFiles || pendingFiles.length === 0) {
+        return;
+      }
+      
+      const availableFiles = pendingFiles.filter(file => 
+        file.availableTargets.includes(targetLang)
+      );
+      
+      if (availableFiles.length === 0) {
+        console.log(chalk.yellow(`⚠️  No files available for translation to ${targetLang}`));
+        return;
+      }
+      
+      console.log(chalk.blue(`\n🚀 Starting translation of ${availableFiles.length} files to ${targetLang.toUpperCase()}`));
+      const fileIds = availableFiles.map(file => file.id);
+      await batchTranslate(fileIds, targetLang);
+    } else {
+      // No target specified = translate to ALL target languages
+      await translateToAllLanguages();
+    }
+    return;
+  }
+  
   switch (command) {
     case 'list':
     case 'show':
-    case undefined:
       await showPendingTranslations();
       break;
       
@@ -187,18 +305,20 @@ async function main() {
     default:
       console.log(chalk.blue.bold('🌐 Translation Workflow Commands'));
       console.log(chalk.gray('='.repeat(40)));
+      console.log(`${chalk.cyan('(no args)')}         Translate all files to ALL languages (${getTargetLanguages().join(', ')})`);
       console.log(`${chalk.cyan('list|show')}        Show files ready for translation`);
       console.log(`${chalk.cyan('translate <id>')}   Translate specific file`);
       console.log(`${chalk.cyan('batch <id1> <id2>')} Translate multiple files`);
       console.log(`${chalk.cyan('all')}             Translate all ready files`);
       console.log('');
       console.log(chalk.gray('Options:'));
-      console.log(`${chalk.gray('--target=<lang>')}  Target language (default: en)`);
+      console.log(`${chalk.gray('--target=<lang>')}  Target specific language only`);
       console.log('');
       console.log(chalk.gray('Examples:'));
+      console.log(`${chalk.gray('npm run translate              # Translate all to ALL languages')}`);
+      console.log(`${chalk.gray('npm run translate --target=ja-JP # Translate all to Japanese only')}`);
       console.log(`${chalk.gray('npm run translate list')}`);
       console.log(`${chalk.gray('npm run translate translate 2025-06-28-crypto-news')}`);
-      console.log(`${chalk.gray('npm run translate all --target=ja-JP')}`);
       break;
   }
 }
@@ -210,4 +330,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   });
 }
 
-export { showPendingTranslations, translateFile, batchTranslate };
+export { showPendingTranslations, translateFile, batchTranslate, translateToAllLanguages };

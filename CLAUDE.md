@@ -34,9 +34,11 @@ claude daily-content [--category daily-news|ethereum|macro]
 npm run review
 
 # Translation workflow
+npm run translate                         # Translate all ready files to ALL languages (en-US, ja-JP)
+npm run translate --target=en-US         # Translate all ready files to English only
+npm run translate --target=ja-JP         # Translate all ready files to Japanese only
 npm run translate list                    # Show files ready for translation
 npm run translate translate <file_id>    # Translate single file
-npm run translate all --target=en        # Translate all ready files
 
 # Process TTS for pending content
 npm run tts

@@ -6,6 +6,7 @@ import { createReadStream } from "fs";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import { google } from "googleapis";
 import chalk from "chalk";
+import cliProgress from "cli-progress";
 import { VOICE_CONFIG, PATHS } from '../config/languages.js';
 
 async function findPendingContent() {
@@ -111,8 +112,20 @@ async function main() {
       console.log(`  ${chalk.cyan(file.language.toUpperCase())} - ${file.title}`);
     });
     
+    // Setup progress bar
+    const progressBar = new cliProgress.SingleBar({
+      format: chalk.cyan('{bar}') + ' {percentage}% | {value}/{total} files | {current_file}',
+      barCompleteChar: '\u2588',
+      barIncompleteChar: '\u2591',
+      hideCursor: true
+    }, cliProgress.Presets.rect);
+
+    progressBar.start(pendingFiles.length, 0, { current_file: 'Starting...' });
+    
     // Process each file
-    for (const file of pendingFiles) {
+    for (let i = 0; i < pendingFiles.length; i++) {
+      const file = pendingFiles[i];
+      progressBar.update(i, { current_file: `${file.language}: ${file.title}` });
       console.log(chalk.blue(`\n🎙️ Processing [${file.language.toUpperCase()}]: ${file.title}`));
       
       // Get voice configuration
@@ -171,6 +184,9 @@ async function main() {
         console.log(chalk.red(`  ❌ Failed to process ${file.language}: ${error.message}`));
       }
     }
+    
+    progressBar.update(pendingFiles.length, { current_file: 'Complete!' });
+    progressBar.stop();
     
     console.log(chalk.green.bold(`\n🎉 Completed TTS processing for ${pendingFiles.length} files!`));
     

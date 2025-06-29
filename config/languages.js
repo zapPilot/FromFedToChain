@@ -33,5 +33,13 @@ export const VOICE_CONFIG = {
 export const TRANSLATION_CONFIG = {
   'en-US': {
     voice: VOICE_CONFIG['en-US']
+  },
+  'ja-JP': {
+    voice: VOICE_CONFIG['ja-JP']
   }
+};
+
+// Helper to get target languages (all except primary)
+export const getTargetLanguages = () => {
+  return LANGUAGES.SUPPORTED.filter(lang => lang !== LANGUAGES.PRIMARY);
 };
