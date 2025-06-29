@@ -3,10 +3,12 @@
 import fs from "fs/promises";
 import path from "path";
 import chalk from "chalk";
+import readline from "readline";
 
 // Function to find JSON files with pending TTS status
 async function findPendingJSONContent() {
-  const contentDir = './content';
+  const contentDir = './content/zh-TW';
+  const categories = ['daily-news', 'ethereum', 'macro'];
   const pendingFiles = [];
   
   async function scanDirectory(dir) {
@@ -22,8 +24,14 @@ async function findPendingJSONContent() {
           const content = await fs.readFile(fullPath, 'utf-8');
           const data = JSON.parse(content);
           
-          // Check if file has pending TTS status
-          if (data.metadata && data.metadata.tts_status === 'pending') {
+          // Check for any language TTS status pending
+          if (
+            data.metadata &&
+            data.metadata.tts &&
+            Object.values(data.metadata.tts).some(
+              tts => tts && tts.status === 'pending'
+            )
+          ) {
             pendingFiles.push({
               path: fullPath,
               data
@@ -36,65 +44,131 @@ async function findPendingJSONContent() {
     }
   }
   
-  await scanDirectory(contentDir);
+  // Scan all category subfolders
+  for (const category of categories) {
+    const categoryDir = path.join(contentDir, category);
+    try {
+      await scanDirectory(categoryDir);
+    } catch (e) {
+      // Ignore missing category folders
+    }
+  }
   return pendingFiles;
 }
 
 // Function to display content for review
 function displayContentForReview(data) {
-  console.log(chalk.blue.bold('\n📄 文章內容預覽'));
+  const lang = 'zh-TW';
+  const langData = data.languages && data.languages[lang] ? data.languages[lang] : {};
+  console.log(chalk.blue.bold('\n📄 Content Preview'));
   console.log(chalk.gray('='.repeat(50)));
   
-  console.log(chalk.green.bold(`標題: ${data.title}`));
-  console.log(chalk.cyan(`日期: ${data.date}`));
-  console.log(chalk.magenta(`類別: ${data.metadata.category}`));
+  console.log(chalk.green.bold(`Title: ${langData.title || '[No title]'}`));
+  console.log(chalk.cyan(`Date: ${data.date}`));
+  console.log(chalk.magenta(`Category: ${data.category}`));
   
   if (data.references && data.references.length > 0) {
-    console.log(chalk.yellow(`參考資料: ${data.references.join(', ')}`));
+    console.log(chalk.yellow(`References: ${data.references.join(', ')}`));
   }
   
-  console.log(chalk.gray('\n--- 內容 (將被 TTS 處理) ---'));
-  console.log(data.content);
+  console.log(chalk.gray('\n--- Content (to be processed by TTS) ---'));
+  console.log(langData.content || '[No content]');
   
-  console.log(chalk.gray('\n--- TTS 狀態 ---'));
-  console.log(`狀態: ${data.metadata.tts_status}`);
-  console.log(`音頻 URL: ${data.metadata.audio_url || '尚未生成'}`);
+  // Show TTS status for zh-TW
+  const ttsStatus = data.metadata && data.metadata.tts && data.metadata.tts[lang] ? data.metadata.tts[lang].status : '[Unknown]';
+  const audioUrl = data.metadata && data.metadata.tts && data.metadata.tts[lang] ? data.metadata.tts[lang].audio_url : '[Not generated]';
+  console.log(chalk.gray('\n--- TTS Status ---'));
+  console.log(`Status: ${ttsStatus}`);
+  console.log(`Audio URL: ${audioUrl}`);
   
   console.log(chalk.gray('='.repeat(50)));
 }
 
+function askQuestion(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  return new Promise((resolve) =>
+    rl.question(query, (ans) => {
+      rl.close();
+      resolve(ans);
+    })
+  );
+}
+
+function getNested(obj, path, fallback = undefined) {
+  return path.split('.').reduce((o, k) => (o || {})[k], obj) ?? fallback;
+}
+
+function setNested(obj, path, value) {
+  const keys = path.split('.');
+  let o = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (!o[keys[i]]) o[keys[i]] = {};
+    o = o[keys[i]];
+  }
+  o[keys[keys.length - 1]] = value;
+}
+
+async function reviewFile(file) {
+  displayContentForReview(file.data);
+  let answer = await askQuestion(chalk.yellow('Approve this content? (y/n): '));
+  answer = answer.trim().toLowerCase();
+  if (answer === 'n' || answer === 'no') {
+    const reason = await askQuestion(chalk.red('Enter rejection reason: '));
+    const timestamp = new Date().toISOString();
+    // Set rejection object
+    if (!getNested(file.data, 'metadata.translation_status.rejection')) {
+      setNested(file.data, 'metadata.translation_status.rejection', {});
+    }
+    setNested(file.data, 'metadata.translation_status.rejection.rejected', true);
+    setNested(file.data, 'metadata.translation_status.rejection.reason', reason);
+    setNested(file.data, 'metadata.translation_status.rejection.timestamp', timestamp);
+    // Always set source_reviewed true after review
+    setNested(file.data, 'metadata.translation_status.source_reviewed', true);
+    await fs.writeFile(file.path, JSON.stringify(file.data, null, 2), 'utf-8');
+    console.log(chalk.red(`Marked as rejected. Reason: ${reason}`));
+    return false;
+  } else if (answer === 'y' || answer === 'yes') {
+    // Approve: clear rejection, set reviewed true
+    setNested(file.data, 'metadata.translation_status.source_reviewed', true);
+    setNested(file.data, 'metadata.translation_status.rejection', {
+      rejected: false,
+      reason: '',
+      timestamp: ''
+    });
+    await fs.writeFile(file.path, JSON.stringify(file.data, null, 2), 'utf-8');
+    console.log(chalk.green('Approved.'));
+    return true;
+  } else {
+    console.log(chalk.yellow('Please enter y (approve) or n (reject).'));
+    return await reviewFile(file);
+  }
+}
+
 async function main() {
   try {
-    console.log(chalk.blue.bold('🔍 掃描待審核的 JSON 內容...'));
-    
+    console.log(chalk.blue.bold('🔍 Scanning for JSON content pending review...'));
     const pendingFiles = await findPendingJSONContent();
-    
     if (pendingFiles.length === 0) {
-      console.log(chalk.green('✅ 沒有找到待審核的內容。'));
+      console.log(chalk.green('✅ No content found for review.'));
       return;
     }
-    
-    console.log(chalk.yellow(`📝 找到 ${pendingFiles.length} 個待審核的文件：`));
-    
+    console.log(chalk.yellow(`📝 Found ${pendingFiles.length} file(s) pending review:`));
     for (let i = 0; i < pendingFiles.length; i++) {
       const file = pendingFiles[i];
-      
-      console.log(chalk.blue.bold(`\n[${i + 1}/${pendingFiles.length}] 審核文件: ${path.basename(file.path)}`));
-      displayContentForReview(file.data);
-      
-      // If there are more files, ask if user wants to continue
+      console.log(chalk.blue.bold(`\n[${i + 1}/${pendingFiles.length}] Reviewing file: ${path.basename(file.path)}`));
+      await reviewFile(file);
       if (i < pendingFiles.length - 1) {
-        console.log(chalk.gray('\n按 Enter 繼續查看下一個文件...'));
-        // In a real scenario, you might want to add readline for user input
+        await askQuestion(chalk.gray('\nPress Enter to continue to the next file...'));
       }
     }
-    
-    console.log(chalk.green.bold('\n🎉 所有內容審核完畢！'));
-    console.log(chalk.gray('如需修改內容，請直接編輯對應的 JSON 文件。'));
-    console.log(chalk.gray('確認無誤後，可執行 TTS 腳本進行語音轉換。'));
-    
+    console.log(chalk.green.bold('\n🎉 All content reviewed!'));
+    console.log(chalk.gray('To edit content, modify the corresponding JSON file directly.'));
+    console.log(chalk.gray('Once confirmed, you can run the TTS script for audio conversion.'));
   } catch (error) {
-    console.error(chalk.red('❌ 錯誤:'), error);
+    console.error(chalk.red('❌ Error:'), error);
     process.exit(1);
   }
 }

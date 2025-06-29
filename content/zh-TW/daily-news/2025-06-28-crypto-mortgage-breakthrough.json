@@ -19,7 +19,13 @@
       "source_reviewed": true,
       "translated_to": [
         "en"
-      ]
+      ],
+"rejection": {
+  "rejected": false,
+  "reason": "",
+  "reviewer": "",
+  "timestamp": ""
+}
     },
     "tts": {
       "zh-TW": {

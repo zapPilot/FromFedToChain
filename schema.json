@@ -111,6 +111,16 @@
                 "type": "string"
               },
               "description": "List of languages this content has been translated to"
+            },
+            "rejection": {
+              "type": "object",
+              "description": "Rejection status and reason for content review workflow",
+              "properties": {
+                "rejected": { "type": "boolean", "default": false },
+                "reason": { "type": "string" },
+                "reviewer": { "type": "string" },
+                "timestamp": { "type": "string", "format": "date-time" }
+              }
             }
           }
         },

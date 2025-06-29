@@ -17,7 +17,13 @@
     "translation_status": {
       "source_language": "zh-TW",
       "source_reviewed": false,
-      "translated_to": []
+      "translated_to": [],
+"rejection": {
+  "rejected": true,
+  "reason": "太像是在幫 unichain 打廣告了，一點知識點都沒有",
+  "reviewer": "",
+  "timestamp": ""
+}
     },
     "tts": {
       "zh-TW": {
