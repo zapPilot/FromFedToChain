@@ -3,6 +3,7 @@
 3. Use zen to find more candidates related to $ARGUMENTS.
 4. Use `zen` to do fact-checking
 5. Use claude to do fact-checking again
+6. keep the reference urls
 6. Write 3 valid candidates as conversational Traditional Chinese explainers in the style of 得到/樊登讀書會.
 7. Content format: The content must follow the structured JSON schema defined in `schema.json`. Refer to the schema file for the complete format specification and validation rules.
 8. Save the file to `/content/zh-TW/daily-news/$ARGUMENTS-topic-name.json`.

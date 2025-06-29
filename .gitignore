@@ -57,6 +57,7 @@ build/
 # Test files
 test-*.mjs
 test-*.js
+tests/temp/
 
 # claude
 usage_tracking2.json
