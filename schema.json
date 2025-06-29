@@ -125,10 +125,6 @@
                   "enum": ["pending", "processing", "completed", "failed"],
                   "default": "pending"
                 },
-                "audio_url": {
-                  "type": ["string", "null"],
-                  "description": "Google Drive URL for generated audio"
-                },
                 "voice_config": {
                   "type": "object",
                   "properties": {

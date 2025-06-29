@@ -22,17 +22,18 @@
     "tts": {
       "en-US": {
         "status": "completed",
-        "audio_url": "https://drive.google.com/file/d/1NAndhDzVQtS4C_YXY5eEBXxrq738QbFJ/view",
         "voice_config": {
           "languageCode": "en-US",
           "name": "en-US-Wavenet-D",
           "folderId": "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw",
           "socialPrefix": "🚀",
           "hookLength": 150
-        }
+        },
+        "audio_path": "audio/en-US/macro/2025-06-29-cbdc-privacy-competition.wav",
+        "audio_url": null
       }
     },
     "created_at": "2025-06-29T07:20:02.993Z",
-    "updated_at": "2025-06-29T07:56:30.544Z"
+    "updated_at": "2025-06-29T14:26:13.229Z"
   }
 }

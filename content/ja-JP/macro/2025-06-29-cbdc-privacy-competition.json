@@ -22,15 +22,16 @@
     "tts": {
       "ja-JP": {
         "status": "completed",
-        "audio_url": "https://drive.google.com/file/d/1YTHfPe6uR4uV7rOiHVGNsnw67N-jAhwM/view",
         "voice_config": {
           "languageCode": "ja-JP",
           "name": "ja-JP-Wavenet-C",
           "folderId": "1KJ1WHnnFtsafzsrWuK6S3S8Atym5lVDs"
-        }
+        },
+        "audio_path": "audio/ja-JP/macro/2025-06-29-cbdc-privacy-competition.wav",
+        "audio_url": null
       }
     },
     "created_at": "2025-06-29T07:42:07.832Z",
-    "updated_at": "2025-06-29T08:04:31.754Z"
+    "updated_at": "2025-06-29T14:27:27.190Z"
   }
 }

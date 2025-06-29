@@ -21,17 +21,18 @@
     "tts": {
       "en-US": {
         "status": "completed",
-        "audio_url": "https://drive.google.com/file/d/1OFANKZmM2csZRwOQ8OPFPHlOndQ9EBFa/view",
         "voice_config": {
           "languageCode": "en-US",
           "name": "en-US-Wavenet-D",
           "folderId": "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw",
           "socialPrefix": "🚀",
           "hookLength": 150
-        }
+        },
+        "audio_path": "audio/en-US/ethereum/2025-06-29-restaking-ecosystem-analysis.wav",
+        "audio_url": null
       }
     },
     "created_at": "2025-06-29T07:19:15.679Z",
-    "updated_at": "2025-06-29T07:56:16.184Z"
+    "updated_at": "2025-06-29T14:26:27.807Z"
   }
 }

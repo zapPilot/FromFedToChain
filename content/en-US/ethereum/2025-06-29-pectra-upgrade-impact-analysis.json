@@ -21,17 +21,18 @@
     "tts": {
       "en-US": {
         "status": "completed",
-        "audio_url": "https://drive.google.com/file/d/1I7lIm17illlnT4_mJ98A2SIBSzQ3XkMq/view",
         "voice_config": {
           "languageCode": "en-US",
           "name": "en-US-Wavenet-D",
           "folderId": "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw",
           "socialPrefix": "🚀",
           "hookLength": 150
-        }
+        },
+        "audio_path": "audio/en-US/ethereum/2025-06-29-pectra-upgrade-impact-analysis.wav",
+        "audio_url": null
       }
     },
     "created_at": "2025-06-29T07:18:44.706Z",
-    "updated_at": "2025-06-29T07:55:48.540Z"
+    "updated_at": "2025-06-29T14:25:51.721Z"
   }
 }

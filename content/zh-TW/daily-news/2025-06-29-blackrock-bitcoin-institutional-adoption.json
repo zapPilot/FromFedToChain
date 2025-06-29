@@ -26,7 +26,6 @@
     "tts": {
       "zh-TW": {
         "status": "pending",
-        "audio_url": null,
         "voice_config": {
           "languageCode": "zh-TW",
           "name": "cmn-TW-Wavenet-A"

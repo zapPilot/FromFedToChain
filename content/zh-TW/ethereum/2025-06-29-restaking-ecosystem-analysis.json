@@ -25,10 +25,11 @@
     "tts": {
       "zh-TW": {
         "status": "completed",
-        "audio_url": "https://drive.google.com/file/d/1kWir379WVMlgoTIjXYTVQ6WYSax9d_Ml/view"
+        "audio_url": null,
+        "audio_path": "audio/zh-TW/ethereum/2025-06-29-restaking-ecosystem-analysis.wav"
       }
     },
     "created_at": "2025-06-29T10:40:00.000Z",
-    "updated_at": "2025-06-29T07:47:43.136Z"
+    "updated_at": "2025-06-29T14:25:12.612Z"
   }
 }

@@ -25,14 +25,15 @@
     "tts": {
       "zh-TW": {
         "status": "completed",
-        "audio_url": "https://drive.google.com/file/d/1-AfP1rxHtTdUC90A5Ztqdlb3CrtRWRCB/view",
         "voice_config": {
           "languageCode": "zh-TW",
           "name": "cmn-TW-Wavenet-A"
-        }
+        },
+        "audio_path": "audio/zh-TW/daily-news/2025-06-29-korean-crypto-retirement-revolution.wav",
+        "audio_url": null
       }
     },
     "created_at": "2025-06-29T00:00:00Z",
-    "updated_at": "2025-06-29T08:50:11.656Z"
+    "updated_at": "2025-06-29T14:25:15.171Z"
   }
 }
