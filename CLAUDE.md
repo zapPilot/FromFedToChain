@@ -17,9 +17,12 @@ This file contains important information for Claude Code to work effectively wit
 ### Scripts Organization
 ```
 scripts/
-├── tts.js       # TTS processing & Google Drive upload
-├── review.js    # Content review & preview  
-└── utils/       # Future utility functions
+├── tts-multi.js         # Multi-language TTS processing & Google Drive upload
+├── review.js            # Content review & preview
+├── translate.js         # Single file translation
+├── workflow-translate.js # Translation workflow management
+└── config/
+    └── languages.js     # Shared language/TTS configuration
 ```
 
 ### Important Commands
@@ -30,9 +33,50 @@ claude daily-content [--category daily-news|ethereum|macro]
 # Review generated content
 npm run review
 
+# Translation workflow
+npm run translate list                    # Show files ready for translation
+npm run translate translate <file_id>    # Translate single file
+npm run translate all --target=en        # Translate all ready files
+
 # Process TTS for pending content
 npm run tts
 ```
+
+### Claude Code Custom Commands
+
+#### Translation Commands
+Use these commands to manage translation workflow via Claude Code:
+
+```bash
+# Show translation status and available files
+claude translate-status
+
+# Translate specific file to English (default)
+claude translate <file_id>
+
+# Translate to specific language
+claude translate <file_id> --target=ja-JP
+
+# Translate all ready files to English
+claude translate-all
+
+# Translate all ready files to specific language  
+claude translate-all --target=ja-JP
+
+# Show available target languages
+claude translate-languages
+```
+
+**Supported Languages:**
+- `en-US`: English (United States)
+- `ja-JP`: Japanese
+- `zh-TW`: Traditional Chinese (source language)
+
+**Translation Process:**
+1. Source content must be reviewed first (`npm run review`)
+2. Uses Claude Code or Gemini CLI for AI translation
+3. Preserves conversational style and crypto/finance terminology
+4. Creates structured JSON files ready for TTS processing
 
 ### Authentication
 - Uses `./service-account.json` for Google Cloud authentication

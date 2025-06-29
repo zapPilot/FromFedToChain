@@ -17,7 +17,9 @@
     "translation_status": {
       "source_language": "zh-TW",
       "source_reviewed": true,
-      "translated_to": [],
+      "translated_to": [
+        "en-US"
+      ],
       "rejection": {
         "rejected": true,
         "reason": "looks like advertising for unichain. It would be fine if you introduce its technology and make it knowledgeable.",
@@ -30,6 +32,6 @@
         "audio_url": "https://drive.google.com/file/d/1JV36JKAw9GXyFrJIDxVfFgsiRcS6vJk0/view"
       }
     },
-    "updated_at": "2025-06-29T01:12:03.397Z"
+    "updated_at": "2025-06-29T07:19:38.431Z"
   }
 }

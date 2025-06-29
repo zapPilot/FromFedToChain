@@ -17,7 +17,9 @@
     "translation_status": {
       "source_language": "zh-TW",
       "source_reviewed": true,
-      "translated_to": [],
+      "translated_to": [
+        "en-US"
+      ],
       "rejection": {
         "rejected": true,
         "reason": "有點普通，感覺我沒學到什麼東西",
@@ -36,6 +38,6 @@
       }
     },
     "created_at": "2025-06-29T00:00:00Z",
-    "updated_at": "2025-06-29T00:00:00Z"
+    "updated_at": "2025-06-29T07:17:50.650Z"
   }
 }

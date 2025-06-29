@@ -1,0 +1,42 @@
+{
+  "id": "2024-12-29-fed-rate-cut-crypto-impact",
+  "date": "2024-12-29",
+  "category": "daily-news",
+  "references": [
+    "CNBC - Bitcoin rises to new record above $107,000 ahead of this week's Fed decision",
+    "Reuters - Crypto market eyes interest rates and expected bitcoin ETFs in 2024",
+    "Crypto Briefing - Fed cuts rates by 25 basis points as crypto market extends losses",
+    "Mudrex Learn - Dec 19 2024 Fed Rate Cut: What To Expect For Crypto"
+  ],
+  "languages": {
+    "en-US": {
+      "title": "The Fed Cut Rates, So Why Did Your Crypto Investments Drop Instead?",
+      "content": "Have you ever wondered why the seemingly good news of the Fed cutting rates actually turned your Bitcoin investment account red?\n\nOn December 18th, the U.S. Federal Reserve announced a 25 basis point rate cut, lowering the benchmark rate to between 4.25% and 4.5%. This was the third consecutive rate cut this year and the lowest level since December 2022. Logically, rate cuts should make money cheaper and encourage investors to put more money into riskier assets like cryptocurrencies.\n\nBut reality slapped us in the face. Bitcoin dropped 4% after the Fed's announcement, while Ethereum and Solana fell even more sharply, dropping 5% and 6% respectively. Within 24 hours, the entire cryptocurrency market saw $675 million in liquidations, with both Bitcoin and Ethereum long positions exceeding $100 million each in liquidations.\n\nWhat's really going on here?\n\nThe market had already priced in expectations for this rate cut. What really made investors nervous was the message Fed Chair Powell revealed during the press conference: there might only be two rate cuts in 2025, not the multiple cuts previously expected.\n\nImagine you thought there would be more rate cut opportunities next year, then suddenly you're told there will be fewer than expected - how would you react? It's like planning to invest using low-interest loans, then suddenly discovering the loan costs might be higher than you imagined. Of course you'd reconsider your investment plans.\n\nMore importantly, the policy uncertainty surrounding Trump's upcoming presidency is also stirring up the market. His proposed tariff and immigration policies could drive up inflation, making the Fed more cautious about rate cuts. The market is starting to worry that if inflation picks up again, the Fed might have to reconsider its loose monetary policy.\n\nBut looking at it from another angle, this drop might just be a short-term adjustment. Bitcoin's performance this year remains impressive: up 9% in December, up 52% since the U.S. presidential election, and up a whopping 149% for the entire year. More importantly, it hit an all-time high of $107,229 in December.\n\nWhy has Bitcoin performed so well this year? There are three main reasons:\n\nFirst, the launch of Bitcoin spot ETFs brought massive capital inflows to the market. This allows traditional investors to invest in Bitcoin more easily without directly holding cryptocurrency.\n\nSecond, after Trump's victory, he promised to establish a more crypto-friendly regulatory environment and possibly even create a national strategic Bitcoin reserve. These policy expectations fueled the so-called \"Trump trade.\"\n\nFinally, global economic uncertainty has led more people to view Bitcoin as a hedge asset similar to gold. When traditional investments become riskier, some investors start treating Bitcoin as part of their portfolio.\n\nSo what should ordinary investors do now?\n\nFirst, don't be scared by short-term volatility. The cryptocurrency market is inherently highly volatile - a 5% daily drop is normal in this market.\n\nSecond, focus on long-term trends rather than short-term news. Fed policy does affect cryptocurrencies, but it's just one influencing factor. Technology development, regulatory environment, and institutional adoption are equally important.\n\nFinally, remember the importance of diversification. No matter how bullish you are on cryptocurrencies, you shouldn't put all your money into them. A reasonable investment portfolio should include different asset classes like stocks, bonds, and real estate.\n\nThis Fed rate cut reminds us that financial markets are never one-directional. Even good news can produce unexpected results due to market expectations and complex economic factors. The key is to stay rational and not let emotions drive investment decisions.\n\nNext time you hear news about Fed rate cuts, remember to ask yourself: Has the market already priced in this expectation? What other factors might affect investments? This way of thinking will make you a smarter investor, whether you're investing in cryptocurrencies or other assets."
+    }
+  },
+  "metadata": {
+    "translation_status": {
+      "source_language": "zh-TW",
+      "source_reviewed": true,
+      "translated_to": [
+        "en-US"
+      ],
+      "translated_at": "2025-06-29T07:16:38.624Z"
+    },
+    "tts": {
+      "en-US": {
+        "status": "pending",
+        "audio_url": null,
+        "voice_config": {
+          "languageCode": "en-US",
+          "name": "en-US-Wavenet-D",
+          "folderId": "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw",
+          "socialPrefix": "🚀",
+          "hookLength": 150
+        }
+      }
+    },
+    "created_at": "2025-06-29T07:16:38.627Z",
+    "updated_at": "2025-06-29T07:16:38.627Z"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "2025-06-29-dedollarization-brics-crypto",
+  "date": "2025-06-29",
+  "category": "macro",
+  "references": [
+    "https://cryptohayes.medium.com/",
+    "BRICS+ Joint Declarations on Alternative Payment Systems",
+    "IMF Reports on Reserve Currency Diversification",
+    "Federal Reserve Research on Dollar Dominance"
+  ],
+  "languages": {
+    "en-US": {
+      "title": "De-dollarization Accelerates: How BRICS+ is Rewriting Global Trade Rules with Digital Assets",
+      "content": "There's been some recent news that might not have caught much attention, but could change the world's economic landscape: BRICS+ countries are accelerating the establishment of trade settlement systems that don't rely on the US dollar. And cryptocurrencies are playing a key role in this process.\n\nLet me start with a number: currently, over 60% of global trade still uses dollar settlements. But this percentage is rapidly declining. Russia, due to sanctions, has already converted almost all of its trade with China to yuan and ruble settlements. India, when purchasing Russian oil, has also bypassed the dollar system.\n\nWhy is this happening? Because the cost of dollar hegemony is getting increasingly expensive. Every time the US implements financial sanctions, other countries become more aware of how dangerous it is to entrust their fate to someone else's monetary system.\n\nThis is where the opportunity window for digital assets opens up. Traditional de-dollarization faces a problem: alternative fiat currency systems still require complex banking infrastructure. But digital assets are different - they can flow directly between countries without going through traditional banking intermediaries.\n\nWhat's even more interesting is that we're seeing some countries start exploring the concept of \"digital asset baskets.\" Instead of relying on a single currency, they're using a basket of digital assets containing Bitcoin, gold, and major currencies for international settlements. This both avoids dependence on any single country's currency and leverages the technological advantages of digital assets.\n\nFrom a macroeconomic perspective, this trend is irreversible. Although the US is still the world's largest economy, its share of global GDP has already declined from 50% after World War II to around 25% now. The relative decline in economic strength will inevitably be accompanied by a weakening of monetary influence.\n\nWhat does this mean for investors? First, the dollar's long-term trajectory may face structural pressure. Second, assets that can play a role in the new multipolar monetary system - including Bitcoin, gold, and major emerging market currencies - may benefit.\n\nBut note that this process won't happen overnight. The dollar system has been established for over 70 years and has deep network effects and inertia. De-dollarization is more like a gradual process rather than a sudden collapse.\n\nThe key is to understand that we're witnessing a historic transformation: the evolution from a unipolar monetary system to a multipolar monetary system. And in this process, digital assets may become the bridge between the old and new systems."
+    }
+  },
+  "metadata": {
+    "translation_status": {
+      "source_language": "zh-TW",
+      "source_reviewed": true,
+      "translated_to": [
+        "en-US"
+      ],
+      "translated_at": "2025-06-29T07:20:24.134Z"
+    },
+    "tts": {
+      "en-US": {
+        "status": "pending",
+        "audio_url": null,
+        "voice_config": {
+          "languageCode": "en-US",
+          "name": "en-US-Wavenet-D",
+          "folderId": "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw",
+          "socialPrefix": "🚀",
+          "hookLength": 150
+        }
+      }
+    },
+    "created_at": "2025-06-29T07:20:24.136Z",
+    "updated_at": "2025-06-29T07:20:24.136Z"
+  }
+}

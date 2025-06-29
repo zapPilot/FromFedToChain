@@ -6,11 +6,12 @@
   "main": "scripts/tts-multi.js",
   "scripts": {
     "tts": "node scripts/tts-multi.js",
-    "translate": "node scripts/translate.js",
+    "translate": "node scripts/workflow-translate.js",
+    "translate-single": "node scripts/translate.js",
     "social-hook": "node scripts/social-hook.js",
     "review": "node scripts/review.js",
     "social": "node scripts/social.js",
-    "pipeline": "echo 'Multi-language pipeline: claude daily-content → npm run review → claude translate → claude social-hook → npm run tts → npm run social'"
+    "pipeline": "echo 'Multi-language pipeline: claude daily-content → npm run review → npm run translate → claude social-hook → npm run tts → npm run social'"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.0.0",

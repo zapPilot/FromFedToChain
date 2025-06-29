@@ -17,7 +17,9 @@
     "translation_status": {
       "source_language": "zh-TW",
       "source_reviewed": true,
-      "translated_to": [],
+      "translated_to": [
+        "en-US"
+      ],
       "rejection": {
         "rejected": true,
         "reason": " base's failure rate 21% is 2024/08's data: https://www.bitget.com/news/detail/12560604172286 . So the number here is outdated",
@@ -30,6 +32,7 @@
         "audio_url": null
       }
     },
-    "created_at": "2025-06-29T10:35:00.000Z"
+    "created_at": "2025-06-29T10:35:00.000Z",
+    "updated_at": "2025-06-29T07:18:17.219Z"
   }
 }

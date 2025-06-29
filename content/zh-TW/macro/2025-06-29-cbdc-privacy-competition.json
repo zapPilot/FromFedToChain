@@ -18,7 +18,9 @@
     "translation_status": {
       "source_language": "zh-TW",
       "source_reviewed": true,
-      "translated_to": [],
+      "translated_to": [
+        "en-US"
+      ],
       "rejection": {
         "rejected": false,
         "reason": "",
@@ -36,6 +38,6 @@
       }
     },
     "created_at": "2025-06-29T00:00:00Z",
-    "updated_at": "2025-06-29T00:00:00Z"
+    "updated_at": "2025-06-29T07:20:03.001Z"
   }
 }

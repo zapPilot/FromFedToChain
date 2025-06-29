@@ -18,14 +18,15 @@
       "source_language": "zh-TW",
       "source_reviewed": true,
       "translated_to": [
-        "en"
+        "en",
+        "en-US"
       ],
-"rejection": {
-  "rejected": false,
-  "reason": "",
-  "reviewer": "",
-  "timestamp": ""
-}
+      "rejection": {
+        "rejected": false,
+        "reason": "",
+        "reviewer": "",
+        "timestamp": ""
+      }
     },
     "tts": {
       "zh-TW": {
@@ -38,6 +39,6 @@
       }
     },
     "created_at": "2025-06-28T00:00:00Z",
-    "updated_at": "2025-06-28T23:52:04.210Z"
+    "updated_at": "2025-06-29T07:17:14.486Z"
   }
 }

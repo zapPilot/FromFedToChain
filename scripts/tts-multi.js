@@ -6,28 +6,10 @@ import { createReadStream } from "fs";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import { google } from "googleapis";
 import chalk from "chalk";
-
-// Voice configurations for different languages
-const VOICE_CONFIG = {
-  'zh-TW': {
-    languageCode: "zh-TW",
-    name: "cmn-TW-Wavenet-B",
-    folderId: "14AhPDY0WCrL6G_W6ZZ6cfR01znf0WLKF"
-  },
-  'en-US': {
-    languageCode: "en-US", 
-    name: "en-US-Wavenet-D",
-    folderId: "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw"
-  },
-  'ja-JP': {
-    languageCode: "ja-JP",
-    name: "ja-JP-Wavenet-C",
-    folderId: "1KJ1WHnnFtsafzsrWuK6S3S8Atym5lVDs"
-  }
-};
+import { VOICE_CONFIG, PATHS } from '../config/languages.js';
 
 async function findPendingContent() {
-  const contentDir = './content';
+  const contentDir = PATHS.CONTENT_ROOT;
   const pendingFiles = [];
   
   async function scanDirectory(dir) {
@@ -88,7 +70,7 @@ async function updateTTSStatus(filePath, language, audioUrl) {
 
 function getContentForTTS(content, language) {
   // For English, if it has social format, use just the content part
-  if (language === 'en' && content.includes('🚀')) {
+  if (language === 'en-US' && content.includes('🚀')) {
     // Extract content after social hook
     const parts = content.split('\n\n');
     if (parts.length > 1) {
@@ -104,7 +86,7 @@ async function main() {
     console.log(chalk.gray('='.repeat(50)));
     
     // Setup Google Cloud Authentication
-    const credsPath = './service-account.json';
+    const credsPath = PATHS.SERVICE_ACCOUNT;
     process.env.GOOGLE_APPLICATION_CREDENTIALS = credsPath;
     
     // Initialize clients

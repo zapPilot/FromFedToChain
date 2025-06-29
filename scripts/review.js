@@ -4,11 +4,11 @@ import fs from "fs/promises";
 import path from "path";
 import chalk from "chalk";
 import readline from "readline";
+import { LANGUAGES, CATEGORIES, PATHS } from '../config/languages.js';
 
 // --- Constants ---
-const LANG = 'zh-TW';
-const CATEGORIES = ['daily-news', 'ethereum', 'macro'];
-const CONTENT_ROOT = './content/zh-TW';
+const LANG = LANGUAGES.PRIMARY;
+const CONTENT_ROOT = path.join(PATHS.CONTENT_ROOT, LANG);
 
 // --- Utility Functions ---
 /**
