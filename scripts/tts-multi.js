@@ -9,6 +9,47 @@ import chalk from "chalk";
 import cliProgress from "cli-progress";
 import { VOICE_CONFIG, PATHS } from '../config/languages.js';
 
+// Upload records file to track uploaded files and prevent duplicates
+const UPLOAD_RECORDS_FILE = './upload-records.json';
+
+async function loadUploadRecords() {
+  try {
+    const content = await fs.readFile(UPLOAD_RECORDS_FILE, 'utf-8');
+    return JSON.parse(content);
+  } catch (error) {
+    // File doesn't exist or is invalid, return empty records
+    return {};
+  }
+}
+
+async function saveUploadRecords(records) {
+  await fs.writeFile(UPLOAD_RECORDS_FILE, JSON.stringify(records, null, 2));
+}
+
+function generateFileHash(fileId, language, content) {
+  // Create a simple hash based on content length and first/last chars
+  const start = content.substring(0, 50);
+  const end = content.substring(content.length - 50);
+  return `${fileId}_${language}_${content.length}_${Buffer.from(start + end).toString('base64').substring(0, 10)}`;
+}
+
+async function isAlreadyUploaded(fileId, language, content, uploadRecords) {
+  const hash = generateFileHash(fileId, language, content);
+  return uploadRecords[hash] || null;
+}
+
+async function recordUpload(fileId, language, content, driveUrl, uploadRecords) {
+  const hash = generateFileHash(fileId, language, content);
+  uploadRecords[hash] = {
+    fileId,
+    language,
+    driveUrl,
+    uploadedAt: new Date().toISOString(),
+    contentLength: content.length
+  };
+  await saveUploadRecords(uploadRecords);
+}
+
 async function findPendingContent() {
   const contentDir = PATHS.CONTENT_ROOT;
   const pendingFiles = [];
@@ -31,7 +72,13 @@ async function findPendingContent() {
             // Check each language for pending TTS
             for (const [lang, langData] of Object.entries(data.languages)) {
               const ttsStatus = data.metadata.tts[lang];
-              if (ttsStatus && ttsStatus.status === 'pending') {
+              const translationStatus = data.metadata.translation_status;
+              
+              // Safe checking for rejection field (might not exist in older files)
+              const isRejected = translationStatus?.rejection?.rejected === true;
+              const isReviewed = translationStatus?.source_reviewed === true;
+              
+              if (ttsStatus && ttsStatus.status === 'pending' && !isRejected && isReviewed) {
                 pendingFiles.push({
                   path: fullPath,
                   language: lang,
@@ -44,7 +91,7 @@ async function findPendingContent() {
             }
           }
         } catch (error) {
-          console.log(chalk.yellow(`⚠️  Warning: Could not parse JSON file ${fullPath}`));
+          console.log(chalk.yellow(`⚠️  Warning: Could not parse JSON file ${fullPath}: ${error.message}`));
         }
       }
     }
@@ -85,6 +132,11 @@ async function main() {
   try {
     console.log(chalk.blue.bold('🎙️ Multi-Language TTS Pipeline'));
     console.log(chalk.gray('='.repeat(50)));
+    
+    // Load upload records to prevent duplicates
+    console.log(chalk.blue('📋 Loading upload records...'));
+    const uploadRecords = await loadUploadRecords();
+    console.log(chalk.gray(`Found ${Object.keys(uploadRecords).length} existing upload records`));
     
     // Setup Google Cloud Authentication
     const credsPath = PATHS.SERVICE_ACCOUNT;
@@ -138,6 +190,18 @@ async function main() {
       // Prepare content for TTS
       const ttsContent = getContentForTTS(file.content, file.language);
       
+      // Check if already uploaded
+      const existingUpload = await isAlreadyUploaded(file.id, file.language, ttsContent, uploadRecords);
+      if (existingUpload) {
+        console.log(chalk.yellow(`  ⏭️  Already uploaded: ${existingUpload.driveUrl}`));
+        console.log(chalk.gray(`  📝 Using existing upload from ${existingUpload.uploadedAt}`));
+        
+        // Update file status with existing URL
+        await updateTTSStatus(file.path, file.language, existingUpload.driveUrl);
+        console.log(chalk.gray(`  📝 Updated status in: ${path.basename(file.path)}`));
+        continue;
+      }
+      
       console.log(chalk.gray(`  📢 Generating speech (${voiceConfig.name})...`));
       
       // Generate speech
@@ -173,6 +237,10 @@ async function main() {
         const driveUrl = `https://drive.google.com/file/d/${uploaded.data.id}/view`;
         console.log(chalk.green(`  ✅ Uploaded: ${driveUrl}`));
         
+        // Record the upload to prevent duplicates
+        await recordUpload(file.id, file.language, ttsContent, driveUrl, uploadRecords);
+        console.log(chalk.gray(`  📋 Recorded upload for duplicate prevention`));
+        
         // Update file status
         await updateTTSStatus(file.path, file.language, driveUrl);
         console.log(chalk.gray(`  📝 Updated status in: ${path.basename(file.path)}`));
@@ -201,4 +269,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-export { findPendingContent, updateTTSStatus };
+export { findPendingContent, updateTTSStatus, loadUploadRecords, saveUploadRecords };

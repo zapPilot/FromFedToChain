@@ -56,3 +56,6 @@ test-*.js
 # claude
 usage_tracking2.json
 uploads/
+
+# Upload tracking
+upload-records.json

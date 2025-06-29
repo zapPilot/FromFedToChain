@@ -30,8 +30,8 @@
     },
     "tts": {
       "zh-TW": {
-        "status": "pending",
-        "audio_url": null,
+        "status": "completed",
+        "audio_url": "https://drive.google.com/file/d/1CrnWhwoLvVqu0TnRzXi6Ea-wWOnlvXyK/view",
         "voice_config": {
           "languageCode": "cmn-TW",
           "name": "cmn-TW-Wavenet-A"
@@ -39,6 +39,6 @@
       }
     },
     "created_at": "2025-06-29T00:00:00Z",
-    "updated_at": "2025-06-29T07:43:10.160Z"
+    "updated_at": "2025-06-29T07:48:16.161Z"
   }
 }

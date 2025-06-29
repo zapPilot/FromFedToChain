@@ -14,7 +14,31 @@ This file contains important information for Claude Code to work effectively wit
 - **TTS Processing**: Only the `content` field is converted to speech
 - **Location**: `/content/{category}/YYYY-MM-DD-topic-name.json`
 
-### Scripts Organization
+### Project Architecture  
+
+**Simplified Architecture (New - Recommended)**
+```
+lib/
+├── core/                # Core business logic
+│   ├── ContentManager.js    # Content operations & file scanning
+│   ├── ReviewService.js     # Content review workflow
+│   ├── TranslationService.js # Translation logic
+│   └── TTSService.js        # TTS generation & upload
+├── utils/               # Shared utilities
+│   ├── FileUtils.js         # File operations
+│   ├── Logger.js            # Consistent logging  
+│   └── ProgressBar.js       # Progress indicators
+└── ui/
+    └── CLI.js               # Command line interface
+
+cli.js                   # Main CLI entry point
+scripts/
+├── review-simple.js     # Simplified review wrapper
+├── translate-simple.js  # Simplified translation wrapper  
+└── tts-simple.js        # Simplified TTS wrapper
+```
+
+**Legacy Architecture (Complex - Still Available)**
 ```
 scripts/
 ├── tts-multi.js         # Multi-language TTS processing & Google Drive upload
@@ -30,18 +54,23 @@ scripts/
 # Content generation (primary workflow)
 claude daily-content [--category daily-news|ethereum|macro]
 
-# Review generated content
-npm run review
+# Simplified workflow (new architecture)
+npm run review                            # Review generated content
+npm run translate                         # Translate all to ALL languages (en-US, ja-JP)
+npm run translate --target=en-US         # Translate all to English only  
+npm run translate-status                  # Show translation status
+npm run tts                               # Process TTS for all pending content
 
-# Translation workflow
-npm run translate                         # Translate all ready files to ALL languages (en-US, ja-JP)
-npm run translate --target=en-US         # Translate all ready files to English only
-npm run translate --target=ja-JP         # Translate all ready files to Japanese only
-npm run translate list                    # Show files ready for translation
-npm run translate translate <file_id>    # Translate single file
+# Alternative CLI usage
+node cli.js review                        # Same as npm run review
+node cli.js translate --target=ja-JP     # Same as npm run translate --target=ja-JP
+node cli.js tts                           # Same as npm run tts
+node cli.js help                          # Show all available commands
 
-# Process TTS for pending content
-npm run tts
+# Legacy commands (complex architecture - still available)
+npm run legacy-review                     # Old review script
+npm run legacy-translate                  # Old translation workflow  
+npm run legacy-tts                        # Old TTS script
 ```
 
 ### Claude Code Custom Commands
@@ -124,6 +153,7 @@ When testing the pipeline, always run:
 - Focus on real-world relevance of crypto/macro topics
 - TTS voice: Chinese Traditional (cmn-TW-Wavenet-A)
 - No Notion integration (removed legacy code)
+- Upload records tracked locally in `upload-records.json` to prevent Google Drive duplicates
 
 ## Troubleshooting
 

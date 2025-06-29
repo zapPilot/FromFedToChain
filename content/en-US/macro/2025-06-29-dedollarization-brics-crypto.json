@@ -25,8 +25,8 @@
     },
     "tts": {
       "en-US": {
-        "status": "pending",
-        "audio_url": null,
+        "status": "completed",
+        "audio_url": "https://drive.google.com/file/d/1CMMz4tXJlb9sdT3KrQy1FUoWxn3ekRIp/view",
         "voice_config": {
           "languageCode": "en-US",
           "name": "en-US-Wavenet-D",
@@ -37,6 +37,6 @@
       }
     },
     "created_at": "2025-06-29T07:20:24.136Z",
-    "updated_at": "2025-06-29T07:20:24.136Z"
+    "updated_at": "2025-06-29T07:56:41.475Z"
   }
 }

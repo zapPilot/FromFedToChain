@@ -25,8 +25,8 @@
     },
     "tts": {
       "ja-JP": {
-        "status": "pending",
-        "audio_url": null,
+        "status": "completed",
+        "audio_url": "https://drive.google.com/file/d/1Kcsn6vMeWBADlzkG66sNJCIMXzrhwGn1/view",
         "voice_config": {
           "languageCode": "ja-JP",
           "name": "ja-JP-Wavenet-C",
@@ -35,6 +35,6 @@
       }
     },
     "created_at": "2025-06-29T07:43:10.158Z",
-    "updated_at": "2025-06-29T07:43:10.158Z"
+    "updated_at": "2025-06-29T08:04:54.532Z"
   }
 }
