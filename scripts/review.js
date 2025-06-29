@@ -24,13 +24,11 @@ async function findPendingJSONContent() {
           const content = await fs.readFile(fullPath, 'utf-8');
           const data = JSON.parse(content);
           
-          // Check for any language TTS status pending
+          // Check for unreviewed content
           if (
             data.metadata &&
-            data.metadata.tts &&
-            Object.values(data.metadata.tts).some(
-              tts => tts && tts.status === 'pending'
-            )
+            data.metadata.translation_status &&
+            data.metadata.translation_status.source_reviewed === false
           ) {
             pendingFiles.push({
               path: fullPath,
