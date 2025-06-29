@@ -7,6 +7,8 @@
   "scripts": {
     "review": "node scripts/review-simple.js",
     "pipeline": "node scripts/pipeline.js",
+    "pipeline:mock": "node scripts/pipeline.js run --mock",
+    "pipeline:gcp": "node scripts/pipeline.js run --gcp",
     "pipeline:retry": "node scripts/pipeline.js retry",
     "pipeline:status": "node scripts/pipeline.js status",
     "pipeline:reset": "node scripts/pipeline.js reset",
@@ -15,15 +17,16 @@
     "translate-status": "node cli.js translate-status",
     "social-hook": "node scripts/social-hook.js",
     "social": "node scripts/social.js",
+    "audio": "node scripts/audio-manager.js",
     "legacy-review": "node scripts/legacy/review.js",
     "legacy-translate": "node scripts/legacy/workflow-translate.js",
     "legacy-tts": "node scripts/legacy/tts-multi.js"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.0.0",
+    "@google-cloud/translate": "^9.1.0",
     "chalk": "^5.4.1",
-    "cli-progress": "^3.12.0",
-    "googleapis": "^126.0.0"
+    "cli-progress": "^3.12.0"
   },
   "keywords": [
     "tts",

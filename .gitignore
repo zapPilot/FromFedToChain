@@ -20,6 +20,11 @@ gcp-creds.json
 *.wav
 *.m4a
 
+# Audio storage directory (keep structure, ignore files)
+audio/*/
+!audio/
+!audio/.gitkeep
+
 # Temporary files
 /tmp/
 temp/
@@ -56,6 +61,3 @@ test-*.js
 # claude
 usage_tracking2.json
 uploads/
-
-# Upload tracking
-upload-records.json

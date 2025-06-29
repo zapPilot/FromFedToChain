@@ -92,47 +92,7 @@ npm run tts
 
 Content follows a structured JSON schema with language separation:
 
-```json
-{
-  "id": "2025-06-28-crypto-mortgage-breakthrough",
-  "date": "2025-06-28",
-  "category": "daily-news",
-  "references": ["Source 1", "Source 2"],
-  "languages": {
-    "zh-TW": {
-      "title": "用比特幣買房子：加密貨幣房貸的突破與風險", 
-      "content": "純文字內容，無 markdown 格式"
-    },
-    "en": {
-      "title": "Bitcoin Mortgages: The Breakthrough and Risks",
-      "content": "Clean English text content",
-      "social_format": {
-        "hook": "🚀 Attention-grabbing opening...",
-        "full_script": "🚀 Hook + complete content for social media"
-      }
-    }
-  },
-  "metadata": {
-    "translation_status": {
-      "source_language": "zh-TW",
-      "source_reviewed": true,
-      "translated_to": ["en"]
-    },
-    "tts": {
-      "zh-TW": {
-        "status": "completed",
-        "audio_url": "https://drive.google.com/...",
-        "voice_config": {...}
-      },
-      "en": {
-        "status": "pending",
-        "audio_url": null,
-        "voice_config": {...}
-      }
-    }
-  }
-}
-```
+check [./schema.json]
 
 ### Schema Benefits:
 

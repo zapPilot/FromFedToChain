@@ -7,7 +7,7 @@
     "https://www.quicknode.com/guides/ethereum-development/ethereum-upgrades/pectra-upgrade",
     "https://cryptoslate.com/ethereum-pectra-upgrade-is-live-bringing-major-changes-and-concerns/"
   ],
-  "languages": {
+  "language": {
     "en-US": {
       "title": "Two Months After the Pectra Upgrade: The Real Impact of Ethereum's Wallet Revolution",
       "content": "Friends, today let's review a major upgrade that changed the game for Ethereum: Pectra. This upgrade went live in early May and has now been running for over two months, so it's time to see what substantial changes it has actually brought.\n\nFirst, let's talk about the most direct change: your Ethereum wallet got smarter. Through the EIP-7702 technical improvement, regular wallets can now work like smart contracts. What does this mean? Imagine before, when you wanted to trade on DeFi, you had to first approve tokens, then execute the transaction - two separate steps with separate fees. Now you can complete both actions in one go, not only saving time but also reducing gas fees.\n\nEven more interesting is the \"sponsored gas fees\" feature. Previously, if you didn't have ETH in your wallet, you couldn't do anything. Now certain dApps can pay gas fees for you, and you only need to use the tokens you have on hand. It's like going from \"must bring cash\" to \"can use credit card\" - a real user experience upgrade.\n\nFor whales and institutions, Pectra solved a long-standing problem: staking efficiency. Previously, large stakers needed to run hundreds or thousands of 32 ETH validator nodes, which was complex and inefficient to manage. Now through EIP-7251, they can consolidate up to 2048 ETH into a single validator node, greatly simplifying operations.\n\nThe deeper significance of this change is that it makes Ethereum's security more robust. When large institutions can participate in staking more efficiently, the entire network's security is strengthened. At the same time, staking service providers can offer better yields, and regular users ultimately benefit too.\n\nFrom the data perspective, in the two months since the upgrade, Layer 2 transaction volume has continued to maintain rapid growth. Although Pectra mainly improved the mainnet experience, it laid a more solid foundation for the entire ecosystem.\n\nThis upgrade truly embodies Ethereum's evolution logic: it's not technology for technology's sake, but to make blockchain truly user-friendly. From complex multi-step operations to one-click completion, from high-barrier staking to more democratized participation, Pectra is transforming Ethereum from a \"geek tool\" into a \"mass platform.\"\n\nThis infrastructure improvement has prepared the ground for the next wave of innovation. When wallets become smarter and operations become simpler, we can expect to see more previously impossible application scenarios emerge."
@@ -15,11 +15,7 @@
   },
   "metadata": {
     "translation_status": {
-      "source_language": "zh-TW",
       "source_reviewed": true,
-      "translated_to": [
-        "en-US"
-      ],
       "translated_at": "2025-06-29T07:18:44.704Z"
     },
     "tts": {

@@ -54,18 +54,18 @@ scripts/
 # Content generation (primary workflow)
 claude daily-content [--category daily-news|ethereum|macro]
 
-# Simplified workflow (new architecture)
+# Unified pipeline (recommended)
 npm run review                            # Review generated content
+npm run pipeline                          # Full pipeline: translate → tts → social (mock translation)
+npm run pipeline:gcp                      # Full pipeline with Google Cloud Translation API
+npm run pipeline:status                   # Show pipeline progress
+npm run pipeline:retry                    # Retry failed tasks
+
+# Individual workflow commands (legacy)
 npm run translate                         # Translate all to ALL languages (en-US, ja-JP)
 npm run translate --target=en-US         # Translate all to English only  
 npm run translate-status                  # Show translation status
 npm run tts                               # Process TTS for all pending content
-
-# Alternative CLI usage
-node cli.js review                        # Same as npm run review
-node cli.js translate --target=ja-JP     # Same as npm run translate --target=ja-JP
-node cli.js tts                           # Same as npm run tts
-node cli.js help                          # Show all available commands
 
 # Legacy commands (complex architecture - still available)
 npm run legacy-review                     # Old review script
@@ -111,7 +111,7 @@ claude translate-languages
 
 ### Authentication
 - Uses `./service-account.json` for Google Cloud authentication
-- Required for both TTS processing and Google Drive upload
+- Required for TTS processing and Translation API (if enabled)
 
 ### Content Categories
 - `daily-news`: Daily crypto/macro news explainers
@@ -133,27 +133,35 @@ claude translate-languages
   "metadata": {
     "category": "daily-news",
     "tts_status": "pending|completed",
-    "audio_url": "Google Drive URL or null"
+    "audio_path": "Local file path or null"
   }
 }
+```
+
+### Audio Management
+```bash
+npm run audio list                        # List all audio files
+npm run audio stats                       # Show storage statistics
+npm run audio list en-US                  # List files for specific language
+npm run audio list en-US daily-news       # List files for language + category
 ```
 
 ### Testing Commands
 When testing the pipeline, always run:
 1. `npm run review` - to preview content
-2. `npm run tts` - to test TTS processing
+2. `npm run pipeline` - to test full pipeline
 
 ### Dependencies
 - `@google-cloud/text-to-speech`: TTS processing
-- `googleapis`: Google Drive upload
+- `@google-cloud/translate`: Translation API (optional)
 - `chalk`: Colorized terminal output
 
 ### Important Notes
 - Content should be in conversational Chinese style
 - Focus on real-world relevance of crypto/macro topics
-- TTS voice: Chinese Traditional (cmn-TW-Wavenet-A)
+- TTS voice: Chinese Traditional (cmn-TW-Wavenet-B)
+- Audio files stored locally in `./audio/` directory
 - No Notion integration (removed legacy code)
-- Upload records tracked locally in `upload-records.json` to prevent Google Drive duplicates
 
 ## Troubleshooting
 

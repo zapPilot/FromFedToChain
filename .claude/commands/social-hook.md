@@ -59,7 +59,7 @@ claude social-hook --file_id 2025-06-28-fed-policy --platform twitter
 ## Generated Format:
 ```json
 {
-  "languages": {
+  "language": {
     "en": {
       "title": "...",
       "content": "...",

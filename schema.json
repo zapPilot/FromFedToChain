@@ -27,7 +27,7 @@
       },
       "description": "Source references (language-agnostic)"
     },
-    "languages": {
+    "language": {
       "type": "object",
       "description": "Language-specific content",
       "patternProperties": {
@@ -97,20 +97,9 @@
           "type": "object",
           "description": "Translation workflow status",
           "properties": {
-            "source_language": {
-              "type": "string",
-              "default": "zh-TW"
-            },
             "source_reviewed": {
               "type": "boolean",
               "default": false
-            },
-            "translated_to": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "List of languages this content has been translated to"
             },
             "rejection": {
               "type": "object",

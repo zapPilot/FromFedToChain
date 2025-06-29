@@ -4,10 +4,16 @@ import { ContentPipeline } from '../lib/workflows/ContentPipeline.js';
 import chalk from 'chalk';
 
 const args = process.argv.slice(2);
-const command = args[0] || 'run';
+const command = args.find(arg => !arg.startsWith('--')) || 'run';
 
 async function main() {
-  const pipeline = new ContentPipeline();
+  const useMock = args.includes('--mock');
+  const useGCP = args.includes('--gcp');
+  
+  // Default behavior: use mock unless --gcp is specified
+  const useMockTranslation = useGCP ? false : (useMock ? true : true);
+  
+  const pipeline = new ContentPipeline({ useMockTranslation });
   
   try {
     switch (command) {
@@ -31,13 +37,15 @@ async function main() {
       default:
         console.log(chalk.blue.bold('📋 Content Pipeline Commands:'));
         console.log(chalk.gray('='.repeat(40)));
-        console.log(chalk.cyan('npm run pipeline') + chalk.gray(' - Run full pipeline (translate → tts → social)'));
-        console.log(chalk.cyan('npm run pipeline retry') + chalk.gray(' - Retry all failed tasks'));
-        console.log(chalk.cyan('npm run pipeline retry translate') + chalk.gray(' - Retry specific step'));
-        console.log(chalk.cyan('npm run pipeline status') + chalk.gray(' - Show pipeline status'));
-        console.log(chalk.cyan('npm run pipeline reset') + chalk.gray(' - Reset pipeline state'));
+        console.log(chalk.cyan('npm run pipeline') + chalk.gray(' - Run full pipeline (mock translation by default)'));
+        console.log(chalk.cyan('npm run pipeline:mock') + chalk.gray(' - Run with mock translation (for testing)'));
+        console.log(chalk.cyan('npm run pipeline:gcp') + chalk.gray(' - Run with Google Cloud Translation API'));
+        console.log(chalk.cyan('npm run pipeline:retry') + chalk.gray(' - Retry all failed tasks'));
+        console.log(chalk.cyan('npm run pipeline:status') + chalk.gray(' - Show pipeline status'));
+        console.log(chalk.cyan('npm run pipeline:reset') + chalk.gray(' - Reset pipeline state'));
         console.log('');
         console.log(chalk.yellow('💡 Use Ctrl+C to safely interrupt and resume later'));
+        console.log(chalk.yellow('💡 Enable GCP Translation API to use real translation'));
         break;
     }
   } catch (error) {
