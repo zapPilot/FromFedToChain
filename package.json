@@ -6,15 +6,18 @@
   "main": "scripts/tts-multi.js",
   "scripts": {
     "review": "node scripts/review-simple.js",
+    "pipeline": "node scripts/pipeline.js",
+    "pipeline:retry": "node scripts/pipeline.js retry",
+    "pipeline:status": "node scripts/pipeline.js status",
+    "pipeline:reset": "node scripts/pipeline.js reset",
     "translate": "node scripts/translate-simple.js",
     "tts": "node scripts/tts-simple.js",
     "translate-status": "node cli.js translate-status",
     "social-hook": "node scripts/social-hook.js",
     "social": "node scripts/social.js",
-    "pipeline": "echo 'Simplified pipeline: npm run review → npm run translate → npm run tts'",
-    "legacy-review": "node scripts/review.js",
-    "legacy-translate": "node scripts/workflow-translate.js",
-    "legacy-tts": "node scripts/tts-multi.js"
+    "legacy-review": "node scripts/legacy/review.js",
+    "legacy-translate": "node scripts/legacy/workflow-translate.js",
+    "legacy-tts": "node scripts/legacy/tts-multi.js"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.0.0",

@@ -1,0 +1,65 @@
+{
+  "currentStep": "completed",
+  "completedFiles": {
+    "tts": {
+      "2025-06-29-korean-crypto-retirement-revolution": {
+        "completedAt": "2025-06-29T08:39:15.304Z",
+        "driveUrl": "https://drive.google.com/file/d/1-AfP1rxHtTdUC90A5Ztqdlb3CrtRWRCB/view",
+        "category": "daily-news"
+      }
+    }
+  },
+  "failedFiles": {
+    "translation": {
+      "2025-06-28-crypto-mortgage-breakthrough": {
+        "failedAt": "2025-06-29T08:38:58.857Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-blackrock-bitcoin-empire-building": {
+        "failedAt": "2025-06-29T08:38:58.858Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-hong-kong-digital-wallet-future": {
+        "failedAt": "2025-06-29T08:38:58.858Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-korean-crypto-retirement-revolution": {
+        "failedAt": "2025-06-29T08:38:58.858Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-pectra-upgrade-impact-analysis": {
+        "failedAt": "2025-06-29T08:38:58.858Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-restaking-ecosystem-analysis": {
+        "failedAt": "2025-06-29T08:38:58.858Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-cbdc-privacy-competition": {
+        "failedAt": "2025-06-29T08:38:58.858Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-dedollarization-brics-crypto": {
+        "failedAt": "2025-06-29T08:38:58.859Z",
+        "error": "this.translationService.translateContent is not a function"
+      },
+      "2025-06-29-sovereign-debt-hard-assets": {
+        "failedAt": "2025-06-29T08:38:58.859Z",
+        "error": "this.translationService.translateContent is not a function"
+      }
+    },
+    "tts": {
+      "2025-06-29-hong-kong-digital-wallet-future": {
+        "failedAt": "2025-06-29T08:39:02.519Z",
+        "error": "3 INVALID_ARGUMENT: Either `input.text` or `input.ssml` is longer than the limit of 5000 bytes. This limit is different from quotas. To fix, reduce the byte length of the characters in this request, or consider using the Long Audio API: https://cloud.google.com/text-to-speech/docs/create-audio-text-long-audio-synthesis."
+      },
+      "2025-06-29-blackrock-bitcoin-empire-building": {
+        "failedAt": "2025-06-29T08:39:25.251Z",
+        "error": "13 INTERNAL: Internal error encountered."
+      }
+    }
+  },
+  "lastRun": "2025-06-29T08:39:25.253Z",
+  "totalFiles": 3,
+  "processedFiles": 1
+}

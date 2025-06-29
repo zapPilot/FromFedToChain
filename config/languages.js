@@ -14,19 +14,31 @@ export const VOICE_CONFIG = {
   'zh-TW': {
     languageCode: "zh-TW",
     name: "cmn-TW-Wavenet-B",
-    folderId: "14AhPDY0WCrL6G_W6ZZ6cfR01znf0WLKF"
+    folders: {
+      'daily-news': "1qciwI3wj8YGNXUiwGhDwKOIAwDXdZzlI",
+      'macro': "1-BUjF3J-ENPQRnPHVByZQ7zOy1OQxXCa",
+      "ethereum": "1zjyELljkjx0yX2EmFsdw4lcPXOQnS0Gw"
+    }
   },
   'en-US': {
     languageCode: "en-US",
     name: "en-US-Wavenet-D",
-    folderId: "1MkzZPY2iu09smRAwzGwXXG5_-hUDCVLw",
+    folders: {
+      'daily-news': "1DCgCiCm0iyUBwZMtYAqADsG1oT3W2Fei",
+      'macro': "1WKFlumPWJ92brvfCkztO7PGw_vEh6f1X",
+      "ethereum": "1LyR50isTCTf2NoXz_2FWZTYYindvgaeu"
+    },
     socialPrefix: "🚀",
     hookLength: 150
   },
   'ja-JP': {
     languageCode: "ja-JP",
     name: "ja-JP-Wavenet-C",
-    folderId: "1KJ1WHnnFtsafzsrWuK6S3S8Atym5lVDs"
+    folders: {
+      'daily-news': "1OSUk7dKM17npIQSXXoKEvgNwDBq9kMoC",
+      'macro': "1B1iqOWcaAEXP7gK6iqjri604XXXPlM64",
+      "ethereum": "1lv4uxITf-UFnR5GQTz0dabonNKJR9ykX"
+    }
   }
 };
 
