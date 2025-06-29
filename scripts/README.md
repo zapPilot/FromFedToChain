@@ -1,68 +1,69 @@
 # Scripts
 
-  📋 Content Schema & Structure:
+📋 Content Schema & Structure:
 
-  - JSON Schema: Comprehensive
+- JSON Schema: Comprehensive
   multi-language format with
   validation
-  - Language-First Folders:
+- Language-First Folders:
   content/zh-TW/ and content/en/
   structure
-  - Future-Ready: Easy to add new
+- Future-Ready: Easy to add new
   languages (ja, ko, es, etc.)
 
-  🔄 Complete Workflow:
+🔄 Complete Workflow:
 
-  1. Generate (zh-TW) → claude 
-  daily-content
-  2. Review → npm run review
-  3. Translate → claude translate 
-  --file_id=... or npm run translate
-  4. Social Format → npm run social 
-  --platform=twitter
-  5. Multi-TTS → npm run tts
-  (processes all languages)
+1. Generate (zh-TW) → claude
+   daily-content
+2. Review → npm run review
+3. Translate → claude translate
+   --file_id=... or npm run translate
+4. Social Format → npm run social
+   --platform=twitter
+5. Multi-TTS → npm run tts
+   (processes all languages)
 
-  🛠️ Key Features:
+🛠️ Key Features:
 
-  - Translation Workflow: zh-TW
+- Translation Workflow: zh-TW
   (reviewed) → English with social
   formatting
-  - Social Media Ready: Hook + full
+- Social Media Ready: Hook + full
   script for
   Twitter/LinkedIn/Facebook
-  - Multi-Language TTS: Separate
+- Multi-Language TTS: Separate
   voices and Drive folders per
   language
-  - Status Tracking: Translation and
+- Status Tracking: Translation and
   TTS status per language
-  - Clean Separation:
+- Clean Separation:
   References/dates excluded from TTS
 
-  🎯 Translation Integration:
+🎯 Translation Integration:
 
-  Note: The translate script
-  currently uses placeholder content.
-   To integrate real translation:
+Note: The translate script
+currently uses placeholder content.
+To integrate real translation:
 
-  1. Claude Code CLI: Use Claude's
-  chat tools within the translate
-  script
-  2. Gemini CLI: Call gemini-cli from
+1. Claude Code CLI: Use Claude's
+   chat tools within the translate
+   script
+2. Gemini CLI: Call gemini-cli from
    the translate script
-  3. API Integration: Direct API
-  calls to Claude/Gemini
+3. API Integration: Direct API
+   calls to Claude/Gemini
 
-  🚀 Ready for Production:
+🚀 Ready for Production:
 
-  - Schema validation ensures
+- Schema validation ensures
   consistent format
-  - Multi-language TTS with proper
+- Multi-language TTS with proper
   voice configs
-  - Social media optimization
+- Social media optimization
   built-in
-  - Scalable to additional languages
-  - Complete workflow automation
+- Scalable to additional languages
+- Complete workflow automation
+
 ## Structure
 
 ```
@@ -76,10 +77,10 @@ scripts/
 └── utils/             # Utility functions (future)
 ```
 
-
 ## Scripts Overview
 
 ### `tts-multi.js`
+
 - Scans for JSON files with pending TTS status across all languages
 - Supports multiple languages (zh-TW, en-US, ja-JP) with language-specific voices
 - Uploads MP3s to language-specific Google Drive folders
@@ -87,6 +88,7 @@ scripts/
 - Intelligently processes content (e.g., strips social hooks from English TTS)
 
 ### `review.js`
+
 - Displays formatted preview of pending JSON content
 - Shows title, date, category, references
 - Highlights content that will be processed by TTS

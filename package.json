@@ -20,13 +20,15 @@
     "audio": "node scripts/audio-manager.js",
     "legacy-review": "node scripts/legacy/review.js",
     "legacy-translate": "node scripts/legacy/workflow-translate.js",
-    "legacy-tts": "node scripts/legacy/tts-multi.js"
+    "legacy-tts": "node scripts/legacy/tts-multi.js",
+    "format": "prettier --write . --ignore-path .prettierignore"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.0.0",
     "@google-cloud/translate": "^9.1.0",
     "chalk": "^5.4.1",
-    "cli-progress": "^3.12.0"
+    "cli-progress": "^3.12.0",
+    "prettier": "^3.6.2"
   },
   "keywords": [
     "tts",

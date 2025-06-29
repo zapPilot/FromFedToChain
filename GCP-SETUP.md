@@ -36,16 +36,19 @@ npm run pipeline:gcp
 ### Language Support:
 
 Currently configured languages:
+
 - **Source**: Traditional Chinese (`zh-TW`)
 - **Targets**: English (`en`), Japanese (`ja`)
 
 ### API Costs:
 
 Google Cloud Translation pricing (as of 2024):
+
 - **First 500,000 characters/month**: Free
 - **Additional characters**: $20 per 1M characters
 
 For typical crypto content (~5000 characters per article):
+
 - **Free tier**: ~100 articles/month
 - **Paid usage**: ~$0.10 per article
 
@@ -65,6 +68,7 @@ For typical crypto content (~5000 characters per article):
 ✅ **Reliable**: Built-in retry logic and error handling
 
 Mock translation is useful for:
+
 - Testing pipeline functionality
 - Development without API costs
 - When translation quality is not important

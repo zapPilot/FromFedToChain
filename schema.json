@@ -67,7 +67,7 @@
                       "description": "Twitter-optimized hook"
                     },
                     "linkedin": {
-                      "type": "string", 
+                      "type": "string",
                       "description": "LinkedIn-optimized hook"
                     },
                     "facebook": {
@@ -149,7 +149,7 @@
           "format": "date-time"
         },
         "updated_at": {
-          "type": "string", 
+          "type": "string",
           "format": "date-time"
         }
       }

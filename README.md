@@ -14,7 +14,7 @@ claude daily-content
 # Review pending content
 npm run review
 
-# Process TTS for pending content  
+# Process TTS for pending content
 npm run tts
 ```
 
@@ -47,42 +47,52 @@ FromFedToChain/
 ## 🔄 Multi-Language Content Pipeline
 
 ### 1. Content Generation (Traditional Chinese)
+
 ```bash
 claude daily-content [--category daily-news|ethereum|macro]
 ```
+
 - Searches current crypto/macro news
 - Generates conversational Traditional Chinese content
 - Saves to `content/zh-TW/{category}/` as structured JSON
 
-### 2. Content Review 
+### 2. Content Review
+
 ```bash
 npm run review
 ```
+
 - Preview generated content before translation
 - Edit JSON files directly if needed
 - Mark as reviewed for translation
 
 ### 3. Translation to English
+
 ```bash
 claude translate --file_id YYYY-MM-DD-topic-name
 npm run translate YYYY-MM-DD-topic-name
 ```
+
 - Translates reviewed zh-TW content to English
 - Creates social media format (hook + full script)
 - Saves to `content/en/{category}/`
 
 ### 4. Social Media Formatting
+
 ```bash
 npm run social YYYY-MM-DD-topic-name --platform=twitter
 ```
+
 - Formats English content for social platforms
 - Supports Twitter, LinkedIn, Facebook
 - Creates optimized hooks and threads
 
 ### 5. Multi-Language TTS Processing
+
 ```bash
 npm run tts
 ```
+
 - Processes pending TTS for all languages
 - Chinese: Traditional voice (cmn-TW-Wavenet-B)
 - English: US voice (en-US-Wavenet-D)
@@ -132,7 +142,7 @@ Both TTS and upload use `./service-account.json` for Google Cloud authentication
 ```bash
 npm run review     # Preview pending content (zh-TW)
 npm run translate  # Translate content zh-TW → en
-npm run tts        # Multi-language TTS processing  
+npm run tts        # Multi-language TTS processing
 npm run social     # Format English content for social media
 npm run pipeline   # Show full pipeline help
 ```
@@ -143,7 +153,7 @@ npm run pipeline   # Show full pipeline help
 # Review generated Chinese content
 npm run review
 
-# Translate specific content to English  
+# Translate specific content to English
 npm run translate 2025-06-28-topic-name
 
 # Generate social media posts
@@ -156,12 +166,13 @@ npm run tts
 ## 🗂️ Content Categories
 
 - **`daily-news`**: Daily crypto/macro news explainers
-- **`ethereum`**: Ethereum ecosystem focused content  
+- **`ethereum`**: Ethereum ecosystem focused content
 - **`macro`**: Macro economics and policy analysis
 
 ## 🔗 Audio Output
 
 Processed audio files are:
+
 - Uploaded to Google Drive automatically
 - Chinese Traditional voice (cmn-TW-Wavenet-A)
 - MP3 format for broad compatibility
@@ -169,4 +180,4 @@ Processed audio files are:
 
 ---
 
-*This pipeline transforms complex financial news into accessible Chinese audio content.*
+_This pipeline transforms complex financial news into accessible Chinese audio content._

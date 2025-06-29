@@ -20,7 +20,7 @@ npm run pipeline
 ✅ **Progress Tracking**: Real-time progress bars and status  
 ✅ **State Management**: Tracks completed/failed files, saves progress  
 ✅ **Concurrent Processing**: Up to 3 files processed simultaneously  
-✅ **Error Recovery**: Failed files don't stop the pipeline  
+✅ **Error Recovery**: Failed files don't stop the pipeline
 
 ### Pipeline Commands
 
@@ -83,6 +83,7 @@ scripts/
 ### State Management
 
 Pipeline state is saved in `pipeline-state.json`:
+
 - Current step (translate/tts/social)
 - Completed files per step
 - Failed files with error details
@@ -98,13 +99,15 @@ Pipeline state is saved in `pipeline-state.json`:
 ### Category-Aware Upload
 
 TTS files are uploaded to category-specific folders:
+
 - `daily-news` → Voice config folders[daily-news]
-- `ethereum` → Voice config folders[ethereum]  
+- `ethereum` → Voice config folders[ethereum]
 - `macro` → Voice config folders[macro]
 
 ### Migration from Legacy
 
 Legacy scripts still available as:
+
 - `npm run legacy-review`
 - `npm run legacy-translate`
 - `npm run legacy-tts`

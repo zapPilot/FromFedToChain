@@ -3,6 +3,7 @@
 **Name:** `translate`  
 **Description:** Translate reviewed Traditional Chinese content to English with social media formatting
 **Parameters:**
+
 - `file_id` (required): Content ID to translate (e.g., "2025-06-28-crypto-mortgage-breakthrough")
 - `target_lang` (optional): Target language (default: "en")
 
@@ -24,16 +25,19 @@ claude translate --file_id 2025-06-28-fed-policy --target_lang en
 ## Translation Guidelines:
 
 ### Style Requirements:
+
 - **Conversational**: Maintain friendly, accessible tone
 - **Natural**: Sound like native English speaker
 - **Engaging**: Keep the storytelling approach
 - **Educational**: Preserve explanatory structure
 
 ### Social Media Format:
+
 - **Hook**: 1-2 sentences to grab attention
 - **Full Script**: Complete translated content for posting
 
 ### Content Structure:
+
 ```
 🚀 [HOOK]
 Compelling opening that makes people want to read more...
@@ -45,11 +49,13 @@ Complete translated explanation maintaining the original structure and insights.
 ## File Processing:
 
 ### Input Requirements:
+
 - Source file must exist in `content/zh-TW/{category}/`
 - `source_reviewed: true` in metadata
 - Valid JSON schema format
 
 ### Output:
+
 - Creates `content/en/{category}/{file_id}.json`
 - Updates source file metadata with translation status
 - Includes social media formatting
@@ -72,4 +78,4 @@ Complete translated explanation maintaining the original structure and insights.
 
 ---
 
-*This command handles the complete zh-TW → en translation workflow with social media optimization.*
+_This command handles the complete zh-TW → en translation workflow with social media optimization._

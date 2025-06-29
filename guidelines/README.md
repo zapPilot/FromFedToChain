@@ -16,8 +16,9 @@ guidelines/
 ## 🎯 Purpose
 
 These guidelines help content creators understand:
+
 - **What topics fit each category**
-- **Target audience for each category** 
+- **Target audience for each category**
 - **Content style and tone expectations**
 - **Research sources and quality standards**
 - **Content structure recommendations**
@@ -25,18 +26,21 @@ These guidelines help content creators understand:
 ## 📋 Category Overview
 
 ### Daily News (`daily-news`)
+
 - **Focus**: Current crypto/macro news affecting daily financial decisions
 - **Style**: Accessible, conversational (得到/樊登讀書會 style)
 - **Length**: 2000-3000 characters
 - **Update Frequency**: Daily/regular
 
-### Ethereum (`ethereum`) 
+### Ethereum (`ethereum`)
+
 - **Focus**: Ethereum ecosystem developments and deep analysis
 - **Style**: Educational but accessible, more technical than daily-news
 - **Length**: 3000-4000 characters
 - **Update Frequency**: Weekly/as major developments occur
 
 ### Macro (`macro`)
+
 - **Focus**: Macroeconomic trends intersecting with cryptocurrency
 - **Style**: Sophisticated economic analysis, policy-focused
 - **Length**: 3500-4500 characters
@@ -63,18 +67,21 @@ These guidelines are referenced during:
 ## 📝 How to Use
 
 ### For Content Creators:
+
 1. **Read the relevant category guideline** before starting research
 2. **Use the topic selection criteria** to evaluate potential stories
 3. **Follow the content structure guidelines** for consistent format
 4. **Reference the quality checklist** before finalizing content
 
 ### For Reviewers:
+
 1. **Check against category guidelines** during review process
 2. **Verify topic relevance** using the criteria
 3. **Ensure style consistency** with category expectations
 4. **Use quality checklist** for comprehensive review
 
 ### For Translators:
+
 1. **Understand the category context** to maintain appropriate tone
 2. **Preserve the target audience focus** in translation
 3. **Adapt examples** while maintaining educational value
@@ -82,6 +89,7 @@ These guidelines are referenced during:
 ## 🔄 Guideline Updates
 
 Guidelines should be updated when:
+
 - **Audience feedback** suggests refinement needed
 - **Content performance** indicates category drift
 - **Market evolution** requires topic scope adjustment
@@ -89,4 +97,4 @@ Guidelines should be updated when:
 
 ---
 
-*These guidelines ensure consistent, high-quality content that serves each category's specific audience and purpose.*
+_These guidelines ensure consistent, high-quality content that serves each category's specific audience and purpose._
