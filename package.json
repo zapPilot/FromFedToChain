@@ -4,14 +4,14 @@
   "type": "module",
   "description": "Streamlined content pipeline: Translation → TTS → Social Media Hooks",
   "scripts": {
-    "review": "node scripts/review.js",
-    "pipeline": "node scripts/pipeline.js",
-    "pipeline:gcp": "node scripts/pipeline.js run --gcp",
-    "pipeline:status": "node scripts/pipeline.js status",
-    "pipeline:reset": "node scripts/pipeline.js reset",
-    "reset-file": "node scripts/reset-file.js",
-    "debug-social": "node scripts/debug-social.js",
-    "audio": "node scripts/audio-manager.js",
+    "review": "node src/cli.js review",
+    "pipeline": "node src/cli.js pipeline",
+    "translate": "node src/cli.js translate",
+    "audio": "node src/cli.js audio", 
+    "social": "node src/cli.js social",
+    "publish": "node src/cli.js publish",
+    "analytics": "node src/cli.js analytics",
+    "export-training": "node src/cli.js export-training",
     "test": "node tests/run-tests.js",
     "format": "prettier --write . --ignore-path .prettierignore"
   },
@@ -19,7 +19,7 @@
     "@google-cloud/text-to-speech": "^5.0.0",
     "@google-cloud/translate": "^9.1.0",
     "chalk": "^5.4.1",
-    "cli-progress": "^3.12.0",
+    "playwright": "^1.41.0",
     "prettier": "^3.6.2"
   },
   "keywords": [

@@ -1,0 +1,581 @@
+#!/usr/bin/env node
+
+import fs from "fs/promises";
+import chalk from "chalk";
+import { ContentManager } from "./ContentManager.js";
+import { TranslationService } from "./services/TranslationService.js";
+import { AudioService } from "./services/AudioService.js";
+import { SocialService } from "./services/SocialService.js";
+import { SpotifyUploader } from "./automation/SpotifyUploader.js";
+import { SocialPoster } from "./automation/SocialPoster.js";
+
+const args = process.argv.slice(2);
+const command = args[0];
+
+async function main() {
+  console.log(chalk.blue.bold("🚀 From Fed to Chain - Content Pipeline"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  try {
+    switch (command) {
+      case 'review':
+        await handleReview();
+        break;
+      case 'pipeline':
+        await handlePipeline();
+        break;
+      case 'translate':
+        await handleTranslate();
+        break;
+      case 'audio':
+        await handleAudio();
+        break;
+      case 'social':
+        await handleSocial();
+        break;
+      case 'publish':
+        await handlePublish();
+        break;
+      case 'analytics':
+        await handleAnalytics();
+        break;
+      case 'export-training':
+        await handleExportTraining();
+        break;
+      case 'list':
+        await handleList();
+        break;
+      case 'status':
+        await handleStatus();
+        break;
+      default:
+        showHelp();
+    }
+  } catch (error) {
+    console.error(chalk.red("❌ Error:"), error.message);
+    process.exit(1);
+  }
+}
+
+async function handleReview() {
+  console.log(chalk.blue.bold("📖 Interactive Content Review"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  // Get all content that needs review
+  const contents = await ContentManager.getByStatus('draft');
+  if (contents.length === 0) {
+    console.log(chalk.green("✅ No content pending review"));
+    return;
+  }
+
+  console.log(chalk.blue(`Found ${contents.length} items needing review\n`));
+
+  for (let i = 0; i < contents.length; i++) {
+    const content = contents[i];
+    
+    console.log(chalk.yellow(`📄 Reviewing [${i + 1}/${contents.length}]: ${content.id}`));
+    console.log(chalk.gray("=".repeat(60)));
+    console.log(chalk.cyan(`Title: ${content.source.title}`));
+    console.log(chalk.cyan(`Category: ${content.category} | Date: ${content.date}`));
+    console.log("");
+    console.log(chalk.white("Content:"));
+    console.log(content.source.content);
+    console.log("");
+    
+    // Get user decision
+    let action, feedback;
+    while (true) {
+      console.log(chalk.blue("Decision: [a]ccept, [r]eject, [s]kip, [q]uit"));
+      process.stdout.write("❯ ");
+      
+      try {
+        const input = await getUserInput();
+        const parts = input.trim().split(' ', 2);
+        const decision = parts[0].toLowerCase();
+        feedback = parts.slice(1).join(' ');
+        
+        if (decision === 'a' || decision === 'accept') {
+          action = 'accept';
+          if (!feedback) {
+            process.stdout.write("Feedback (optional): ");
+            feedback = await getUserInput();
+          }
+          break;
+        } else if (decision === 'r' || decision === 'reject') {
+          action = 'reject';
+          if (!feedback) {
+            process.stdout.write("Feedback (required for rejection): ");
+            feedback = await getUserInput();
+          }
+          break;
+        } else if (decision === 's' || decision === 'skip') {
+          console.log(chalk.yellow("⏭️ Skipped\n"));
+          action = null;
+          break;
+        } else if (decision === 'q' || decision === 'quit') {
+          console.log(chalk.gray("Review session ended"));
+          return;
+        } else {
+          console.log(chalk.red("Invalid option. Use: a/accept, r/reject, s/skip, q/quit"));
+          continue;
+        }
+      } catch (error) {
+        console.log(chalk.red(`\n❌ Error getting input: ${error.message}`));
+        return;
+      }
+    }
+
+    // Process decision
+    if (action === 'accept') {
+      try {
+        await ContentManager.addContentFeedback(
+          content.id,
+          'accepted',
+          4,
+          'reviewer_cli',
+          feedback || 'Approved for translation',
+          {}
+        );
+        await ContentManager.updateStatus(content.id, 'reviewed');
+        console.log(chalk.green(`✅ Accepted: ${content.id}`));
+        if (feedback) {
+          console.log(chalk.gray(`📝 Feedback: ${feedback}`));
+        }
+      } catch (error) {
+        console.log(chalk.red(`❌ Failed to accept: ${error.message}`));
+      }
+    } else if (action === 'reject') {
+      try {
+        await ContentManager.addContentFeedback(
+          content.id,
+          'rejected',
+          2,
+          'reviewer_cli',
+          feedback,
+          {}
+        );
+        // Keep as draft for revision
+        console.log(chalk.red(`❌ Rejected: ${content.id}`));
+        console.log(chalk.yellow(`📝 Feedback: ${feedback}`));
+      } catch (error) {
+        console.log(chalk.red(`❌ Failed to reject: ${error.message}`));
+      }
+    }
+    
+    console.log(""); // Add spacing between reviews
+  }
+
+  console.log(chalk.green.bold("🎉 Review session completed!"));
+}
+
+// Helper function to get user input
+function getUserInput() {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Input timeout'));
+    }, 300000); // 5 minute timeout
+
+    process.stdin.once('readable', () => {
+      clearTimeout(timeout);
+      const chunk = process.stdin.read();
+      if (chunk !== null) {
+        resolve(chunk.toString().trim());
+      } else {
+        reject(new Error('No input received'));
+      }
+    });
+
+    process.stdin.once('error', (error) => {
+      clearTimeout(timeout);
+      reject(error);
+    });
+  });
+}
+
+async function handlePipeline() {
+  const id = args[1];
+
+  console.log(chalk.blue.bold("🔄 Running Full Pipeline"));
+  console.log(chalk.gray("Steps: Translate → Audio → Social → Publish"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  if (id) {
+    // Run pipeline for specific content
+    await runPipelineForContent(id);
+  } else {
+    // Run pipeline for all ready content
+    const contents = await ContentManager.getByStatus('reviewed');
+    if (contents.length === 0) {
+      console.log(chalk.yellow("No content ready for pipeline"));
+      console.log(chalk.gray("💡 Use 'npm run review' to approve content first"));
+      return;
+    }
+
+    console.log(chalk.blue(`Processing ${contents.length} content items`));
+    for (const content of contents) {
+      console.log(chalk.cyan(`\n🔄 Processing: ${content.id}`));
+      await runPipelineForContent(content.id);
+    }
+  }
+
+  console.log(chalk.green.bold("\n🎉 Pipeline completed!"));
+}
+
+async function runPipelineForContent(id) {
+  try {
+    // Step 1: Translation
+    console.log(chalk.blue("1️⃣ Translation..."));
+    await TranslationService.translateAll(id);
+
+    // Step 2: Audio
+    console.log(chalk.blue("2️⃣ Audio generation..."));
+    await AudioService.generateAllAudio(id);
+
+    // Step 3: Social hooks
+    console.log(chalk.blue("3️⃣ Social hooks..."));
+    await SocialService.generateAllHooks(id);
+
+    // Step 4: Publish
+    console.log(chalk.blue("4️⃣ Publishing..."));
+    await publishContent(id);
+
+    console.log(chalk.green(`✅ Pipeline completed for: ${id}`));
+
+  } catch (error) {
+    console.error(chalk.red(`❌ Pipeline failed for ${id}: ${error.message}`));
+  }
+}
+
+async function publishContent(id) {
+  const content = await ContentManager.read(id);
+  
+  // Collect audio files for Spotify upload
+  const audioFiles = {};
+  for (const [lang, translation] of Object.entries(content.translations)) {
+    if (translation.audio_file) {
+      audioFiles[lang] = translation.audio_file;
+    }
+  }
+
+  if (Object.keys(audioFiles).length > 0) {
+    console.log(chalk.blue("📤 Uploading to Spotify..."));
+    try {
+      const spotifyResults = await SpotifyUploader.uploadMultipleEpisodes(content, audioFiles);
+      console.log(chalk.green("✅ Spotify upload completed"));
+    } catch (error) {
+      console.log(chalk.yellow(`⚠️ Spotify upload failed: ${error.message}`));
+    }
+  }
+
+  // Post to social platforms
+  console.log(chalk.blue("📱 Posting to social platforms..."));
+  for (const [lang, translation] of Object.entries(content.translations)) {
+    if (translation.social_hook) {
+      try {
+        const socialResults = await SocialPoster.postToAllPlatforms(translation.social_hook);
+        console.log(chalk.green(`✅ Social posts completed (${lang})`));
+      } catch (error) {
+        console.log(chalk.yellow(`⚠️ Social posting failed for ${lang}: ${error.message}`));
+      }
+    }
+  }
+
+  // Update status
+  await ContentManager.updateStatus(id, 'published');
+}
+
+async function handleTranslate() {
+  const id = args[1];
+  const language = args[2];
+  
+  if (id && language) {
+    await TranslationService.translate(id, language);
+  } else if (id) {
+    console.log(chalk.blue(`🌐 Translating ${id} to all languages...`));
+    await TranslationService.translateAll(id);
+  } else {
+    const contents = await TranslationService.getContentNeedingTranslation();
+    if (contents.length === 0) {
+      console.log(chalk.green("✅ No content needs translation"));
+      return;
+    }
+    
+    console.log(chalk.blue(`📋 Content Ready for Translation (${contents.length})`));
+    contents.forEach(content => {
+      console.log(chalk.yellow(`📄 ${content.id}: ${content.source.title}`));
+    });
+    
+    console.log(chalk.gray("\n💡 Usage:"));
+    console.log(chalk.gray("  npm run translate <id>           - Translate specific content"));
+    console.log(chalk.gray("  npm run translate <id> en-US     - Translate to specific language"));
+  }
+}
+
+async function handleAudio() {
+  const id = args[1];
+  const language = args[2];
+  
+  if (id && language) {
+    await AudioService.generateAudio(id, language);
+  } else if (id) {
+    console.log(chalk.blue(`🎙️ Generating audio for ${id}...`));
+    await AudioService.generateAllAudio(id);
+  } else if (args[1] === 'list') {
+    const audioFiles = await AudioService.listAudioFiles();
+    if (audioFiles.length === 0) {
+      console.log(chalk.yellow("No audio files found"));
+      return;
+    }
+    
+    console.log(chalk.blue(`🎵 Audio Files (${audioFiles.length})`));
+    console.log(chalk.gray("-".repeat(80)));
+    console.log(
+      chalk.cyan("ID".padEnd(30)) +
+      chalk.cyan("Language".padEnd(10)) +
+      chalk.cyan("Size".padEnd(10)) +
+      chalk.cyan("Created".padEnd(12))
+    );
+    console.log(chalk.gray("-".repeat(80)));
+    
+    audioFiles.forEach(audio => {
+      console.log(
+        audio.id.padEnd(30) +
+        audio.language.padEnd(10) +
+        audio.size.padEnd(10) +
+        audio.created.padEnd(12)
+      );
+    });
+  } else {
+    const contents = await AudioService.getContentNeedingAudio();
+    if (contents.length === 0) {
+      console.log(chalk.green("✅ No content needs audio generation"));
+      return;
+    }
+    
+    console.log(chalk.blue(`📋 Content Ready for Audio (${contents.length})`));
+    contents.forEach(content => {
+      console.log(chalk.yellow(`🎙️ ${content.id}: ${content.source.title}`));
+    });
+  }
+}
+
+async function handleSocial() {
+  const id = args[1];
+  const language = args[2];
+  
+  if (id && language) {
+    await SocialService.generateHook(id, language);
+  } else if (id) {
+    console.log(chalk.blue(`📱 Generating social hooks for ${id}...`));
+    await SocialService.generateAllHooks(id);
+  } else {
+    const contents = await SocialService.getContentNeedingSocial();
+    if (contents.length === 0) {
+      console.log(chalk.green("✅ No content needs social hook generation"));
+      return;
+    }
+    
+    console.log(chalk.blue(`📋 Content Ready for Social Hooks (${contents.length})`));
+    contents.forEach(content => {
+      console.log(chalk.yellow(`📱 ${content.id}: ${content.source.title}`));
+    });
+  }
+}
+
+async function handlePublish() {
+  const id = args[1];
+  const platform = args[2];
+  
+  if (!id) {
+    const contents = await SocialService.getContentReadyToPublish();
+    if (contents.length === 0) {
+      console.log(chalk.green("✅ No content ready to publish"));
+      return;
+    }
+    
+    console.log(chalk.blue(`📋 Content Ready to Publish (${contents.length})`));
+    contents.forEach(content => {
+      console.log(chalk.yellow(`🚀 ${content.id}: ${content.source.title}`));
+    });
+    
+    console.log(chalk.gray("\n💡 Usage:"));
+    console.log(chalk.gray("  npm run publish <id>              - Upload to Spotify and post to all platforms"));
+    console.log(chalk.gray("  npm run publish <id> spotify      - Upload to Spotify only"));
+    console.log(chalk.gray("  npm run publish <id> social       - Post to social platforms only"));
+    return;
+  }
+
+  await publishContent(id);
+  console.log(chalk.green.bold(`\n🎉 Publishing completed for: ${id}`));
+}
+
+async function handleList() {
+  const status = args[1];
+  const contents = await ContentManager.list(status);
+  
+  if (contents.length === 0) {
+    console.log(chalk.yellow(`No content found${status ? ` with status: ${status}` : ''}`));
+    return;
+  }
+
+  console.log(chalk.blue(`📋 Content List${status ? ` (${status})` : ''}`));
+  console.log(chalk.gray("-".repeat(100)));
+  
+  console.log(
+    chalk.cyan("ID".padEnd(25)) +
+    chalk.cyan("Status".padEnd(12)) +
+    chalk.cyan("Category".padEnd(12)) +
+    chalk.cyan("Date".padEnd(12)) +
+    chalk.cyan("Trans".padEnd(6)) +
+    chalk.cyan("Audio".padEnd(6)) +
+    chalk.cyan("Social".padEnd(7)) +
+    chalk.cyan("Feedback".padEnd(9))
+  );
+  
+  console.log(chalk.gray("-".repeat(100)));
+  
+  contents.forEach(content => {
+    const summary = ContentManager.formatSummary(content);
+    const statusColor = getStatusColor(summary.status);
+    
+    console.log(
+      summary.id.padEnd(25) +
+      statusColor(summary.status.padEnd(12)) +
+      summary.category.padEnd(12) +
+      summary.date.padEnd(12) +
+      String(summary.translations).padEnd(6) +
+      String(summary.audio).padEnd(6) +
+      String(summary.social).padEnd(7) +
+      String(summary.feedback).padEnd(9)
+    );
+  });
+}
+
+async function handleAnalytics() {
+  console.log(chalk.blue("📊 Content Analytics"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  const contents = await ContentManager.list();
+  const feedbackStats = {
+    total_content: contents.length,
+    with_feedback: 0,
+    accepted: 0,
+    rejected: 0
+  };
+
+  contents.forEach(content => {
+    if (content.feedback?.content_review) {
+      feedbackStats.with_feedback++;
+      if (content.feedback.content_review.status === 'accepted') {
+        feedbackStats.accepted++;
+      } else if (content.feedback.content_review.status === 'rejected') {
+        feedbackStats.rejected++;
+      }
+    }
+  });
+
+  console.log(chalk.cyan(`📋 Total Content: ${feedbackStats.total_content}`));
+  console.log(chalk.cyan(`📝 With Feedback: ${feedbackStats.with_feedback}`));
+  console.log(chalk.green(`✅ Accepted: ${feedbackStats.accepted}`));
+  console.log(chalk.red(`❌ Rejected: ${feedbackStats.rejected}`));
+
+  console.log(chalk.gray("\n💡 Use 'npm run export-training' to export training data"));
+}
+
+async function handleExportTraining() {
+  console.log(chalk.blue("📤 Exporting Training Data"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  const trainingData = await ContentManager.exportTrainingData();
+  
+  const filename = `training-data-${new Date().toISOString().split('T')[0]}.json`;
+  await fs.writeFile(filename, JSON.stringify(trainingData, null, 2));
+  
+  console.log(chalk.green(`✅ Training data exported: ${filename}`));
+  console.log(chalk.cyan(`📊 Total samples: ${trainingData.training_samples.length}`));
+  
+  const taskBreakdown = {};
+  trainingData.training_samples.forEach(sample => {
+    const task = sample.input.task;
+    taskBreakdown[task] = (taskBreakdown[task] || 0) + 1;
+  });
+  
+  console.log(chalk.gray("\n📋 Breakdown by task:"));
+  Object.entries(taskBreakdown).forEach(([task, count]) => {
+    console.log(chalk.gray(`  ${task}: ${count} samples`));
+  });
+}
+
+async function handleStatus() {
+  console.log(chalk.blue("📊 Pipeline Status"));
+  console.log(chalk.gray("=".repeat(50)));
+  
+  const statuses = ['draft', 'reviewed', 'translated', 'audio', 'social', 'published'];
+  
+  for (const status of statuses) {
+    const contents = await ContentManager.getByStatus(status);
+    const statusColor = getStatusColor(status);
+    console.log(statusColor(`${status.toUpperCase().padEnd(12)}: ${contents.length} items`));
+  }
+  
+  console.log(chalk.gray("\n💡 Next steps:"));
+  const drafts = await ContentManager.getByStatus('draft');
+  const reviewed = await ContentManager.getByStatus('reviewed');
+  
+  if (drafts.length > 0) {
+    console.log(chalk.yellow(`📝 Review ${drafts.length} draft(s): npm run review`));
+  }
+  if (reviewed.length > 0) {
+    console.log(chalk.blue(`🔄 Run pipeline for ${reviewed.length} item(s): npm run pipeline`));
+  }
+}
+
+function getStatusColor(status) {
+  const colors = {
+    draft: chalk.yellow,
+    reviewed: chalk.blue,
+    translated: chalk.cyan,
+    audio: chalk.green,
+    social: chalk.magenta,
+    published: chalk.green.bold
+  };
+  return colors[status] || chalk.white;
+}
+
+function showHelp() {
+  console.log(chalk.blue.bold("📖 From Fed to Chain CLI"));
+  console.log(chalk.gray("=".repeat(50)));
+  console.log(chalk.cyan("Core Workflow:"));
+  console.log("  npm run review                                 - Interactive review of all pending content");
+  console.log("  npm run pipeline [id]                          - Full pipeline: translate → audio → social → publish");
+  
+  console.log(chalk.cyan("\nIndividual Steps:"));
+  console.log("  npm run translate [id] [language]              - Translate content");
+  console.log("  npm run audio [id] [language]                  - Generate audio");
+  console.log("  npm run social [id] [language]                 - Generate social hooks");
+  console.log("  npm run publish [id] [platform]                - Publish content");
+  
+  console.log(chalk.cyan("\nUtilities:"));
+  console.log("  npm run list [status]                          - List content");
+  console.log("  npm run status                                 - Show pipeline status");
+  console.log("  npm run analytics                              - Show feedback analytics");
+  console.log("  npm run export-training                        - Export training data");
+  
+  console.log(chalk.gray("\nExamples:"));
+  console.log("  npm run review                                 - Review all draft content interactively");
+  console.log("  npm run pipeline                               - Process all reviewed content");
+  console.log("  npm run pipeline 2025-06-30-bitcoin           - Process specific content");
+  console.log("");
+  console.log(chalk.yellow("Review Controls:"));
+  console.log("  [a]ccept    - Approve content (optional feedback)");
+  console.log("  [r]eject    - Reject with required feedback");
+  console.log("  [s]kip      - Skip this content");
+  console.log("  [q]uit      - Exit review session");
+  console.log("");
+  console.log(chalk.gray("Tips:"));
+  console.log("  • Type 'a good content' to accept with feedback");
+  console.log("  • Type 'r needs examples' to reject with feedback");
+  console.log("  • Just 'a' or 'r' will prompt for feedback");
+}
+
+main();
