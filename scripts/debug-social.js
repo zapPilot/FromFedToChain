@@ -51,17 +51,11 @@ async function main() {
     console.log(chalk.red(`   ${error.message}`));
   }
 
-  // Check 3: Configuration
-  console.log(chalk.blue("\n4. Checking social media configuration..."));
-  try {
-    const config = await import("../config/social-media.js");
-    console.log(chalk.green("✅ Social media config loaded"));
-    console.log(chalk.gray(`   Languages: ${Object.keys(config.SOCIAL_LANGUAGES).join(', ')}`));
-    console.log(chalk.gray(`   Platforms: ${Object.keys(config.SOCIAL_PLATFORMS).join(', ')}`));
-  } catch (error) {
-    console.log(chalk.red("❌ Error loading social media config:"));
-    console.log(chalk.red(`   ${error.message}`));
-  }
+  // Check 3: Configuration (simplified)
+  console.log(chalk.blue("\n4. Checking configuration..."));
+  console.log(chalk.green("✅ Using simplified configuration"));
+  console.log(chalk.gray("   Languages: en-US, ja-JP"));
+  console.log(chalk.gray("   Format: Single universal hook per language"));
 
   // Check 4: Single file test
   console.log(chalk.blue("\n5. Testing single file processing..."));

@@ -1,7 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { LANGUAGES, CATEGORIES, VOICE_CONFIG } from '../config/languages.js';
-import { SOCIAL_PLATFORMS, SOCIAL_LANGUAGES, getSupportedPlatforms, isLanguageEnabled } from '../config/social-media.js';
 
 describe('Configuration', () => {
   
@@ -28,53 +27,13 @@ describe('Configuration', () => {
     });
   });
 
-  it('should have valid social media configuration', () => {
-    // Check platform configs
-    Object.values(SOCIAL_PLATFORMS).forEach(platform => {
-      assert(typeof platform.maxLength === 'number');
-      assert(typeof platform.style === 'string');
-      assert(typeof platform.emoji === 'boolean');
-    });
-
-    // Check language configs
-    Object.entries(SOCIAL_LANGUAGES).forEach(([lang, config]) => {
-      assert(typeof config.enabled === 'boolean');
-      assert(Array.isArray(config.platforms));
-      assert(typeof config.defaultPlatform === 'string');
-      
-      if (config.enabled) {
-        assert(config.platforms.length > 0, `Enabled language ${lang} has no platforms`);
-      }
-    });
-  });
-
-  it('should have consistent platform references', () => {
-    const platformNames = Object.keys(SOCIAL_PLATFORMS);
+  it('should support social media languages', () => {
+    // Test simplified social media support
+    const socialLanguages = ['en-US', 'ja-JP'];
     
-    Object.entries(SOCIAL_LANGUAGES).forEach(([lang, config]) => {
-      config.platforms.forEach(platform => {
-        assert(platformNames.includes(platform), 
-          `Language ${lang} references unknown platform: ${platform}`);
-      });
-      
-      assert(platformNames.includes(config.defaultPlatform),
-        `Language ${lang} has unknown default platform: ${config.defaultPlatform}`);
+    socialLanguages.forEach(lang => {
+      assert(LANGUAGES.SUPPORTED.includes(lang), `Social language ${lang} not in supported languages`);
+      assert(VOICE_CONFIG[lang], `Social language ${lang} missing voice config`);
     });
-  });
-
-  it('should provide correct helper functions', () => {
-    // Test getSupportedPlatforms
-    const enPlatforms = getSupportedPlatforms('en-US');
-    const jaPlatforms = getSupportedPlatforms('ja-JP');
-    const unknownPlatforms = getSupportedPlatforms('unknown');
-    
-    assert(Array.isArray(enPlatforms));
-    assert(Array.isArray(jaPlatforms));
-    assert(Array.isArray(unknownPlatforms));
-    assert(unknownPlatforms.length === 0);
-
-    // Test isLanguageEnabled
-    assert(isLanguageEnabled('en-US') === true);
-    assert(isLanguageEnabled('unknown') === false);
   });
 });

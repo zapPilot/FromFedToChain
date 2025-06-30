@@ -156,42 +156,21 @@ async function resetSocialStep(fileId, category) {
   const languages = ['en-US', 'ja-JP'];
   let resetCount = 0;
 
+  // Remove social hook txt files
   for (const lang of languages) {
-    const filePath = FileUtils.getContentPath(lang, category, fileId);
+    const socialFile = `./social/${lang}/${category}/${fileId}.txt`;
     
     try {
-      await fs.access(filePath);
-      
-      // Read and update file metadata
-      const content = await FileUtils.readJSON(filePath);
-      
-      if (content.social_hooks) {
-        delete content.social_hooks;
-        content.metadata.updated_at = new Date().toISOString();
-        await FileUtils.writeJSON(filePath, content);
-        
-        console.log(chalk.yellow(`🔄 Removed social hooks from: ${path.basename(filePath)}`));
-        resetCount++;
-      }
-
-    } catch (e) {
-      // File doesn't exist, skip
-    }
-  }
-
-  // Remove social media platform files
-  const socialFiles = await findSocialFiles(fileId);
-  for (const socialFile of socialFiles) {
-    try {
       await fs.unlink(socialFile);
-      console.log(chalk.yellow(`🗑️  Removed social file: ${socialFile}`));
+      console.log(chalk.yellow(`🗑️  Removed: ${socialFile}`));
+      resetCount++;
     } catch (e) {
       // File doesn't exist, skip
     }
   }
 
   if (resetCount === 0) {
-    console.log(chalk.gray("   No social data to reset"));
+    console.log(chalk.gray("   No social hooks to reset"));
   }
 
   return resetCount;
@@ -215,29 +194,5 @@ async function findAudioFiles(fileId, language) {
   return audioFiles;
 }
 
-async function findSocialFiles(fileId) {
-  const socialFiles = [];
-  const socialDir = './social';
-  
-  try {
-    const scan = async (dir) => {
-      const items = await fs.readdir(dir, { withFileTypes: true });
-      for (const item of items) {
-        const fullPath = path.join(dir, item.name);
-        if (item.isDirectory()) {
-          await scan(fullPath);
-        } else if (item.name.includes(fileId) && (item.name.endsWith('.txt') || item.name.endsWith('.json'))) {
-          socialFiles.push(fullPath);
-        }
-      }
-    };
-    
-    await scan(socialDir);
-  } catch (e) {
-    // Social directory doesn't exist
-  }
-
-  return socialFiles;
-}
 
 main();
