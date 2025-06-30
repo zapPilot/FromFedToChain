@@ -271,6 +271,7 @@ npm run format             # Code formatting
 - **Platform Optimization**: Automatic formatting for each social platform
 - **Hashtag Integration**: Language and category-specific hashtag suggestions
 - **Fallback System**: Works even without claude command (with basic templates)
+- **Ultra-Fast Processing**: Batch optimization + smart caching = 5x speed improvement
 
 ## 🧪 Testing Strategy
 

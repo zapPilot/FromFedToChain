@@ -9,6 +9,8 @@
     "pipeline:gcp": "node scripts/pipeline.js run --gcp",
     "pipeline:status": "node scripts/pipeline.js status",
     "pipeline:reset": "node scripts/pipeline.js reset",
+    "reset-file": "node scripts/reset-file.js",
+    "debug-social": "node scripts/debug-social.js",
     "audio": "node scripts/audio-manager.js",
     "test": "node tests/run-tests.js",
     "format": "prettier --write . --ignore-path .prettierignore"

@@ -39,19 +39,19 @@ describe('SocialMediaService', () => {
   });
 
   it('should build proper prompts for claude', () => {
-    const content = 'Bitcoin price reaches new highs as institutional adoption accelerates.';
+    const keyInsight = 'Bitcoin price reaches new highs as institutional adoption accelerates.';
     const title = 'Bitcoin Institutional Adoption';
     const language = 'en-US';
     const category = 'daily-news';
 
-    const prompt = SocialMediaService.buildPrompt(content, title, language, category);
+    const prompt = SocialMediaService.buildShortPrompt(keyInsight, title, language, category);
 
-    assert(prompt.includes(content));
+    assert(prompt.includes(keyInsight));
     assert(prompt.includes(title));
     assert(prompt.includes(language));
-    assert(prompt.includes(category));
     assert(prompt.includes('hook'));
-    assert(prompt.includes('200 characters'));
+    assert(prompt.includes('180 chars'));
+    assert(prompt.includes('Hashtags:')); // Category is used for hashtags
   });
 
   it('should generate fallback hooks when claude unavailable', () => {
@@ -86,5 +86,51 @@ describe('SocialMediaService', () => {
     
     assert(twitterOptimized.length <= 280);
     assert(linkedinOptimized.length <= 3000);
+  });
+
+  it('should extract key insights efficiently', () => {
+    const content = 'Bitcoin reaches $100,000 as government adoption accelerates. This is a breakthrough moment. The market is responding positively to regulatory clarity.';
+    
+    const keyInsight = SocialMediaService.extractKeyInsight(content);
+    
+    assert(typeof keyInsight === 'string');
+    assert(keyInsight.length > 10);
+    assert(keyInsight.length <= 150);
+    assert(keyInsight.includes('Bitcoin') || keyInsight.includes('government'));
+  });
+
+  it('should generate content hashes for change detection', () => {
+    const content1 = 'Bitcoin reaches new highs';
+    const content2 = 'Bitcoin reaches new highs';
+    const content3 = 'Ethereum updates coming soon';
+    
+    const hash1 = SocialMediaService.hashContent(content1);
+    const hash2 = SocialMediaService.hashContent(content2);
+    const hash3 = SocialMediaService.hashContent(content3);
+    
+    assert.equal(hash1, hash2); // Same content = same hash
+    assert.notEqual(hash1, hash3); // Different content = different hash
+    assert.equal(hash1.length, 16); // Hash is 16 characters
+  });
+
+  it('should build efficient batch prompts', () => {
+    const files = [
+      {
+        data: { language: { 'en-US': { title: 'Bitcoin News', content: 'Bitcoin reaches $100k milestone' } } },
+        category: 'daily-news'
+      },
+      {
+        data: { language: { 'en-US': { title: 'Ethereum Update', content: 'Ethereum scaling improves dramatically' } } },
+        category: 'ethereum'
+      }
+    ];
+
+    const prompt = SocialMediaService.buildBatchPrompt(files, 'en-US');
+    
+    assert(prompt.includes('Bitcoin News'));
+    assert(prompt.includes('Ethereum Update'));
+    assert(prompt.includes('EXACTLY 2 hooks'));
+    assert(prompt.includes('numbered 1-2'));
+    assert(prompt.length < 1000); // Should be much shorter than individual prompts
   });
 });
