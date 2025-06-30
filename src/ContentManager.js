@@ -1,38 +1,18 @@
 import fs from "fs/promises";
 import path from "path";
 import chalk from "chalk";
+import { ContentSchema } from "./ContentSchema.js";
 
 export class ContentManager {
   static CONTENT_DIR = "./content";
   static AUDIO_DIR = "./audio";
 
-  // Create new content with enhanced schema (including feedback structure)
+  // Create new content using schema
   static async create(id, category, title, content, references = []) {
-    const contentData = {
-      id,
-      status: "draft",
-      category,
-      date: new Date().toISOString().split('T')[0],
-      source: {
-        title,
-        content,
-        references
-      },
-      translations: {},
-      feedback: {
-        content_review: null,
-        ai_outputs: {
-          translations: {},
-          audio: {},
-          social_hooks: {}
-        },
-        performance_metrics: {
-          spotify: {},
-          social_platforms: {}
-        }
-      },
-      updated_at: new Date().toISOString()
-    };
+    const contentData = ContentSchema.createContent(id, category, title, content, references);
+    
+    // Validate the content
+    ContentSchema.validate(contentData);
 
     const filePath = path.join(this.CONTENT_DIR, `${id}.json`);
     await fs.writeFile(filePath, JSON.stringify(contentData, null, 2));
@@ -46,10 +26,47 @@ export class ContentManager {
     const filePath = path.join(this.CONTENT_DIR, `${id}.json`);
     try {
       const content = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      
+      // Validate content on read (helps catch schema issues)
+      try {
+        ContentSchema.validate(parsed);
+      } catch (validationError) {
+        console.warn(chalk.yellow(`⚠️ Schema validation warning for ${id}: ${validationError.message}`));
+      }
+      
+      return parsed;
     } catch (error) {
       throw new Error(`Content not found: ${id}`);
     }
+  }
+
+  // Validate content against schema
+  static validateContent(content) {
+    return ContentSchema.validate(content);
+  }
+
+  // Get schema constants (no longer async)
+  static getSchemaInfo() {
+    return {
+      categories: ContentSchema.getCategories(),
+      languages: ContentSchema.getSupportedLanguages(),
+      statuses: ContentSchema.getStatuses(),
+      platforms: ContentSchema.getSocialPlatforms()
+    };
+  }
+
+  // Get supported languages, categories, etc.
+  static getSupportedLanguages() {
+    return ContentSchema.getSupportedLanguages();
+  }
+
+  static getCategories() {
+    return ContentSchema.getCategories();
+  }
+
+  static getStatuses() {
+    return ContentSchema.getStatuses();
   }
 
   // Update content
