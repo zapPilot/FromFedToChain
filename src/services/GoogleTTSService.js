@@ -12,6 +12,20 @@ export class GoogleTTSService {
   }
 
   async synthesizeSpeech(text, voiceConfig) {
+    // Check if content needs to be batched
+    const chunks = this.splitContentIntoChunks(text);
+    
+    if (chunks.length === 1) {
+      // Single chunk - use standard synthesis
+      return await this.synthesizeSingleChunk(chunks[0], voiceConfig);
+    } else {
+      // Multiple chunks - batch process and combine
+      console.log(`📝 Processing ${chunks.length} chunks for complete TTS audio`);
+      return await this.synthesizeBatchedContent(chunks, voiceConfig);
+    }
+  }
+
+  async synthesizeSingleChunk(text, voiceConfig) {
     const request = {
       input: { text },
       voice: {
@@ -26,6 +40,186 @@ export class GoogleTTSService {
 
     const [response] = await this.client.synthesizeSpeech(request);
     return response;
+  }
+
+  async synthesizeBatchedContent(chunks, voiceConfig) {
+    const audioChunks = [];
+    
+    for (let i = 0; i < chunks.length; i++) {
+      console.log(`🎙️ Synthesizing chunk ${i + 1}/${chunks.length}`);
+      
+      const response = await this.synthesizeSingleChunk(chunks[i], voiceConfig);
+      audioChunks.push(response.audioContent);
+      
+      // Add small delay between requests to avoid rate limiting
+      if (i < chunks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    
+    // Combine audio chunks
+    const combinedAudio = this.combineAudioChunks(audioChunks);
+    
+    return {
+      audioContent: combinedAudio
+    };
+  }
+
+  combineAudioChunks(audioChunks) {
+    if (!audioChunks || audioChunks.length === 0) {
+      throw new Error('No audio chunks to combine');
+    }
+    
+    if (audioChunks.length === 1) {
+      return audioChunks[0];
+    }
+    
+    // For LINEAR16 format, we can simply concatenate the audio data
+    // Skip WAV headers (first 44 bytes) for all chunks except the first
+    let totalLength = audioChunks[0].length;
+    
+    // Calculate total length (first chunk + data portion of subsequent chunks)
+    for (let i = 1; i < audioChunks.length; i++) {
+      const chunk = audioChunks[i];
+      if (chunk.length > 44) {
+        totalLength += chunk.length - 44; // Skip WAV header
+      } else {
+        // If chunk is too small to have a WAV header, just add it as-is
+        totalLength += chunk.length;
+      }
+    }
+    
+    // Create combined buffer
+    const combinedBuffer = Buffer.alloc(totalLength);
+    let offset = 0;
+    
+    // Copy first chunk completely (including WAV header)
+    audioChunks[0].copy(combinedBuffer, offset);
+    offset += audioChunks[0].length;
+    
+    // Copy subsequent chunks without headers
+    for (let i = 1; i < audioChunks.length; i++) {
+      const chunk = audioChunks[i];
+      if (chunk.length > 44) {
+        // Normal case: skip WAV header
+        chunk.copy(combinedBuffer, offset, 44);
+        offset += chunk.length - 44;
+      } else {
+        // Edge case: chunk too small to have header, copy as-is
+        chunk.copy(combinedBuffer, offset);
+        offset += chunk.length;
+      }
+    }
+    
+    // Update WAV header with new file size
+    this.updateWAVHeader(combinedBuffer);
+    
+    return combinedBuffer;
+  }
+
+  updateWAVHeader(buffer) {
+    // Update file size in WAV header (bytes 4-7)
+    const fileSize = buffer.length - 8;
+    buffer.writeUInt32LE(fileSize, 4);
+    
+    // Update data chunk size (bytes 40-43)
+    const dataSize = buffer.length - 44;
+    buffer.writeUInt32LE(dataSize, 40);
+  }
+
+  splitContentIntoChunks(content) {
+    const MAX_CHUNK_BYTES = 4800; // Safe buffer under 5000 byte limit
+    
+    // If content is under limit, return as single chunk
+    if (Buffer.byteLength(content, 'utf8') <= MAX_CHUNK_BYTES) {
+      return [content];
+    }
+    
+    const chunks = [];
+    
+    // First, try to split by paragraphs
+    const paragraphs = content.split(/\n\s*\n/);
+    let currentChunk = '';
+    
+    for (const paragraph of paragraphs) {
+      const testChunk = currentChunk ? currentChunk + '\n\n' + paragraph : paragraph;
+      
+      if (Buffer.byteLength(testChunk, 'utf8') <= MAX_CHUNK_BYTES) {
+        currentChunk = testChunk;
+      } else {
+        // Current chunk is good, save it
+        if (currentChunk) {
+          chunks.push(currentChunk);
+        }
+        
+        // Check if single paragraph is too large
+        if (Buffer.byteLength(paragraph, 'utf8') > MAX_CHUNK_BYTES) {
+          // Split paragraph by sentences
+          const sentenceChunks = this.splitParagraphBySentences(paragraph, MAX_CHUNK_BYTES);
+          chunks.push(...sentenceChunks);
+          currentChunk = '';
+        } else {
+          currentChunk = paragraph;
+        }
+      }
+    }
+    
+    // Add remaining chunk
+    if (currentChunk) {
+      chunks.push(currentChunk);
+    }
+    
+    // Ensure no chunk is empty and all are under limit
+    return chunks.filter(chunk => chunk.trim().length > 0)
+                 .map(chunk => this.ensureChunkSize(chunk, MAX_CHUNK_BYTES));
+  }
+
+  splitParagraphBySentences(paragraph, maxBytes) {
+    const sentences = paragraph.split(/[.!?]+\s+/);
+    const chunks = [];
+    let currentChunk = '';
+    
+    for (const sentence of sentences) {
+      const testChunk = currentChunk ? currentChunk + '. ' + sentence : sentence;
+      
+      if (Buffer.byteLength(testChunk, 'utf8') <= maxBytes) {
+        currentChunk = testChunk;
+      } else {
+        if (currentChunk) {
+          chunks.push(currentChunk + '.');
+        }
+        
+        // If single sentence is too large, force split
+        if (Buffer.byteLength(sentence, 'utf8') > maxBytes) {
+          chunks.push(this.forceSplitText(sentence, maxBytes));
+          currentChunk = '';
+        } else {
+          currentChunk = sentence;
+        }
+      }
+    }
+    
+    if (currentChunk) {
+      chunks.push(currentChunk + (currentChunk.match(/[.!?]$/) ? '' : '.'));
+    }
+    
+    return chunks;
+  }
+
+  forceSplitText(text, maxBytes) {
+    // Last resort: split text at character boundaries
+    let chunk = text;
+    while (Buffer.byteLength(chunk, 'utf8') > maxBytes) {
+      chunk = chunk.substring(0, chunk.length - 10);
+    }
+    return chunk + '...';
+  }
+
+  ensureChunkSize(chunk, maxBytes) {
+    if (Buffer.byteLength(chunk, 'utf8') <= maxBytes) {
+      return chunk;
+    }
+    return this.forceSplitText(chunk, maxBytes);
   }
 
   static prepareContentForTTS(content, language) {
@@ -43,31 +237,6 @@ export class GoogleTTSService {
     ttsContent = ttsContent
       .replace(/\n\n/g, '\n\n... \n\n') // Add pause between paragraphs
       .replace(/([.!?])\s+([A-Z])/g, '$1 ... $2'); // Add pause between sentences
-
-    // Check if content exceeds Google TTS limit (5000 bytes)
-    const contentBytes = Buffer.byteLength(ttsContent, 'utf8');
-    const MAX_TTS_BYTES = 4800; // Leave some buffer under 5000 byte limit
-
-    if (contentBytes > MAX_TTS_BYTES) {
-      console.warn(`⚠️ Content too long (${contentBytes} bytes). Truncating to fit TTS limit.`);
-      
-      // Truncate content while trying to preserve sentence boundaries
-      let truncated = ttsContent;
-      while (Buffer.byteLength(truncated, 'utf8') > MAX_TTS_BYTES) {
-        // Find last sentence ending before the limit
-        const sentences = truncated.split(/[.!?]\s+/);
-        if (sentences.length > 1) {
-          sentences.pop(); // Remove last sentence
-          truncated = sentences.join('. ') + '.';
-        } else {
-          // If we can't preserve sentences, just truncate
-          truncated = truncated.substring(0, truncated.length - 100);
-        }
-      }
-      
-      // Add indication that content was truncated
-      ttsContent = truncated + '... 內容已截斷以符合語音合成限制。';
-    }
 
     return ttsContent;
   }
