@@ -39,7 +39,7 @@ export class ContentSchema {
 
   // Get content categories
   static getCategories() {
-    return ['daily-news', 'ethereum', 'macro'];
+    return ['daily-news', 'ethereum', 'macro', 'startup', 'ai'];
   }
 
   // Get status workflow states

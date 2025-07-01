@@ -4,8 +4,8 @@
 4. Use `zen` to do fact-checking
 5. Use claude to do fact-checking again, ultrathink
 6. keep the reference urls
-6. Write 3 valid candidates as conversational Traditional Chinese explainers in the style of 得到/樊登讀書會.
-7. Content format: 
+7. Write 3 candidate conversational explainer pieces in Traditional Chinese, in the style of 得到/樊登讀書會, bearing in mind that the audience is international. You may reference a specific country as an example when appropriate, but do not assume all readers are from any single country.
+8. Content format: 
 ```javascript
 import { ContentSchema } from './src/ContentSchema.js';
 
@@ -21,5 +21,5 @@ const content = ContentSchema.createContent(
 // Validate content
 ContentSchema.validate(content);
 ```
-8. Save the file to `/content/zh-TW/daily-news/$ARGUMENTS-topic-slug.json`.
-9. Set source_reviewed: false to indicate that human review is needed.
+9. Save the file to `/content/zh-TW/daily-news/$ARGUMENTS-topic-slug.json`.
+10. Set source_reviewed: false to indicate that human review is needed.
