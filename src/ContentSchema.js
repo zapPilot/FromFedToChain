@@ -3,30 +3,23 @@
 
 export class ContentSchema {
 
-  // Create a new content object following the schema
-  static createContent(id, category, title, content, references = []) {
+  // Create a new content object for single language
+  static createContent(id, category, language, title, content, references = []) {
     return {
       id,
       status: "draft",
       category,
       date: new Date().toISOString().split('T')[0],
-      source: {
-        title,
-        content,
-        references
-      },
-      translations: {},
+      language,
+      title,
+      content,
+      references,
+      audio_file: null,
+      social_hook: null,
       feedback: {
         content_review: null,
-        ai_outputs: {
-          translations: {},
-          audio: {},
-          social_hooks: {}
-        },
-        performance_metrics: {
-          spotify: {},
-          social_platforms: {}
-        }
+        ai_outputs: {},
+        performance_metrics: {}
       },
       updated_at: new Date().toISOString()
     };
@@ -52,9 +45,9 @@ export class ContentSchema {
     return ['twitter', 'threads', 'farcaster', 'debank'];
   }
 
-  // Basic validation (for simple cases, full JSON Schema validation would need a library)
+  // Basic validation for single-language content structure
   static validate(content) {
-    const required = ['id', 'status', 'category', 'date', 'source', 'translations', 'feedback', 'updated_at'];
+    const required = ['id', 'status', 'category', 'date', 'language', 'title', 'content', 'references', 'feedback', 'updated_at'];
     
     for (const field of required) {
       if (!(field in content)) {
@@ -70,8 +63,13 @@ export class ContentSchema {
       throw new Error(`Invalid status: ${content.status}`);
     }
 
-    if (!content.source || !content.source.title || !content.source.content) {
-      throw new Error('Invalid source content structure');
+    const allLanguages = ['zh-TW', ...this.getSupportedLanguages()];
+    if (!allLanguages.includes(content.language)) {
+      throw new Error(`Invalid language: ${content.language}`);
+    }
+
+    if (!content.title || !content.content) {
+      throw new Error('Title and content are required');
     }
 
     return true;
@@ -81,10 +79,16 @@ export class ContentSchema {
   static getExample() {
     return this.createContent(
       '2025-06-30-example-content',
-      'daily-news',
+      'daily-news', 
+      'zh-TW',
       'Example Bitcoin Analysis',
       'This is example content about Bitcoin trends...',
       ['Example Source 1', 'Example Source 2']
     );
+  }
+
+  // Helper method to get all supported languages including source language
+  static getAllLanguages() {
+    return ['zh-TW', ...this.getSupportedLanguages()];
   }
 }

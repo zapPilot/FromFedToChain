@@ -61,8 +61,8 @@ async function handleReview() {
   console.log(chalk.blue.bold("📖 Interactive Content Review"));
   console.log(chalk.gray("=".repeat(50)));
 
-  // Get all content that needs review
-  const contents = await ContentManager.getByStatus('draft');
+  // Get all source content that needs review
+  const contents = await ContentManager.getSourceByStatus('draft');
   if (contents.length === 0) {
     console.log(chalk.green("✅ No content pending review"));
     return;
@@ -75,11 +75,12 @@ async function handleReview() {
     
     console.log(chalk.yellow(`📄 Reviewing [${i + 1}/${contents.length}]: ${content.id}`));
     console.log(chalk.gray("=".repeat(60)));
-    console.log(chalk.cyan(`Title: ${content.source.title}`));
+    console.log(chalk.cyan(`Title: ${content.title}`));
     console.log(chalk.cyan(`Category: ${content.category} | Date: ${content.date}`));
+    console.log(chalk.cyan(`Language: ${content.language}`));
     console.log("");
     console.log(chalk.white("Content:"));
-    console.log(content.source.content);
+    console.log(content.content);
     console.log("");
     
     // Get user decision
@@ -136,7 +137,7 @@ async function handleReview() {
           feedback || 'Approved for translation',
           {}
         );
-        await ContentManager.updateStatus(content.id, 'reviewed');
+        await ContentManager.updateSourceStatus(content.id, 'reviewed');
         console.log(chalk.green(`✅ Accepted: ${content.id}`));
         if (feedback) {
           console.log(chalk.gray(`📝 Feedback: ${feedback}`));
@@ -203,8 +204,8 @@ async function handlePipeline() {
     // Run pipeline for specific content
     await runPipelineForContent(id);
   } else {
-    // Run pipeline for all ready content
-    const contents = await ContentManager.getByStatus('reviewed');
+    // Run pipeline for all ready source content
+    const contents = await ContentManager.getSourceByStatus('reviewed');
     if (contents.length === 0) {
       console.log(chalk.yellow("No content ready for pipeline"));
       console.log(chalk.gray("💡 Use 'npm run review' to approve content first"));
@@ -247,20 +248,29 @@ async function runPipelineForContent(id) {
 }
 
 async function publishContent(id) {
-  const content = await ContentManager.read(id);
+  // Get all language versions of this content
+  const allVersions = await ContentManager.getAllLanguagesForId(id);
   
   // Collect audio files for Spotify upload
   const audioFiles = {};
-  for (const [lang, translation] of Object.entries(content.translations)) {
-    if (translation.audio_file) {
-      audioFiles[lang] = translation.audio_file;
+  const socialHooks = {};
+  
+  for (const content of allVersions) {
+    const lang = content.language;
+    if (content.audio_file) {
+      audioFiles[lang] = content.audio_file;
+    }
+    if (content.social_hook) {
+      socialHooks[lang] = content.social_hook;
     }
   }
 
   if (Object.keys(audioFiles).length > 0) {
     console.log(chalk.blue("📤 Uploading to Spotify..."));
     try {
-      const spotifyResults = await SpotifyUploader.uploadMultipleEpisodes(content, audioFiles);
+      // Use the source content for metadata
+      const sourceContent = await ContentManager.readSource(id);
+      const spotifyResults = await SpotifyUploader.uploadMultipleEpisodes(sourceContent, audioFiles);
       console.log(chalk.green("✅ Spotify upload completed"));
     } catch (error) {
       console.log(chalk.yellow(`⚠️ Spotify upload failed: ${error.message}`));
@@ -269,19 +279,17 @@ async function publishContent(id) {
 
   // Post to social platforms
   console.log(chalk.blue("📱 Posting to social platforms..."));
-  for (const [lang, translation] of Object.entries(content.translations)) {
-    if (translation.social_hook) {
-      try {
-        const socialResults = await SocialPoster.postToAllPlatforms(translation.social_hook);
-        console.log(chalk.green(`✅ Social posts completed (${lang})`));
-      } catch (error) {
-        console.log(chalk.yellow(`⚠️ Social posting failed for ${lang}: ${error.message}`));
-      }
+  for (const [lang, hook] of Object.entries(socialHooks)) {
+    try {
+      const socialResults = await SocialPoster.postToAllPlatforms(hook);
+      console.log(chalk.green(`✅ Social posts completed (${lang})`));
+    } catch (error) {
+      console.log(chalk.yellow(`⚠️ Social posting failed for ${lang}: ${error.message}`));
     }
   }
 
-  // Update status
-  await ContentManager.updateStatus(id, 'published');
+  // Update status of source content
+  await ContentManager.updateSourceStatus(id, 'published');
 }
 
 async function handleTranslate() {
@@ -302,7 +310,7 @@ async function handleTranslate() {
     
     console.log(chalk.blue(`📋 Content Ready for Translation (${contents.length})`));
     contents.forEach(content => {
-      console.log(chalk.yellow(`📄 ${content.id}: ${content.source.title}`));
+      console.log(chalk.yellow(`📄 ${content.id}: ${content.title}`));
     });
     
     console.log(chalk.gray("\n💡 Usage:"));
@@ -354,7 +362,7 @@ async function handleAudio() {
     
     console.log(chalk.blue(`📋 Content Ready for Audio (${contents.length})`));
     contents.forEach(content => {
-      console.log(chalk.yellow(`🎙️ ${content.id}: ${content.source.title}`));
+      console.log(chalk.yellow(`🎙️ ${content.id}: ${content.title}`));
     });
   }
 }
@@ -377,7 +385,7 @@ async function handleSocial() {
     
     console.log(chalk.blue(`📋 Content Ready for Social Hooks (${contents.length})`));
     contents.forEach(content => {
-      console.log(chalk.yellow(`📱 ${content.id}: ${content.source.title}`));
+      console.log(chalk.yellow(`📱 ${content.id}: ${content.title}`));
     });
   }
 }
@@ -395,7 +403,7 @@ async function handlePublish() {
     
     console.log(chalk.blue(`📋 Content Ready to Publish (${contents.length})`));
     contents.forEach(content => {
-      console.log(chalk.yellow(`🚀 ${content.id}: ${content.source.title}`));
+      console.log(chalk.yellow(`🚀 ${content.id}: ${content.title}`));
     });
     
     console.log(chalk.gray("\n💡 Usage:"));
@@ -423,10 +431,10 @@ async function handleList() {
   
   console.log(
     chalk.cyan("ID".padEnd(25)) +
+    chalk.cyan("Lang".padEnd(6)) +
     chalk.cyan("Status".padEnd(12)) +
     chalk.cyan("Category".padEnd(12)) +
     chalk.cyan("Date".padEnd(12)) +
-    chalk.cyan("Trans".padEnd(6)) +
     chalk.cyan("Audio".padEnd(6)) +
     chalk.cyan("Social".padEnd(7)) +
     chalk.cyan("Feedback".padEnd(9))
@@ -440,10 +448,10 @@ async function handleList() {
     
     console.log(
       summary.id.padEnd(25) +
+      summary.language.padEnd(6) +
       statusColor(summary.status.padEnd(12)) +
       summary.category.padEnd(12) +
       summary.date.padEnd(12) +
-      String(summary.translations).padEnd(6) +
       String(summary.audio).padEnd(6) +
       String(summary.social).padEnd(7) +
       String(summary.feedback).padEnd(9)
@@ -513,14 +521,14 @@ async function handleStatus() {
   const statuses = ['draft', 'reviewed', 'translated', 'audio', 'social', 'published'];
   
   for (const status of statuses) {
-    const contents = await ContentManager.getByStatus(status);
+    const contents = await ContentManager.getSourceByStatus(status);
     const statusColor = getStatusColor(status);
-    console.log(statusColor(`${status.toUpperCase().padEnd(12)}: ${contents.length} items`));
+    console.log(statusColor(`${status.toUpperCase().padEnd(12)}: ${contents.length} items (source)`));
   }
   
   console.log(chalk.gray("\n💡 Next steps:"));
-  const drafts = await ContentManager.getByStatus('draft');
-  const reviewed = await ContentManager.getByStatus('reviewed');
+  const drafts = await ContentManager.getSourceByStatus('draft');
+  const reviewed = await ContentManager.getSourceByStatus('reviewed');
   
   if (drafts.length > 0) {
     console.log(chalk.yellow(`📝 Review ${drafts.length} draft(s): npm run review`));

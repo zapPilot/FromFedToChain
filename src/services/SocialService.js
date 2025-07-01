@@ -9,13 +9,14 @@ export class SocialService {
   static async generateHook(id, language) {
     console.log(chalk.blue(`📱 Generating social hook: ${id} (${language})`));
 
-    const content = await ContentManager.read(id);
+    // Get specific language content
+    const content = await ContentManager.read(id, language);
     
-    if (!content.translations[language]) {
+    if (!content) {
       throw new Error(`No ${language} translation found for ${id}`);
     }
 
-    const { title, content: text } = content.translations[language];
+    const { title, content: text } = content;
 
     // Generate social hook using Claude
     const hook = await this.generateHookWithClaude(title, text, language);
@@ -29,16 +30,22 @@ export class SocialService {
 
   // Generate social hooks for all languages
   static async generateAllHooks(id) {
-    const content = await ContentManager.read(id);
+    // Check source status first
+    const sourceContent = await ContentManager.readSource(id);
     
-    if (content.status !== 'audio') {
-      throw new Error(`Content must have audio before social hooks. Current status: ${content.status}`);
+    if (sourceContent.status !== 'audio') {
+      throw new Error(`Content must have audio before social hooks. Current status: ${sourceContent.status}`);
     }
 
-    const results = {};
-    const languages = Object.keys(content.translations);
+    // Get all available languages for this content
+    const availableLanguages = await ContentManager.getAvailableLanguages(id);
+    
+    // Filter out source language for social hooks (only need translations)
+    const translationLanguages = availableLanguages.filter(lang => lang !== 'zh-TW');
 
-    for (const language of languages) {
+    const results = {};
+
+    for (const language of translationLanguages) {
       try {
         const hook = await this.generateHook(id, language);
         results[language] = { success: true, hook };
@@ -48,10 +55,10 @@ export class SocialService {
       }
     }
 
-    // Update status if all hooks generated
+    // Update source status if all hooks generated
     const allSuccessful = Object.values(results).every(r => r.success);
-    if (allSuccessful) {
-      await ContentManager.updateStatus(id, 'social');
+    if (allSuccessful && translationLanguages.length > 0) {
+      await ContentManager.updateSourceStatus(id, 'social');
     }
 
     return results;
@@ -104,11 +111,11 @@ Return only the hook, no explanations.`;
 
   // Get content needing social hooks
   static async getContentNeedingSocial() {
-    return ContentManager.getByStatus('audio');
+    return ContentManager.getSourceByStatus('audio');
   }
 
   // Get content ready for publishing
   static async getContentReadyToPublish() {
-    return ContentManager.getByStatus('social');
+    return ContentManager.getSourceByStatus('social');
   }
 }

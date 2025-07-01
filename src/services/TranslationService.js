@@ -13,27 +13,28 @@ export class TranslationService {
 
     console.log(chalk.blue(`🌐 Translating ${id} to ${targetLanguage}...`));
 
-    const content = await ContentManager.read(id);
+    // Get the source content (zh-TW)
+    const sourceContent = await ContentManager.readSource(id);
     
-    if (content.status !== 'reviewed') {
-      throw new Error(`Content must be reviewed before translation. Current status: ${content.status}`);
+    if (sourceContent.status !== 'reviewed') {
+      throw new Error(`Content must be reviewed before translation. Current status: ${sourceContent.status}`);
     }
 
-    const { title, content: sourceContent } = content.source;
+    const { title, content } = sourceContent;
 
     // Generate translation using Claude
     const translatedTitle = await this.translateText(title, targetLanguage);
-    const translatedContent = await this.translateText(sourceContent, targetLanguage);
+    const translatedContent = await this.translateText(content, targetLanguage);
 
-    // Add translation to content
+    // Add translation to content (creates new language file)
     await ContentManager.addTranslation(id, targetLanguage, translatedTitle, translatedContent);
 
-    // Update status if this is the first translation
-    const updatedContent = await ContentManager.read(id);
-    const translationCount = Object.keys(updatedContent.translations).length;
+    // Update source status if all translations are complete
+    const availableLanguages = await ContentManager.getAvailableLanguages(id);
+    const targetLanguages = ['zh-TW', ...this.SUPPORTED_LANGUAGES]; // Source + translations
     
-    if (translationCount === this.SUPPORTED_LANGUAGES.length) {
-      await ContentManager.updateStatus(id, 'translated');
+    if (availableLanguages.length === targetLanguages.length) {
+      await ContentManager.updateSourceStatus(id, 'translated');
     }
 
     console.log(chalk.green(`✅ Translation completed: ${id} (${targetLanguage})`));
@@ -94,6 +95,6 @@ ${text}`;
 
   // Get content needing translation
   static async getContentNeedingTranslation() {
-    return ContentManager.getByStatus('reviewed');
+    return ContentManager.getSourceByStatus('reviewed');
   }
 }

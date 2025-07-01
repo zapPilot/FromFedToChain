@@ -12,9 +12,10 @@ export class AudioService {
   static async generateAudio(id, language) {
     console.log(chalk.blue(`🎙️ Generating audio: ${id} (${language})`));
 
-    const content = await ContentManager.read(id);
+    // Get specific language content
+    const content = await ContentManager.read(id, language);
     
-    if (!content.translations[language]) {
+    if (!content) {
       throw new Error(`No ${language} translation found for ${id}`);
     }
 
@@ -23,7 +24,7 @@ export class AudioService {
       throw new Error(`No voice config for language: ${language}`);
     }
 
-    const { content: text } = content.translations[language];
+    const { content: text } = content;
 
     // Prepare content for TTS
     const ttsContent = GoogleTTSService.prepareContentForTTS(text, language);
@@ -49,16 +50,22 @@ export class AudioService {
 
   // Generate audio for all translations
   static async generateAllAudio(id) {
-    const content = await ContentManager.read(id);
+    // Check source status first
+    const sourceContent = await ContentManager.readSource(id);
     
-    if (content.status !== 'translated') {
-      throw new Error(`Content must be translated before audio generation. Current status: ${content.status}`);
+    if (sourceContent.status !== 'translated') {
+      throw new Error(`Content must be translated before audio generation. Current status: ${sourceContent.status}`);
     }
 
-    const results = {};
-    const languages = Object.keys(content.translations);
+    // Get all available languages for this content
+    const availableLanguages = await ContentManager.getAvailableLanguages(id);
+    
+    // Filter out source language for audio generation (only need translations)
+    const translationLanguages = availableLanguages.filter(lang => lang !== 'zh-TW');
 
-    for (const language of languages) {
+    const results = {};
+
+    for (const language of translationLanguages) {
       try {
         const audioPath = await this.generateAudio(id, language);
         results[language] = { success: true, audioPath };
@@ -68,10 +75,10 @@ export class AudioService {
       }
     }
 
-    // Update status if all audio generated
+    // Update source status if all audio generated
     const allSuccessful = Object.values(results).every(r => r.success);
-    if (allSuccessful) {
-      await ContentManager.updateStatus(id, 'audio');
+    if (allSuccessful && translationLanguages.length > 0) {
+      await ContentManager.updateSourceStatus(id, 'audio');
     }
 
     return results;
@@ -92,7 +99,7 @@ export class AudioService {
 
   // Get content needing audio generation
   static async getContentNeedingAudio() {
-    return ContentManager.getByStatus('translated');
+    return ContentManager.getSourceByStatus('translated');
   }
 
   // List all audio files

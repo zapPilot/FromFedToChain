@@ -22,40 +22,61 @@ src/
         ├── SpotifyUploader.js    # Playwright Spotify automation
         └── SocialPoster.js       # Playwright social media automation
 
-content/                 # Single JSON file per article
-├── 2025-06-30-article-id.json
-└── 2025-06-29-other-article.json
+content/                 # Nested structure by language and category
+├── zh-TW/               # Source language (Traditional Chinese)
+│   ├── daily-news/
+│   │   └── 2025-06-30-article-id.json
+│   ├── ethereum/
+│   └── macro/
+├── en-US/               # English translations
+│   ├── daily-news/
+│   │   └── 2025-06-30-article-id.json
+│   └── ...
+└── ja-JP/               # Japanese translations
+    └── ...
 
 audio/                   # Audio files only
 ├── en-US/2025-06-30-article-id.wav
 └── ja-JP/2025-06-30-article-id.wav
 ```
 
-## 📋 Simplified Content Schema
+## 📋 Content Schema
 
-**Single file contains everything:**
+**Each file contains content in one language:**
 
+**Source file** (`content/zh-TW/daily-news/2025-06-30-bitcoin-news.json`):
 ```json
 {
   "id": "2025-06-30-bitcoin-news",
-  "status": "published",  // draft → reviewed → translated → audio → social → published
-  "category": "daily-news",
+  "status": "draft",
+  "category": "daily-news", 
   "date": "2025-06-30",
-  "source": {
-    "title": "比特幣突破新高...",
-    "content": "你有沒有想過...",
-    "references": ["資料來源1", "資料來源2"]
-  },
-  "translations": {
-    "en-US": {
-      "title": "Bitcoin Breaks New Highs...",
-      "content": "Have you ever wondered...",
-      "audio_file": "audio/en-US/2025-06-30-bitcoin-news.wav",
-      "social_hook": "🚀 Bitcoin breaks new highs as institutional money floods in! Why are the world's most conservative investors suddenly going crypto-crazy? 🧵 #Bitcoin #Crypto #Investing"
-    },
-    "ja-JP": { /* same structure */ }
-  },
+  "language": "zh-TW",
+  "title": "比特幣突破新高...",
+  "content": "你有沒有想過...",
+  "references": ["資料來源1", "資料來源2"],
+  "audio_file": null,
+  "social_hook": null,
+  "feedback": { "content_review": null, "ai_outputs": {}, "performance_metrics": {} },
   "updated_at": "2025-06-30T14:00:00Z"
+}
+```
+
+**Translation file** (`content/en-US/daily-news/2025-06-30-bitcoin-news.json`):
+```json
+{
+  "id": "2025-06-30-bitcoin-news", 
+  "status": "translated",
+  "category": "daily-news",
+  "date": "2025-06-30", 
+  "language": "en-US",
+  "title": "Bitcoin Breaks New Highs...",
+  "content": "Have you ever wondered...",
+  "references": ["Source 1", "Source 2"],
+  "audio_file": "audio/en-US/2025-06-30-bitcoin-news.wav",
+  "social_hook": "🚀 Bitcoin breaks new highs...",
+  "feedback": { "ai_outputs": { "translation": {...} } },
+  "updated_at": "2025-06-30T15:00:00Z"
 }
 ```
 
@@ -124,9 +145,10 @@ npm run publish 2025-06-30-bitcoin-news social
 ## 📁 File Structure
 
 ### Content Files
-- **Location**: `/content/{id}.json`
-- **Format**: Single JSON with all languages and metadata
+- **Location**: `/content/{language}/{category}/{id}.json`
+- **Format**: Single JSON per language with content and metadata
 - **Status**: Tracked in `status` field (draft → published)
+- **Languages**: zh-TW (source), en-US, ja-JP
 
 ### Audio Files
 - **Location**: `/audio/{language}/{id}.wav`
@@ -163,9 +185,9 @@ npm run publish 2025-06-30-bitcoin-news social
 ## 🎯 Design Principles
 
 1. **Human Review Bottleneck**: All optimizations focus on maintainability, not speed
-2. **Single Source of Truth**: One file per content ID contains everything
+2. **Language Separation**: One file per language, clear separation of concerns
 3. **Simple State**: Linear status progression, no complex metadata
-4. **Manual Triggers**: No automatic processing, human-controlled workflow
+4. **Manual Triggers**: No automatic processing, human-controlled workflow  
 5. **Browser Automation**: Playwright for platforms without APIs
 
 ## 🚨 Important Notes

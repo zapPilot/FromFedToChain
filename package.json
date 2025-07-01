@@ -10,6 +10,8 @@
     "audio": "node src/cli.js audio", 
     "social": "node src/cli.js social",
     "publish": "node src/cli.js publish",
+    "list": "node src/cli.js list",
+    "status": "node src/cli.js status",
     "analytics": "node src/cli.js analytics",
     "export-training": "node src/cli.js export-training",
     "test": "node tests/run-tests.js",
