@@ -1,9 +1,27 @@
-import { execSync } from "child_process";
+import { Translate } from "@google-cloud/translate/build/src/v2/index.js";
 import chalk from "chalk";
 import { ContentManager } from "../ContentManager.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class TranslationService {
   static SUPPORTED_LANGUAGES = ['en-US', 'ja-JP'];
+  static translate_client = null;
+
+  // Initialize Google Cloud Translate client
+  static getTranslateClient() {
+    if (!this.translate_client) {
+      const serviceAccountPath = path.resolve(process.cwd(), 'service-account.json');
+      this.translate_client = new Translate({
+        keyFilename: serviceAccountPath,
+        projectId: process.env.GOOGLE_CLOUD_PROJECT_ID // Optional: can be inferred from service account
+      });
+    }
+    return this.translate_client;
+  }
 
   // Translate content to target language
   static async translate(id, targetLanguage) {
@@ -22,7 +40,7 @@ export class TranslationService {
 
     const { title, content } = sourceContent;
 
-    // Generate translation using Claude
+    // Generate translation using Google Cloud Translate API
     const translatedTitle = await this.translateText(title, targetLanguage);
     const translatedContent = await this.translateText(content, targetLanguage);
 
@@ -58,35 +76,36 @@ export class TranslationService {
     return results;
   }
 
-  // Translate text using Claude
+  // Translate text using Google Cloud Translate API
   static async translateText(text, targetLanguage) {
     const languageMap = {
-      'en-US': 'English',
-      'ja-JP': 'Japanese'
+      'zh-TW': 'zh',  // Source language
+      'en-US': 'en',  // Target languages
+      'ja-JP': 'ja'
     };
 
-    const targetLangName = languageMap[targetLanguage];
+    const sourceLanguage = languageMap['zh-TW'];
+    const targetLangCode = languageMap[targetLanguage];
     
-    const prompt = `Translate the following Chinese text to ${targetLangName}. Maintain the conversational style and keep crypto/finance terminology accurate. Return only the translation, no explanations.
-
-Text to translate:
-${text}`;
+    if (!targetLangCode) {
+      throw new Error(`Unsupported language: ${targetLanguage}`);
+    }
 
     try {
-      const claudeCommand = `claude -p ${JSON.stringify(prompt)}`;
+      const translateClient = this.getTranslateClient();
       
-      const result = execSync(claudeCommand, { 
-        encoding: 'utf-8',
-        timeout: 60000,
-        maxBuffer: 1024 * 1024
+      const [translation] = await translateClient.translate(text, {
+        from: sourceLanguage,
+        to: targetLangCode,
+        format: 'text'
       });
 
-      return result.trim();
+      return translation;
     } catch (error) {
       if (error.code === 'ENOENT') {
-        throw new Error('Claude command not found. Install with: npm install -g claude-code');
-      } else if (error.signal === 'SIGTERM') {
-        throw new Error('Claude command timed out after 60 seconds');
+        throw new Error('Google Cloud service account file not found. Please ensure service-account.json exists in the project root.');
+      } else if (error.code === 'EACCES') {
+        throw new Error('Google Cloud authentication failed. Please check your service-account.json credentials.');
       } else {
         throw new Error(`Translation failed: ${error.message}`);
       }
