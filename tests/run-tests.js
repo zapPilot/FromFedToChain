@@ -46,6 +46,7 @@ async function runTests() {
     testProcess.on('close', (code) => {
       if (code === 0) {
         console.log(chalk.green.bold('\n✅ All tests passed!'));
+        process.exit(0);
       } else {
         console.log(chalk.red.bold('\n❌ Some tests failed'));
         process.exit(code);
