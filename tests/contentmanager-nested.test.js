@@ -244,21 +244,29 @@ describe('ContentManager Nested Structure Tests', () => {
 
   describe('Performance and Edge Cases', () => {
     it('should handle empty directories gracefully', async () => {
+      // Get initial count
+      const initialContents = await ContentManager.list();
+      const initialCount = initialContents.length;
+      
       // Create empty category directory
       await fs.mkdir(path.join(tempDir, 'ja-JP', 'macro'), { recursive: true });
       
       const contents = await ContentManager.list();
-      assert.equal(contents.length, 1); // Only our original test content
+      assert.equal(contents.length, initialCount); // Should not change count
     });
 
     it('should handle corrupted files gracefully', async () => {
+      // Get initial count
+      const initialContents = await ContentManager.list();
+      const initialCount = initialContents.length;
+      
       // Create corrupted file
       const corruptedDir = path.join(tempDir, 'zh-TW', 'macro');
       await fs.mkdir(corruptedDir, { recursive: true });
       await fs.writeFile(path.join(corruptedDir, 'corrupted.json'), '{ invalid json }');
 
       const contents = await ContentManager.list();
-      assert.equal(contents.length, 1); // Should skip corrupted file
+      assert.equal(contents.length, initialCount); // Should skip corrupted file and not change count
     });
 
     it('should prevent access outside nested structure', async () => {

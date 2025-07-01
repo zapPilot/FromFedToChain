@@ -210,6 +210,11 @@ export class ContentManager {
 
   // Add feedback for content review (applies to source language file)
   static async addContentFeedback(id, status, score, reviewer, comments, trainingLabels = {}) {
+    // Validate that rejection requires feedback
+    if (status === 'rejected' && (!comments || comments.trim() === '')) {
+      throw new Error('Feedback comment is required when rejecting content');
+    }
+
     const contentData = await this.read(id, 'zh-TW');
     
     // Initialize feedback structure if missing (backward compatibility)
