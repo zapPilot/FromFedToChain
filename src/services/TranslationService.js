@@ -16,8 +16,8 @@ export class TranslationService {
     if (!this.translate_client) {
       const serviceAccountPath = path.resolve(process.cwd(), 'service-account.json');
       this.translate_client = new Translate({
-        keyFilename: serviceAccountPath,
-        projectId: process.env.GOOGLE_CLOUD_PROJECT_ID // Optional: can be inferred from service account
+        keyFilename: serviceAccountPath
+        // projectId will be automatically inferred from service account file
       });
     }
     return this.translate_client;

@@ -196,49 +196,129 @@ function getUserInput() {
 async function handlePipeline() {
   const id = args[1];
 
-  console.log(chalk.blue.bold("🔄 Running Full Pipeline"));
-  console.log(chalk.gray("Steps: Translate → Audio → Social → Publish"));
+  console.log(chalk.blue.bold("🔄 Running Smart Pipeline"));
+  console.log(chalk.gray("Automatically detects and processes unfinished phases"));
   console.log(chalk.gray("=".repeat(50)));
 
   if (id) {
     // Run pipeline for specific content
     await runPipelineForContent(id);
   } else {
-    // Run pipeline for all ready source content
-    const contents = await ContentManager.getSourceByStatus('reviewed');
-    if (contents.length === 0) {
-      console.log(chalk.yellow("No content ready for pipeline"));
-      console.log(chalk.gray("💡 Use 'npm run review' to approve content first"));
+    // Check all phases and find content that needs processing
+    const allPendingContent = await getAllPendingContent();
+    
+    if (allPendingContent.length === 0) {
+      console.log(chalk.green("✅ No content needs processing"));
+      console.log(chalk.gray("💡 Use 'npm run review' to approve new content"));
       return;
     }
 
-    console.log(chalk.blue(`Processing ${contents.length} content items`));
-    for (const content of contents) {
-      console.log(chalk.cyan(`\n🔄 Processing: ${content.id}`));
-      await runPipelineForContent(content.id);
+    // Show what was found
+    console.log(chalk.blue(`Found ${allPendingContent.length} content items needing processing:`));
+    showPipelineStatus(allPendingContent);
+    console.log("");
+
+    // Process each content item
+    for (const item of allPendingContent) {
+      console.log(chalk.cyan(`\n🔄 Processing: ${item.content.id} (needs ${item.nextPhase})`));
+      await runPipelineForContent(item.content.id);
     }
   }
 
   console.log(chalk.green.bold("\n🎉 Pipeline completed!"));
 }
 
+// Get all content that needs processing at any phase
+async function getAllPendingContent() {
+  const pendingContent = [];
+
+  // Phase 1: Translation (reviewed → translated)
+  const needTranslation = await TranslationService.getContentNeedingTranslation();
+  needTranslation.forEach(content => {
+    pendingContent.push({ content, nextPhase: 'translation', currentStatus: 'reviewed' });
+  });
+
+  // Phase 2: Audio (translated → audio)  
+  const needAudio = await AudioService.getContentNeedingAudio();
+  needAudio.forEach(content => {
+    pendingContent.push({ content, nextPhase: 'audio', currentStatus: 'translated' });
+  });
+
+  // Phase 3: Social hooks (audio → social)
+  const needSocial = await SocialService.getContentNeedingSocial();
+  needSocial.forEach(content => {
+    pendingContent.push({ content, nextPhase: 'social', currentStatus: 'audio' });
+  });
+
+  // Phase 4: Publishing (social → published)
+  const needPublishing = await SocialService.getContentReadyToPublish();
+  needPublishing.forEach(content => {
+    pendingContent.push({ content, nextPhase: 'publishing', currentStatus: 'social' });
+  });
+
+  // Sort by date (newest first)
+  return pendingContent.sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+}
+
+// Show pipeline status summary
+function showPipelineStatus(pendingContent) {
+  const phaseGroups = {};
+  pendingContent.forEach(item => {
+    if (!phaseGroups[item.nextPhase]) {
+      phaseGroups[item.nextPhase] = [];
+    }
+    phaseGroups[item.nextPhase].push(item);
+  });
+
+  Object.entries(phaseGroups).forEach(([phase, items]) => {
+    const phaseColor = {
+      'translation': chalk.cyan,
+      'audio': chalk.green,
+      'social': chalk.magenta,
+      'publishing': chalk.yellow
+    }[phase] || chalk.white;
+    
+    console.log(phaseColor(`📋 ${phase.toUpperCase()}: ${items.length} items`));
+    items.forEach(item => {
+      console.log(chalk.gray(`   • ${item.content.id}: ${item.content.title.substring(0, 50)}...`));
+    });
+  });
+}
+
 async function runPipelineForContent(id) {
   try {
-    // Step 1: Translation
-    console.log(chalk.blue("1️⃣ Translation..."));
-    await TranslationService.translateAll(id);
+    // Determine what phase this content needs
+    const sourceContent = await ContentManager.readSource(id);
+    const currentStatus = sourceContent.status;
+    
+    console.log(chalk.gray(`Current status: ${currentStatus}`));
 
-    // Step 2: Audio
-    console.log(chalk.blue("2️⃣ Audio generation..."));
-    await AudioService.generateAllAudio(id);
+    // Run appropriate phases based on current status
+    if (currentStatus === 'reviewed') {
+      console.log(chalk.blue("1️⃣ Translation..."));
+      await TranslationService.translateAll(id);
+    }
 
-    // Step 3: Social hooks
-    console.log(chalk.blue("3️⃣ Social hooks..."));
-    await SocialService.generateAllHooks(id);
+    // Check updated status for next phase
+    const updatedContent = await ContentManager.readSource(id);
+    if (updatedContent.status === 'translated') {
+      console.log(chalk.blue("2️⃣ Audio generation..."));
+      await AudioService.generateAllAudio(id);
+    }
 
-    // Step 4: Publish
-    console.log(chalk.blue("4️⃣ Publishing..."));
-    await publishContent(id);
+    // Check updated status for next phase
+    const audioContent = await ContentManager.readSource(id);
+    if (audioContent.status === 'audio') {
+      console.log(chalk.blue("3️⃣ Social hooks..."));
+      await SocialService.generateAllHooks(id);
+    }
+
+    // Check updated status for publishing
+    const socialContent = await ContentManager.readSource(id);
+    if (socialContent.status === 'social') {
+      console.log(chalk.blue("4️⃣ Publishing..."));
+      await publishContent(id);
+    }
 
     console.log(chalk.green(`✅ Pipeline completed for: ${id}`));
 
@@ -555,7 +635,7 @@ function showHelp() {
   console.log(chalk.gray("=".repeat(50)));
   console.log(chalk.cyan("Core Workflow:"));
   console.log("  npm run review                                 - Interactive review of all pending content");
-  console.log("  npm run pipeline [id]                          - Full pipeline: translate → audio → social → publish");
+  console.log("  npm run pipeline [id]                          - Smart pipeline: auto-detects and runs needed phases");
   
   console.log(chalk.cyan("\nIndividual Steps:"));
   console.log("  npm run translate [id] [language]              - Translate content");
@@ -571,8 +651,8 @@ function showHelp() {
   
   console.log(chalk.gray("\nExamples:"));
   console.log("  npm run review                                 - Review all draft content interactively");
-  console.log("  npm run pipeline                               - Process all reviewed content");
-  console.log("  npm run pipeline 2025-06-30-bitcoin           - Process specific content");
+  console.log("  npm run pipeline                               - Auto-detect and process all unfinished content");
+  console.log("  npm run pipeline 2025-06-30-bitcoin           - Continue processing specific content from where it left off");
   console.log("");
   console.log(chalk.yellow("Review Controls:"));
   console.log("  [a]ccept    - Approve content (optional feedback)");
@@ -580,7 +660,12 @@ function showHelp() {
   console.log("  [s]kip      - Skip this content");
   console.log("  [q]uit      - Exit review session");
   console.log("");
-  console.log(chalk.gray("Tips:"));
+  console.log(chalk.gray("Smart Pipeline Features:"));
+  console.log("  • Automatically detects content at each phase: reviewed → translated → audio → social → published");
+  console.log("  • Picks up where you left off - no need to restart from translation");
+  console.log("  • Shows what content needs what phase before processing");
+  
+  console.log(chalk.gray("\nReview Tips:"));
   console.log("  • Type 'a good content' to accept with feedback");
   console.log("  • Type 'r needs examples' to reject with feedback");
   console.log("  • Just 'a' or 'r' will prompt for feedback");

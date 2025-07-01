@@ -70,7 +70,6 @@ export class AudioService {
         const audioPath = await this.generateAudio(id, language);
         results[language] = { success: true, audioPath };
       } catch (error) {
-        throw error
         console.error(chalk.red(`❌ Audio generation failed for ${language}: ${error.message}`));
         results[language] = { success: false, error: error.message };
       }
