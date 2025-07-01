@@ -1,6 +1,6 @@
 {
   "id": "2025-07-01-cbdc-digital-euro",
-  "status": "draft",
+  "status": "reviewed",
   "category": "daily-news",
   "date": "2025-07-01",
   "language": "zh-TW",
@@ -14,7 +14,14 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-01T13:32:05.354Z",
+      "comments": "很貼近我們的生活，有",
+      "training_labels": {}
+    },
     "ai_outputs": {
       "translations": {},
       "audio": {},
@@ -25,5 +32,5 @@
       "social_platforms": {}
     }
   },
-  "updated_at": "2025-07-01T00:00:00.000Z"
+  "updated_at": "2025-07-01T13:32:05.358Z"
 }

@@ -1,6 +1,6 @@
 {
   "id": "2025-07-01-wealth-protection-war",
-  "status": "draft",
+  "status": "reviewed",
   "category": "macro",
   "date": "2025-07-01",
   "language": "zh-TW",
@@ -20,7 +20,14 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-01T13:33:49.691Z",
+      "comments": "Approved for translation",
+      "training_labels": {}
+    },
     "ai_outputs": {
       "translations": {},
       "audio": {},
@@ -31,5 +38,5 @@
       "social_platforms": {}
     }
   },
-  "updated_at": "2025-07-01T14:00:00Z"
+  "updated_at": "2025-07-01T13:33:49.694Z"
 }
