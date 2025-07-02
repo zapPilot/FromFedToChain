@@ -103,8 +103,8 @@ describe('GoogleTTSService Batching Tests', () => {
     });
 
     it('should split very long paragraphs by sentences', () => {
-      // Create a single very long paragraph
-      const longParagraph = Array(50).fill(
+      // Create a single very long paragraph (over 4800 bytes)
+      const longParagraph = Array(90).fill(
         'This is a sentence that forms part of a very long paragraph. '
       ).join('');
       

@@ -7,7 +7,20 @@ export class SpotifyUploader {
   constructor() {
     this.browser = null;
     this.page = null;
-    this.multilingualShowIdentifier = ['中文', '日本語', 'Eng'];
+    this.showConfig = {
+      'en-US': {
+        name: 'From Fed to Chain [Eng]',
+        identifier: 'Eng'
+      },
+      'zh-TW': {
+        name: 'From Fed to Chain【中文】',
+        identifier: '中文'
+      },
+      'ja-JP': {
+        name: 'From Fed to Chain【日本語】',
+        identifier: '日本語'
+      }
+    };
   }
 
   async init() {
@@ -42,8 +55,13 @@ export class SpotifyUploader {
     }
   }
 
-  async findMultilingualShow() {
-    console.log(chalk.blue('🎯 Finding multilingual show...'));
+  async selectShow(language) {
+    console.log(chalk.blue(`🎯 Selecting show for language: ${language}`));
+    
+    const showConfig = this.showConfig[language];
+    if (!showConfig) {
+      throw new Error(`No show configuration found for language: ${language}`);
+    }
     
     try {
       let showFound = false;
@@ -60,13 +78,9 @@ export class SpotifyUploader {
             const showText = await showElement.textContent();
             console.log(chalk.cyan(`📋 Checking show ${showNumber}: ${showText}`));
             
-            // Check if show title contains all multilingual identifiers
-            const hasAllLanguages = this.multilingualShowIdentifier.all(lang => 
-              showText.includes(lang)
-            );
-            
-            if (hasAllLanguages) {
-              console.log(chalk.green(`✅ Found multilingual show: ${showText}`));
+            // Check if show title contains the specific language identifier
+            if (showText.includes(showConfig.identifier)) {
+              console.log(chalk.green(`✅ Found show for ${language}: ${showText}`));
               await showElement.click();
               showFound = true;
               return showText;
@@ -84,12 +98,12 @@ export class SpotifyUploader {
       }
       
       if (!showFound) {
-        throw new Error(`Multilingual show containing "${this.multilingualShowIdentifier.join(', ')}" not found in first ${maxAttempts} shows`);
+        throw new Error(`Show containing "${showConfig.identifier}" not found in first ${maxAttempts} shows`);
       }
       
     } catch (error) {
-      console.error(chalk.red(`❌ Failed to find multilingual show: ${error.message}`));
-      console.log(chalk.yellow('⚠️ Please manually navigate to the multilingual show'));
+      console.error(chalk.red(`❌ Failed to select show: ${error.message}`));
+      console.log(chalk.yellow(`⚠️ Please manually select show containing: ${showConfig.identifier}`));
       throw error;
     }
   }
@@ -98,14 +112,8 @@ export class SpotifyUploader {
     console.log(chalk.blue(`📤 Uploading episode: ${title} [${language}]`));
     
     try {
-      // Create multilingual episode title with language indicator
-      const languageIndicators = {
-        'en-US': '[Eng]',
-        'zh-TW': '【中文】',
-        'ja-JP': '【日本語】'
-      };
-      
-      const episodeTitle = `${title} ${languageIndicators[language] || '[' + language + ']'}`;
+      // Select the correct show for this language
+      await this.selectShow(language);
       
       // Click the new episode button using the specific selector you provided
       await this.page.click('[data-testid="new-episode-button"]', { timeout: 10000 });
@@ -119,8 +127,8 @@ export class SpotifyUploader {
       await this.page.waitForSelector('text="Upload complete", text="Processing complete", [data-testid="upload-complete"]', 
         { timeout: 600000 }); // 10 minutes
       
-      // Fill episode details with multilingual title
-      await this.page.fill('input[name="title"], [data-testid="episode-title"]', episodeTitle);
+      // Fill episode details (no language indicator needed since show is language-specific)
+      await this.page.fill('input[name="title"], [data-testid="episode-title"]', title);
       await this.page.fill('textarea[name="description"], [data-testid="episode-description"]', description);
       
       // Try to select category if available
@@ -150,7 +158,7 @@ export class SpotifyUploader {
       await this.page.waitForSelector('text="Episode published", text="Published successfully", [data-testid="publish-success"]', 
         { timeout: 60000 });
       
-      console.log(chalk.green(`✅ Episode uploaded successfully: ${episodeTitle}`));
+      console.log(chalk.green(`✅ Episode uploaded successfully to ${this.showConfig[language].name}: ${title}`));
       
       return true;
       
@@ -270,50 +278,58 @@ export class SpotifyUploader {
       await uploader.init();
       await uploader.navigateToDashboard();
       
-      // Find and select the multilingual show once
-      await uploader.findMultilingualShow();
+      // Group by language to process each show separately
+      const byLanguage = {};
+      unuploaded.forEach(item => {
+        if (!byLanguage[item.language]) byLanguage[item.language] = [];
+        byLanguage[item.language].push(item);
+      });
       
-      // Upload all episodes to the same multilingual show
-      for (const item of unuploaded) {
-        try {
-          console.log(chalk.cyan(`\n📤 Uploading: ${item.title} [${item.language}]`));
-          
-          await uploader.uploadEpisode(
-            item.audioPath,
-            item.title,
-            item.description,
-            item.language,
-            'Technology'
-          );
-          
-          // Mark as uploaded in content file
-          item.content.uploaded_to_spotify = true;
-          item.content.spotify_upload_date = new Date().toISOString();
-          fs.writeFileSync(item.contentPath, JSON.stringify(item.content, null, 2));
-          
-          results.uploaded++;
-          results.details.push({
-            ...item,
-            success: true,
-            uploadedAt: new Date().toISOString()
-          });
-          
-          console.log(chalk.green(`✅ Successfully uploaded: ${item.title} [${item.language}]`));
-          
-          // Wait between uploads to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-        } catch (error) {
-          console.error(chalk.red(`❌ Failed to upload: ${item.title} [${item.language}] - ${error.message}`));
-          results.failed++;
-          results.details.push({
-            ...item,
-            success: false,
-            error: error.message
-          });
-          
-          // Continue with next episode even if one fails
-          continue;
+      // Upload by language (each language has its own show)
+      for (const [language, items] of Object.entries(byLanguage)) {
+        console.log(chalk.blue(`\n🎯 Processing ${items.length} episodes for ${uploader.showConfig[language].name}`));
+        
+        for (const item of items) {
+          try {
+            console.log(chalk.cyan(`\n📤 Uploading: ${item.title}`));
+            
+            await uploader.uploadEpisode(
+              item.audioPath,
+              item.title,
+              item.description,
+              language,
+              'Technology'
+            );
+            
+            // Mark as uploaded in content file
+            item.content.uploaded_to_spotify = true;
+            item.content.spotify_upload_date = new Date().toISOString();
+            fs.writeFileSync(item.contentPath, JSON.stringify(item.content, null, 2));
+            
+            results.uploaded++;
+            results.details.push({
+              ...item,
+              success: true,
+              uploadedAt: new Date().toISOString()
+            });
+            
+            console.log(chalk.green(`✅ Successfully uploaded: ${item.title}`));
+            
+            // Wait between uploads to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+          } catch (error) {
+            console.error(chalk.red(`❌ Failed to upload: ${item.title} - ${error.message}`));
+            results.failed++;
+            results.details.push({
+              ...item,
+              success: false,
+              error: error.message
+            });
+            
+            // Continue with next episode even if one fails
+            continue;
+          }
         }
       }
       

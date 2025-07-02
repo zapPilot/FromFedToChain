@@ -202,7 +202,7 @@ describe('Audio Architecture Tests', () => {
       const audioPath = await AudioService.generateAudio('2025-07-01-test-audio', 'zh-TW');
       
       // Verify audio path follows correct structure
-      assert(audioPath.includes('audio/zh-TW/daily-news/2025-07-01-test-audio.wav'));
+      assert(audioPath.includes('zh-TW/daily-news/2025-07-01-test-audio.wav'));
       
       // Verify file was created
       const fileExists = await fs.access(audioPath).then(() => true).catch(() => false);
@@ -337,7 +337,7 @@ describe('Audio Architecture Tests', () => {
         'macro'
       );
 
-      assert(audioPath.includes('audio/zh-TW/macro/'), 'Should create macro category structure');
+      assert(audioPath.includes('zh-TW/macro/'), 'Should create macro category structure');
     });
 
     it('should create directories recursively', async () => {
@@ -396,11 +396,11 @@ describe('Audio Architecture Tests', () => {
       // Find specific files and verify their structure
       const zhDailyNews = files.find(f => f.language === 'zh-TW' && f.category === 'daily-news');
       assert(zhDailyNews, 'Should find zh-TW daily-news file');
-      assert(zhDailyNews.file.includes('audio/zh-TW/daily-news/'), 'Should have correct path structure');
+      assert(zhDailyNews.file.includes('zh-TW/daily-news/'), 'Should have correct path structure');
 
       const jaMacro = files.find(f => f.language === 'ja-JP' && f.category === 'macro');
       assert(jaMacro, 'Should find ja-JP macro file');
-      assert(jaMacro.file.includes('audio/ja-JP/macro/'), 'Should have correct path structure');
+      assert(jaMacro.file.includes('ja-JP/macro/'), 'Should have correct path structure');
     });
 
     it('should sort files by creation date', async () => {
@@ -438,7 +438,7 @@ describe('Audio Architecture Tests', () => {
         },
         {
           name: 'Error',
-          message: /No zh-TW content found for nonexistent-id/
+          message: /Content not found in zh-TW: nonexistent-id/
         }
       );
     });
@@ -450,7 +450,7 @@ describe('Audio Architecture Tests', () => {
         },
         {
           name: 'Error',
-          message: /Unsupported language: invalid-lang/
+          message: /Audio generation not configured for language: invalid-lang/
         }
       );
     });

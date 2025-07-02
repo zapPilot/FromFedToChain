@@ -171,7 +171,7 @@ export class GoogleTTSService {
     
     // Ensure no chunk is empty and all are under limit
     return chunks.filter(chunk => chunk.trim().length > 0)
-                 .map(chunk => this.ensureChunkSize(chunk, MAX_CHUNK_BYTES));
+                 .flatMap(chunk => this.ensureChunkSize(chunk, MAX_CHUNK_BYTES));
   }
 
   splitParagraphBySentences(paragraph, maxBytes) {
@@ -191,7 +191,7 @@ export class GoogleTTSService {
         
         // If single sentence is too large, force split
         if (Buffer.byteLength(sentence, 'utf8') > maxBytes) {
-          chunks.push(this.forceSplitText(sentence, maxBytes));
+          chunks.push(...this.forceSplitText(sentence, maxBytes));
           currentChunk = '';
         } else {
           currentChunk = sentence;
@@ -207,17 +207,33 @@ export class GoogleTTSService {
   }
 
   forceSplitText(text, maxBytes) {
-    // Last resort: split text at character boundaries
-    let chunk = text;
-    while (Buffer.byteLength(chunk, 'utf8') > maxBytes) {
-      chunk = chunk.substring(0, chunk.length - 10);
+    // Last resort: split text at character boundaries into multiple chunks
+    const chunks = [];
+    let remaining = text;
+    
+    while (remaining.length > 0) {
+      let chunk = remaining;
+      
+      // Find the largest chunk that fits
+      while (Buffer.byteLength(chunk, 'utf8') > maxBytes && chunk.length > 0) {
+        chunk = chunk.substring(0, chunk.length - 10);
+      }
+      
+      if (chunk.length === 0) {
+        // Edge case: even 10 characters exceed limit
+        chunk = remaining.substring(0, 1);
+      }
+      
+      chunks.push(chunk + (remaining.length > chunk.length ? '...' : ''));
+      remaining = remaining.substring(chunk.length);
     }
-    return chunk + '...';
+    
+    return chunks;
   }
 
   ensureChunkSize(chunk, maxBytes) {
     if (Buffer.byteLength(chunk, 'utf8') <= maxBytes) {
-      return chunk;
+      return [chunk];
     }
     return this.forceSplitText(chunk, maxBytes);
   }

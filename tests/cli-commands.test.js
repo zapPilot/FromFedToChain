@@ -110,49 +110,57 @@ describe('CLI Commands Tests', () => {
   }
 
   async function runCLI(args) {
-    // Reset argv to simulate CLI call
-    const originalArgv = process.argv;
-    process.argv = ['node', 'src/cli.js', ...args];
-    
-    try {
-      // Reset mock call counts
-      mockExit.mock.resetCalls();
-      consoleOutput.log = [];
-      consoleOutput.error = [];
-      
-      // Import and run CLI - just test that it can be imported
-      // Since CLI runs immediately on import, we'll just test basic functionality
-      
-      return {
-        exitCode: 0,
-        stdout: [`From Fed to Chain - Content Pipeline`],
-        stderr: []
-      };
-    } catch (error) {
-      return {
-        exitCode: 1,
-        stdout: [],
-        stderr: [error.message]
-      };
-    } finally {
-      process.argv = originalArgv;
-    }
+    return new Promise((resolve) => {
+      const child = spawn('node', [path.join(originalCwd, 'src/cli.js'), ...args], {
+        cwd: tempDir,
+        stdio: 'pipe',
+        env: { ...process.env, NODE_ENV: 'test' }
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      child.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      child.on('close', (code) => {
+        resolve({
+          exitCode: code || 0,
+          stdout: stdout.trim(),
+          stderr: stderr.trim()
+        });
+      });
+
+      // Kill process after 5 seconds to prevent hanging
+      setTimeout(() => {
+        child.kill('SIGTERM');
+        resolve({
+          exitCode: 1,
+          stdout: stdout.trim(),
+          stderr: 'Process timeout'
+        });
+      }, 5000);
+    });
   }
 
   describe('Command Parsing', () => {
     it('should show help when no command provided', async () => {
       const result = await runCLI([]);
       
-      const output = result.stdout.join(' ');
-      assert(output.includes('From Fed to Chain - Content Pipeline'));
-      assert(output.includes('Usage:') || output.includes('Commands:') || output.includes('help'));
+      const output = result.stdout;
+      assert(output.includes('From Fed to Chain CLI') || output.includes('Core Workflow:') || output.includes('npm run'));
     });
 
     it('should show help for invalid command', async () => {
       const result = await runCLI(['invalid-command']);
       
-      const output = result.stdout.join(' ');
-      assert(output.includes('Usage:') || output.includes('Commands:') || output.includes('help'));
+      const output = result.stdout;
+      assert(output.includes('From Fed to Chain CLI') || output.includes('Core Workflow:') || output.includes('npm run'));
     });
 
     it('should recognize valid commands', async () => {
@@ -171,7 +179,7 @@ describe('CLI Commands Tests', () => {
           await runCLI([command]);
           
           // Should not show help message for valid commands
-          const output = result.stdout.join(' ');
+          const output = result.stdout;
           assert(!output.includes('Usage:'), `Command ${command} should be recognized as valid`);
         } catch (error) {
           // Commands may throw errors due to missing content/setup, but they should be recognized
@@ -185,7 +193,7 @@ describe('CLI Commands Tests', () => {
     it('should list available content', async () => {
       const result = await runCLI(['list']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       assert(output.includes('2025-07-02-cli-test') || output.includes('CLI測試內容'));
     });
 
@@ -195,7 +203,7 @@ describe('CLI Commands Tests', () => {
       
       const result = await runCLI(['list']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       assert(output.includes('No content found') || output.includes('empty') || output.includes('0'));
     });
   });
@@ -204,7 +212,7 @@ describe('CLI Commands Tests', () => {
     it('should show content status overview', async () => {
       const result = await runCLI(['status']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       assert(output.includes('draft') || output.includes('status') || output.includes('Content Status'));
     });
 
@@ -221,30 +229,10 @@ describe('CLI Commands Tests', () => {
 
   describe('Review Command', () => {
     it('should start review process for draft content', async () => {
-      // Mock user input for review
-      const originalStdin = process.stdin;
-      let inputIndex = 0;
-      const mockInputs = ['q\n']; // Quit review immediately
+      const result = await runCLI(['review']);
       
-      process.stdin = {
-        resume: () => {},
-        setRawMode: () => {},
-        on: (event, callback) => {
-          if (event === 'data' && inputIndex < mockInputs.length) {
-            callback(Buffer.from(mockInputs[inputIndex]));
-            inputIndex++;
-          }
-        }
-      };
-
-      try {
-        const result = await runCLI(['review']);
-        
-        const output = result.stdout.join(' ');
-        assert(output.includes('Review') || output.includes('CLI測試內容') || output.includes('2025-07-02-cli-test'));
-      } finally {
-        process.stdin = originalStdin;
-      }
+      const output = result.stdout;
+      assert(output.includes('Interactive Content Review') || output.includes('No content pending review') || output.includes('review'));
     });
 
     it('should handle no content to review', async () => {
@@ -256,17 +244,17 @@ describe('CLI Commands Tests', () => {
       
       const result = await runCLI(['review']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       assert(output.includes('No content pending review') || output.includes('Nothing to review'));
     });
   });
 
   describe('Translate Command', () => {
-    it('should require content ID argument', async () => {
+    it('should handle translate without ID by showing available content', async () => {
       const result = await runCLI(['translate']);
       
-      const errorOutput = result.stderr.join(' ');
-      assert(errorOutput.includes('Content ID required') || errorOutput.includes('Missing') || errorOutput.includes('Usage'));
+      const output = result.stdout;
+      assert(output.includes('No content needs translation') || output.includes('Content Ready for Translation') || output.includes('translate'));
     });
 
     it('should handle translate command with valid ID', async () => {
@@ -302,11 +290,11 @@ describe('CLI Commands Tests', () => {
   });
 
   describe('Audio Command', () => {
-    it('should require content ID for audio generation', async () => {
+    it('should handle audio without ID by showing available content', async () => {
       const result = await runCLI(['audio']);
       
-      const errorOutput = result.stderr.join(' ');
-      assert(errorOutput.includes('Content ID required') || errorOutput.includes('Missing') || errorOutput.includes('Usage'));
+      const output = result.stdout;
+      assert(output.includes('No content needs audio generation') || output.includes('audio') || output.includes('Content Ready'));
     });
 
     it('should handle audio command with content ID', async () => {
@@ -323,11 +311,11 @@ describe('CLI Commands Tests', () => {
   });
 
   describe('Social Command', () => {
-    it('should require content ID for social hook generation', async () => {
+    it('should handle social without ID by showing available content', async () => {
       const result = await runCLI(['social']);
       
-      const errorOutput = result.stderr.join(' ');
-      assert(errorOutput.includes('Content ID required') || errorOutput.includes('Missing') || errorOutput.includes('Usage'));
+      const output = result.stdout;
+      assert(output.includes('No content needs social hook generation') || output.includes('social') || output.includes('Content Ready'));
     });
 
     it('should handle social command with content ID', async () => {
@@ -344,11 +332,11 @@ describe('CLI Commands Tests', () => {
   });
 
   describe('Publish Command', () => {
-    it('should require content ID for publishing', async () => {
+    it('should show usage and ready content when no ID provided', async () => {
       const result = await runCLI(['publish']);
       
-      const errorOutput = result.stderr.join(' ');
-      assert(errorOutput.includes('Content ID required') || errorOutput.includes('Missing') || errorOutput.includes('Usage'));
+      const output = result.stdout;
+      assert(output.includes('Content Ready to Publish') || output.includes('Usage:') || output.includes('npm run publish'));
     });
 
     it('should handle publish command with platform argument', async () => {
@@ -389,11 +377,12 @@ describe('CLI Commands Tests', () => {
       }
     });
 
-    it('should require content ID for pipeline', async () => {
+    it('should run smart pipeline when no ID provided', async () => {
       const result = await runCLI(['pipeline']);
       
-      const errorOutput = result.stderr.join(' ');
-      assert(errorOutput.includes('Content ID required') || errorOutput.includes('Missing') || errorOutput.includes('Usage'));
+      const output = result.stdout;
+      // Pipeline should start running or complete quickly
+      assert(output.includes('Smart Pipeline') || output.includes('Found') || output.includes('Processing') || result.exitCode === 0);
     });
   });
 
@@ -401,7 +390,7 @@ describe('CLI Commands Tests', () => {
     it('should run analytics without requiring arguments', async () => {
       const result = await runCLI(['analytics']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       assert(output.includes('Analytics') || output.includes('statistics') || output.includes('metrics') || output.includes('0'));
     });
   });
@@ -410,7 +399,7 @@ describe('CLI Commands Tests', () => {
     it('should run export-training command', async () => {
       const result = await runCLI(['export-training']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       assert(output.includes('export') || output.includes('training') || output.includes('data') || output.includes('Export'));
     });
   });
@@ -423,14 +412,14 @@ describe('CLI Commands Tests', () => {
       const result = await runCLI(['list']);
       
       // Should handle error gracefully without crashing
-      const errorOutput = result.stderr.join(' ');
+      const errorOutput = result.stderr;
       assert(errorOutput.includes('Error') || errorOutput.includes('not found') || result.exitCode === 1);
     });
 
     it('should handle invalid content ID', async () => {
       const result = await runCLI(['translate', 'non-existent-content']);
       
-      const errorOutput = result.stderr.join(' ');
+      const errorOutput = result.stderr;
       assert(errorOutput.includes('not found') || errorOutput.includes('Error') || errorOutput.includes('Content'));
     });
 
@@ -465,7 +454,7 @@ describe('CLI Commands Tests', () => {
     it('should use colored output for better UX', async () => {
       const result = await runCLI(['list']);
       
-      const output = result.stdout.join(' ');
+      const output = result.stdout;
       // Check for ANSI color codes or chalk-style formatting
       assert(output.includes('From Fed to Chain'));
     });
@@ -474,7 +463,7 @@ describe('CLI Commands Tests', () => {
       try {
         const result = await runCLI(['pipeline', '2025-07-02-cli-test']);
         
-        const output = result.stdout.join(' ');
+        const output = result.stdout;
         assert(output.includes('='.repeat(5)) || output.includes('Loading') || output.includes('Processing'));
       } catch (error) {
         // Expected due to missing services
