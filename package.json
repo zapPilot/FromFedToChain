@@ -10,6 +10,7 @@
     "audio": "node src/cli.js audio", 
     "social": "node src/cli.js social",
     "publish": "node src/cli.js publish",
+    "spotify": "node src/cli.js spotify",
     "list": "node src/cli.js list",
     "status": "node src/cli.js status",
     "analytics": "node src/cli.js analytics",

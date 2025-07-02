@@ -36,6 +36,9 @@ async function main() {
       case 'publish':
         await handlePublish();
         break;
+      case 'spotify':
+        await handleSpotify();
+        break;
       case 'analytics':
         await handleAnalytics();
         break;
@@ -327,6 +330,68 @@ async function runPipelineForContent(id) {
   }
 }
 
+async function handleSpotify() {
+  const command = args[1];
+  
+  if (command === 'upload') {
+    console.log(chalk.blue.bold("📤 Spotify Auto-Upload"));
+    console.log(chalk.gray("=".repeat(50)));
+    
+    try {
+      const results = await SpotifyUploader.uploadAllUnuploaded();
+      console.log(chalk.green.bold(`\n🎉 Upload completed: ${results.uploaded} uploaded, ${results.failed} failed`));
+    } catch (error) {
+      console.error(chalk.red(`❌ Spotify upload failed: ${error.message}`));
+    }
+  } else if (command === 'list') {
+    console.log(chalk.blue.bold("📋 Un-uploaded Audio Files"));
+    console.log(chalk.gray("=".repeat(50)));
+    
+    const unuploaded = SpotifyUploader.findUnuploadedAudios();
+    if (unuploaded.length === 0) {
+      console.log(chalk.green("✅ All audio files are uploaded to Spotify"));
+      return;
+    }
+    
+    console.log(chalk.cyan(`Found ${unuploaded.length} un-uploaded audio files:\n`));
+    
+    const byLanguage = {};
+    unuploaded.forEach(item => {
+      if (!byLanguage[item.language]) byLanguage[item.language] = [];
+      byLanguage[item.language].push(item);
+    });
+    
+    Object.entries(byLanguage).forEach(([language, items]) => {
+      const showName = {
+        'en-US': 'From Fed to Chain [Eng]',
+        'zh-TW': 'From Fed to Chain【中文】',
+        'ja-JP': 'From Fed to Chain【日本語】'
+      }[language];
+      
+      console.log(chalk.blue(`🎯 ${showName} (${items.length} episodes):`));
+      items.forEach(item => {
+        console.log(chalk.white(`  • ${item.title}`));
+        console.log(chalk.gray(`    ${item.audioPath}`));
+      });
+      console.log("");
+    });
+    
+    console.log(chalk.gray("💡 Run 'npm run spotify upload' to upload all files"));
+  } else {
+    console.log(chalk.blue.bold("🎵 Spotify Management"));
+    console.log(chalk.gray("=".repeat(50)));
+    console.log(chalk.cyan("Commands:"));
+    console.log("  npm run spotify list               - List un-uploaded audio files");
+    console.log("  npm run spotify upload             - Auto-upload all un-uploaded files");
+    console.log("");
+    console.log(chalk.yellow("Features:"));
+    console.log("  • Automatically finds un-uploaded audio files");
+    console.log("  • Groups by language/show for efficient uploading");
+    console.log("  • Tracks upload status in content files");
+    console.log("  • Supports three shows: [Eng], 【中文】, 【日本語】");
+  }
+}
+
 async function publishContent(id) {
   // Get all language versions of this content
   const allVersions = await ContentManager.getAllLanguagesForId(id);
@@ -348,9 +413,8 @@ async function publishContent(id) {
   if (Object.keys(audioFiles).length > 0) {
     console.log(chalk.blue("📤 Uploading to Spotify..."));
     try {
-      // Use the source content for metadata
-      const sourceContent = await ContentManager.readSource(id);
-      const spotifyResults = await SpotifyUploader.uploadMultipleEpisodes(sourceContent, audioFiles);
+      // Use the new auto-upload method
+      await SpotifyUploader.uploadAllUnuploaded();
       console.log(chalk.green("✅ Spotify upload completed"));
     } catch (error) {
       console.log(chalk.yellow(`⚠️ Spotify upload failed: ${error.message}`));
@@ -642,6 +706,7 @@ function showHelp() {
   console.log("  npm run audio [id] [language]                  - Generate audio");
   console.log("  npm run social [id] [language]                 - Generate social hooks");
   console.log("  npm run publish [id] [platform]                - Publish content");
+  console.log("  npm run spotify [upload|list]                  - Manage Spotify uploads");
   
   console.log(chalk.cyan("\nUtilities:"));
   console.log("  npm run list [status]                          - List content");

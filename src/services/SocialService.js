@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { executeCommandSync } from "../utils/command-executor.js";
 import chalk from "chalk";
 import { ContentManager } from "../ContentManager.js";
 
@@ -6,7 +6,7 @@ export class SocialService {
   static SUPPORTED_LANGUAGES = ['en-US', 'ja-JP'];
 
   // Generate social hook for specific language
-  static async generateHook(id, language) {
+  static async generateHook(id, language, commandExecutor = executeCommandSync) {
     console.log(chalk.blue(`📱 Generating social hook: ${id} (${language})`));
 
     // Get specific language content
@@ -19,7 +19,7 @@ export class SocialService {
     const { title, content: text } = content;
 
     // Generate social hook using Claude
-    const hook = await this.generateHookWithClaude(title, text, language);
+    const hook = await this.generateHookWithClaude(title, text, language, commandExecutor);
 
     // Add social hook to content
     await ContentManager.addSocialHook(id, language, hook);
@@ -29,7 +29,7 @@ export class SocialService {
   }
 
   // Generate social hooks for all languages
-  static async generateAllHooks(id) {
+  static async generateAllHooks(id, commandExecutor = executeCommandSync) {
     // Check source status first
     const sourceContent = await ContentManager.readSource(id);
     
@@ -47,7 +47,7 @@ export class SocialService {
 
     for (const language of translationLanguages) {
       try {
-        const hook = await this.generateHook(id, language);
+        const hook = await this.generateHook(id, language, commandExecutor);
         results[language] = { success: true, hook };
       } catch (error) {
         console.error(chalk.red(`❌ Social hook generation failed for ${language}: ${error.message}`));
@@ -55,9 +55,9 @@ export class SocialService {
       }
     }
 
-    // Update source status if all hooks generated
+    // Update source status if all hooks generated (or no translation languages exist)
     const allSuccessful = Object.values(results).every(r => r.success);
-    if (allSuccessful && translationLanguages.length > 0) {
+    if (translationLanguages.length === 0 || allSuccessful) {
       await ContentManager.updateSourceStatus(id, 'social');
     }
 
@@ -65,7 +65,7 @@ export class SocialService {
   }
 
   // Generate social hook using Claude
-  static async generateHookWithClaude(title, content, language) {
+  static async generateHookWithClaude(title, content, language, commandExecutor = executeCommandSync) {
     const languageMap = {
       'en-US': 'English',
       'ja-JP': 'Japanese'
@@ -91,7 +91,7 @@ Return only the hook, no explanations.`;
     try {
       const claudeCommand = `claude -p ${JSON.stringify(prompt)}`;
       
-      const hookResult = execSync(claudeCommand, { 
+      const hookResult = commandExecutor(claudeCommand, { 
         encoding: 'utf-8',
         timeout: 60000,
         maxBuffer: 1024 * 1024
