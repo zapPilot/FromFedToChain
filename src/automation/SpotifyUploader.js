@@ -30,14 +30,14 @@ export class SpotifyUploader {
     // Go to Spotify Creators dashboard
     await this.page.goto('https://creators.spotify.com/pod/dashboard/home');
     
-    // Wait for dashboard to load (you'll need to login manually if not already logged in)
+    // Wait for dashboard to load (check if already logged in using listrow-title-1)
     try {
-      await this.page.waitForSelector('[data-testid="dashboard-header"]', { timeout: 10000 });
-      console.log(chalk.green('✅ Dashboard loaded successfully'));
+      await this.page.waitForSelector('#listrow-title-1', { timeout: 10000 });
+      console.log(chalk.green('✅ Dashboard loaded successfully (already logged in)'));
     } catch (error) {
       console.log(chalk.yellow('⚠️ Please log in manually in the browser window'));
       console.log(chalk.cyan('Waiting for dashboard to load...'));
-      await this.page.waitForSelector('[data-testid="dashboard-header"]', { timeout: 300000 }); // 5 minutes
+      await this.page.waitForSelector('#listrow-title-1', { timeout: 300000 }); // 5 minutes
       console.log(chalk.green('✅ Dashboard loaded after manual login'));
     }
   }
@@ -46,9 +46,6 @@ export class SpotifyUploader {
     console.log(chalk.blue('🎯 Finding multilingual show...'));
     
     try {
-      // Wait for dashboard to be ready
-      await this.page.waitForSelector('[data-testid="dashboard-header"]', { timeout: 10000 });
-      
       let showFound = false;
       let showNumber = 1;
       let maxAttempts = 10; // Limit search to first 10 shows
@@ -64,7 +61,7 @@ export class SpotifyUploader {
             console.log(chalk.cyan(`📋 Checking show ${showNumber}: ${showText}`));
             
             // Check if show title contains all multilingual identifiers
-            const hasAllLanguages = this.multilingualShowIdentifier.every(lang => 
+            const hasAllLanguages = this.multilingualShowIdentifier.all(lang => 
               showText.includes(lang)
             );
             
