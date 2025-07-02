@@ -3,18 +3,24 @@ import chalk from "chalk";
 import { ContentManager } from "../ContentManager.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { 
+  getTranslationTargets, 
+  getTranslationConfig,
+  LANGUAGES,
+  PATHS 
+} from "../../config/languages.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class TranslationService {
-  static SUPPORTED_LANGUAGES = ['en-US', 'ja-JP'];
+  static SUPPORTED_LANGUAGES = getTranslationTargets();
   static translate_client = null;
 
   // Initialize Google Cloud Translate client
   static getTranslateClient() {
     if (!this.translate_client) {
-      const serviceAccountPath = path.resolve(process.cwd(), 'service-account.json');
+      const serviceAccountPath = path.resolve(process.cwd(), PATHS.SERVICE_ACCOUNT);
       this.translate_client = new Translate({
         keyFilename: serviceAccountPath
         // projectId will be automatically inferred from service account file
@@ -78,17 +84,15 @@ export class TranslationService {
 
   // Translate text using Google Cloud Translate API
   static async translateText(text, targetLanguage) {
-    const languageMap = {
-      'zh-TW': 'zh',  // Source language
-      'en-US': 'en',  // Target languages
-      'ja-JP': 'ja'
-    };
-
-    const sourceLanguage = languageMap['zh-TW'];
-    const targetLangCode = languageMap[targetLanguage];
+    // Get translation configurations
+    const sourceConfig = getTranslationConfig(LANGUAGES.PRIMARY);
+    const targetConfig = getTranslationConfig(targetLanguage);
     
-    if (!targetLangCode) {
-      throw new Error(`Unsupported language: ${targetLanguage}`);
+    const sourceLanguage = sourceConfig.languageCode;
+    const targetLangCode = targetConfig.languageCode;
+    
+    if (!targetConfig.isTarget) {
+      throw new Error(`Language ${targetLanguage} is not configured as a translation target`);
     }
 
     try {

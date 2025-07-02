@@ -3,26 +3,38 @@ import path from "path";
 import chalk from "chalk";
 import { GoogleTTSService } from "./GoogleTTSService.js";
 import { ContentManager } from "../ContentManager.js";
-import { VOICE_CONFIG } from "../../config/languages.js";
+import { 
+  getAudioLanguages, 
+  getTTSConfig, 
+  shouldGenerateAudio,
+  PATHS
+} from "../../config/languages.js";
 
 export class AudioService {
-  static AUDIO_DIR = "./audio";
+  static AUDIO_DIR = PATHS.AUDIO_ROOT;
 
   // Generate audio for specific language
   static async generateAudio(id, language) {
     console.log(chalk.blue(`🎙️ Generating audio: ${id} (${language})`));
 
+    // Check if this language should have audio generated
+    if (!shouldGenerateAudio(language)) {
+      throw new Error(`Audio generation not configured for language: ${language}`);
+    }
+
     // Get specific language content
     const content = await ContentManager.read(id, language);
     
     if (!content) {
-      throw new Error(`No ${language} translation found for ${id}`);
+      throw new Error(`No ${language} content found for ${id}`);
     }
 
-    const voiceConfig = VOICE_CONFIG[language];
-    if (!voiceConfig) {
-      throw new Error(`No voice config for language: ${language}`);
-    }
+    // Get TTS configuration for this language
+    const ttsConfig = getTTSConfig(language);
+    const voiceConfig = {
+      languageCode: ttsConfig.languageCode,
+      name: ttsConfig.name
+    };
 
     const { content: text } = content;
 
@@ -33,7 +45,7 @@ export class AudioService {
     const ttsService = new GoogleTTSService();
     const audioResponse = await ttsService.synthesizeSpeech(ttsContent, voiceConfig);
 
-    // Save audio file
+    // Save audio file with category-based structure
     const audioPath = await this.saveAudioFile(
       audioResponse.audioContent,
       id,
@@ -48,7 +60,7 @@ export class AudioService {
     return audioPath;
   }
 
-  // Generate audio for all translations
+  // Generate audio for all languages (including source language)
   static async generateAllAudio(id) {
     // Check source status first
     const sourceContent = await ContentManager.readSource(id);
@@ -60,12 +72,21 @@ export class AudioService {
     // Get all available languages for this content
     const availableLanguages = await ContentManager.getAvailableLanguages(id);
     
-    // Filter out source language for audio generation (only need translations)
-    const translationLanguages = availableLanguages.filter(lang => lang !== 'zh-TW');
+    // Get all languages that should have audio generated
+    const audioLanguages = getAudioLanguages();
+    
+    // Find intersection of available languages and configured audio languages
+    const targetLanguages = availableLanguages.filter(lang => audioLanguages.includes(lang));
+
+    if (targetLanguages.length === 0) {
+      throw new Error(`No languages configured for audio generation found for content: ${id}`);
+    }
+
+    console.log(chalk.blue(`📝 Generating audio for ${targetLanguages.length} languages: ${targetLanguages.join(', ')}`));
 
     const results = {};
 
-    for (const language of translationLanguages) {
+    for (const language of targetLanguages) {
       try {
         const audioPath = await this.generateAudio(id, language);
         results[language] = { success: true, audioPath };
@@ -75,22 +96,23 @@ export class AudioService {
       }
     }
 
-    // Update source status if all audio generated
+    // Update source status if all audio generated successfully
     const allSuccessful = Object.values(results).every(r => r.success);
-    if (allSuccessful && translationLanguages.length > 0) {
+    if (allSuccessful && targetLanguages.length > 0) {
       await ContentManager.updateSourceStatus(id, 'audio');
     }
 
     return results;
   }
 
-  // Save audio file to disk
+  // Save audio file to disk with category-based structure
   static async saveAudioFile(audioContent, id, language, category) {
-    const languageDir = path.join(this.AUDIO_DIR, language);
-    await fs.mkdir(languageDir, { recursive: true });
+    // Create directory structure: audio/<language>/<category>/
+    const categoryDir = path.join(this.AUDIO_DIR, language, category);
+    await fs.mkdir(categoryDir, { recursive: true });
 
     const fileName = `${id}.wav`;
-    const filePath = path.join(languageDir, fileName);
+    const filePath = path.join(categoryDir, fileName);
 
     await fs.writeFile(filePath, audioContent);
     
@@ -102,7 +124,7 @@ export class AudioService {
     return ContentManager.getSourceByStatus('translated');
   }
 
-  // List all audio files
+  // List all audio files with category-based structure
   static async listAudioFiles() {
     try {
       const languages = await fs.readdir(this.AUDIO_DIR);
@@ -111,21 +133,38 @@ export class AudioService {
       for (const language of languages) {
         const languageDir = path.join(this.AUDIO_DIR, language);
         try {
-          const files = await fs.readdir(languageDir);
-          for (const file of files) {
-            if (file.endsWith('.wav')) {
-              const stats = await fs.stat(path.join(languageDir, file));
-              audioFiles.push({
-                id: path.basename(file, '.wav'),
-                language,
-                file: path.join(languageDir, file),
-                size: Math.round(stats.size / 1024) + 'KB',
-                created: stats.birthtime.toISOString().split('T')[0]
-              });
+          const stat = await fs.stat(languageDir);
+          if (!stat.isDirectory()) continue;
+
+          const categories = await fs.readdir(languageDir);
+          
+          for (const category of categories) {
+            const categoryDir = path.join(languageDir, category);
+            try {
+              const categoryStat = await fs.stat(categoryDir);
+              if (!categoryStat.isDirectory()) continue;
+
+              const files = await fs.readdir(categoryDir);
+              for (const file of files) {
+                if (file.endsWith('.wav')) {
+                  const filePath = path.join(categoryDir, file);
+                  const stats = await fs.stat(filePath);
+                  audioFiles.push({
+                    id: path.basename(file, '.wav'),
+                    language,
+                    category,
+                    file: filePath,
+                    size: Math.round(stats.size / 1024) + 'KB',
+                    created: stats.birthtime.toISOString().split('T')[0]
+                  });
+                }
+              }
+            } catch (e) {
+              // Skip invalid category directories
             }
           }
         } catch (e) {
-          // Skip invalid directories
+          // Skip invalid language directories
         }
       }
 
