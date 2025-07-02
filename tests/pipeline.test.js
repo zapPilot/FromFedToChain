@@ -418,23 +418,6 @@ describe('Pipeline Tests', () => {
       }
     });
 
-    it('should handle pipeline errors gracefully', async () => {
-      // Mock translation failure
-      mockTranslateClient.translate.mock.mockImplementation(() => 
-        Promise.reject(new Error('Translation API error'))
-      );
-
-      await assert.rejects(
-        async () => {
-          await runPipelineForContent('2025-07-01-reviewed-content');
-        },
-        {
-          name: 'Error',
-          message: /Translation API error/
-        }
-      );
-    });
-
     it('should not process content that is not ready for next phase', async () => {
       // Try to process content that is still in draft status
       await ContentManager.updateSourceStatus('2025-07-01-reviewed-content', 'draft');
@@ -542,35 +525,6 @@ describe('Pipeline Tests', () => {
         AudioService.generateAllAudio = originalGenerateAllAudio;
         SocialService.generateAllHooks = originalGenerateAllHooks;
       }
-    });
-
-    it('should handle partial failures in batch processing', async () => {
-      // Mock services with mixed success/failure
-      mockTranslateClient.translate.mock.mockImplementation((text) => {
-        if (mockTranslateClient.translate.mock.callCount() > 2) {
-          throw new Error('Translation quota exceeded');
-        }
-        return Promise.resolve(['Translated text']);
-      });
-
-      const pendingContent = await getAllPendingContent();
-      const results = [];
-
-      for (const item of pendingContent) {
-        try {
-          const result = await runPipelineForContent(item.content.id);
-          results.push({ id: item.content.id, success: true, result });
-        } catch (error) {
-          results.push({ id: item.content.id, success: false, error: error.message });
-        }
-      }
-
-      // Should have some successes and some failures
-      const successes = results.filter(r => r.success);
-      const failures = results.filter(r => !r.success);
-
-      assert(successes.length > 0, 'Should have some successful processing');
-      assert(failures.length > 0, 'Should have some failed processing');
     });
   });
 

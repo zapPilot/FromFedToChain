@@ -18,8 +18,8 @@
       "status": "rejected",
       "score": 2,
       "reviewer": "reviewer_cli",
-      "timestamp": "2025-07-01T13:31:17.721Z",
-      "comments": "感覺知識點很少，也沒有具體說哪個機構開始投資，背後的原因是啥等等。很像是一篇單純的新聞而不是一篇知識性的文章很像是一篇單純的新聞而不是一篇知識性的文章",
+      "timestamp": "2025-07-02T22:27:20.239Z",
+      "comments": "就是單純在講幣價波動，沒有知識點",
       "training_labels": {}
     },
     "ai_outputs": {
@@ -32,5 +32,5 @@
       "social_platforms": {}
     }
   },
-  "updated_at": "2025-07-01T13:31:17.724Z"
+  "updated_at": "2025-07-02T22:27:20.241Z"
 }

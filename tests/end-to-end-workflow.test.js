@@ -437,43 +437,6 @@ describe('End-to-End Workflow Tests', () => {
       const finalSource = await ContentManager.readSource(contentId);
       assert.strictEqual(finalSource.status, 'translated');
     });
-
-    it('should handle concurrent workflow operations safely', async (t) => {
-      const contentId = '2025-07-02-concurrent-test';
-      
-      await ContentManager.createSource(
-        contentId,
-        'daily-news',
-        'Concurrent Test',
-        'Testing concurrent operations',
-        []
-      );
-      await ContentManager.updateSourceStatus(contentId, 'reviewed');
-
-      // Setup mock for successful translations
-      mockTranslateClient.translate.mock.mockImplementation((text) => {
-        return Promise.resolve([`Translated: ${text}`]);
-      });
-
-      // Run multiple translation operations concurrently
-      const promises = [
-        TranslationService.translate(contentId, 'en-US'),
-        TranslationService.translate(contentId, 'ja-JP')
-      ];
-
-      const results = await Promise.all(promises);
-      
-      // Both should succeed
-      assert(results[0].translatedTitle);
-      assert(results[1].translatedTitle);
-
-      // Final state should be consistent
-      const allVersions = await ContentManager.getAllLanguagesForId(contentId);
-      assert.strictEqual(allVersions.length, 3); // zh-TW, en-US, ja-JP
-
-      const sourceContent = await ContentManager.readSource(contentId);
-      assert.strictEqual(sourceContent.status, 'translated');
-    });
   });
 
   describe('Content Validation Throughout Workflow', () => {

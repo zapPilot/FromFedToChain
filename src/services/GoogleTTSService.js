@@ -130,6 +130,11 @@ export class GoogleTTSService {
   splitContentIntoChunks(content) {
     const MAX_CHUNK_BYTES = 4800; // Safe buffer under 5000 byte limit
     
+    // If content is empty or only whitespace, return no chunks
+    if (!content || content.trim().length === 0) {
+      return [];
+    }
+    
     // If content is under limit, return as single chunk
     if (Buffer.byteLength(content, 'utf8') <= MAX_CHUNK_BYTES) {
       return [content];
