@@ -2,23 +2,14 @@
   "name": "from-fed-to-chain",
   "version": "1.0.0",
   "type": "module",
-  "description": "Streamlined content pipeline: Review → Translation → TTS → Social Hooks (Manual Publishing)",
+  "description": "Simplified content review and training data export system",
   "scripts": {
     "review": "node src/cli.js review",
-    "pipeline": "node src/cli.js pipeline",
-    "translate": "node src/cli.js translate",
-    "audio": "node src/cli.js audio", 
-    "social": "node src/cli.js social",
-    "list": "node src/cli.js list",
-    "status": "node src/cli.js status",
-    "analytics": "node src/cli.js analytics",
     "export-training": "node src/cli.js export-training",
     "test": "node tests/run-tests.js",
     "format": "prettier --write . --ignore-path .prettierignore"
   },
   "dependencies": {
-    "@google-cloud/text-to-speech": "^5.0.0",
-    "@google-cloud/translate": "^9.1.0",
     "chalk": "^5.4.1",
     "prettier": "^3.6.2"
   },

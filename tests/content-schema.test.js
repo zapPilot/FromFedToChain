@@ -372,7 +372,7 @@ describe('ContentSchema Tests', () => {
         'Title',
         'Content'
       );
-      content.feedback = null;
+      delete content.feedback; // Remove the field entirely
 
       assert.throws(
         () => ContentSchema.validate(content),
