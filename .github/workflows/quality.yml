@@ -26,10 +26,8 @@ jobs:
     - name: Check code formatting
       run: npm run format -- --check
 
-    - name: Run basic tests
-      run: npm test
-      env:
-        NODE_ENV: test
+    - name: Run tests
+      run: npm run test
 
     - name: Security audit
       run: npm audit --audit-level=moderate
