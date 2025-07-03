@@ -31,11 +31,7 @@ async function getAllPendingContent() {
     pendingContent.push({ content, nextPhase: 'social', currentStatus: 'audio' });
   });
 
-  // Phase 4: Publishing (social → published)
-  const needPublishing = await SocialService.getContentReadyToPublish();
-  needPublishing.forEach(content => {
-    pendingContent.push({ content, nextPhase: 'publishing', currentStatus: 'social' });
-  });
+  // Content with 'social' status is ready for manual publishing
 
   // Sort by date (newest first)
   return pendingContent.sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
@@ -533,8 +529,6 @@ describe('Pipeline Tests', () => {
       const translationContent = await TranslationService.getContentNeedingTranslation();
       const audioContent = await AudioService.getContentNeedingAudio();
       const socialContent = await SocialService.getContentNeedingSocial();
-      const publishingContent = await SocialService.getContentReadyToPublish();
-
       assert.strictEqual(translationContent.length, 1);
       assert.strictEqual(translationContent[0].id, '2025-07-01-reviewed-content');
 
@@ -544,8 +538,7 @@ describe('Pipeline Tests', () => {
       assert.strictEqual(socialContent.length, 1);
       assert.strictEqual(socialContent[0].id, '2025-07-01-audio-content');
 
-      assert.strictEqual(publishingContent.length, 1);
-      assert.strictEqual(publishingContent[0].id, '2025-07-01-social-content');
+      // Pipeline complete - content with 'social' status is ready for manual publishing
     });
 
     it('should handle empty phases correctly', async () => {
@@ -560,12 +553,9 @@ describe('Pipeline Tests', () => {
       const translationContent = await TranslationService.getContentNeedingTranslation();
       const audioContent = await AudioService.getContentNeedingAudio();
       const socialContent = await SocialService.getContentNeedingSocial();
-      const publishingContent = await SocialService.getContentReadyToPublish();
-
       assert.strictEqual(translationContent.length, 0);
       assert.strictEqual(audioContent.length, 0);
       assert.strictEqual(socialContent.length, 0);
-      assert.strictEqual(publishingContent.length, 0);
     });
   });
 });

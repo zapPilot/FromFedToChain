@@ -114,8 +114,4 @@ Return only the hook, no explanations.`;
     return ContentManager.getSourceByStatus('audio');
   }
 
-  // Get content ready for publishing
-  static async getContentReadyToPublish() {
-    return ContentManager.getSourceByStatus('social');
-  }
 }

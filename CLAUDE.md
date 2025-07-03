@@ -110,44 +110,23 @@ npm run audio 2025-06-30-bitcoin-news
 npm run social 2025-06-30-bitcoin-news
 ```
 
-### Automated Publishing
-```bash
-# Full publish: Upload to Spotify + Post to social media
-npm run publish 2025-06-30-bitcoin-news
+### Manual Publishing
+After the content pipeline completes (review → translate → audio → social), content is ready for manual publishing:
 
-# Upload to Spotify only
-npm run publish 2025-06-30-bitcoin-news spotify
-
-# Post to social media only (Twitter, Threads, Farcaster, DeBank)
-npm run publish 2025-06-30-bitcoin-news social
-```
-
-## 🤖 Automation Features
-
-### Spotify Upload (Playwright)
-- Automated podcast upload to Spotify for Podcasters
-- Handles multiple languages as separate episodes
-- Returns podcast URLs for social sharing
-- Manual login required (browser automation)
-
-### Social Media Posting (Playwright)
-- **Twitter/X**: Automated posting with podcast links
-- **Threads**: Meta's text-based platform
-- **Farcaster**: Decentralized social via Warpcast
-- **DeBank**: Crypto-focused social platform
-- Manual login required for each platform
+- **Audio Files**: Located in `/audio/{language}/{category}/{id}.wav`
+- **Social Hooks**: Generated and stored in content files for easy copy-paste
+- **Manual Upload**: Upload audio files to your preferred podcast platform
+- **Manual Posting**: Use generated social hooks to post on your preferred platforms
 
 ### Authentication
-- Uses `./service-account.json` for Google Cloud (TTS)
-- Social platforms require manual browser login
-- Spotify requires Spotify for Podcasters account
+- Uses `./service-account.json` for Google Cloud (TTS and Translation)
 
 ## 📁 File Structure
 
 ### Content Files
 - **Location**: `/content/{language}/{category}/{id}.json`
 - **Format**: Single JSON per language with content and metadata
-- **Status**: Tracked in `status` field (draft → published)
+- **Status**: Tracked in `status` field (draft → reviewed → translated → audio → social)
 - **Languages**: zh-TW (source), en-US, ja-JP
 
 ### Audio Files
@@ -164,7 +143,7 @@ npm run publish 2025-06-30-bitcoin-news social
 
 ### ContentManager
 - Single-file CRUD operations
-- Status management (draft → published)
+- Status management (draft → reviewed → translated → audio → social)
 - No complex metadata or file scanning
 
 ### TranslationService  
@@ -206,7 +185,7 @@ npm run publish 2025-06-30-bitcoin-news social
 4. **Translate**: `npm run translate 2025-06-30-topic`
 5. **Audio**: `npm run audio 2025-06-30-topic`
 6. **Social**: `npm run social 2025-06-30-topic`
-7. **Publish**: `npm run publish 2025-06-30-topic`
+7. **Manual Publish**: Upload audio files and post social hooks manually
 
 This simplified approach removes all performance optimizations and complex state management, focusing on clarity and ease of maintenance for a human-bottlenecked workflow.
 

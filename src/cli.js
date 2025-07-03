@@ -6,8 +6,6 @@ import { ContentManager } from "./ContentManager.js";
 import { TranslationService } from "./services/TranslationService.js";
 import { AudioService } from "./services/AudioService.js";
 import { SocialService } from "./services/SocialService.js";
-import { SpotifyUploader } from "./automation/SpotifyUploader.js";
-import { SocialPoster } from "./automation/SocialPoster.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -32,12 +30,6 @@ async function main() {
         break;
       case 'social':
         await handleSocial();
-        break;
-      case 'publish':
-        await handlePublish();
-        break;
-      case 'spotify':
-        await handleSpotify();
         break;
       case 'analytics':
         await handleAnalytics();
@@ -253,11 +245,6 @@ async function getAllPendingContent() {
     pendingContent.push({ content, nextPhase: 'social', currentStatus: 'audio' });
   });
 
-  // Phase 4: Publishing (social → published)
-  const needPublishing = await SocialService.getContentReadyToPublish();
-  needPublishing.forEach(content => {
-    pendingContent.push({ content, nextPhase: 'publishing', currentStatus: 'social' });
-  });
 
   // Sort by date (newest first)
   return pendingContent.sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
@@ -277,8 +264,7 @@ function showPipelineStatus(pendingContent) {
     const phaseColor = {
       'translation': chalk.cyan,
       'audio': chalk.green,
-      'social': chalk.magenta,
-      'publishing': chalk.yellow
+      'social': chalk.magenta
     }[phase] || chalk.white;
     
     console.log(phaseColor(`📋 ${phase.toUpperCase()}: ${items.length} items`));
@@ -316,12 +302,7 @@ async function runPipelineForContent(id) {
       await SocialService.generateAllHooks(id);
     }
 
-    // Check updated status for publishing
-    const socialContent = await ContentManager.readSource(id);
-    if (socialContent.status === 'social') {
-      console.log(chalk.blue("4️⃣ Publishing..."));
-      await publishContent(id);
-    }
+    // Pipeline complete - content now has social hooks and is ready for manual publishing
 
     console.log(chalk.green(`✅ Pipeline completed for: ${id}`));
 
@@ -330,111 +311,7 @@ async function runPipelineForContent(id) {
   }
 }
 
-async function handleSpotify() {
-  const command = args[1];
-  
-  if (command === 'upload') {
-    console.log(chalk.blue.bold("📤 Spotify Auto-Upload"));
-    console.log(chalk.gray("=".repeat(50)));
-    
-    try {
-      const results = await SpotifyUploader.uploadAllUnuploaded();
-      console.log(chalk.green.bold(`\n🎉 Upload completed: ${results.uploaded} uploaded, ${results.failed} failed`));
-    } catch (error) {
-      console.error(chalk.red(`❌ Spotify upload failed: ${error.message}`));
-    }
-  } else if (command === 'list') {
-    console.log(chalk.blue.bold("📋 Un-uploaded Audio Files"));
-    console.log(chalk.gray("=".repeat(50)));
-    
-    const unuploaded = SpotifyUploader.findUnuploadedAudios();
-    if (unuploaded.length === 0) {
-      console.log(chalk.green("✅ All audio files are uploaded to Spotify"));
-      return;
-    }
-    
-    console.log(chalk.cyan(`Found ${unuploaded.length} un-uploaded audio files:\n`));
-    
-    const byLanguage = {};
-    unuploaded.forEach(item => {
-      if (!byLanguage[item.language]) byLanguage[item.language] = [];
-      byLanguage[item.language].push(item);
-    });
-    
-    Object.entries(byLanguage).forEach(([language, items]) => {
-      const showName = {
-        'en-US': 'From Fed to Chain [Eng]',
-        'zh-TW': 'From Fed to Chain【中文】',
-        'ja-JP': 'From Fed to Chain【日本語】'
-      }[language];
-      
-      console.log(chalk.blue(`🎯 ${showName} (${items.length} episodes):`));
-      items.forEach(item => {
-        console.log(chalk.white(`  • ${item.title}`));
-        console.log(chalk.gray(`    ${item.audioPath}`));
-      });
-      console.log("");
-    });
-    
-    console.log(chalk.gray("💡 Run 'npm run spotify upload' to upload all files"));
-  } else {
-    console.log(chalk.blue.bold("🎵 Spotify Management"));
-    console.log(chalk.gray("=".repeat(50)));
-    console.log(chalk.cyan("Commands:"));
-    console.log("  npm run spotify list               - List un-uploaded audio files");
-    console.log("  npm run spotify upload             - Auto-upload all un-uploaded files");
-    console.log("");
-    console.log(chalk.yellow("Features:"));
-    console.log("  • Automatically finds un-uploaded audio files");
-    console.log("  • Groups by language/show for efficient uploading");
-    console.log("  • Tracks upload status in content files");
-    console.log("  • Supports three shows: [Eng], 【中文】, 【日本語】");
-  }
-}
 
-async function publishContent(id) {
-  // Get all language versions of this content
-  const allVersions = await ContentManager.getAllLanguagesForId(id);
-  
-  // Collect audio files for Spotify upload
-  const audioFiles = {};
-  const socialHooks = {};
-  
-  for (const content of allVersions) {
-    const lang = content.language;
-    if (content.audio_file) {
-      audioFiles[lang] = content.audio_file;
-    }
-    if (content.social_hook) {
-      socialHooks[lang] = content.social_hook;
-    }
-  }
-
-  if (Object.keys(audioFiles).length > 0) {
-    console.log(chalk.blue("📤 Uploading to Spotify..."));
-    try {
-      // Use the new auto-upload method
-      await SpotifyUploader.uploadAllUnuploaded();
-      console.log(chalk.green("✅ Spotify upload completed"));
-    } catch (error) {
-      console.log(chalk.yellow(`⚠️ Spotify upload failed: ${error.message}`));
-    }
-  }
-
-  // Post to social platforms
-  console.log(chalk.blue("📱 Posting to social platforms..."));
-  for (const [lang, hook] of Object.entries(socialHooks)) {
-    try {
-      const socialResults = await SocialPoster.postToAllPlatforms(hook);
-      console.log(chalk.green(`✅ Social posts completed (${lang})`));
-    } catch (error) {
-      console.log(chalk.yellow(`⚠️ Social posting failed for ${lang}: ${error.message}`));
-    }
-  }
-
-  // Update status of source content
-  await ContentManager.updateSourceStatus(id, 'published');
-}
 
 async function handleTranslate() {
   const id = args[1];
@@ -534,32 +411,6 @@ async function handleSocial() {
   }
 }
 
-async function handlePublish() {
-  const id = args[1];
-  const platform = args[2];
-  
-  if (!id) {
-    const contents = await SocialService.getContentReadyToPublish();
-    if (contents.length === 0) {
-      console.log(chalk.green("✅ No content ready to publish"));
-      return;
-    }
-    
-    console.log(chalk.blue(`📋 Content Ready to Publish (${contents.length})`));
-    contents.forEach(content => {
-      console.log(chalk.yellow(`🚀 ${content.id}: ${content.title}`));
-    });
-    
-    console.log(chalk.gray("\n💡 Usage:"));
-    console.log(chalk.gray("  npm run publish <id>              - Upload to Spotify and post to all platforms"));
-    console.log(chalk.gray("  npm run publish <id> spotify      - Upload to Spotify only"));
-    console.log(chalk.gray("  npm run publish <id> social       - Post to social platforms only"));
-    return;
-  }
-
-  await publishContent(id);
-  console.log(chalk.green.bold(`\n🎉 Publishing completed for: ${id}`));
-}
 
 async function handleList() {
   const status = args[1];
@@ -705,8 +556,6 @@ function showHelp() {
   console.log("  npm run translate [id] [language]              - Translate content");
   console.log("  npm run audio [id] [language]                  - Generate audio");
   console.log("  npm run social [id] [language]                 - Generate social hooks");
-  console.log("  npm run publish [id] [platform]                - Publish content");
-  console.log("  npm run spotify [upload|list]                  - Manage Spotify uploads");
   
   console.log(chalk.cyan("\nUtilities:"));
   console.log("  npm run list [status]                          - List content");
@@ -726,7 +575,7 @@ function showHelp() {
   console.log("  [q]uit      - Exit review session");
   console.log("");
   console.log(chalk.gray("Smart Pipeline Features:"));
-  console.log("  • Automatically detects content at each phase: reviewed → translated → audio → social → published");
+  console.log("  • Automatically detects content at each phase: reviewed → translated → audio → social");
   console.log("  • Picks up where you left off - no need to restart from translation");
   console.log("  • Shows what content needs what phase before processing");
   
