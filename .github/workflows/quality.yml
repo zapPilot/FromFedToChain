@@ -33,10 +33,9 @@ jobs:
       run: npm audit --audit-level=moderate
       continue-on-error: true
 
-    - name: Check for secrets
+    - name: Check for secrets (full scan)
+      if: github.event_name == 'push'
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        base: main
-        head: HEAD
         extra_args: --debug --only-verified
