@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export class TestUtils {
   static async createTempDir() {
-    const tempDir = path.join(__dirname, 'temp', Date.now().toString());
+    const tempDir = path.join(__dirname, 'temp', `${Date.now()}-${Math.random().toString(36).substring(7)}`);
     await fs.mkdir(tempDir, { recursive: true });
     return tempDir;
   }

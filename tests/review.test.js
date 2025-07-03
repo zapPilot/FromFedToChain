@@ -65,7 +65,17 @@ describe('Review Command Tests', () => {
       await fs.mkdir(dir, { recursive: true });
       const filePath = path.join(dir, `${content.id}.json`);
       await fs.writeFile(filePath, JSON.stringify(content, null, 2));
+      
+      // Verify file was created
+      try {
+        await fs.access(filePath);
+      } catch (error) {
+        throw new Error(`Failed to create test file: ${filePath}`);
+      }
     }
+    
+    // Additional wait to ensure all filesystem operations complete
+    await new Promise(resolve => setTimeout(resolve, 50));
   });
 
   afterEach(async () => {
@@ -79,6 +89,34 @@ describe('Review Command Tests', () => {
   describe('Basic Functionality', () => {
     it('should list all draft content', async () => {
       const draftContents = await ContentManager.getSourceByStatus('draft');
+      
+      // Debug information for CI
+      if (draftContents.length !== 2) {
+        console.log(`Expected 2 draft contents, got ${draftContents.length}`);
+        console.log('Found draft contents:', draftContents.map(c => c.id));
+        console.log('ContentManager.CONTENT_DIR:', ContentManager.CONTENT_DIR);
+        
+        // Check if mock files exist
+        try {
+          const zhTWDir = path.join(ContentManager.CONTENT_DIR, 'zh-TW');
+          const dailyNewsDir = path.join(zhTWDir, 'daily-news');
+          const ethereumDir = path.join(zhTWDir, 'ethereum');
+          
+          console.log('Directory structure check:');
+          console.log('zh-TW exists:', await fs.access(zhTWDir).then(() => true).catch(() => false));
+          console.log('daily-news exists:', await fs.access(dailyNewsDir).then(() => true).catch(() => false));
+          console.log('ethereum exists:', await fs.access(ethereumDir).then(() => true).catch(() => false));
+          
+          const bitcoinFile = path.join(dailyNewsDir, '2025-06-30-bitcoin-test.json');
+          const ethereumFile = path.join(ethereumDir, '2025-06-30-ethereum-test.json');
+          
+          console.log('bitcoin file exists:', await fs.access(bitcoinFile).then(() => true).catch(() => false));
+          console.log('ethereum file exists:', await fs.access(ethereumFile).then(() => true).catch(() => false));
+        } catch (error) {
+          console.log('Debug error:', error.message);
+        }
+      }
+      
       assert.equal(draftContents.length, 2);
       
       // Check that both pieces of content are present (order may vary for same date)
