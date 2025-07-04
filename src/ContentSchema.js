@@ -2,53 +2,71 @@
 // This file defines the content structure and provides utilities for content creation
 
 export class ContentSchema {
-
   // Create a new content object for single language
-  static createContent(id, category, language, title, content, references = []) {
+  static createContent(
+    id,
+    category,
+    language,
+    title,
+    content,
+    references = [],
+  ) {
+    console.log("content", content)
     return {
       id,
       status: "draft",
       category,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       language,
       title,
-      content,
+      content: typeof content === "string" ? content.replace(/\n\n/g, " ") : content,
       references,
       audio_file: null,
       social_hook: null,
       feedback: {
         content_review: null,
         ai_outputs: {},
-        performance_metrics: {}
+        performance_metrics: {},
       },
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
   }
 
   // Get supported languages
   static getSupportedLanguages() {
-    return ['en-US', 'ja-JP'];
+    return ["en-US", "ja-JP"];
   }
 
   // Get content categories
   static getCategories() {
-    return ['daily-news', 'ethereum', 'macro', 'startup', 'ai'];
+    return ["daily-news", "ethereum", "macro", "startup", "ai"];
   }
 
   // Get status workflow states
   static getStatuses() {
-    return ['draft', 'reviewed', 'translated', 'audio', 'social', 'published'];
+    return ["draft", "reviewed", "translated", "audio", "social", "published"];
   }
 
   // Get supported social platforms
   static getSocialPlatforms() {
-    return ['twitter', 'threads', 'farcaster', 'debank'];
+    return ["twitter", "threads", "farcaster", "debank"];
   }
 
   // Basic validation for single-language content structure
   static validate(content) {
-    const required = ['id', 'status', 'category', 'date', 'language', 'title', 'content', 'references', 'feedback', 'updated_at'];
-    
+    const required = [
+      "id",
+      "status",
+      "category",
+      "date",
+      "language",
+      "title",
+      "content",
+      "references",
+      "feedback",
+      "updated_at",
+    ];
+
     for (const field of required) {
       if (!(field in content)) {
         throw new Error(`Missing required field: ${field}`);
@@ -63,13 +81,13 @@ export class ContentSchema {
       throw new Error(`Invalid status: ${content.status}`);
     }
 
-    const allLanguages = ['zh-TW', ...this.getSupportedLanguages()];
+    const allLanguages = ["zh-TW", ...this.getSupportedLanguages()];
     if (!allLanguages.includes(content.language)) {
       throw new Error(`Invalid language: ${content.language}`);
     }
 
     if (!content.title || !content.content) {
-      throw new Error('Title and content are required');
+      throw new Error("Title and content are required");
     }
 
     return true;
@@ -78,17 +96,17 @@ export class ContentSchema {
   // Example content for reference
   static getExample() {
     return this.createContent(
-      '2025-06-30-example-content',
-      'daily-news', 
-      'zh-TW',
-      'Example Bitcoin Analysis',
-      'This is example content about Bitcoin trends...',
-      ['Example Source 1', 'Example Source 2']
+      "2025-06-30-example-content",
+      "daily-news",
+      "zh-TW",
+      "Example Bitcoin Analysis",
+      "This is example content about Bitcoin trends...",
+      ["Example Source 1", "Example Source 2"],
     );
   }
 
   // Helper method to get all supported languages including source language
   static getAllLanguages() {
-    return ['zh-TW', ...this.getSupportedLanguages()];
+    return ["zh-TW", ...this.getSupportedLanguages()];
   }
 }

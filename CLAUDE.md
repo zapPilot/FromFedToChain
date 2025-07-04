@@ -4,38 +4,33 @@ This file contains important information for Claude Code to work effectively wit
 
 ## Project Context
 
-**From Fed to Chain** is a simplified daily content pipeline that creates conversational Chinese explainers about crypto/macro economics in the style of 得到/樊登讀書會, with full automation for translation, TTS, and social media publishing.
+**From Fed to Chain** is a simplified content review and training data export system for Chinese explainers about crypto/macro economics. The focus is on human review workflow and AI training data collection.
 
-## ✨ Simplified Architecture (2024)
+## ✨ Current Architecture (2024)
 
-**Key Principle**: Human review is the bottleneck (5 articles/day), so we optimize for maintainability over performance.
+**Key Principle**: Simplified content review workflow with training data export for AI model improvement.
 
 ```
 src/
-├── cli.js               # Unified CLI for all operations
-├── ContentManager.js    # Simple CRUD for single-file content
-└── services/
-    ├── TranslationService.js  # Claude-based translation
-    ├── AudioService.js        # Google TTS generation
-    ├── SocialService.js       # Social hook generation
-    └── automation/
-        ├── SpotifyUploader.js    # Playwright Spotify automation
-        └── SocialPoster.js       # Playwright social media automation
+├── cli.js               # CLI for review and export operations
+├── ContentManager.js    # Content CRUD operations with nested file structure
+└── ContentSchema.js     # Schema validation and content structure
 
 content/                 # Nested structure by language and category
 ├── zh-TW/               # Source language (Traditional Chinese)
 │   ├── daily-news/
 │   │   └── 2025-06-30-article-id.json
 │   ├── ethereum/
-│   └── macro/
-├── en-US/               # English translations
+│   ├── macro/
+│   └── startup/
+├── en-US/               # English translations (if available)
 │   ├── daily-news/
 │   │   └── 2025-06-30-article-id.json
 │   └── ...
-└── ja-JP/               # Japanese translations
+└── ja-JP/               # Japanese translations (if available)
     └── ...
 
-audio/                   # Audio files only
+audio/                   # Audio files (if generated)
 ├── en-US/2025-06-30-article-id.wav
 └── ja-JP/2025-06-30-article-id.wav
 ```
@@ -45,11 +40,12 @@ audio/                   # Audio files only
 **Each file contains content in one language:**
 
 **Source file** (`content/zh-TW/daily-news/2025-06-30-bitcoin-news.json`):
+
 ```json
 {
   "id": "2025-06-30-bitcoin-news",
   "status": "draft",
-  "category": "daily-news", 
+  "category": "daily-news",
   "date": "2025-06-30",
   "language": "zh-TW",
   "title": "比特幣突破新高...",
@@ -57,18 +53,23 @@ audio/                   # Audio files only
   "references": ["資料來源1", "資料來源2"],
   "audio_file": null,
   "social_hook": null,
-  "feedback": { "content_review": null, "ai_outputs": {}, "performance_metrics": {} },
+  "feedback": {
+    "content_review": null,
+    "ai_outputs": {},
+    "performance_metrics": {}
+  },
   "updated_at": "2025-06-30T14:00:00Z"
 }
 ```
 
 **Translation file** (`content/en-US/daily-news/2025-06-30-bitcoin-news.json`):
+
 ```json
 {
-  "id": "2025-06-30-bitcoin-news", 
+  "id": "2025-06-30-bitcoin-news",
   "status": "translated",
   "category": "daily-news",
-  "date": "2025-06-30", 
+  "date": "2025-06-30",
   "language": "en-US",
   "title": "Bitcoin Breaks New Highs...",
   "content": "Have you ever wondered...",
@@ -82,113 +83,111 @@ audio/                   # Audio files only
 
 ## 🚀 CLI Commands
 
-### Content Management
+### Available Commands
+
 ```bash
-# Create new content
-npm run content create 2025-06-30-bitcoin-news daily-news
+# Interactive review of all pending content
+npm run review
 
-# List all content (or filter by status)
-npm run content list
-npm run content list draft
+# Export training data from reviewed content
+npm run export-training
 
-# Review content (approve for translation)
-npm run content review 2025-06-30-bitcoin-news
+# Run tests
+npm run test
 
-# Check pipeline status
-npm run content status
+# Format code
+npm run format
 ```
 
-### Processing Pipeline
+### Review Workflow
+
 ```bash
-# Translate to all languages (en-US, ja-JP)
-npm run translate 2025-06-30-bitcoin-news
+# Start interactive review session
+npm run review
 
-# Generate audio for all languages
-npm run audio 2025-06-30-bitcoin-news
-
-# Generate social hooks for all languages
-npm run social 2025-06-30-bitcoin-news
+# During review, use these controls:
+# [a]ccept    - Approve content (optional feedback)
+# [r]eject    - Reject with required feedback
+# [s]kip      - Skip this content
+# [q]uit      - Exit review session
 ```
 
-### Manual Publishing
-After the content pipeline completes (review → translate → audio → social), content is ready for manual publishing:
+### Training Data Export
 
-- **Audio Files**: Located in `/audio/{language}/{category}/{id}.wav`
-- **Social Hooks**: Generated and stored in content files for easy copy-paste
-- **Manual Upload**: Upload audio files to your preferred podcast platform
-- **Manual Posting**: Use generated social hooks to post on your preferred platforms
-
-### Authentication
-- Uses `./service-account.json` for Google Cloud (TTS and Translation)
+```bash
+# Export all feedback data for AI training
+npm run export-training
+# Creates: training-data-YYYY-MM-DD.json
+```
 
 ## 📁 File Structure
 
 ### Content Files
+
 - **Location**: `/content/{language}/{category}/{id}.json`
 - **Format**: Single JSON per language with content and metadata
 - **Status**: Tracked in `status` field (draft → reviewed → translated → audio → social)
 - **Languages**: zh-TW (source), en-US, ja-JP
 
 ### Audio Files
+
 - **Location**: `/audio/{language}/{id}.wav`
 - **Format**: WAV files for podcast upload
 - **Generated**: Google Cloud TTS
 
 ### Configuration
-- **Languages**: English (en-US), Japanese (ja-JP), Source (zh-TW)
-- **Categories**: daily-news, ethereum, macro
-- **TTS**: Chinese Traditional (cmn-TW-Wavenet-B)
 
-## 🔧 Simplified Services
+- **Languages**: English (en-US), Japanese (ja-JP), Source (zh-TW)
+- **Categories**: daily-news, ethereum, macro, startup, ai
+- **Status Flow**: draft → reviewed (via review) → (manual processing)
+
+## 🔧 Core Components
 
 ### ContentManager
-- Single-file CRUD operations
-- Status management (draft → reviewed → translated → audio → social)
-- No complex metadata or file scanning
 
-### TranslationService  
-- Claude-based translation via CLI
-- Maintains conversational style
-- Processes one file at a time
+- Single-file CRUD operations with nested directory structure
+- Status management and content lifecycle
+- Feedback collection and training data generation
+- Schema validation and content integrity
 
-### AudioService
-- Google Cloud TTS generation
-- Saves directly to audio directory
-- Updates content file with audio path
+### ContentSchema
 
-### SocialService
-- Claude-based social hook generation
-- Platform-agnostic format (180 chars)
-- Stored directly in content file
+- Content structure validation
+- Schema constants and utilities
+- Example content generation
+- Language and category management
+
+### CLI (cli.js)
+
+- Interactive content review workflow
+- Training data export functionality
+- Error handling and user feedback
 
 ## 🎯 Design Principles
 
-1. **Human Review Bottleneck**: All optimizations focus on maintainability, not speed
+1. **Human Review Focus**: Optimized for content quality review and feedback collection
 2. **Language Separation**: One file per language, clear separation of concerns
-3. **Simple State**: Linear status progression, no complex metadata
-4. **Manual Triggers**: No automatic processing, human-controlled workflow  
-5. **Browser Automation**: Playwright for platforms without APIs
+3. **Simple State**: Linear status progression with clear validation
+4. **Training Data Collection**: All feedback stored for AI model improvement
+5. **Maintainability**: Clean code structure prioritizing readability over performance
 
 ## 🚨 Important Notes
 
-- **No Backfilling**: Schema redesigned from scratch
-- **Manual Login**: Social platforms require browser-based authentication
-- **Rate Limiting**: 2-second delays between social posts
-- **Error Handling**: Failed operations logged, manual retry required
+- **Review-Focused**: System designed primarily for content review and feedback
+- **Training Data**: All reviewer feedback collected for AI training
 - **File Paths**: Always use absolute paths, no relative references
+- **Schema Validation**: Content validated against schema on read/write operations
+- **Nested Structure**: Content organized by language/category for clarity
 
-## 📖 Typical Workflow
+## 📖 Current Workflow
 
-1. **Create**: `npm run content create 2025-06-30-topic`
-2. **Edit**: Manually edit the JSON file with actual content
-3. **Review**: `npm run content review 2025-06-30-topic`
-4. **Translate**: `npm run translate 2025-06-30-topic`
-5. **Audio**: `npm run audio 2025-06-30-topic`
-6. **Social**: `npm run social 2025-06-30-topic`
-7. **Manual Publish**: Upload audio files and post social hooks manually
+1. **Content Creation**: Create source content files manually in `content/zh-TW/`
+2. **Review**: Use `npm run review` to approve/reject content with feedback
+3. **Training Export**: Use `npm run export-training` to export reviewer feedback
+4. **Future Processing**: Additional translation/audio features can be added as needed
 
-This simplified approach removes all performance optimizations and complex state management, focusing on clarity and ease of maintenance for a human-bottlenecked workflow.
+This simplified approach focuses on content review quality and training data collection, providing a solid foundation for future feature expansion.
 
 ---
 
-_Last updated: 2025-06-30 - Simplified architecture focusing on maintainability over performance_
+_Last updated: 2025-07-03 - Content review and training data export system_

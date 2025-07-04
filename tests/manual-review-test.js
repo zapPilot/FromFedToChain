@@ -3,27 +3,27 @@
 // Manual test script for review functionality
 // Run this to test the review command interactively
 
-import fs from 'fs/promises';
-import path from 'path';
-import chalk from 'chalk';
-import { ContentManager } from '../src/ContentManager.js';
+import fs from "fs/promises";
+import path from "path";
+import chalk from "chalk";
+import { ContentManager } from "../src/ContentManager.js";
 
-const TEST_DIR = './test-content';
+const TEST_DIR = "./test-content";
 
 async function setupTestContent() {
-  console.log(chalk.blue('🔧 Setting up test content...'));
-  
+  console.log(chalk.blue("🔧 Setting up test content..."));
+
   // Create test directory
   await fs.mkdir(TEST_DIR, { recursive: true });
-  
+
   // Temporarily change ContentManager to use test directory
   const originalDir = ContentManager.CONTENT_DIR;
   ContentManager.CONTENT_DIR = TEST_DIR;
-  
+
   // Create sample content
   const testContents = [
     {
-      title: 'Bitcoin Institutional Adoption Surge',
+      title: "Bitcoin Institutional Adoption Surge",
       content: `你有沒有想過，當全世界最保守的錢都開始瘋狂湧入比特幣時，這意味著什麼？
 
 最近這波比特幣突破新高，背後的驅動力已經完全不同於以往的零售投資者FOMO。這次，是機構資金的系統性配置。
@@ -45,11 +45,15 @@ async function setupTestContent() {
 所以，這波行情的邏輯已經不是"數字黃金"的故事，而是"機構避險工具"的現實。
 
 下一個值得關注的時間點是美聯儲的下次議息會議。如果降息預期落空，機構資金很可能會重新評估比特幣的配置權重。`,
-      category: 'daily-news',
-      references: ['Bloomberg Terminal', 'CoinGecko', 'Federal Reserve Economic Data']
+      category: "daily-news",
+      references: [
+        "Bloomberg Terminal",
+        "CoinGecko",
+        "Federal Reserve Economic Data",
+      ],
     },
     {
-      title: 'DeFi協議治理代幣的價值重估',
+      title: "DeFi協議治理代幣的價值重估",
       content: `最近Uniswap的治理提案引發了整個DeFi生態的討論，但真正的問題是：治理代幣到底值多少錢？
 
 傳統的估值模型在DeFi世界完全失效。你不能用PE比、現金流折現這些方法來評估一個去中心化協議的代幣價值。
@@ -77,59 +81,74 @@ async function setupTestContent() {
 但無論如何，治理代幣的估值邏輯正在發生根本性變化。從純粹的投機工具，轉變為具有實際經濟價值的數字資產。
 
 這個轉變的速度，可能比我們想像的更快。`,
-      category: 'ethereum',
-      references: ['DefiLlama', 'Snapshot.org', 'Dune Analytics']
-    }
+      category: "ethereum",
+      references: ["DefiLlama", "Snapshot.org", "Dune Analytics"],
+    },
   ];
-  
+
   // Create content files
   for (let i = 0; i < testContents.length; i++) {
     const content = testContents[i];
     const id = `2025-06-30-test-${i + 1}`;
-    await ContentManager.create(id, content.category, content.title, content.content, content.references);
+    await ContentManager.create(
+      id,
+      content.category,
+      content.title,
+      content.content,
+      content.references,
+    );
   }
-  
-  console.log(chalk.green(`✅ Created ${testContents.length} test content items`));
+
+  console.log(
+    chalk.green(`✅ Created ${testContents.length} test content items`),
+  );
   console.log(chalk.gray(`📁 Content stored in: ${TEST_DIR}`));
-  
+
   return originalDir;
 }
 
 async function cleanupTestContent(originalDir) {
-  console.log(chalk.blue('\n🧹 Cleaning up test content...'));
-  
+  console.log(chalk.blue("\n🧹 Cleaning up test content..."));
+
   try {
     await fs.rm(TEST_DIR, { recursive: true, force: true });
     ContentManager.CONTENT_DIR = originalDir;
-    console.log(chalk.green('✅ Test content cleaned up'));
+    console.log(chalk.green("✅ Test content cleaned up"));
   } catch (error) {
     console.log(chalk.yellow(`⚠️ Cleanup warning: ${error.message}`));
   }
 }
 
 async function main() {
-  console.log(chalk.blue.bold('🧪 Manual Review Test'));
-  console.log(chalk.gray('='.repeat(50)));
-  console.log(chalk.yellow('This will create test content and let you try the review command.'));
-  console.log(chalk.gray('Press Ctrl+C to exit at any time.\n'));
-  
+  console.log(chalk.blue.bold("🧪 Manual Review Test"));
+  console.log(chalk.gray("=".repeat(50)));
+  console.log(
+    chalk.yellow(
+      "This will create test content and let you try the review command.",
+    ),
+  );
+  console.log(chalk.gray("Press Ctrl+C to exit at any time.\n"));
+
   let originalDir;
-  
+
   try {
     originalDir = await setupTestContent();
-    
-    console.log(chalk.cyan('\n📝 Test content created. Now run:'));
-    console.log(chalk.white('npm run review'));
-    console.log(chalk.gray('\nTry these review commands:'));
-    console.log(chalk.gray('• a - Accept content'));
-    console.log(chalk.gray('• a great analysis - Accept with feedback'));
-    console.log(chalk.gray('• r - Reject content'));
-    console.log(chalk.gray('• r needs more data - Reject with feedback'));
-    console.log(chalk.gray('• s - Skip content'));
-    console.log(chalk.gray('• q - Quit review session'));
-    
-    console.log(chalk.blue('\n🔍 When done testing, run this script again with --cleanup'));
-    
+
+    console.log(chalk.cyan("\n📝 Test content created. Now run:"));
+    console.log(chalk.white("npm run review"));
+    console.log(chalk.gray("\nTry these review commands:"));
+    console.log(chalk.gray("• a - Accept content"));
+    console.log(chalk.gray("• a great analysis - Accept with feedback"));
+    console.log(chalk.gray("• r - Reject content"));
+    console.log(chalk.gray("• r needs more data - Reject with feedback"));
+    console.log(chalk.gray("• s - Skip content"));
+    console.log(chalk.gray("• q - Quit review session"));
+
+    console.log(
+      chalk.blue(
+        "\n🔍 When done testing, run this script again with --cleanup",
+      ),
+    );
   } catch (error) {
     console.error(chalk.red(`❌ Setup failed: ${error.message}`));
     if (originalDir) {
@@ -140,13 +159,15 @@ async function main() {
 }
 
 // Check for cleanup flag
-if (process.argv.includes('--cleanup')) {
-  console.log(chalk.blue('🧹 Cleaning up test content...'));
+if (process.argv.includes("--cleanup")) {
+  console.log(chalk.blue("🧹 Cleaning up test content..."));
   try {
     await fs.rm(TEST_DIR, { recursive: true, force: true });
-    console.log(chalk.green('✅ Test content cleaned up'));
+    console.log(chalk.green("✅ Test content cleaned up"));
   } catch (error) {
-    console.log(chalk.yellow(`⚠️ No test content to clean up: ${error.message}`));
+    console.log(
+      chalk.yellow(`⚠️ No test content to clean up: ${error.message}`),
+    );
   }
 } else {
   main();

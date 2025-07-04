@@ -2,7 +2,7 @@
   "name": "from-fed-to-chain",
   "version": "1.0.0",
   "type": "module",
-  "description": "Simplified content review and training data export system",
+  "description": "Content review and training data export system for crypto/macro economics content",
   "scripts": {
     "review": "node src/cli.js review",
     "export-training": "node src/cli.js export-training",

@@ -8,7 +8,7 @@ Daily content pipeline for creating conversational Chinese explainers about cryp
 # Install dependencies
 npm install
 
-# Generate daily content  
+# Generate daily content
 claude daily-content
 
 # Review pending content
@@ -40,7 +40,7 @@ FromFedToChain/
 │   └── workflows/
 │       └── ContentPipeline.js   # Main pipeline orchestration
 ├── scripts/                 # Essential scripts only
-│   ├── pipeline.js              # Main pipeline script  
+│   ├── pipeline.js              # Main pipeline script
 │   ├── review.js                # Content review
 │   └── audio-manager.js         # Audio file management
 ├── config/
@@ -94,8 +94,9 @@ npm run pipeline:reset      # Reset when pipeline gets stuck
 ```
 
 **Reset needed when:**
+
 - Pipeline stuck due to API rate limits
-- Corrupted state/authentication issues  
+- Corrupted state/authentication issues
 - Want to reprocess everything from scratch
 
 ## 📱 Social Media Hook Generation
@@ -116,17 +117,17 @@ Language and platform preferences in `config/social-media.js`:
 ```javascript
 // Example: English supports all platforms, Japanese only Twitter/Facebook
 SOCIAL_LANGUAGES = {
-  'en-US': {
+  "en-US": {
     enabled: true,
-    platforms: ['twitter', 'linkedin', 'facebook', 'instagram'],
-    defaultPlatform: 'twitter'
+    platforms: ["twitter", "linkedin", "facebook", "instagram"],
+    defaultPlatform: "twitter",
   },
-  'ja-JP': {
+  "ja-JP": {
     enabled: true,
-    platforms: ['twitter', 'facebook'],
-    defaultPlatform: 'twitter'
-  }
-}
+    platforms: ["twitter", "facebook"],
+    defaultPlatform: "twitter",
+  },
+};
 ```
 
 ### Output Structure
@@ -194,6 +195,7 @@ Content follows a structured JSON schema with language separation:
    - Download service account JSON → `service-account.json`
 
 2. **Claude Code CLI**:
+
    ```bash
    npm install -g claude-code
    ```
@@ -218,6 +220,7 @@ Content follows a structured JSON schema with language separation:
 ## 📝 Essential Commands (Only 7!)
 
 ### Core Workflow
+
 ```bash
 npm run review             # Review pending content
 npm run pipeline           # Full pipeline (Translation → TTS → Social)
@@ -225,12 +228,14 @@ npm run pipeline:gcp       # Use Google Cloud Translation API
 ```
 
 ### Status & Recovery
+
 ```bash
 npm run pipeline:status    # Show current pipeline status
 npm run pipeline:reset     # Reset when pipeline gets stuck
 ```
 
 ### Utilities
+
 ```bash
 npm run audio              # Audio file management (list, stats)
 npm run test               # Run focused unit tests
@@ -240,7 +245,7 @@ npm run format             # Code formatting
 ## 🗂️ Content Categories
 
 - **`daily-news`**: Daily crypto/macro news explainers
-- **`ethereum`**: Ethereum ecosystem focused content  
+- **`ethereum`**: Ethereum ecosystem focused content
 - **`macro`**: Macro economics and policy analysis
 
 ## 🔗 Multi-Language Support
@@ -276,6 +281,7 @@ npm run format             # Code formatting
 ## 🧪 Testing Strategy
 
 ### **Focused Testing Approach**
+
 This project uses a **surgical testing strategy** - test business logic, not 3rd party APIs.
 
 ```bash
@@ -283,17 +289,20 @@ npm test                   # Run focused unit tests
 ```
 
 ### **What We Test**
+
 ✅ **Business Logic**: Content validation, social hook formatting  
 ✅ **Configuration**: Language/platform settings, schema validation  
 ✅ **File Operations**: JSON parsing, file structure validation  
-✅ **Error Handling**: Graceful failures, data corruption prevention  
+✅ **Error Handling**: Graceful failures, data corruption prevention
 
-### **What We DON'T Test** 
+### **What We DON'T Test**
+
 ❌ **3rd Party APIs**: Google TTS, Google Translate, Claude CLI (they own quality)  
 ❌ **Infrastructure**: File permissions, network connectivity, auth tokens  
 ❌ **Integration**: End-to-end API workflows (too complex, low value)
 
 ### **GitHub Actions**
+
 - ✅ **Code Quality**: Prettier formatting, basic linting
 - ✅ **Security**: Dependency audit, secret scanning
 - ✅ **Fast Tests**: Business logic validation (< 30 seconds)

@@ -10,66 +10,66 @@ export const LANGUAGE_CONFIG = {
     region: "Taiwan",
     isSource: true,
     isTarget: false,
-    
+
     // Google Cloud TTS Configuration
     tts: {
       languageCode: "zh-TW",
       voiceName: "cmn-TW-Wavenet-B",
       gender: "FEMALE",
       speakingRate: 1.0,
-      pitch: 0.0
+      pitch: 0.0,
     },
-    
+
     // Translation API mapping (for content coming FROM this language)
     translationCode: "zh",
-    
+
     // Social media settings
     social: {
       prefix: "📰",
       hookLength: 180, // Chinese can be more concise
-      platforms: ["twitter", "threads", "farcaster", "debank"]
+      platforms: ["twitter", "threads", "farcaster", "debank"],
     },
-    
+
     // Content processing
     contentProcessing: {
       generateAudio: true, // Generate TTS for source language too!
       generateSocialHooks: true,
-      requiresTranslation: false
-    }
+      requiresTranslation: false,
+    },
   },
 
   // English (US)
   "en-US": {
     name: "English",
-    region: "United States", 
+    region: "United States",
     isSource: false,
     isTarget: true,
-    
+
     // Google Cloud TTS Configuration
     tts: {
       languageCode: "en-US",
       voiceName: "en-US-Wavenet-D",
       gender: "MALE",
       speakingRate: 1.0,
-      pitch: 0.0
+      pitch: 0.0,
     },
-    
+
     // Translation API mapping (for content going TO this language)
     translationCode: "en",
-    
+
     // Social media settings
     social: {
       prefix: "🚀",
       hookLength: 150, // Twitter-optimized
-      platforms: ["twitter", "threads", "farcaster", "debank"]
+      platforms: ["twitter", "threads", "farcaster", "debank"],
     },
-    
+
     // Content processing
     contentProcessing: {
       generateAudio: true,
       generateSocialHooks: true,
-      requiresTranslation: true
-    }
+      requiresTranslation: true,
+    },
   },
 
   // Japanese
@@ -78,33 +78,33 @@ export const LANGUAGE_CONFIG = {
     region: "Japan",
     isSource: false,
     isTarget: true,
-    
+
     // Google Cloud TTS Configuration
     tts: {
-      languageCode: "ja-JP", 
+      languageCode: "ja-JP",
       voiceName: "ja-JP-Wavenet-C",
       gender: "FEMALE",
       speakingRate: 1.0,
-      pitch: 0.0
+      pitch: 0.0,
     },
-    
+
     // Translation API mapping
     translationCode: "ja",
-    
+
     // Social media settings
     social: {
       prefix: "🌸",
       hookLength: 140, // Japanese can be very concise
-      platforms: ["twitter", "threads"]
+      platforms: ["twitter", "threads"],
     },
-    
+
     // Content processing
     contentProcessing: {
       generateAudio: true,
       generateSocialHooks: true,
-      requiresTranslation: true
-    }
-  }
+      requiresTranslation: true,
+    },
+  },
 };
 
 // ============================================
@@ -115,7 +115,9 @@ export const LANGUAGE_CONFIG = {
 export const LANGUAGES = {
   PRIMARY: "zh-TW",
   SUPPORTED: Object.keys(LANGUAGE_CONFIG),
-  TRANSLATION_TARGETS: Object.keys(LANGUAGE_CONFIG).filter(lang => LANGUAGE_CONFIG[lang].isTarget)
+  TRANSLATION_TARGETS: Object.keys(LANGUAGE_CONFIG).filter(
+    (lang) => LANGUAGE_CONFIG[lang].isTarget,
+  ),
 };
 
 // Content categories
@@ -124,7 +126,7 @@ export const CATEGORIES = ["daily-news", "ethereum", "macro"];
 // File system paths
 export const PATHS = {
   CONTENT_ROOT: "./content",
-  AUDIO_ROOT: "./audio", 
+  AUDIO_ROOT: "./audio",
   SERVICE_ACCOUNT: "./service-account.json",
 };
 
@@ -134,8 +136,8 @@ export const PATHS = {
 
 // Get all languages that should have audio generated
 export const getAudioLanguages = () => {
-  return Object.keys(LANGUAGE_CONFIG).filter(lang => 
-    LANGUAGE_CONFIG[lang].contentProcessing.generateAudio
+  return Object.keys(LANGUAGE_CONFIG).filter(
+    (lang) => LANGUAGE_CONFIG[lang].contentProcessing.generateAudio,
   );
 };
 
@@ -150,21 +152,21 @@ export const getTTSConfig = (language) => {
   if (!config) {
     throw new Error(`Unsupported language: ${language}`);
   }
-  
+
   return {
     languageCode: config.tts.languageCode,
     name: config.tts.voiceName,
     voiceConfig: {
       languageCode: config.tts.languageCode,
       name: config.tts.voiceName,
-      ssmlGender: config.tts.gender
+      ssmlGender: config.tts.gender,
     },
     audioConfig: {
       audioEncoding: "LINEAR16",
       sampleRateHertz: 16000,
       speakingRate: config.tts.speakingRate,
-      pitch: config.tts.pitch
-    }
+      pitch: config.tts.pitch,
+    },
   };
 };
 
@@ -174,11 +176,11 @@ export const getTranslationConfig = (language) => {
   if (!config) {
     throw new Error(`Unsupported language: ${language}`);
   }
-  
+
   return {
     languageCode: config.translationCode,
     targetLanguage: language,
-    isTarget: config.isTarget
+    isTarget: config.isTarget,
   };
 };
 
@@ -188,7 +190,7 @@ export const getSocialConfig = (language) => {
   if (!config) {
     throw new Error(`Unsupported language: ${language}`);
   }
-  
+
   return config.social;
 };
 
@@ -199,7 +201,9 @@ export const shouldGenerateAudio = (language) => {
 
 // Check if language should have social hooks generated
 export const shouldGenerateSocialHooks = (language) => {
-  return LANGUAGE_CONFIG[language]?.contentProcessing?.generateSocialHooks || false;
+  return (
+    LANGUAGE_CONFIG[language]?.contentProcessing?.generateSocialHooks || false
+  );
 };
 
 // Get language display name
@@ -217,23 +221,25 @@ export const VOICE_CONFIG = Object.fromEntries(
     lang,
     {
       languageCode: config.tts.languageCode,
-      name: config.tts.voiceName
-    }
-  ])
+      name: config.tts.voiceName,
+    },
+  ]),
 );
 
 export const TRANSLATION_CONFIG = Object.fromEntries(
-  LANGUAGES.TRANSLATION_TARGETS.map(lang => [
+  LANGUAGES.TRANSLATION_TARGETS.map((lang) => [
     lang,
     {
-      voice: VOICE_CONFIG[lang]
-    }
-  ])
+      voice: VOICE_CONFIG[lang],
+    },
+  ]),
 );
 
 // Deprecated - use getTranslationTargets() instead
 export const getTargetLanguages = () => {
-  console.warn("getTargetLanguages() is deprecated. Use getTranslationTargets() instead.");
+  console.warn(
+    "getTargetLanguages() is deprecated. Use getTranslationTargets() instead.",
+  );
   return getTranslationTargets();
 };
 
@@ -244,19 +250,22 @@ export const getTargetLanguages = () => {
 // Validate language configuration at startup
 export const validateLanguageConfig = () => {
   const errors = [];
-  
+
   Object.entries(LANGUAGE_CONFIG).forEach(([lang, config]) => {
     if (!config.name) errors.push(`${lang}: Missing name`);
-    if (!config.tts?.languageCode) errors.push(`${lang}: Missing TTS languageCode`);
+    if (!config.tts?.languageCode)
+      errors.push(`${lang}: Missing TTS languageCode`);
     if (!config.tts?.voiceName) errors.push(`${lang}: Missing TTS voiceName`);
-    if (!config.translationCode) errors.push(`${lang}: Missing translationCode`);
-    if (!config.social?.hookLength) errors.push(`${lang}: Missing social hookLength`);
+    if (!config.translationCode)
+      errors.push(`${lang}: Missing translationCode`);
+    if (!config.social?.hookLength)
+      errors.push(`${lang}: Missing social hookLength`);
   });
-  
+
   if (errors.length > 0) {
-    throw new Error(`Language configuration errors:\n${errors.join('\n')}`);
+    throw new Error(`Language configuration errors:\n${errors.join("\n")}`);
   }
-  
+
   return true;
 };
 
