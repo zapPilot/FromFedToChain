@@ -19,14 +19,12 @@ export class ContentSchema {
       date: new Date().toISOString().split("T")[0],
       language,
       title,
-      content: typeof content === "string" ? content.replace(/\n\n/g, " ") : content,
+      content: typeof content === "string" ? content.replace(/\n\n/g, " ").replace(/\*\*/g, " ").replace(/\#\#/g, " ") : content,
       references,
       audio_file: null,
       social_hook: null,
       feedback: {
         content_review: null,
-        ai_outputs: {},
-        performance_metrics: {},
       },
       updated_at: new Date().toISOString(),
     };

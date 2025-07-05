@@ -2,10 +2,9 @@
   "name": "from-fed-to-chain",
   "version": "1.0.0",
   "type": "module",
-  "description": "Content review and training data export system for crypto/macro economics content",
+  "description": "Content review system for crypto/macro economics content",
   "scripts": {
     "review": "node src/cli.js review",
-    "export-training": "node src/cli.js export-training",
     "test": "node tests/run-tests.js",
     "format": "prettier --write . --ignore-path .prettierignore"
   },

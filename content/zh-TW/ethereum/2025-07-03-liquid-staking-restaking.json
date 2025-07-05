@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "rejected",
+      "score": 2,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T05:03:07.038Z",
+      "comments": "內容不錯，拿他跟現實世界的比喻也很好但是內容太舊了，現在 LRT 流動性質押大家都知道了",
+      "training_labels": {}
+    },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T05:03:07.038Z"
 }

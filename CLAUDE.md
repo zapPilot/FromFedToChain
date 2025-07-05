@@ -4,15 +4,15 @@ This file contains important information for Claude Code to work effectively wit
 
 ## Project Context
 
-**From Fed to Chain** is a simplified content review and training data export system for Chinese explainers about crypto/macro economics. The focus is on human review workflow and AI training data collection.
+**From Fed to Chain** is a simplified content review system for Chinese explainers about crypto/macro economics. The focus is on human review workflow and content management.
 
 ## ✨ Current Architecture (2024)
 
-**Key Principle**: Simplified content review workflow with training data export for AI model improvement.
+**Key Principle**: Simplified content review workflow for content quality assurance.
 
 ```
 src/
-├── cli.js               # CLI for review and export operations
+├── cli.js               # CLI for review operations
 ├── ContentManager.js    # Content CRUD operations with nested file structure
 └── ContentSchema.js     # Schema validation and content structure
 
@@ -54,9 +54,7 @@ audio/                   # Audio files (if generated)
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
-    "ai_outputs": {},
-    "performance_metrics": {}
+    "content_review": null
   },
   "updated_at": "2025-06-30T14:00:00Z"
 }
@@ -76,7 +74,7 @@ audio/                   # Audio files (if generated)
   "references": ["Source 1", "Source 2"],
   "audio_file": "audio/en-US/2025-06-30-bitcoin-news.wav",
   "social_hook": "🚀 Bitcoin breaks new highs...",
-  "feedback": { "ai_outputs": { "translation": {...} } },
+  "feedback": { "content_review": null },
   "updated_at": "2025-06-30T15:00:00Z"
 }
 ```
@@ -88,9 +86,6 @@ audio/                   # Audio files (if generated)
 ```bash
 # Interactive review of all pending content
 npm run review
-
-# Export training data from reviewed content
-npm run export-training
 
 # Run tests
 npm run test
@@ -112,13 +107,6 @@ npm run review
 # [q]uit      - Exit review session
 ```
 
-### Training Data Export
-
-```bash
-# Export all feedback data for AI training
-npm run export-training
-# Creates: training-data-YYYY-MM-DD.json
-```
 
 ## 📁 File Structure
 
@@ -126,7 +114,7 @@ npm run export-training
 
 - **Location**: `/content/{language}/{category}/{id}.json`
 - **Format**: Single JSON per language with content and metadata
-- **Status**: Tracked in `status` field (draft → reviewed → translated → audio → social)
+- **Status**: Tracked in `status` field (draft → reviewed → published)
 - **Languages**: zh-TW (source), en-US, ja-JP
 
 ### Audio Files
@@ -147,7 +135,7 @@ npm run export-training
 
 - Single-file CRUD operations with nested directory structure
 - Status management and content lifecycle
-- Feedback collection and training data generation
+- Feedback collection for review workflow
 - Schema validation and content integrity
 
 ### ContentSchema
@@ -160,7 +148,6 @@ npm run export-training
 ### CLI (cli.js)
 
 - Interactive content review workflow
-- Training data export functionality
 - Error handling and user feedback
 
 ## 🎯 Design Principles
@@ -168,13 +155,13 @@ npm run export-training
 1. **Human Review Focus**: Optimized for content quality review and feedback collection
 2. **Language Separation**: One file per language, clear separation of concerns
 3. **Simple State**: Linear status progression with clear validation
-4. **Training Data Collection**: All feedback stored for AI model improvement
+4. **Review Workflow**: Streamlined feedback collection for content quality assurance
 5. **Maintainability**: Clean code structure prioritizing readability over performance
 
 ## 🚨 Important Notes
 
 - **Review-Focused**: System designed primarily for content review and feedback
-- **Training Data**: All reviewer feedback collected for AI training
+- **Content Management**: Reviewer feedback collected for quality assurance
 - **File Paths**: Always use absolute paths, no relative references
 - **Schema Validation**: Content validated against schema on read/write operations
 - **Nested Structure**: Content organized by language/category for clarity
@@ -183,11 +170,11 @@ npm run export-training
 
 1. **Content Creation**: Create source content files manually in `content/zh-TW/`
 2. **Review**: Use `npm run review` to approve/reject content with feedback
-3. **Training Export**: Use `npm run export-training` to export reviewer feedback
+3. **Content Management**: Review feedback is stored for quality tracking
 4. **Future Processing**: Additional translation/audio features can be added as needed
 
-This simplified approach focuses on content review quality and training data collection, providing a solid foundation for future feature expansion.
+This simplified approach focuses on content review quality and content management, providing a solid foundation for future feature expansion.
 
 ---
 
-_Last updated: 2025-07-03 - Content review and training data export system_
+_Last updated: 2025-07-05 - Content review and management system_

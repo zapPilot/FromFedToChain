@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-ethereum-pectra-scalability",
-  "status": "draft",
+  "status": "reviewed",
   "category": "ethereum",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T04:35:29.287Z",
+      "comments": "不錯，然後因為 pectra upgrade 已經上了幾個月了，所以可以把重心放在為來的升級上免得資訊過時",
+      "training_labels": {}
+    },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T04:35:29.289Z"
 }

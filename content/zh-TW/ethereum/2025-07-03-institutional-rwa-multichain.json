@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "rejected",
+      "score": 2,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T05:01:02.543Z",
+      "comments": "我覺得深度不夠，主題不錯但是好像都是我知道的，是很淺的介紹",
+      "training_labels": {}
+    },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T05:01:02.543Z"
 }

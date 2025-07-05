@@ -34,8 +34,6 @@ describe("Review Command Tests", () => {
         social_hook: null,
         feedback: {
           content_review: null,
-          ai_outputs: { translations: {}, audio: {}, social_hooks: {} },
-          performance_metrics: { spotify: {}, social_platforms: {} },
         },
         updated_at: new Date().toISOString(),
       },
@@ -52,8 +50,6 @@ describe("Review Command Tests", () => {
         social_hook: null,
         feedback: {
           content_review: null,
-          ai_outputs: { translations: {}, audio: {}, social_hooks: {} },
-          performance_metrics: { spotify: {}, social_platforms: {} },
         },
         updated_at: new Date().toISOString(),
       },
@@ -413,7 +409,6 @@ describe("Review Command Tests", () => {
         4,
         "reviewer_cli",
         "Migrated content",
-        {},
       );
 
       const updatedContent = await ContentManager.readSource(minimalContent.id);
@@ -423,62 +418,6 @@ describe("Review Command Tests", () => {
     });
   });
 
-  describe("Training Data Collection", () => {
-    it("should store training labels with feedback", async () => {
-      const trainingLabels = {
-        engagement: 4,
-        accuracy: 5,
-        clarity: 4,
-        relevance: 5,
-      };
-
-      await ContentManager.addContentFeedback(
-        "2025-06-30-bitcoin-test",
-        "accepted",
-        4,
-        "reviewer_expert_finance",
-        "Great insights",
-        trainingLabels,
-      );
-
-      const content = await ContentManager.read("2025-06-30-bitcoin-test");
-      assert.deepEqual(
-        content.feedback.content_review.training_labels,
-        trainingLabels,
-      );
-      assert.equal(
-        content.feedback.content_review.reviewer,
-        "reviewer_expert_finance",
-      );
-    });
-
-    it("should export training data correctly", async () => {
-      // Add feedback to both pieces of content
-      await ContentManager.addContentFeedback(
-        "2025-06-30-bitcoin-test",
-        "accepted",
-        4,
-        "reviewer_cli",
-        "Good content",
-        { engagement: 4 },
-      );
-
-      await ContentManager.addContentFeedback(
-        "2025-06-30-ethereum-test",
-        "rejected",
-        2,
-        "reviewer_cli",
-        "Needs improvement",
-        { clarity: 2 },
-      );
-
-      const trainingData = await ContentManager.exportTrainingData();
-
-      assert(trainingData.export_metadata);
-      assert.equal(trainingData.export_metadata.total_samples, 0); // No AI outputs yet
-      assert(Array.isArray(trainingData.training_samples));
-    });
-  });
 
   describe("Error Handling", () => {
     it("should handle missing content files gracefully", async () => {

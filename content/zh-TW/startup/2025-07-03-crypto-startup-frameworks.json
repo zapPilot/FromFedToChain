@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-crypto-startup-frameworks",
-  "status": "draft",
+  "status": "reviewed",
   "category": "startup",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T05:08:55.717Z",
+      "comments": "最近我創業卡住了需要一點建議",
+      "training_labels": {}
+    },
     "ai_outputs": {},
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-03T10:30:00Z"
+  "updated_at": "2025-07-05T05:08:55.721Z"
 }

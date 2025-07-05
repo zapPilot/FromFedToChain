@@ -259,37 +259,6 @@ describe("ContentManager Nested Structure Tests", () => {
       assert.equal(content.feedback.content_review.score, 4);
     });
 
-    it("should add AI feedback to specific language file", async () => {
-      // Create translation first
-      await ContentManager.addTranslation(
-        "2025-07-01-test-content",
-        "en-US",
-        "Test Title",
-        "Test content...",
-      );
-
-      await ContentManager.addAIFeedback(
-        "2025-07-01-test-content",
-        "translation",
-        "en-US",
-        "accepted",
-        5,
-        "ai_reviewer",
-        "Excellent translation",
-        { model: "claude-3.5" },
-        { accuracy: 5 },
-      );
-
-      const content = await ContentManager.read(
-        "2025-07-01-test-content",
-        "en-US",
-      );
-      assert.equal(content.feedback.ai_outputs.translation.status, "accepted");
-      assert.equal(
-        content.feedback.ai_outputs.translation.comments,
-        "Excellent translation",
-      );
-    });
   });
 
   describe("Performance and Edge Cases", () => {

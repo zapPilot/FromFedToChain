@@ -16,9 +16,6 @@ async function main() {
       case "review":
         await handleReview();
         break;
-      case "export-training":
-        await handleExportTraining();
-        break;
       default:
         showHelp();
     }
@@ -114,7 +111,6 @@ async function handleReview() {
           4,
           "reviewer_cli",
           feedback || "Approved for translation",
-          {},
         );
         await ContentManager.updateSourceStatus(content.id, "reviewed");
         console.log(chalk.green(`✅ Accepted: ${content.id}`));
@@ -132,7 +128,6 @@ async function handleReview() {
           2,
           "reviewer_cli",
           feedback,
-          {},
         );
         // Keep as draft for revision
         console.log(chalk.red(`❌ Rejected: ${content.id}`));
@@ -172,31 +167,6 @@ function getUserInput() {
   });
 }
 
-async function handleExportTraining() {
-  console.log(chalk.blue("📤 Exporting Training Data"));
-  console.log(chalk.gray("=".repeat(50)));
-
-  const trainingData = await ContentManager.exportTrainingData();
-
-  const filename = `training-data-${new Date().toISOString().split("T")[0]}.json`;
-  await fs.writeFile(filename, JSON.stringify(trainingData, null, 2));
-
-  console.log(chalk.green(`✅ Training data exported: ${filename}`));
-  console.log(
-    chalk.cyan(`📊 Total samples: ${trainingData.training_samples.length}`),
-  );
-
-  const taskBreakdown = {};
-  trainingData.training_samples.forEach((sample) => {
-    const task = sample.input.task;
-    taskBreakdown[task] = (taskBreakdown[task] || 0) + 1;
-  });
-
-  console.log(chalk.gray("\n📋 Breakdown by task:"));
-  Object.entries(taskBreakdown).forEach(([task, count]) => {
-    console.log(chalk.gray(`  ${task}: ${count} samples`));
-  });
-}
 
 function showHelp() {
   console.log(chalk.blue.bold("📖 From Fed to Chain CLI"));
@@ -205,9 +175,6 @@ function showHelp() {
   console.log(
     "  npm run review                  - Interactive review of all pending content",
   );
-  console.log(
-    "  npm run export-training         - Export training data from reviewed content",
-  );
 
   console.log(chalk.gray("\nContent Flow:"));
   console.log("  draft → reviewed (via review) → published (manual)");
@@ -215,9 +182,6 @@ function showHelp() {
   console.log(chalk.gray("\nExamples:"));
   console.log(
     "  npm run review                  - Review all draft content interactively",
-  );
-  console.log(
-    "  npm run export-training         - Export feedback data for AI training",
   );
   console.log("");
   console.log(chalk.yellow("Review Controls:"));

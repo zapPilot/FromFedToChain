@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "rejected",
+      "score": 2,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T05:01:43.127Z",
+      "comments": "這篇很像是綜合型的介紹，一樣是太淺了，沒有知識點，需要深一點",
+      "training_labels": {}
+    },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T05:01:43.127Z"
 }

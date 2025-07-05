@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-crosschain-interoperability",
-  "status": "draft",
+  "status": "reviewed",
   "category": "ethereum",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T04:32:40.959Z",
+      "comments": "方向性不錯，但是不夠深，7841 這些只有一句話的類比，我沒有很確定這是啥。但是類比舉例這是不錯的方向",
+      "training_labels": {}
+    },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T04:32:40.962Z"
 }

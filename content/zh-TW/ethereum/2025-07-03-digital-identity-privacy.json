@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-digital-identity-privacy",
-  "status": "draft",
+  "status": "reviewed",
   "category": "ethereum",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T04:34:28.759Z",
+      "comments": "挺有趣的，延伸vitalik 的觀點這種題材我有興趣",
+      "training_labels": {}
+    },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T04:34:28.761Z"
 }

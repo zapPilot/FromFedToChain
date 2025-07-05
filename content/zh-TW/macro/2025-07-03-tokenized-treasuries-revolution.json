@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-tokenized-treasuries-revolution",
-  "status": "draft",
+  "status": "reviewed",
   "category": "macro",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -17,9 +17,16 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T05:08:14.915Z",
+      "comments": "很棒，RWA 的事情我其實沒有知道得太清楚，需要些細節讓我們在聊天的時候能深入淺出地講給別人聽。重點是你要把一個深的概念簡單的講給讀者聽，讓讀者有社交資本可以炫耀他的支付或是談資給別人",
+      "training_labels": {}
+    },
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-03T00:00:00Z"
+  "updated_at": "2025-07-05T05:08:14.917Z"
 }

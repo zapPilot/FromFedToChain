@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-circle-valuation-digital-dollar",
-  "status": "draft",
+  "status": "reviewed",
   "category": "macro",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -21,10 +21,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T05:05:15.065Z",
+      "comments": "深度的 Circle 解析，挺有趣的而且是最近的熱門話題",
+      "training_labels": {}
+    },
     "ai_outputs": {},
     "performance_metrics": {},
     "source_reviewed": false
   },
-  "updated_at": "2025-07-03T19:15:00Z"
+  "updated_at": "2025-07-05T05:05:15.067Z"
 }

@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-tokenized-assets-revolution",
-  "status": "draft",
+  "status": "reviewed",
   "category": "daily-news",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -15,10 +15,17 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-05T04:29:25.555Z",
+      "comments": "很有趣，是全新的主題。多來點這種新知很適合拿來當談資",
+      "training_labels": {}
+    },
     "ai_outputs": {},
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-03T12:00:00Z"
+  "updated_at": "2025-07-05T04:29:25.557Z"
 }

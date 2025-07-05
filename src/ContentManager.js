@@ -250,7 +250,6 @@ export class ContentManager {
     score,
     reviewer,
     comments,
-    trainingLabels = {},
   ) {
     // Validate that rejection requires feedback
     if (status === "rejected" && (!comments || comments.trim() === "")) {
@@ -263,8 +262,6 @@ export class ContentManager {
     if (!contentData.feedback) {
       contentData.feedback = {
         content_review: null,
-        ai_outputs: {},
-        performance_metrics: {},
       };
     }
 
@@ -274,139 +271,13 @@ export class ContentManager {
       reviewer,
       timestamp: new Date().toISOString(),
       comments,
-      training_labels: trainingLabels,
     };
 
     return this.update(id, contentData, "zh-TW");
   }
 
-  // Add feedback for AI outputs (translation, audio, social)
-  static async addAIFeedback(
-    id,
-    type,
-    language,
-    status,
-    score,
-    reviewer,
-    comments,
-    modelInfo = {},
-    trainingLabels = {},
-  ) {
-    const contentData = await this.read(id, language);
 
-    // Initialize feedback structure if missing
-    if (!contentData.feedback) {
-      contentData.feedback = {
-        content_review: null,
-        ai_outputs: {},
-        performance_metrics: {},
-      };
-    }
 
-    if (!contentData.feedback.ai_outputs[type]) {
-      contentData.feedback.ai_outputs[type] = {};
-    }
-
-    contentData.feedback.ai_outputs[type] = {
-      status,
-      score,
-      reviewer,
-      timestamp: new Date().toISOString(),
-      comments,
-      model_info: modelInfo,
-      training_labels: trainingLabels,
-    };
-
-    return this.update(id, contentData, language);
-  }
-
-  // Add performance metrics to specific language file
-  static async addPerformanceMetrics(id, platform, language, metrics) {
-    const contentData = await this.read(id, language);
-
-    // Initialize feedback structure if missing
-    if (!contentData.feedback) {
-      contentData.feedback = {
-        content_review: null,
-        ai_outputs: {},
-        performance_metrics: {},
-      };
-    }
-
-    if (!contentData.feedback.performance_metrics[platform]) {
-      contentData.feedback.performance_metrics[platform] = {};
-    }
-
-    contentData.feedback.performance_metrics[platform] = {
-      ...metrics,
-      measured_at: new Date().toISOString(),
-    };
-
-    return this.update(id, contentData, language);
-  }
-
-  // Export training data format (scans all language files)
-  static async exportTrainingData(filters = {}) {
-    const contents = await this.list();
-    const trainingSamples = [];
-
-    contents.forEach((content) => {
-      if (!content.feedback || !content.feedback.ai_outputs) return;
-
-      // Export training data from AI feedback in this language file
-      Object.entries(content.feedback.ai_outputs).forEach(
-        ([type, feedback]) => {
-          if (
-            feedback.status === "accepted" ||
-            feedback.status === "rejected"
-          ) {
-            const sample = {
-              input: {
-                task: type,
-                language: content.language,
-                content_id: content.id,
-                category: content.category,
-                context: `${content.category} content, conversational style`,
-              },
-              output: {
-                model_version: feedback.model_info?.model,
-                timestamp: feedback.timestamp,
-              },
-              feedback: {
-                rating: feedback.score,
-                accepted: feedback.status === "accepted",
-                reviewer_expertise: feedback.reviewer,
-                detailed_scores: feedback.training_labels,
-                comments: feedback.comments,
-              },
-            };
-
-            // Add specific fields based on task type
-            if (type === "translation") {
-              sample.input.target_language = content.language;
-              sample.input.source_language = "zh-TW";
-              sample.output.generated_text = content.content;
-            } else if (type === "social_hook") {
-              sample.input.title = content.title;
-              sample.input.content_summary = content.content.substring(0, 500);
-              sample.output.generated_text = content.social_hook;
-            }
-
-            trainingSamples.push(sample);
-          }
-        },
-      );
-    });
-
-    return {
-      export_metadata: {
-        total_samples: trainingSamples.length,
-        export_date: new Date().toISOString(),
-        filters_applied: filters,
-      },
-      training_samples: trainingSamples,
-    };
-  }
 
   // Get content summary for CLI display (single language format)
   static formatSummary(content) {
@@ -423,11 +294,7 @@ export class ContentManager {
     } = content;
 
     // Count feedback items
-    const feedbackCount = feedback
-      ? (feedback.content_review ? 1 : 0) +
-        Object.keys(feedback.ai_outputs || {}).length +
-        Object.keys(feedback.performance_metrics || {}).length
-      : 0;
+    const feedbackCount = feedback && feedback.content_review ? 1 : 0;
 
     return {
       id: id.substring(0, 25) + (id.length > 25 ? "..." : ""),

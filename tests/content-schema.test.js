@@ -25,8 +25,6 @@ describe("ContentSchema Tests", () => {
       assert.strictEqual(content.social_hook, null);
       assert(content.feedback);
       assert.strictEqual(content.feedback.content_review, null);
-      assert.deepStrictEqual(content.feedback.ai_outputs, {});
-      assert.deepStrictEqual(content.feedback.performance_metrics, {});
       assert(content.updated_at);
       assert(content.date);
     });
