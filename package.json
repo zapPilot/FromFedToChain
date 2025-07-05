@@ -2,13 +2,16 @@
   "name": "from-fed-to-chain",
   "version": "1.0.0",
   "type": "module",
-  "description": "Content review system for crypto/macro economics content",
+  "description": "Streamlined content pipeline: Review → Translation → TTS → Social Hooks (Manual Publishing)",
   "scripts": {
     "review": "node src/cli.js review",
+    "pipeline": "node src/cli.js pipeline",
     "test": "node tests/run-tests.js",
     "format": "prettier --write . --ignore-path .prettierignore"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech": "^5.0.0",
+    "@google-cloud/translate": "^9.1.0",
     "chalk": "^5.4.1",
     "prettier": "^3.6.2"
   },
