@@ -1,6 +1,6 @@
 {
   "id": "2025-07-05-blockchain-private-equity-tokenization",
-  "status": "reviewed",
+  "status": "social",
   "category": "startup",
   "date": "2025-07-05",
   "language": "zh-TW",
@@ -18,7 +18,7 @@
     "https://www.reuters.com/business/openai-says-it-has-not-partnered-with-robinhood-stock-token-2025-07-02/",
     "https://www.coindesk.com/markets/2025/07/02/openai-warns-that-tokenized-equity-sale-on-robinhood-is-unauthorized"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/startup/2025-07-05-blockchain-private-equity-tokenization.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -31,5 +31,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-12T04:25:44.982Z"
+  "updated_at": "2025-07-12T04:56:33.236Z"
 }
