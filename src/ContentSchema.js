@@ -11,7 +11,6 @@ export class ContentSchema {
     content,
     references = [],
   ) {
-    console.log("content", content)
     return {
       id,
       status: "draft",
@@ -37,12 +36,12 @@ export class ContentSchema {
 
   // Get content categories
   static getCategories() {
-    return ["daily-news", "ethereum", "macro", "startup", "ai"];
+    return ["daily-news", "ethereum", "macro", "startup", "ai", "defi"];
   }
 
   // Get status workflow states
   static getStatuses() {
-    return ["draft", "reviewed", "translated", "audio", "social", "published"];
+    return ["draft", "reviewed", "translated", "audio", "social"];
   }
 
   // Get supported social platforms

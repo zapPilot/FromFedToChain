@@ -2,16 +2,12 @@ import { Translate } from "@google-cloud/translate/build/src/v2/index.js";
 import chalk from "chalk";
 import { ContentManager } from "../ContentManager.js";
 import path from "path";
-import { fileURLToPath } from "url";
 import { 
   getTranslationTargets, 
   getTranslationConfig,
   LANGUAGES,
   PATHS 
 } from "../../config/languages.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export class TranslationService {
   static SUPPORTED_LANGUAGES = getTranslationTargets();
@@ -113,6 +109,28 @@ export class TranslationService {
       } else {
         throw new Error(`Translation failed: ${error.message}`);
       }
+    }
+  }
+
+  // Translate social hook text
+  static async translateSocialHook(hookText, targetLanguage) {
+    if (!hookText || !hookText.trim()) {
+      throw new Error('Hook text cannot be empty');
+    }
+
+    if (!this.SUPPORTED_LANGUAGES.includes(targetLanguage)) {
+      throw new Error(`Unsupported language for social hook translation: ${targetLanguage}`);
+    }
+
+    console.log(chalk.blue(`🔄 Translating social hook to ${targetLanguage}...`));
+    
+    try {
+      const translatedHook = await this.translateText(hookText.trim(), targetLanguage);
+      console.log(chalk.green(`✅ Social hook translated to ${targetLanguage}`));
+      return translatedHook;
+    } catch (error) {
+      console.error(chalk.red(`❌ Social hook translation failed for ${targetLanguage}: ${error.message}`));
+      throw error;
     }
   }
 

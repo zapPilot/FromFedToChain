@@ -1,9 +1,15 @@
 import { executeCommandSync } from "../utils/command-executor.js";
 import chalk from "chalk";
 import { ContentManager } from "../ContentManager.js";
+import { TranslationService } from "./TranslationService.js";
+import { ContentSchema } from "../ContentSchema.js";
+import { getSocialConfig, shouldGenerateSocialHooks, getTranslationTargets } from "../../config/languages.js";
 
 export class SocialService {
-  static SUPPORTED_LANGUAGES = ['en-US', 'ja-JP'];
+  // Dynamic language support based on configuration
+  static get SUPPORTED_LANGUAGES() {
+    return ContentSchema.getAllLanguages().filter(lang => shouldGenerateSocialHooks(lang));
+  }
 
   // Generate social hook for specific language
   static async generateHook(id, language, commandExecutor = executeCommandSync) {
@@ -21,15 +27,20 @@ export class SocialService {
     // Generate social hook using Claude
     const hook = await this.generateHookWithClaude(title, text, language, commandExecutor);
 
+    // Validate hook length
+    const validatedHook = this.validateHookLength(hook, language);
+
     // Add social hook to content
-    await ContentManager.addSocialHook(id, language, hook);
+    await ContentManager.addSocialHook(id, language, validatedHook);
 
     console.log(chalk.green(`✅ Social hook generated: ${id} (${language})`));
-    return hook;
+    return validatedHook;
   }
 
-  // Generate social hooks for all languages
-  static async generateAllHooks(id, commandExecutor = executeCommandSync) {
+  // Generate social hooks using optimized translation pipeline
+  static async generateAllHooksTranslated(id, commandExecutor = executeCommandSync) {
+    console.log(chalk.blue(`📱 Starting optimized social hook generation for: ${id}`));
+
     // Check source status first
     const sourceContent = await ContentManager.readSource(id);
     
@@ -40,24 +51,161 @@ export class SocialService {
     // Get all available languages for this content
     const availableLanguages = await ContentManager.getAvailableLanguages(id);
     
-    // Filter out source language for social hooks (only need translations)
-    const translationLanguages = availableLanguages.filter(lang => lang !== 'zh-TW');
+    // Get all languages that should have social hooks generated
+    const socialHookLanguages = ContentSchema.getAllLanguages().filter(lang => 
+      availableLanguages.includes(lang) && shouldGenerateSocialHooks(lang)
+    );
+
+    if (socialHookLanguages.length === 0) {
+      console.log(chalk.yellow(`⚠️  No languages configured for social hook generation for ${id}`));
+      await ContentManager.updateSourceStatus(id, 'social');
+      return {};
+    }
 
     const results = {};
 
-    for (const language of translationLanguages) {
+    try {
+      // Step 1: Generate master English hook
+      const englishLang = 'en-US';
+      if (socialHookLanguages.includes(englishLang)) {
+        console.log(chalk.blue(`🎯 Generating master English social hook for: ${id}`));
+        
+        const englishContent = await ContentManager.read(id, englishLang);
+        if (!englishContent) {
+          throw new Error(`No English translation found for ${id}`);
+        }
+
+        const masterHook = await this.generateHookWithClaude(
+          englishContent.title, 
+          englishContent.content, 
+          englishLang, 
+          commandExecutor
+        );
+
+        // Validate and save English hook
+        const validatedEnglishHook = this.validateHookLength(masterHook, englishLang);
+        await ContentManager.addSocialHook(id, englishLang, validatedEnglishHook);
+        
+        results[englishLang] = { success: true, hook: validatedEnglishHook, method: 'generated' };
+        console.log(chalk.green(`✅ Master English hook generated: ${id}`));
+
+        // Step 2: Handle other languages
+        const otherLanguages = socialHookLanguages.filter(lang => lang !== englishLang);
+        const translationTargets = getTranslationTargets();
+        
+        for (const targetLang of otherLanguages) {
+          try {
+            if (translationTargets.includes(targetLang)) {
+              // Translate for translation target languages
+              console.log(chalk.blue(`🔄 Translating social hook to ${targetLang}: ${id}`));
+              
+              const translatedHook = await TranslationService.translateSocialHook(masterHook, targetLang);
+              const validatedHook = this.validateHookLength(translatedHook, targetLang);
+              
+              await ContentManager.addSocialHook(id, targetLang, validatedHook);
+              results[targetLang] = { success: true, hook: validatedHook, method: 'translated' };
+              
+              console.log(chalk.green(`✅ Social hook translated to ${targetLang}: ${id}`));
+            } else {
+              // Generate directly for source language (zh-TW)
+              console.log(chalk.blue(`🎯 Generating native social hook for ${targetLang}: ${id}`));
+              
+              const hook = await this.generateHook(id, targetLang, commandExecutor);
+              results[targetLang] = { success: true, hook, method: 'generated' };
+              
+              console.log(chalk.green(`✅ Social hook generated for ${targetLang}: ${id}`));
+            }
+          } catch (error) {
+            console.error(chalk.red(`❌ Social hook processing failed for ${targetLang}: ${error.message}`));
+            results[targetLang] = { success: false, error: error.message, method: targetLang.includes('en') ? 'generated' : 'translated' };
+          }
+        }
+      } else {
+        // Fallback: Generate for each language individually if English not available
+        console.log(chalk.yellow(`⚠️  English not available, falling back to individual generation`));
+        return await this.generateAllHooksIndividual(id, commandExecutor);
+      }
+
+      // Update source status if all hooks generated successfully
+      const allSuccessful = Object.values(results).every(r => r.success);
+      if (allSuccessful) {
+        await ContentManager.updateSourceStatus(id, 'social');
+        console.log(chalk.green(`🎉 All social hooks completed for: ${id}`));
+      } else {
+        console.log(chalk.yellow(`⚠️  Some social hooks failed for: ${id}`));
+      }
+
+      return results;
+    } catch (error) {
+      console.error(chalk.red(`❌ Social hook generation pipeline failed for ${id}: ${error.message}`));
+      throw error;
+    }
+  }
+
+  // Validate hook length and truncate if necessary
+  static validateHookLength(hook, language) {
+    const socialConfig = getSocialConfig(language);
+    const maxLength = socialConfig.hookLength;
+    
+    if (hook.length <= maxLength) {
+      return hook;
+    }
+
+    console.log(chalk.yellow(`⚠️  Hook too long for ${language} (${hook.length}>${maxLength}), truncating...`));
+    
+    // Truncate at last complete word before limit
+    const truncated = hook.substring(0, maxLength);
+    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    
+    if (lastSpaceIndex > maxLength * 0.8) { // Only truncate at word boundary if we don't lose too much
+      return truncated.substring(0, lastSpaceIndex) + '...';
+    } else {
+      return truncated.substring(0, maxLength - 3) + '...';
+    }
+  }
+
+  // Generate social hooks for all languages (main entry point)
+  static async generateAllHooks(id, commandExecutor = executeCommandSync) {
+    // Use optimized translation pipeline by default
+    return await this.generateAllHooksTranslated(id, commandExecutor);
+  }
+
+  // Generate social hooks for all languages (legacy individual method)
+  static async generateAllHooksIndividual(id, commandExecutor = executeCommandSync) {
+    console.log(chalk.blue(`📱 Generating social hooks individually for: ${id}`));
+    
+    // Check source status first
+    const sourceContent = await ContentManager.readSource(id);
+    
+    if (sourceContent.status !== 'audio') {
+      throw new Error(`Content must have audio before social hooks. Current status: ${sourceContent.status}`);
+    }
+
+    // Get all available languages for this content
+    const availableLanguages = await ContentManager.getAvailableLanguages(id);
+    
+    // Get all languages that should have social hooks generated
+    const socialHookLanguages = ContentSchema.getAllLanguages().filter(lang => 
+      availableLanguages.includes(lang) && shouldGenerateSocialHooks(lang)
+    );
+
+    const results = {};
+
+    for (const language of socialHookLanguages) {
       try {
         const hook = await this.generateHook(id, language, commandExecutor);
-        results[language] = { success: true, hook };
+        const validatedHook = this.validateHookLength(hook, language);
+        await ContentManager.addSocialHook(id, language, validatedHook);
+        results[language] = { success: true, hook: validatedHook, method: 'generated' };
       } catch (error) {
         console.error(chalk.red(`❌ Social hook generation failed for ${language}: ${error.message}`));
-        results[language] = { success: false, error: error.message };
+        results[language] = { success: false, error: error.message, method: 'generated' };
       }
     }
 
-    // Update source status if all hooks generated (or no translation languages exist)
+    // Update source status if all hooks generated successfully
     const allSuccessful = Object.values(results).every(r => r.success);
-    if (translationLanguages.length === 0 || allSuccessful) {
+    if (socialHookLanguages.length === 0 || allSuccessful) {
       await ContentManager.updateSourceStatus(id, 'social');
     }
 
