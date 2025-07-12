@@ -18,13 +18,12 @@
       "status": "rejected",
       "score": 2,
       "reviewer": "reviewer_cli",
-      "timestamp": "2025-07-05T04:31:04.263Z",
-      "comments": "就是單純的利率資訊，沒有知識點",
-      "training_labels": {}
+      "timestamp": "2025-07-12T04:28:28.072Z",
+      "comments": "boring"
     },
     "ai_outputs": {},
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-05T04:31:04.264Z"
+  "updated_at": "2025-07-12T04:28:28.072Z"
 }

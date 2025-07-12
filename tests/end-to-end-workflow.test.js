@@ -297,8 +297,7 @@ describe('End-to-End Workflow Tests', () => {
         
         // All should have same feedback structure
         assert(version.feedback);
-        assert(typeof version.feedback.ai_outputs === 'object');
-        assert(typeof version.feedback.performance_metrics === 'object');
+        assert.strictEqual(version.feedback.content_review, null);
       });
 
       // Verify source retains original references
@@ -491,7 +490,7 @@ describe('End-to-End Workflow Tests', () => {
       const contentDir = path.join(tempDir, 'zh-TW', 'daily-news');
       await fs.mkdir(contentDir, { recursive: true });
       await fs.writeFile(
-        path.join(contentDir, 'malformed-content.json'),
+        path.join(contentDir, '2025-07-02-malformed.json'),
         JSON.stringify(malformedContent, null, 2)
       );
 

@@ -18,13 +18,12 @@
       "status": "rejected",
       "score": 2,
       "reviewer": "reviewer_cli",
-      "timestamp": "2025-07-05T04:30:49.727Z",
-      "comments": "cbdc真的太重複了，我沒看到新的知識點或進展",
-      "training_labels": {}
+      "timestamp": "2025-07-12T04:28:23.717Z",
+      "comments": "no more CBDC"
     },
     "ai_outputs": {},
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-05T04:30:49.729Z"
+  "updated_at": "2025-07-12T04:28:23.718Z"
 }

@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-crypto-startup-frameworks",
-  "status": "reviewed",
+  "status": "social",
   "category": "startup",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -12,7 +12,7 @@
     "Crypto Economics and Tokenomics Design Principles",
     "Decentralized Autonomous Organization Governance Models"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/startup/2025-07-03-crypto-startup-frameworks.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -27,5 +27,5 @@
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-05T05:08:55.721Z"
+  "updated_at": "2025-07-05T11:16:11.175Z"
 }

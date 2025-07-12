@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-stablecoin-business-revolution",
-  "status": "reviewed",
+  "status": "social",
   "category": "daily-news",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -12,7 +12,7 @@
     "https://www.bitwave.io/blog/which-stablecoin-is-best-for-b2b-payments",
     "https://treasurup.com/stablecoins-strategic-playbook-banks-2025/"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/daily-news/2025-07-03-stablecoin-business-revolution.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -27,5 +27,5 @@
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-05T04:29:06.501Z"
+  "updated_at": "2025-07-05T11:37:19.511Z"
 }

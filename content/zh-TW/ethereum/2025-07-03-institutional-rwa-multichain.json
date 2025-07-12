@@ -19,13 +19,12 @@
       "status": "rejected",
       "score": 2,
       "reviewer": "reviewer_cli",
-      "timestamp": "2025-07-05T05:01:02.543Z",
-      "comments": "我覺得深度不夠，主題不錯但是好像都是我知道的，是很淺的介紹",
-      "training_labels": {}
+      "timestamp": "2025-07-12T04:28:33.993Z",
+      "comments": "沒有知識點"
     },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T05:01:02.543Z"
+  "updated_at": "2025-07-12T04:28:33.994Z"
 }

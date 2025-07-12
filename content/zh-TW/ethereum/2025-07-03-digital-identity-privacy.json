@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-digital-identity-privacy",
-  "status": "reviewed",
+  "status": "social",
   "category": "ethereum",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -12,7 +12,7 @@
     "https://cointelegraph.com/news/vitalik-introduces-pluralistic-ids-protect-privacy-in-digital-systems",
     "https://techcrunch.com/2025/06/28/vitalik-buterin-has-reservations-about-sam-altmans-world-project/"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/ethereum/2025-07-03-digital-identity-privacy.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -27,5 +27,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T04:34:28.761Z"
+  "updated_at": "2025-07-05T10:47:34.056Z"
 }

@@ -362,7 +362,7 @@ describe("ContentSchema Tests", () => {
         "Title",
         "Content",
       );
-      content.feedback = null;
+      delete content.feedback;
 
       assert.throws(() => ContentSchema.validate(content), {
         name: "Error",

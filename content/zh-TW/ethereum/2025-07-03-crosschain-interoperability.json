@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-crosschain-interoperability",
-  "status": "reviewed",
+  "status": "social",
   "category": "ethereum",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -12,7 +12,7 @@
     "https://chain.link/cross-chain",
     "https://www.circle.com/cross-chain-transfer-protocol"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/ethereum/2025-07-03-crosschain-interoperability.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -27,5 +27,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T04:32:40.962Z"
+  "updated_at": "2025-07-05T10:46:12.395Z"
 }

@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-tokenized-assets-revolution",
-  "status": "reviewed",
+  "status": "social",
   "category": "daily-news",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -12,7 +12,7 @@
     "https://www.investax.io/blog/2024-real-world-asset-tokenization-market-recap",
     "https://cointelegraph.com/news/rwa-tokenization-trends-and-market-outlook-for-2025-report"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/daily-news/2025-07-03-tokenized-assets-revolution.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -27,5 +27,5 @@
     "performance_metrics": {}
   },
   "source_reviewed": false,
-  "updated_at": "2025-07-05T04:29:25.557Z"
+  "updated_at": "2025-07-05T10:44:42.277Z"
 }

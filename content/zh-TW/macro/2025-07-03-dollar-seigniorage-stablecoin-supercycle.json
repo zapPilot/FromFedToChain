@@ -21,13 +21,12 @@
       "status": "rejected",
       "score": 2,
       "reviewer": "reviewer_cli",
-      "timestamp": "2025-07-05T05:06:40.701Z",
-      "comments": "主題是我有興趣的，但是需要多一點現實生活的案例不能講各國。例如哪一國實際上在哪一天發佈了哪個政策，會產生什麼影響這樣會比較好",
-      "training_labels": {}
+      "timestamp": "2025-07-12T04:28:50.444Z",
+      "comments": "a"
     },
     "source_reviewed": false,
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T05:06:40.701Z"
+  "updated_at": "2025-07-12T04:28:50.444Z"
 }

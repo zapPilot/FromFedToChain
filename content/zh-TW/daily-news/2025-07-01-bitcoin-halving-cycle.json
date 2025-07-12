@@ -18,9 +18,8 @@
       "status": "rejected",
       "score": 2,
       "reviewer": "reviewer_cli",
-      "timestamp": "2025-07-05T05:09:16.531Z",
-      "comments": "這個就單純地講幣價，沒有 in a nut-shell 的內容",
-      "training_labels": {}
+      "timestamp": "2025-07-12T04:28:53.302Z",
+      "comments": "boring"
     },
     "ai_outputs": {
       "translations": {},
@@ -32,5 +31,5 @@
       "social_platforms": {}
     }
   },
-  "updated_at": "2025-07-05T05:09:16.532Z"
+  "updated_at": "2025-07-12T04:28:53.302Z"
 }

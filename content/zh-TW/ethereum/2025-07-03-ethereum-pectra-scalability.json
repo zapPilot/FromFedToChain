@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-ethereum-pectra-scalability",
-  "status": "reviewed",
+  "status": "social",
   "category": "ethereum",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -12,7 +12,7 @@
     "https://eips.ethereum.org/EIPS/eip-7702",
     "https://consensys.io/ethereum-pectra-upgrade"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/ethereum/2025-07-03-ethereum-pectra-scalability.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -27,5 +27,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T04:35:29.289Z"
+  "updated_at": "2025-07-05T10:48:40.511Z"
 }

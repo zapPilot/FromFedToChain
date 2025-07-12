@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-brics-payment-revolution",
-  "status": "reviewed",
+  "status": "social",
   "category": "macro",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -15,7 +15,7 @@
     "https://geopoliticaleconomy.com/2024/10/19/brics-russia-multi-currency-system-us-dollar/",
     "https://www.intellinews.com/brics-announce-a-blockchain-based-payment-system-to-create-a-common-currency-318710/"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/macro/2025-07-03-brics-payment-revolution.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -29,5 +29,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T05:04:29.466Z"
+  "updated_at": "2025-07-05T10:54:31.610Z"
 }

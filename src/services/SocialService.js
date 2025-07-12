@@ -81,10 +81,10 @@ export class SocialService {
 Key content: ${keyInsight}
 
 Requirements:
-- Under 180 characters
+- Under 280 characters
 - Compelling and shareable
-- Include relevant hashtags
 - Match ${langName} social media style
+- mention that Eng | 中 | 日 podcasts are available on Apple Podcasts, Spotify
 
 Return only the hook, no explanations.`;
 

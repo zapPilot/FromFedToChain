@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-tokenized-treasuries-revolution",
-  "status": "reviewed",
+  "status": "social",
   "category": "macro",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -14,7 +14,7 @@
     "https://cointelegraph.com/news/blackrock-five-entities-issue-88-tokenized-treasuries",
     "https://unchainedcrypto.com/tokenized-treasuries-grow-20x-faster-than-stablecoins-as-crypto-market-languishes/"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/macro/2025-07-03-tokenized-treasuries-revolution.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -28,5 +28,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T05:08:14.917Z"
+  "updated_at": "2025-07-05T11:13:56.325Z"
 }

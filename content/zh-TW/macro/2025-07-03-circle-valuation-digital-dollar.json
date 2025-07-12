@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-circle-valuation-digital-dollar",
-  "status": "reviewed",
+  "status": "social",
   "category": "macro",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -18,7 +18,7 @@
     "https://www.ledgerinsights.com/cbdc-dollarization-monetary-sovereignty-ecb-forum/",
     "https://www.grandviewresearch.com/industry-analysis/cross-border-payments-market-report"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/macro/2025-07-03-circle-valuation-digital-dollar.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -33,5 +33,5 @@
     "performance_metrics": {},
     "source_reviewed": false
   },
-  "updated_at": "2025-07-05T05:05:15.067Z"
+  "updated_at": "2025-07-05T11:39:16.080Z"
 }

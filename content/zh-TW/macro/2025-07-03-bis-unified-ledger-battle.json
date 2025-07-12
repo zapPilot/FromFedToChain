@@ -1,6 +1,6 @@
 {
   "id": "2025-07-03-bis-unified-ledger-battle",
-  "status": "reviewed",
+  "status": "social",
   "category": "macro",
   "date": "2025-07-03",
   "language": "zh-TW",
@@ -14,7 +14,7 @@
     "https://www.ledgerinsights.com/41-institutions-join-bis-tokenized-cross-border-payment-project-agora/",
     "https://www.centralbanking.com/central-banks/payments/7962290/bis-begins-design-phase-of-project-agora"
   ],
-  "audio_file": null,
+  "audio_file": "audio/zh-TW/macro/2025-07-03-bis-unified-ledger-battle.wav",
   "social_hook": null,
   "feedback": {
     "content_review": {
@@ -28,5 +28,5 @@
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T05:04:07.311Z"
+  "updated_at": "2025-07-05T10:50:49.146Z"
 }

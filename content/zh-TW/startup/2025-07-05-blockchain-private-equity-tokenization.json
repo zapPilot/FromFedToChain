@@ -1,6 +1,6 @@
 {
   "id": "2025-07-05-blockchain-private-equity-tokenization",
-  "status": "draft",
+  "status": "reviewed",
   "category": "startup",
   "date": "2025-07-05",
   "language": "zh-TW",
@@ -21,9 +21,15 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null,
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-12T04:25:44.976Z",
+      "comments": "有解釋運作原理很棒，但是不要寫給中文讀者的建議，因為讀者來自各國"
+    },
     "ai_outputs": {},
     "performance_metrics": {}
   },
-  "updated_at": "2025-07-05T07:00:00Z"
+  "updated_at": "2025-07-12T04:25:44.982Z"
 }
