@@ -316,6 +316,17 @@ export class ContentManager {
     return this.list(status, "zh-TW");
   }
 
+  // Get source content for review (excludes rejected content)
+  static async getSourceForReview() {
+    const draftContent = await this.getSourceByStatus("draft");
+    
+    // Filter out content that has been rejected
+    return draftContent.filter(content => {
+      const review = content.feedback?.content_review;
+      return !review || review.status !== "rejected";
+    });
+  }
+
   // Create source content (simplified method for Claude commands)
   static async createSource(id, category, title, content, references = []) {
     return this.create(id, category, "zh-TW", title, content, references);

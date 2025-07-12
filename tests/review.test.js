@@ -340,6 +340,30 @@ describe("Review Command Tests", () => {
       assert.equal(content.status, "draft");
       assert.equal(content.feedback.content_review.status, "rejected");
     });
+
+    it("should exclude rejected content from review list", async () => {
+      // Initially, both content items should be available for review
+      const initialReviewList = await ContentManager.getSourceForReview();
+      assert.equal(initialReviewList.length, 2);
+
+      // Reject one piece of content
+      await ContentManager.addContentFeedback(
+        "2025-06-30-bitcoin-test",
+        "rejected",
+        2,
+        "reviewer_cli",
+        "Needs more detail and sources",
+      );
+
+      // getSourceForReview should now exclude the rejected content
+      const filteredReviewList = await ContentManager.getSourceForReview();
+      assert.equal(filteredReviewList.length, 1);
+      assert.equal(filteredReviewList[0].id, "2025-06-30-ethereum-test");
+
+      // But getSourceByStatus("draft") should still include both (rejected stays in draft)
+      const allDrafts = await ContentManager.getSourceByStatus("draft");
+      assert.equal(allDrafts.length, 2);
+    });
   });
 
   describe("Data Integrity", () => {

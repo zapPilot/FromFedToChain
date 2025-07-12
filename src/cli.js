@@ -35,8 +35,8 @@ async function handleReview() {
   console.log(chalk.blue.bold("📖 Interactive Content Review"));
   console.log(chalk.gray("=".repeat(50)));
 
-  // Get all source content that needs review
-  const contents = await ContentManager.getSourceByStatus("draft");
+  // Get all source content that needs review (excludes rejected content)
+  const contents = await ContentManager.getSourceForReview();
   if (contents.length === 0) {
     console.log(chalk.green("✅ No content pending review"));
     return;
