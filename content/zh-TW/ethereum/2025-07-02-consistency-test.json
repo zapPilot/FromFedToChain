@@ -1,0 +1,19 @@
+{
+  "id": "2025-07-02-consistency-test",
+  "status": "social",
+  "category": "ethereum",
+  "date": "2025-07-13",
+  "language": "zh-TW",
+  "title": "Ethereum升級測試",
+  "content": "這是一個用於測試數據一致性的以太坊內容",
+  "references": [
+    "Ethereum Foundation",
+    "Vitalik Blog"
+  ],
+  "audio_file": null,
+  "social_hook": null,
+  "feedback": {
+    "content_review": null
+  },
+  "updated_at": "2025-07-13T13:40:34.096Z"
+}

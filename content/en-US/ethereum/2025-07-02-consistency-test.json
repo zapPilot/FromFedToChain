@@ -1,0 +1,19 @@
+{
+  "id": "2025-07-02-consistency-test",
+  "status": "translated",
+  "category": "ethereum",
+  "date": "2025-07-13",
+  "language": "en-US",
+  "title": "Translated: Ethereum升級測試 (en)",
+  "content": "Translated: 這是一個用於測試數據一致性的以太坊內容 en",
+  "references": [
+    "Ethereum Foundation",
+    "Vitalik Blog"
+  ],
+  "audio_file": null,
+  "social_hook": null,
+  "feedback": {
+    "content_review": null
+  },
+  "updated_at": "2025-07-13T13:40:33.819Z"
+}

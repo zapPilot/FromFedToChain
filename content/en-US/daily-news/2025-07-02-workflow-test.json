@@ -1,0 +1,19 @@
+{
+  "id": "2025-07-02-workflow-test",
+  "status": "translated",
+  "category": "daily-news",
+  "date": "2025-07-13",
+  "language": "en-US",
+  "title": "Bitcoin Breaks New Heights",
+  "content": "Bitcoin price reached new historical highs today, marking an important turning point for the cryptocurrency market. Experts predict this trend will continue.",
+  "references": [
+    "Financial Times",
+    "CoinDesk"
+  ],
+  "audio_file": null,
+  "social_hook": null,
+  "feedback": {
+    "content_review": null
+  },
+  "updated_at": "2025-07-13T13:40:33.612Z"
+}
