@@ -37,9 +37,9 @@ export class SocialService {
     return validatedHook;
   }
 
-  // Generate social hooks using optimized translation pipeline
+  // Generate social hooks using zh-TW-first translation pipeline
   static async generateAllHooksTranslated(id, commandExecutor = executeCommandSync) {
-    console.log(chalk.blue(`📱 Starting optimized social hook generation for: ${id}`));
+    console.log(chalk.blue(`📱 Starting zh-TW-first social hook generation for: ${id}`));
 
     // Check source status first
     const sourceContent = await ContentManager.readSource(id);
@@ -65,41 +65,52 @@ export class SocialService {
     const results = {};
 
     try {
-      // Step 1: Generate master English hook
-      const englishLang = 'en-US';
-      if (socialHookLanguages.includes(englishLang)) {
-        console.log(chalk.blue(`🎯 Generating master English social hook for: ${id}`));
-        
-        const englishContent = await ContentManager.read(id, englishLang);
-        if (!englishContent) {
-          throw new Error(`No English translation found for ${id}`);
+      // Step 1: Get or generate master Chinese (zh-TW) hook - the source language
+      const sourceLang = 'zh-TW';
+      if (socialHookLanguages.includes(sourceLang)) {
+        const sourceContent = await ContentManager.read(id, sourceLang);
+        if (!sourceContent) {
+          throw new Error(`No Chinese source content found for ${id}`);
         }
 
-        const masterHook = await this.generateHookWithClaude(
-          englishContent.title, 
-          englishContent.content, 
-          englishLang, 
-          commandExecutor
-        );
-
-        // Validate and save English hook
-        const validatedEnglishHook = this.validateHookLength(masterHook, englishLang);
-        await ContentManager.addSocialHook(id, englishLang, validatedEnglishHook);
+        let validatedChineseHook;
         
-        results[englishLang] = { success: true, hook: validatedEnglishHook, method: 'generated' };
-        console.log(chalk.green(`✅ Master English hook generated: ${id}`));
+        // Check if Chinese hook already exists
+        if (sourceContent.social_hook && sourceContent.social_hook.trim()) {
+          console.log(chalk.blue(`🎯 Using existing Chinese social hook for: ${id}`));
+          validatedChineseHook = sourceContent.social_hook;
+          results[sourceLang] = { success: true, hook: validatedChineseHook, method: 'existing' };
+          console.log(chalk.green(`✅ Master Chinese hook found: ${id}`));
+        } else {
+          // Generate new Chinese hook
+          console.log(chalk.blue(`🎯 Generating master Chinese social hook for: ${id}`));
+          
+          const masterHook = await this.generateHookWithClaude(
+            sourceContent.title, 
+            sourceContent.content, 
+            sourceLang, 
+            commandExecutor
+          );
 
-        // Step 2: Handle other languages
-        const otherLanguages = socialHookLanguages.filter(lang => lang !== englishLang);
-        const translationTargets = getTranslationTargets();
+          // Validate and save Chinese hook
+          validatedChineseHook = this.validateHookLength(masterHook, sourceLang);
+          await ContentManager.addSocialHook(id, sourceLang, validatedChineseHook);
+          
+          results[sourceLang] = { success: true, hook: validatedChineseHook, method: 'generated' };
+          console.log(chalk.green(`✅ Master Chinese hook generated: ${id}`));
+        }
+
+        // Step 2: Translate Chinese hook to other languages
+        const otherLanguages = socialHookLanguages.filter(lang => lang !== sourceLang);
+        const translationTargets = getTranslationTargets(); // en-US, ja-JP
         
         for (const targetLang of otherLanguages) {
           try {
             if (translationTargets.includes(targetLang)) {
-              // Translate for translation target languages
-              console.log(chalk.blue(`🔄 Translating social hook to ${targetLang}: ${id}`));
+              // Translate from Chinese to target language
+              console.log(chalk.blue(`🔄 Translating Chinese social hook to ${targetLang}: ${id}`));
               
-              const translatedHook = await TranslationService.translateSocialHook(masterHook, targetLang);
+              const translatedHook = await TranslationService.translateSocialHook(validatedChineseHook, targetLang);
               const validatedHook = this.validateHookLength(translatedHook, targetLang);
               
               await ContentManager.addSocialHook(id, targetLang, validatedHook);
@@ -107,7 +118,7 @@ export class SocialService {
               
               console.log(chalk.green(`✅ Social hook translated to ${targetLang}: ${id}`));
             } else {
-              // Generate directly for source language (zh-TW)
+              // Generate directly for any non-translation-target languages
               console.log(chalk.blue(`🎯 Generating native social hook for ${targetLang}: ${id}`));
               
               const hook = await this.generateHook(id, targetLang, commandExecutor);
@@ -117,12 +128,12 @@ export class SocialService {
             }
           } catch (error) {
             console.error(chalk.red(`❌ Social hook processing failed for ${targetLang}: ${error.message}`));
-            results[targetLang] = { success: false, error: error.message, method: targetLang.includes('en') ? 'generated' : 'translated' };
+            results[targetLang] = { success: false, error: error.message, method: 'translated' };
           }
         }
       } else {
-        // Fallback: Generate for each language individually if English not available
-        console.log(chalk.yellow(`⚠️  English not available, falling back to individual generation`));
+        // Fallback: Generate for each language individually if Chinese not available
+        console.log(chalk.yellow(`⚠️  Chinese source not available, falling back to individual generation`));
         return await this.generateAllHooksIndividual(id, commandExecutor);
       }
 
@@ -215,6 +226,7 @@ export class SocialService {
   // Generate social hook using Claude
   static async generateHookWithClaude(title, content, language, commandExecutor = executeCommandSync) {
     const languageMap = {
+      'zh-TW': 'Traditional Chinese',
       'en-US': 'English',
       'ja-JP': 'Japanese'
     };
