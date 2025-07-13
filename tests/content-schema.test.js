@@ -285,7 +285,6 @@ describe("ContentSchema Tests", () => {
         "translated",
         "audio",
         "social",
-        "published",
       ]);
     });
 
