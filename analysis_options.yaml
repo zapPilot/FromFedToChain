@@ -1,0 +1,24 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Additional rules for better code quality
+    avoid_print: false  # Allow prints for debugging
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    sort_child_properties_last: true
+    use_key_in_widget_constructors: true
+    prefer_const_constructors_in_immutables: true
+    avoid_unnecessary_containers: true
+    prefer_const_declarations: true
+    prefer_final_fields: true
+    prefer_single_quotes: true
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false

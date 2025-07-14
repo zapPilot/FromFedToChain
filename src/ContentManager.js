@@ -121,6 +121,12 @@ export class ContentManager {
   // Update content (finds existing file and updates it)
   static async update(id, updates, language = null) {
     const content = await this.read(id, language);
+    
+    // Apply content cleaning if content field is being updated
+    if (updates.content && typeof updates.content === "string") {
+      updates.content = ContentSchema.cleanContent(updates.content);
+    }
+    
     const updatedContent = {
       ...content,
       ...updates,

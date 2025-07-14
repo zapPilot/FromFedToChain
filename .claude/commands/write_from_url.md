@@ -1,5 +1,5 @@
 1. review the existing content in `/content/zh-TW/**/*.json`, focusing on each item’s `title`, `content`, `feedback.content_review.status`, and `feedback.content_review.comments` as learning data. Avoid repeating the same knowledge points—it’s okay to use the same topic, but make sure to extend it or present different knowledge angles.
-2. Read the multiple urls specified in `$ARGUMENTS`.
+2. Read the multiple URLs specified in `$ARGUMENTS`. Assume that readers are beginners, so use "in a nutshell" to explain this topic to them, providing some background knowledge first.
 3. Use `zen` to conduct additional research on this topic (deep dive / ultrathink).
 4. Use `claude` to conduct further research on the same topic (deep dive / ultrathink).
 5. `Collect` and keep all reference `URLs` from Steps 1 – 3.

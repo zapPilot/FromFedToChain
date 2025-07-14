@@ -4,11 +4,13 @@ This file contains important information for Claude Code to work effectively wit
 
 ## Project Context
 
-**From Fed to Chain** is a simplified content review system for Chinese explainers about crypto/macro economics. The focus is on human review workflow and content management.
+**From Fed to Chain** is a simplified content review system for Chinese explainers about crypto/macro economics. The focus is on human review workflow and content management. The project includes both a Node.js CLI pipeline and a Flutter mobile/web app for audio playback.
 
 ## ✨ Current Architecture (2024)
 
 **Key Principle**: Simplified content review workflow for content quality assurance.
+
+### Node.js CLI Pipeline
 
 ```
 src/
@@ -33,6 +35,29 @@ content/                 # Nested structure by language and category
 audio/                   # Audio files (if generated)
 ├── en-US/2025-06-30-article-id.wav
 └── ja-JP/2025-06-30-article-id.wav
+```
+
+### Flutter Mobile/Web App
+
+```
+lib/
+├── main.dart                 # App entry point
+├── models/                   # Data models
+│   ├── audio_content.dart    # Content metadata model
+│   └── audio_file.dart       # Audio file model
+├── screens/                  # App screens
+│   └── home_screen.dart      # Main screen
+├── services/                 # Business logic
+│   ├── audio_service.dart    # Audio playback service
+│   └── content_service.dart  # Content loading service
+├── themes/                   # App theming
+│   └── app_theme.dart        # Dark theme configuration
+└── widgets/                  # UI components
+    ├── animated_background.dart
+    ├── audio_item_card.dart
+    ├── audio_list.dart
+    ├── filter_bar.dart
+    └── mini_player.dart
 ```
 
 ## 📋 Content Schema
@@ -81,7 +106,7 @@ audio/                   # Audio files (if generated)
 
 ## 🚀 CLI Commands
 
-### Available Commands
+### Node.js CLI Commands
 
 ```bash
 # Interactive review of all pending content
@@ -92,6 +117,23 @@ npm run test
 
 # Format code
 npm run format
+```
+
+### Flutter App Commands
+
+```bash
+# Web development
+flutter run -d chrome
+
+# Mobile development
+flutter run
+
+# Build for web
+flutter build web
+
+# Build for mobile
+flutter build apk  # Android
+flutter build ios  # iOS
 ```
 
 ### Review Workflow
@@ -165,16 +207,27 @@ npm run review
 - **File Paths**: Always use absolute paths, no relative references
 - **Schema Validation**: Content validated against schema on read/write operations
 - **Nested Structure**: Content organized by language/category for clarity
+- **Flutter Integration**: Flutter app provides modern UI for audio playback of generated content
+- **Coexisting Dependencies**: Node.js (package.json) and Flutter (pubspec.yaml) dependencies coexist
 
 ## 📖 Current Workflow
+
+### Content Management Workflow
 
 1. **Content Creation**: Create source content files manually in `content/zh-TW/`
 2. **Review**: Use `npm run review` to approve/reject content with feedback
 3. **Content Management**: Review feedback is stored for quality tracking
 4. **Future Processing**: Additional translation/audio features can be added as needed
 
-This simplified approach focuses on content review quality and content management, providing a solid foundation for future feature expansion.
+### Flutter App Workflow
+
+1. **Content Processing**: Use Node.js CLI to generate content and audio files
+2. **Audio Playback**: Launch Flutter app with `flutter run -d chrome` or `flutter run`
+3. **Browse Content**: Use modern UI to browse and play generated TTS audio files
+4. **Multi-platform**: Deploy to web, Android, or iOS for broader accessibility
+
+This dual approach provides both efficient content management and modern audio playback capabilities.
 
 ---
 
-_Last updated: 2025-07-05 - Content review and management system_
+_Last updated: 2025-07-15 - Content review and management system with Flutter audio player_
