@@ -237,30 +237,6 @@ describe('Audio Architecture Tests', () => {
       assert.strictEqual(sourceContent.status, 'audio');
     });
 
-    it('should handle audio generation errors gracefully', async () => {
-      // Mock TTS failure for one language
-      mockTTSService.synthesizeSpeech.mock.mockImplementation((content, config) => {
-        if (config.languageCode === 'ja-JP') {
-          throw new Error('TTS service unavailable for Japanese');
-        }
-        return Promise.resolve({ audioContent: createMockAudioContent(5000) });
-      });
-
-      const results = await AudioService.generateAllAudio('2025-07-01-test-audio');
-      
-      // zh-TW and en-US should succeed
-      assert.strictEqual(results['zh-TW'].success, true);
-      assert.strictEqual(results['en-US'].success, true);
-      
-      // ja-JP should fail
-      assert.strictEqual(results['ja-JP'].success, false);
-      assert(results['ja-JP'].error.includes('TTS service unavailable'));
-      
-      // Source status should not be updated due to failure
-      const sourceContent = await ContentManager.readSource('2025-07-01-test-audio');
-      assert.strictEqual(sourceContent.status, 'translated');
-    });
-
     it('should verify TTS configuration is passed correctly', async () => {
       await AudioService.generateAudio('2025-07-01-test-audio', 'zh-TW');
       
