@@ -2,32 +2,6 @@
 // This file defines the content structure and provides utilities for content creation
 
 export class ContentSchema {
-  // Clean content for storage - removes markdown formatting
-  static cleanContent(content) {
-    if (typeof content !== "string") {
-      return content;
-    }
-
-    return content
-      // Remove code blocks first (must be before inline code)
-      .replace(/```[\s\S]*?```/g, '')       // Remove multi-line code blocks
-      
-      // Remove markdown formatting but preserve the text content
-      .replace(/\*\*(.*?)\*\*/g, '$1')      // Remove bold: **text** -> text
-      .replace(/\*(.*?)\*/g, '$1')          // Remove italic: *text* -> text
-      .replace(/`([^`]*)`/g, '$1')          // Remove inline code: `text` -> text (improved)
-      .replace(/#{1,6}\s+/g, '')            // Remove headers: ## Header -> Header
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links: [text](url) -> text
-      .replace(/^\s*[-*+]\s+/gm, '')        // Remove list markers: - item -> item
-      
-      // Clean up line breaks and spacing
-      .replace(/\n{3,}/g, '\n\n')           // Normalize excessive line breaks
-      .replace(/\n\n/g, ' ')                // Replace double newlines with space
-      .replace(/\n/g, ' ')                  // Replace single newlines with space
-      .replace(/\s{2,}/g, ' ')              // Collapse multiple spaces
-      .trim();                              // Remove leading/trailing whitespace
-  }
-
   // Create a new content object for single language
   static createContent(
     id,
@@ -44,7 +18,7 @@ export class ContentSchema {
       date: new Date().toISOString().split("T")[0],
       language,
       title,
-      content: this.cleanContent(content),
+      content,
       references,
       audio_file: null,
       social_hook: null,

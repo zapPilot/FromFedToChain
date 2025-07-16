@@ -222,7 +222,7 @@ npm run review
 - **Node.js** (v18+) - Runtime environment
 - **npm** - Package manager
 - **FFmpeg** - Audio processing and M3U8 conversion
-- **rclone** - Cloudflare R2 uploads (optional)
+- **rclone** - Cloudflare R2 uploads for M3U8 streaming
 
 ### Installation Commands
 ```bash
@@ -233,7 +233,7 @@ brew install ffmpeg
 curl https://rclone.org/install.sh | sudo bash
 
 # Configure rclone for Cloudflare R2
-rclone config create fromfedtochain s3 \
+rclone config create r2 s3 \
   provider=Cloudflare \
   access_key_id=YOUR_ACCESS_KEY \
   secret_access_key=YOUR_SECRET_KEY \
@@ -253,24 +253,76 @@ npm run check-deps
 # ✅ Overall pipeline readiness
 ```
 
+### Pipeline Testing
+
+```bash
+# Test end-to-end pipeline with a content ID
+npm run pipeline <content-id>
+
+# Example: Process a specific content file
+npm run pipeline 2025-07-05-blockchain-private-equity-tokenization
+```
+
+**Note**: For testing, you can manually edit content files to remove `streaming_urls` and set `status` to `reviewed` to trigger the pipeline phases.
+
 ## 📖 Current Workflow
 
 ### Content Management Workflow
 
 1. **Content Creation**: Create source content files manually in `content/zh-TW/`
 2. **Review**: Use `npm run review` to approve/reject content with feedback
-3. **Content Management**: Review feedback is stored for quality tracking
-4. **Future Processing**: Additional translation/audio features can be added as needed
+3. **Pipeline Processing**: Use `npm run pipeline <content-id>` to process content through translation → audio → social hooks
+4. **Testing**: Edit content files to remove `streaming_urls` and set `status: "reviewed"` for testing
 
 ### Flutter App Workflow
 
-1. **Content Processing**: Use Node.js CLI to generate content and audio files
-2. **Audio Playback**: Launch Flutter app with `flutter run -d chrome` or `flutter run`
-3. **Browse Content**: Use modern UI to browse and play generated TTS audio files
+1. **Content Processing**: Use `npm run pipeline <content-id>` to generate content and M3U8 streaming files
+2. **Audio Streaming**: Launch Flutter app with `flutter run -d chrome` or `flutter run`
+3. **Browse Content**: Use modern UI to browse and stream M3U8 audio files
 4. **Multi-platform**: Deploy to web, Android, or iOS for broader accessibility
 
-This dual approach provides both efficient content management and modern audio playback capabilities.
+This streamlined approach provides efficient content management and modern streaming audio playback.
+
+## 🔧 Troubleshooting
+
+### Pipeline Issues
+
+**Problem**: `npm run pipeline` fails with "remote not configured"
+
+**Cause**: rclone is not properly configured for Cloudflare R2 uploads
+
+**Solutions**:
+1. **Check rclone configuration**: Run `npm run check-deps` to verify rclone setup
+2. **Configure rclone**: Follow the rclone configuration steps in the Pipeline Dependencies section
+3. **Verify remote name**: Ensure remote name matches `REMOTE_NAME` in `CloudflareR2Service.js`
+
+**Problem**: Pipeline skips audio/M3U8 generation
+
+**Cause**: Content file already has `streaming_urls` populated or incorrect status
+
+**Solutions**:
+1. **Check content status**: Content must have `status: "reviewed"` to trigger pipeline
+2. **Remove streaming URLs**: Delete `streaming_urls` field from content JSON file to force re-processing
+3. **Manual testing**: Edit content file to remove `streaming_urls` and set `status: "reviewed"`
+
+### Pipeline Dependencies
+
+**Problem**: Pipeline fails with dependency errors
+
+**Solutions**:
+1. **Check dependencies**: Run `npm run check-deps` to verify all tools are installed
+2. **Install missing tools**: Follow installation commands in the Pipeline Dependencies section
+3. **Path issues**: Ensure ffmpeg and rclone are in your system PATH
+
+### Content Generation Issues
+
+**Problem**: Audio or M3U8 files not generated
+
+**Solutions**:
+1. **Check language configuration**: Verify language is enabled in `config/languages.js`
+2. **Verify content status**: Content must be in correct status for each pipeline phase
+3. **Check service accounts**: Ensure Google Cloud TTS credentials are configured
 
 ---
 
-_Last updated: 2025-07-15 - Content review and management system with Flutter audio player_
+_Last updated: 2025-07-16 - Simplified pipeline-focused workflow_

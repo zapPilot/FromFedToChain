@@ -283,35 +283,64 @@ export class M3U8AudioService {
   static async listM3U8Files() {
     try {
       const m3u8Files = [];
+      
+      // Check if M3U8_DIR exists
+      try {
+        await fs.access(this.M3U8_DIR);
+      } catch (error) {
+        console.log(chalk.yellow(`⚠️ M3U8 directory does not exist: ${this.M3U8_DIR}`));
+        return [];
+      }
+      
       const languages = await fs.readdir(this.M3U8_DIR);
 
       for (const language of languages) {
-        const languageDir = path.join(this.M3U8_DIR, language);
-        const languageStat = await fs.stat(languageDir);
-        
-        if (!languageStat.isDirectory()) continue;
-
-        const categories = await fs.readdir(languageDir);
-        
-        for (const category of categories) {
-          const categoryDir = path.join(languageDir, category);
-          const categoryStat = await fs.stat(categoryDir);
+        try {
+          const languageDir = path.join(this.M3U8_DIR, language);
+          const languageStat = await fs.stat(languageDir);
           
-          if (!categoryStat.isDirectory()) continue;
+          if (!languageStat.isDirectory()) continue;
 
-          const contentIds = await fs.readdir(categoryDir);
+          const categories = await fs.readdir(languageDir);
           
-          for (const id of contentIds) {
-            const m3u8Info = await this.getM3U8Files(id, language, category);
-            if (m3u8Info) {
-              m3u8Files.push({
-                id,
-                language,
-                category,
-                ...m3u8Info
-              });
+          for (const category of categories) {
+            try {
+              const categoryDir = path.join(languageDir, category);
+              const categoryStat = await fs.stat(categoryDir);
+              
+              if (!categoryStat.isDirectory()) continue;
+
+              const contentIds = await fs.readdir(categoryDir);
+              
+              for (const id of contentIds) {
+                try {
+                  const idDir = path.join(categoryDir, id);
+                  const idStat = await fs.stat(idDir);
+                  
+                  if (!idStat.isDirectory()) continue;
+
+                  const m3u8Info = await this.getM3U8Files(id, language, category);
+                  if (m3u8Info) {
+                    m3u8Files.push({
+                      id,
+                      language,
+                      category,
+                      ...m3u8Info
+                    });
+                  }
+                } catch (error) {
+                  // Skip individual content directories that have issues
+                  console.log(chalk.yellow(`⚠️ Skipping ${language}/${category}/${id}: ${error.message}`));
+                }
+              }
+            } catch (error) {
+              // Skip individual category directories that have issues  
+              console.log(chalk.yellow(`⚠️ Skipping ${language}/${category}: ${error.message}`));
             }
           }
+        } catch (error) {
+          // Skip individual language directories that have issues
+          console.log(chalk.yellow(`⚠️ Skipping ${language}: ${error.message}`));
         }
       }
 

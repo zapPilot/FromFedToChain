@@ -66,6 +66,7 @@ export class AudioService {
     // Generate M3U8 if enabled for this language
     if (shouldGenerateM3U8(language)) {
       try {
+        console.log(chalk.blue(`🎬 Starting M3U8 generation for ${id} (${language})`));
         const m3u8Config = getM3U8Config(language);
         const m3u8Result = await M3U8AudioService.convertToM3U8(
           audioPath,
@@ -77,10 +78,14 @@ export class AudioService {
         
         if (m3u8Result.success) {
           result.m3u8 = m3u8Result;
-          console.log(chalk.green(`✅ M3U8 generated: ${m3u8Result.playlistPath}`));
+          console.log(chalk.green(`✅ M3U8 generated successfully`));
+          console.log(chalk.gray(`   Playlist: ${m3u8Result.playlistPath}`));
+          console.log(chalk.gray(`   Segments: ${m3u8Result.segments.length}`));
+        } else {
+          console.log(chalk.red(`❌ M3U8 generation failed`));
         }
       } catch (error) {
-        console.error(chalk.red(`❌ M3U8 generation failed: ${error.message}`));
+        console.error(chalk.red(`❌ M3U8 generation error: ${error.message}`));
         // Don't fail the entire process if M3U8 generation fails
       }
     }
@@ -95,11 +100,16 @@ export class AudioService {
         
         if (rcloneAvailable) {
           const uploadFiles = {
-            wavPath: audioPath,
             m3u8Data: result.m3u8
           };
           
           console.log(chalk.blue(`📤 Starting R2 upload for ${id} (${language})...`));
+          console.log(chalk.gray(`   M3U8 data: ${result.m3u8 ? 'Available' : 'Missing'}`));
+          if (result.m3u8) {
+            console.log(chalk.gray(`   M3U8 playlist: ${result.m3u8.playlistPath}`));
+            console.log(chalk.gray(`   M3U8 segments: ${result.m3u8.segments.length}`));
+          }
+          
           const uploadResult = await CloudflareR2Service.uploadAudioFiles(
             id,
             language,

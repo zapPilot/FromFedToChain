@@ -244,19 +244,32 @@ export class GoogleTTSService {
   }
 
   static prepareContentForTTS(content, language) {
-    // Remove markdown and format for speech
+    // Clean content for TTS - removes markdown formatting and optimizes for speech
+    if (typeof content !== "string") {
+      return content;
+    }
+
     let ttsContent = content
-      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
-      .replace(/\*(.*?)\*/g, '$1')     // Remove italic
-      .replace(/`(.*?)`/g, '$1')       // Remove code
-      .replace(/#{1,6}\s/g, '')        // Remove headers
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links, keep text
-      .replace(/\n{3,}/g, '\n\n')      // Normalize line breaks
-      .trim();
+      // Remove code blocks first (must be before inline code)
+      .replace(/```[\s\S]*?```/g, '')       // Remove multi-line code blocks
+      
+      // Remove markdown formatting but preserve the text content
+      .replace(/\*\*(.*?)\*\*/g, '$1')      // Remove bold: **text** -> text
+      .replace(/\*(.*?)\*/g, '$1')          // Remove italic: *text* -> text
+      .replace(/`([^`]*)`/g, '$1')          // Remove inline code: `text` -> text (improved)
+      .replace(/#{1,6}\s+/g, '')            // Remove headers: ## Header -> Header
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links: [text](url) -> text
+      .replace(/^\s*[-*+]\s+/gm, '')        // Remove list markers: - item -> item
+      
+      // Clean up line breaks and spacing
+      .replace(/\n{3,}/g, '\n\n')           // Normalize excessive line breaks
+      .replace(/\n\n/g, ' ')                // Replace double newlines with space
+      .replace(/\n/g, ' ')                  // Replace single newlines with space
+      .replace(/\s{2,}/g, ' ')              // Collapse multiple spaces
+      .trim();                              // Remove leading/trailing whitespace
 
     // Add pauses for better speech flow
     ttsContent = ttsContent
-      .replace(/\n\n/g, '\n\n... \n\n') // Add pause between paragraphs
       .replace(/([.!?])\s+([A-Z])/g, '$1 ... $2'); // Add pause between sentences
 
     return ttsContent;

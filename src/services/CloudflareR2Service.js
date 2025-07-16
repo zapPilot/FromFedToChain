@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { spawn } from "child_process";
 
 export class CloudflareR2Service {
-  static REMOTE_NAME = "fromfedtochain"; // R2 remote name in rclone config
+  static REMOTE_NAME = "r2"; // R2 remote name in rclone config
   static BUCKET_NAME = "fromfedtochain"; // R2 bucket name
   static RCLONE_BINARY = "rclone"; // Assumes rclone is in PATH
   static BASE_URL = "https://fromfedtochain.your-domain.com"; // Update with your actual R2 domain
@@ -19,6 +19,7 @@ export class CloudflareR2Service {
    */
   static async uploadAudioFiles(id, language, category, files) {
     console.log(chalk.blue(`☁️ Uploading to R2: ${id} (${language})`));
+    console.log(chalk.gray(`   Files to upload: ${Object.keys(files).join(', ')}`));
 
     const uploadResults = {
       success: true,
@@ -30,32 +31,32 @@ export class CloudflareR2Service {
       // Create R2 directory structure: audio/{language}/{category}/{id}/
       const r2BasePath = `audio/${language}/${category}/${id}`;
       
-      // Upload WAV file if provided
-      if (files.wavPath) {
-        const wavResult = await this.uploadFile(files.wavPath, `${r2BasePath}/audio.wav`);
-        if (wavResult.success) {
-          uploadResults.urls.wav = `${this.BASE_URL}/${r2BasePath}/audio.wav`;
-        } else {
-          uploadResults.errors.push(`WAV upload failed: ${wavResult.error}`);
-          uploadResults.success = false;
-        }
-      }
+      // WAV files are stored locally only, not uploaded to R2 for streaming
 
       // Upload M3U8 files if provided
       if (files.m3u8Data) {
+        console.log(chalk.blue(`🎬 Uploading M3U8 files...`));
+        console.log(chalk.gray(`   Playlist: ${files.m3u8Data.playlistPath}`));
+        console.log(chalk.gray(`   Segments: ${files.m3u8Data.segments.length}`));
+        
         const m3u8Result = await this.uploadM3U8Files(files.m3u8Data, r2BasePath);
         if (m3u8Result.success) {
           uploadResults.urls.m3u8 = `${this.BASE_URL}/${r2BasePath}/playlist.m3u8`;
           uploadResults.urls.segments = m3u8Result.segmentUrls;
+          console.log(chalk.green(`✅ M3U8 files uploaded successfully`));
+          console.log(chalk.gray(`   Playlist URL: ${uploadResults.urls.m3u8}`));
+          console.log(chalk.gray(`   Segments uploaded: ${m3u8Result.segmentUrls.length}`));
         } else {
+          console.error(chalk.red(`❌ M3U8 upload failed: ${m3u8Result.error}`));
           uploadResults.errors.push(`M3U8 upload failed: ${m3u8Result.error}`);
           uploadResults.success = false;
         }
+      } else {
+        console.log(chalk.yellow(`⚠️ No M3U8 data provided for upload`));
       }
 
       if (uploadResults.success) {
         console.log(chalk.green(`✅ R2 upload completed: ${id} (${language})`));
-        console.log(chalk.gray(`   WAV: ${uploadResults.urls.wav || 'N/A'}`));
         console.log(chalk.gray(`   M3U8: ${uploadResults.urls.m3u8 || 'N/A'}`));
       } else {
         console.error(chalk.red(`❌ R2 upload had errors: ${uploadResults.errors.join(', ')}`));
