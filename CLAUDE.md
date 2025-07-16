@@ -112,6 +112,12 @@ lib/
 # Interactive review of all pending content
 npm run review
 
+# Auto-process content through translation → audio → social hooks
+npm run pipeline
+
+# Check all pipeline dependencies (ffmpeg, rclone, etc.)
+npm run check-deps
+
 # Run tests
 npm run test
 
@@ -209,6 +215,43 @@ npm run review
 - **Nested Structure**: Content organized by language/category for clarity
 - **Flutter Integration**: Flutter app provides modern UI for audio playback of generated content
 - **Coexisting Dependencies**: Node.js (package.json) and Flutter (pubspec.yaml) dependencies coexist
+
+## 🔧 Pipeline Dependencies
+
+### Required Dependencies
+- **Node.js** (v18+) - Runtime environment
+- **npm** - Package manager
+- **FFmpeg** - Audio processing and M3U8 conversion
+- **rclone** - Cloudflare R2 uploads (optional)
+
+### Installation Commands
+```bash
+# macOS (using Homebrew)
+brew install ffmpeg
+
+# Install rclone
+curl https://rclone.org/install.sh | sudo bash
+
+# Configure rclone for Cloudflare R2
+rclone config create fromfedtochain s3 \
+  provider=Cloudflare \
+  access_key_id=YOUR_ACCESS_KEY \
+  secret_access_key=YOUR_SECRET_KEY \
+  endpoint=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com \
+  region=auto
+```
+
+### Dependency Verification
+```bash
+# Check all dependencies
+npm run check-deps
+
+# This will verify:
+# ✅ Node.js and npm versions
+# ✅ FFmpeg installation and path
+# ✅ rclone installation and configuration
+# ✅ Overall pipeline readiness
+```
 
 ## 📖 Current Workflow
 

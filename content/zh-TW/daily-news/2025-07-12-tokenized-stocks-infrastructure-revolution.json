@@ -24,5 +24,29 @@
       "comments": "很棒，我就是喜歡這種風格的教育文章，告訴我這個新觀念背後是怎麼運作的，有真的解決我的疑問"
     }
   },
-  "updated_at": "2025-07-13T13:40:34.098Z"
+  "updated_at": "2025-07-13T13:40:34.098Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/audio.wav",
+    "m3u8": "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/playlist.m3u8",
+    "segments": [
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment000.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment001.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment002.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment003.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment004.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment005.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment006.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment007.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment008.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment009.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment010.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment011.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment012.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment013.ts",
+      "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution/segment014.ts"
+    ],
+    "baseUrl": "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-12-tokenized-stocks-infrastructure-revolution"
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.622Z"
 }

@@ -12,5 +12,12 @@
   "feedback": {
     "content_review": null
   },
-  "updated_at": "2025-07-13T13:40:33.914Z"
+  "updated_at": "2025-07-13T13:40:33.914Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/en-US/daily-news/2025-07-02-recovery-test/audio.wav",
+    "m3u8": null,
+    "segments": []
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.608Z"
 }

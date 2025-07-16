@@ -15,5 +15,12 @@
   "feedback": {
     "content_review": null
   },
-  "updated_at": "2025-07-13T10:56:19.292Z"
+  "updated_at": "2025-07-13T10:56:19.292Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/ja-JP/daily-news/2025-07-02-workflow-test/audio.wav",
+    "m3u8": null,
+    "segments": []
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.616Z"
 }

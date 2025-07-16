@@ -36,6 +36,14 @@ export const LANGUAGE_CONFIG = {
       generateSocialHooks: true,
       requiresTranslation: false,
     },
+
+    // M3U8 streaming configuration
+    m3u8: {
+      enabled: true,
+      segmentDuration: 10, // seconds
+      segmentFormat: "ts",
+      uploadToR2: true,
+    },
   },
 
   // English (US)
@@ -70,6 +78,14 @@ export const LANGUAGE_CONFIG = {
       generateSocialHooks: true,
       requiresTranslation: true,
     },
+
+    // M3U8 streaming configuration
+    m3u8: {
+      enabled: true,
+      segmentDuration: 10, // seconds
+      segmentFormat: "ts",
+      uploadToR2: true,
+    },
   },
 
   // Japanese
@@ -103,6 +119,14 @@ export const LANGUAGE_CONFIG = {
       generateAudio: true,
       generateSocialHooks: true,
       requiresTranslation: true,
+    },
+
+    // M3U8 streaming configuration
+    m3u8: {
+      enabled: true,
+      segmentDuration: 10, // seconds
+      segmentFormat: "ts",
+      uploadToR2: true,
     },
   },
 };
@@ -204,6 +228,31 @@ export const shouldGenerateSocialHooks = (language) => {
   return (
     LANGUAGE_CONFIG[language]?.contentProcessing?.generateSocialHooks || false
   );
+};
+
+// Check if language should have M3U8 generated
+export const shouldGenerateM3U8 = (language) => {
+  return LANGUAGE_CONFIG[language]?.m3u8?.enabled || false;
+};
+
+// Check if language should upload to R2
+export const shouldUploadToR2 = (language) => {
+  return LANGUAGE_CONFIG[language]?.m3u8?.uploadToR2 || false;
+};
+
+// Get M3U8 configuration for a language
+export const getM3U8Config = (language) => {
+  const config = LANGUAGE_CONFIG[language];
+  if (!config) {
+    throw new Error(`Unsupported language: ${language}`);
+  }
+
+  return {
+    enabled: config.m3u8?.enabled || false,
+    segmentDuration: config.m3u8?.segmentDuration || 10,
+    segmentFormat: config.m3u8?.segmentFormat || "ts",
+    uploadToR2: config.m3u8?.uploadToR2 || false,
+  };
 };
 
 // Get language display name

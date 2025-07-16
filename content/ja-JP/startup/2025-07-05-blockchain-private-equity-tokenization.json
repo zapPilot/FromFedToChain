@@ -23,5 +23,29 @@
   "feedback": {
     "content_review": null
   },
-  "updated_at": "2025-07-12T04:56:33.225Z"
+  "updated_at": "2025-07-12T04:56:33.225Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/audio.wav",
+    "m3u8": "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/playlist.m3u8",
+    "segments": [
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment000.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment001.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment002.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment003.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment004.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment005.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment006.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment007.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment008.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment009.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment010.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment011.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment012.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment013.ts",
+      "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization/segment014.ts"
+    ],
+    "baseUrl": "https://mock-r2.fromfedtochain.com/audio/ja-JP/startup/2025-07-05-blockchain-private-equity-tokenization"
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.618Z"
 }

@@ -21,5 +21,12 @@
       "comments": "Good content for translation"
     }
   },
-  "updated_at": "2025-07-13T13:40:34.095Z"
+  "updated_at": "2025-07-13T13:40:34.095Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/zh-TW/daily-news/2025-07-02-workflow-test/audio.wav",
+    "m3u8": null,
+    "segments": []
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.622Z"
 }

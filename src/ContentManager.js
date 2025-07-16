@@ -238,9 +238,16 @@ export class ContentManager {
   }
 
   // Add audio file path to specific language file
-  static async addAudio(id, language, audioPath) {
+  static async addAudio(id, language, audioPath, streamingUrls = {}) {
     const content = await this.read(id, language);
-    return this.update(id, { audio_file: audioPath }, language);
+    const updateData = { audio_file: audioPath };
+    
+    // Add streaming URLs if provided
+    if (streamingUrls && Object.keys(streamingUrls).length > 0) {
+      updateData.streaming_urls = streamingUrls;
+    }
+    
+    return this.update(id, updateData, language);
   }
 
   // Add social hook to specific language file

@@ -23,5 +23,41 @@
   "feedback": {
     "content_review": null
   },
-  "updated_at": "2025-07-12T04:56:09.009Z"
+  "updated_at": "2025-07-12T04:56:09.009Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/audio.wav",
+    "m3u8": "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/playlist.m3u8",
+    "segments": [
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment000.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment001.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment002.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment003.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment004.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment005.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment006.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment007.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment008.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment009.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment010.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment011.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment012.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment013.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment014.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment015.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment016.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment017.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment018.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment019.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment020.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment021.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment022.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment023.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment024.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment025.ts",
+      "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization/segment026.ts"
+    ],
+    "baseUrl": "https://mock-r2.fromfedtochain.com/audio/en-US/startup/2025-07-05-blockchain-private-equity-tokenization"
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.614Z"
 }

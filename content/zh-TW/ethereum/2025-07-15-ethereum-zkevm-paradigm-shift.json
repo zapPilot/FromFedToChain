@@ -1,6 +1,6 @@
 {
   "id": "2025-07-15-ethereum-zkevm-paradigm-shift",
-  "status": "draft",
+  "status": "social",
   "category": "ethereum",
   "date": "2025-07-15",
   "language": "zh-TW",
@@ -19,10 +19,23 @@
     "https://zksync.io",
     "https://linea.build"
   ],
-  "audio_file": null,
-  "social_hook": null,
+  "audio_file": "audio/zh-TW/ethereum/2025-07-15-ethereum-zkevm-paradigm-shift.wav",
+  "social_hook": "⚡ 以太坊2025超級升級！從「重新執行」變「證明驗證」，零知識證明大革命！像驗證廚師證書vs重做整道菜 🔥 比The Merge更震撼！🎧 播客 Eng | 中 | 日 Apple Podcasts, Spotify",
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-07-16T06:03:40.521Z",
+      "comments": "不錯的zk綜合型介紹"
+    }
   },
-  "updated_at": "2025-07-15T12:13:41.127Z"
+  "updated_at": "2025-07-16T06:16:39.434Z",
+  "streaming_urls": {
+    "wav": "https://mock-r2.fromfedtochain.com/audio/zh-TW/ethereum/2025-07-15-ethereum-zkevm-paradigm-shift/audio.wav",
+    "m3u8": null,
+    "segments": []
+  },
+  "mock_data": true,
+  "mock_generated_at": "2025-07-15T22:52:18.623Z"
 }

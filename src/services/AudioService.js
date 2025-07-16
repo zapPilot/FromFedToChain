@@ -2,11 +2,16 @@ import fs from "fs/promises";
 import path from "path";
 import chalk from "chalk";
 import { GoogleTTSService } from "./GoogleTTSService.js";
+import { M3U8AudioService } from "./M3U8AudioService.js";
+import { CloudflareR2Service } from "./CloudflareR2Service.js";
 import { ContentManager } from "../ContentManager.js";
 import { 
   getAudioLanguages, 
   getTTSConfig, 
   shouldGenerateAudio,
+  shouldGenerateM3U8,
+  shouldUploadToR2,
+  getM3U8Config,
   PATHS
 } from "../../config/languages.js";
 
@@ -53,11 +58,80 @@ export class AudioService {
       content.category
     );
 
-    // Update content with audio path
-    await ContentManager.addAudio(id, language, audioPath);
+    const result = {
+      audioPath,
+      urls: {}
+    };
 
-    console.log(chalk.green(`✅ Audio generated: ${audioPath}`));
-    return audioPath;
+    // Generate M3U8 if enabled for this language
+    if (shouldGenerateM3U8(language)) {
+      try {
+        const m3u8Config = getM3U8Config(language);
+        const m3u8Result = await M3U8AudioService.convertToM3U8(
+          audioPath,
+          id,
+          language,
+          content.category,
+          m3u8Config
+        );
+        
+        if (m3u8Result.success) {
+          result.m3u8 = m3u8Result;
+          console.log(chalk.green(`✅ M3U8 generated: ${m3u8Result.playlistPath}`));
+        }
+      } catch (error) {
+        console.error(chalk.red(`❌ M3U8 generation failed: ${error.message}`));
+        // Don't fail the entire process if M3U8 generation fails
+      }
+    }
+
+    // Upload to R2 if enabled for this language
+    if (shouldUploadToR2(language)) {
+      try {
+        console.log(chalk.blue(`☁️ Checking R2 upload requirements for ${language}...`));
+        
+        // Check if rclone is available
+        const rcloneAvailable = await CloudflareR2Service.checkRcloneAvailability();
+        
+        if (rcloneAvailable) {
+          const uploadFiles = {
+            wavPath: audioPath,
+            m3u8Data: result.m3u8
+          };
+          
+          console.log(chalk.blue(`📤 Starting R2 upload for ${id} (${language})...`));
+          const uploadResult = await CloudflareR2Service.uploadAudioFiles(
+            id,
+            language,
+            content.category,
+            uploadFiles
+          );
+          
+          if (uploadResult.success) {
+            result.urls = uploadResult.urls;
+            console.log(chalk.green(`✅ R2 upload completed successfully`));
+            console.log(chalk.gray(`   Available URLs: ${Object.keys(uploadResult.urls).join(', ')}`));
+          } else {
+            console.error(chalk.red(`❌ R2 upload failed: ${uploadResult.errors.join(', ')}`));
+          }
+        } else {
+          console.warn(chalk.yellow(`⚠️ rclone not available, skipping R2 upload`));
+          console.warn(chalk.yellow(`   Audio files will be available locally only`));
+        }
+      } catch (error) {
+        console.error(chalk.red(`❌ R2 upload failed: ${error.message}`));
+        console.error(chalk.yellow(`   Continuing with local audio files only`));
+        // Don't fail the entire process if R2 upload fails
+      }
+    } else {
+      console.log(chalk.blue(`ℹ️ R2 upload disabled for language: ${language}`));
+    }
+
+    // Update content with audio path and streaming URLs
+    await ContentManager.addAudio(id, language, audioPath, result.urls);
+
+    console.log(chalk.green(`✅ Audio processing completed: ${audioPath}`));
+    return result;
   }
 
   // Generate audio for all languages (including source language)
