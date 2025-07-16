@@ -29,12 +29,28 @@ class CourseCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          gradient: AppTheme.cardGradient,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.surface.withOpacity(0.9),
+              AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.1),
+              AppTheme.surface.withOpacity(0.8),
+            ],
+            stops: [0.0, 0.5, 1.0],
+          ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.textTertiary.withOpacity(0.2),
+            color: AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.3),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: isHorizontal
             ? _buildHorizontalLayout(context)
@@ -128,8 +144,15 @@ class CourseCard extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
+        gradient: AppTheme.categoryGradient(audioFile.category),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -201,7 +224,7 @@ class CourseCard extends StatelessWidget {
             widthFactor: progress,
             child: Container(
               decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
+                gradient: AppTheme.categoryGradient(audioFile.category),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -236,10 +259,15 @@ class CourseCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: AppTheme.purplePrimary.withOpacity(0.1),
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.1),
+                  AppTheme.categoryGradient(audioFile.category).colors.last.withOpacity(0.05),
+                ],
+              ),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: AppTheme.purplePrimary.withOpacity(0.3),
+                color: AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.3),
                 width: 1,
               ),
             ),
@@ -250,14 +278,14 @@ class CourseCard extends StatelessWidget {
                   isCurrentlyPlaying && isPlaying 
                       ? Icons.pause 
                       : Icons.play_arrow,
-                  color: AppTheme.purplePrimary,
+                  color: AppTheme.categoryGradient(audioFile.category).colors.first,
                   size: 16,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   isCurrentlyPlaying && isPlaying ? 'Pause' : 'Play',
                   style: TextStyle(
-                    color: AppTheme.purplePrimary,
+                    color: AppTheme.categoryGradient(audioFile.category).colors.first,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),

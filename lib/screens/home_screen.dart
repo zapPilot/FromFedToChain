@@ -56,26 +56,98 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.surface.withOpacity(0.3),
+            Colors.transparent,
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Greeting
-          Text(
-            'Good ${_getGreeting()},',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+          ShaderMask(
+            shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
+            child: Text(
+              'Good ${_getGreeting()},',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
             'Ready to learn something new?',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               color: AppTheme.textTertiary,
+              fontWeight: FontWeight.w500,
             ),
           ),
+          const SizedBox(height: 16),
+          // Stats row
+          Row(
+            children: [
+              _buildStatCard('12', 'Episodes', AppTheme.purplePrimary),
+              const SizedBox(width: 16),
+              _buildStatCard('5', 'Categories', AppTheme.bluePrimary),
+              const SizedBox(width: 16),
+              _buildStatCard('3', 'Languages', AppTheme.accent),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String number, String label, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              color.withOpacity(0.1),
+              color.withOpacity(0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: color.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              number,
+              style: TextStyle(
+                color: color,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: AppTheme.textTertiary,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -241,27 +313,32 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 16),
         Container(
-          height: 200,
+          height: 220,
           decoration: BoxDecoration(
-            gradient: AppTheme.primaryGradient,
-            borderRadius: BorderRadius.circular(16),
+            gradient: AppTheme.featuredGradient,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.purplePrimary.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: AppTheme.purplePrimary.withOpacity(0.1),
+                blurRadius: 40,
+                offset: const Offset(0, 16),
+              ),
+            ],
           ),
           child: Stack(
             children: [
               // Background pattern
               Positioned.fill(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.1),
-                        ],
-                      ),
+                      gradient: AppTheme.glassmorphismGradient,
                     ),
                   ),
                 ),

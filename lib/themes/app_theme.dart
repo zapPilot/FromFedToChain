@@ -189,12 +189,13 @@ class AppTheme {
     );
   }
 
-  // Gradient utilities
+  // Enhanced gradient utilities
   static LinearGradient get primaryGradient {
     return const LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [purplePrimary, bluePrimary],
+      stops: [0.0, 1.0],
     );
   }
 
@@ -204,9 +205,11 @@ class AppTheme {
       end: Alignment.bottomCenter,
       colors: [
         background,
-        purplePrimary.withOpacity(0.1),
-        bluePrimary.withOpacity(0.1),
+        purplePrimary.withOpacity(0.08),
+        bluePrimary.withOpacity(0.05),
+        background,
       ],
+      stops: [0.0, 0.3, 0.7, 1.0],
     );
   }
 
@@ -217,7 +220,71 @@ class AppTheme {
       colors: [
         surface,
         purplePrimary.withOpacity(0.05),
+        bluePrimary.withOpacity(0.03),
       ],
+      stops: [0.0, 0.5, 1.0],
     );
+  }
+
+  // New gradient variations
+  static LinearGradient get featuredGradient {
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        purplePrimary,
+        purpleSecondary,
+        bluePrimary,
+        blueSecondary,
+      ],
+      stops: [0.0, 0.3, 0.7, 1.0],
+    );
+  }
+
+  static LinearGradient get glassmorphismGradient {
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Colors.white.withOpacity(0.1),
+        Colors.white.withOpacity(0.05),
+        Colors.white.withOpacity(0.02),
+      ],
+      stops: [0.0, 0.5, 1.0],
+    );
+  }
+
+  static LinearGradient categoryGradient(String category) {
+    switch (category.toLowerCase()) {
+      case 'ethereum':
+        return LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            purplePrimary,
+            const Color(0xFF627EEA), // Ethereum blue
+          ],
+        );
+      case 'macro':
+        return LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFF59E0B), // Amber
+            const Color(0xFFEF4444), // Red
+          ],
+        );
+      case 'startup':
+        return LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF10B981), // Emerald
+            const Color(0xFF059669), // Emerald-600
+          ],
+        );
+      default:
+        return primaryGradient;
+    }
   }
 }

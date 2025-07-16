@@ -26,23 +26,37 @@ class AudioItemCard extends StatelessWidget {
         
         return Container(
           decoration: BoxDecoration(
-            gradient: isCurrentFile ? AppTheme.cardGradient : null,
-            color: isCurrentFile ? null : AppTheme.surface.withOpacity(0.8),
+            gradient: isCurrentFile 
+                ? AppTheme.categoryGradient(audioFile.category)
+                : LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppTheme.surface.withOpacity(0.9),
+                      AppTheme.surface.withOpacity(0.7),
+                    ],
+                  ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isCurrentFile 
-                  ? AppTheme.purplePrimary.withOpacity(0.5)
+                  ? AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.5)
                   : AppTheme.textTertiary.withOpacity(0.1),
               width: isCurrentFile ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: isCurrentFile 
-                    ? AppTheme.purplePrimary.withOpacity(0.2)
+                    ? AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.2)
                     : Colors.black.withOpacity(0.1),
-                blurRadius: isCurrentFile ? 12 : 4,
-                offset: const Offset(0, 2),
+                blurRadius: isCurrentFile ? 16 : 6,
+                offset: const Offset(0, 4),
               ),
+              if (isCurrentFile)
+                BoxShadow(
+                  color: AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.1),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
             ],
           ),
           child: Material(
@@ -55,7 +69,7 @@ class AudioItemCard extends StatelessWidget {
                 child: Row(
                   children: [
                     // Play button
-                    _buildPlayButton(isPlaying, audioService.isLoading && isCurrentFile),
+                    _buildPlayButton(isPlaying, audioService.isLoading && isCurrentFile, audioFile.category),
                     
                     const SizedBox(width: 16),
                     
@@ -91,7 +105,7 @@ class AudioItemCard extends StatelessWidget {
                               // Category
                               _buildChip(
                                 audioFile.categoryDisplayName,
-                                AppTheme.purplePrimary,
+                                AppTheme.categoryGradient(audioFile.category).colors.first,
                               ),
                               
                               const Spacer(),
@@ -200,18 +214,24 @@ class AudioItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlayButton(bool isPlaying, bool isLoading) {
+  Widget _buildPlayButton(bool isPlaying, bool isLoading, String category) {
+    final gradient = AppTheme.categoryGradient(category);
     return Container(
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
+        gradient: gradient,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppTheme.purplePrimary.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: gradient.colors.first.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: gradient.colors.first.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
