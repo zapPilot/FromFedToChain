@@ -25,6 +25,10 @@ dependencies:
   
   # HTTP for potential future API calls
   http: ^1.1.0
+  dio: ^5.4.0
+  
+  # Environment variables
+  flutter_dotenv: ^5.1.0
   
   # State management
   provider: ^6.1.1
@@ -48,6 +52,7 @@ flutter:
   assets:
     - audio/
     - content/
+    - .env
   
   # Fonts (if needed for custom typography)
   # fonts:

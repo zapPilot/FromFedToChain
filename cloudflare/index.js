@@ -4,8 +4,11 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 function withCors(resp) {
   const headers = new Headers(resp.headers)
   headers.set("Access-Control-Allow-Origin", "*")
-  headers.set("Access-Control-Allow-Methods", "GET, OPTIONS")
-  headers.set("Access-Control-Allow-Headers", "Content-Type")
+  headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD")
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Origin, X-Requested-With")
+  headers.set("Access-Control-Allow-Credentials", "false")
+  headers.set("Access-Control-Max-Age", "86400")
+  headers.set("Access-Control-Expose-Headers", "Content-Length, Content-Range")
   return new Response(resp.body, {
     status: resp.status,
     headers
@@ -22,8 +25,11 @@ export default {
         status: 204,
         headers: {
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS, HEAD",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, Origin, X-Requested-With",
+          "Access-Control-Allow-Credentials": "false",
+          "Access-Control-Max-Age": "86400",
+          "Access-Control-Expose-Headers": "Content-Length, Content-Range",
         },
       })
     }

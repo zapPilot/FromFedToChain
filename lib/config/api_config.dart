@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 /// Production-ready API configuration for signed URL streaming service
 /// 
 /// Features:
@@ -5,10 +7,11 @@
 /// ✅ Multi-environment support (production, staging, development, test)
 /// ✅ Optimized streaming with pre-signed URLs
 /// ✅ Backwards compatibility with path-based URL construction
+/// ✅ .env file support
 class ApiConfig {
   // Environment detection
-  static const String environment = String.fromEnvironment('ENVIRONMENT', defaultValue: 'production');
-  static const bool isTest = bool.fromEnvironment('dart.library.io', defaultValue: false);
+  static String get environment => dotenv.get('ENVIRONMENT', fallback: 'production');
+  static const bool isTest = bool.fromEnvironment('FLUTTER_TEST', defaultValue: false);
   
   // Base URLs by environment
   static const Map<String, String> _streamingUrls = {
@@ -21,6 +24,11 @@ class ApiConfig {
   // Dynamic URL resolution
   static String get streamingBaseUrl {
     if (isTest) return _streamingUrls['test']!;
+    
+    // Check for direct URL override in .env
+    final envUrl = dotenv.get('STREAMING_BASE_URL', fallback: '');
+    if (envUrl.isNotEmpty) return envUrl;
+    
     return _streamingUrls[environment] ?? _streamingUrls['production']!;
   }
   
@@ -32,8 +40,8 @@ class ApiConfig {
       '$streamingBaseUrl/?path=${Uri.encodeComponent(path)}';
   
   // Configuration constants
-  static const Duration apiTimeout = Duration(seconds: 30);
-  static const Duration streamTimeout = Duration(seconds: 30);
+  static Duration get apiTimeout => Duration(seconds: int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));
+  static Duration get streamTimeout => Duration(seconds: int.parse(dotenv.get('STREAM_TIMEOUT_SECONDS', fallback: '30')));
   static const int retryAttempts = 3;
   
   // Supported languages and categories (synced with ContentSchema.js)
