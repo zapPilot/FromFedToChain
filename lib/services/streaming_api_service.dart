@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +21,14 @@ class StreamingApiService {
 
     final url = Uri.parse(ApiConfig.getListUrl(language, category));
     
+    if (kDebugMode) {
+      print('StreamingApiService: Environment: ${ApiConfig.currentEnvironment}');
+      print('StreamingApiService: Base URL: ${ApiConfig.streamingBaseUrl}');
+      print('StreamingApiService: Making request to: $url');
+      print('StreamingApiService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+      print('StreamingApiService: Headers: Accept: application/json, Content-Type: application/json');
+    }
+    
     try {
       final response = await http.get(
         url,
@@ -28,6 +37,11 @@ class StreamingApiService {
           'Content-Type': 'application/json',
         },
       ).timeout(ApiConfig.apiTimeout);
+      
+      if (kDebugMode) {
+        print('StreamingApiService: Response status: ${response.statusCode}');
+        print('StreamingApiService: Response headers: ${response.headers}');
+      }
       
       if (response.statusCode == 200) {
         final dynamic responseData = json.decode(response.body);
@@ -62,11 +76,28 @@ class StreamingApiService {
         
         throw Exception('Unexpected response format: ${responseData.runtimeType}');
       } else {
+        if (kDebugMode) {
+          print('StreamingApiService: HTTP Error ${response.statusCode}');
+          print('StreamingApiService: Response body: ${response.body}');
+        }
         throw Exception('Failed to load episodes: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } on http.ClientException catch (e) {
+      if (kDebugMode) {
+        print('StreamingApiService: ClientException: ${e.message}');
+        print('StreamingApiService: This usually indicates CORS or network issues');
+      }
       throw Exception('Network connection error: ${e.message}');
+    } on TimeoutException catch (e) {
+      if (kDebugMode) {
+        print('StreamingApiService: Request timed out after ${ApiConfig.apiTimeout.inSeconds} seconds');
+      }
+      throw Exception('Request timed out: ${e.message}');
     } catch (e) {
+      if (kDebugMode) {
+        print('StreamingApiService: Unexpected error: $e');
+        print('StreamingApiService: Error type: ${e.runtimeType}');
+      }
       if (e is Exception) rethrow;
       throw Exception('Unexpected error: $e');
     }

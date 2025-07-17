@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   
   # Audio playback
-  audioplayers: ^6.0.0
+  just_audio: ^0.9.36
   
   # File system access
   path: ^1.8.3

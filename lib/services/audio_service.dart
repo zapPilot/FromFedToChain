@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import '../models/audio_file.dart';
 
 enum PlaybackState {
@@ -57,35 +57,35 @@ class AudioService extends ChangeNotifier {
     _audioPlayer = AudioPlayer();
     
     // Listen to position changes
-    _audioPlayer.onPositionChanged.listen((position) {
+    _audioPlayer.positionStream.listen((position) {
       _currentPosition = position;
       notifyListeners();
     });
     
     // Listen to duration changes
-    _audioPlayer.onDurationChanged.listen((duration) {
-      _totalDuration = duration;
+    _audioPlayer.durationStream.listen((duration) {
+      _totalDuration = duration ?? Duration.zero;
       notifyListeners();
     });
     
     // Listen to player state changes
-    _audioPlayer.onPlayerStateChanged.listen((state) {
-      switch (state) {
-        case PlayerState.playing:
-          _playbackState = PlaybackState.playing;
-          break;
-        case PlayerState.paused:
-          _playbackState = PlaybackState.paused;
-          break;
-        case PlayerState.stopped:
+    _audioPlayer.playerStateStream.listen((state) {
+      switch (state.processingState) {
+        case ProcessingState.idle:
           _playbackState = PlaybackState.stopped;
           break;
-        case PlayerState.completed:
+        case ProcessingState.loading:
+          _playbackState = PlaybackState.loading;
+          break;
+        case ProcessingState.buffering:
+          _playbackState = PlaybackState.loading;
+          break;
+        case ProcessingState.ready:
+          _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
+          break;
+        case ProcessingState.completed:
           _playbackState = PlaybackState.stopped;
           _currentPosition = Duration.zero;
-          break;
-        case PlayerState.disposed:
-          _playbackState = PlaybackState.stopped;
           break;
       }
       notifyListeners();
@@ -108,9 +108,8 @@ class AudioService extends ChangeNotifier {
         _totalDuration = Duration.zero;
       }
 
-      // Use appropriate audio source based on file type
+      // Use appropriate audio source based on file type and platform
       if (audioFile.isStreamingFile) {
-        // Use URL source for streaming files
         final streamingUrl = audioFile.streamingUrl;
         if (streamingUrl == null) {
           throw Exception('Streaming URL not available for ${audioFile.id}');
@@ -120,40 +119,39 @@ class AudioService extends ChangeNotifier {
           final urlType = audioFile.isUsingDirectSignedUrl ? 'pre-signed' : 'constructed';
           print('AudioService: Playing streaming audio ($urlType)');
           print('AudioService: Streaming URL: $streamingUrl');
-          print('AudioService: Original streaming path: ${audioFile.streamingPath}');
-          print('AudioService: Direct signed URL: ${audioFile.directSignedUrl}');
+          print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
         }
         
-        await _audioPlayer.play(UrlSource(streamingUrl));
+        if (kIsWeb) {
+          // Web platform: Show helpful message for HLS limitation
+          throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
+        } else {
+          // Mobile platform: Use native streaming
+          await _audioPlayer.setUrl(streamingUrl);
+          await _audioPlayer.play();
+        }
       } else {
         // Use file source for local files
         if (kDebugMode) {
           print('AudioService: Playing local file: ${audioFile.filePath}');
         }
         
-        await _audioPlayer.play(DeviceFileSource(audioFile.filePath));
+        await _audioPlayer.setFilePath(audioFile.filePath);
+        await _audioPlayer.play();
       }
       
-      await _audioPlayer.setPlaybackRate(_playbackSpeed);
+      await _audioPlayer.setSpeed(_playbackSpeed);
       
     } catch (e) {
       _playbackState = PlaybackState.error;
       
       // Provide helpful error messages for common issues
-      if (e.toString().contains('NotSupportedError')) {
-        if (kIsWeb) {
-          _errorMessage = 'HLS playback not supported in web browsers. Use Android/iOS for streaming development.';
-        } else {
-          _errorMessage = 'Media format not supported on this platform.';
-        }
-        
-        if (kDebugMode) {
-          print('AudioService: HLS playback not supported');
-          print('AudioService: Current platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-          print('AudioService: Recommendation: Use Android/iOS for HLS streaming development');
-        }
-      } else if (e.toString().contains('NetworkError') || e.toString().contains('CORS')) {
-        _errorMessage = 'Network error: Cannot access streaming URL. Check CORS configuration.';
+      if (e.toString().contains('HttpException') || e.toString().contains('SocketException')) {
+        _errorMessage = 'Network error: Cannot access streaming URL. Check internet connection.';
+      } else if (e.toString().contains('FormatException') || e.toString().contains('UnsupportedError')) {
+        _errorMessage = 'Unsupported media format. Please try a different audio source.';
+      } else if (e.toString().contains('PlayerException')) {
+        _errorMessage = 'Audio player error: ${e.toString()}';
       } else {
         _errorMessage = 'Failed to play audio: $e';
       }
@@ -174,7 +172,7 @@ class AudioService extends ChangeNotifier {
   // Resume playback
   Future<void> resume() async {
     try {
-      await _audioPlayer.resume();
+      await _audioPlayer.play();
     } catch (e) {
       _playbackState = PlaybackState.error;
       _errorMessage = 'Failed to resume playback: $e';
@@ -220,7 +218,7 @@ class AudioService extends ChangeNotifier {
   Future<void> setPlaybackSpeed(double speed) async {
     try {
       _playbackSpeed = speed;
-      await _audioPlayer.setPlaybackRate(speed);
+      await _audioPlayer.setSpeed(speed);
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to set playback speed: $e';

@@ -1,14 +1,38 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
+function withCors(resp) {
+  const headers = new Headers(resp.headers)
+  headers.set("Access-Control-Allow-Origin", "*")
+  headers.set("Access-Control-Allow-Methods", "GET, OPTIONS")
+  headers.set("Access-Control-Allow-Headers", "Content-Type")
+  return new Response(resp.body, {
+    status: resp.status,
+    headers
+  })
+}
+
 export default {
   async fetch(req, env) {
+    const url = new URL(req.url)
+
+    // 👇 Handle CORS preflight
+    if (req.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      })
+    }
+
     try {
-      const url = new URL(req.url)
       const path = url.searchParams.get("path")
       const listPrefix = url.searchParams.get("prefix")
 
-      // 1️⃣ 簽名播放網址
+      // 1️⃣ Signed playback URL
       if (path) {
         const s3 = new S3Client({
           region: "auto",
@@ -26,14 +50,14 @@ export default {
 
         const signed = await getSignedUrl(s3, cmd, { expiresIn: 3600 })
 
-        return Response.json({ url: signed })
+        return withCors(Response.json({ url: signed }))
       }
 
-      // 2️⃣ 列出 prefix 下有哪些子資料夾（每集一個）
+      // 2️⃣ List episodes
       if (listPrefix) {
         const list = await env.R2_BUCKET.list({
           prefix: listPrefix,
-          delimiter: "/", // 只抓下一層資料夾，不列出所有 .ts 檔
+          delimiter: "/",
         })
 
         const result = list.delimitedPrefixes.map((p) => {
@@ -41,17 +65,17 @@ export default {
           return {
             id,
             path: `${listPrefix}${id}/playlist.m3u8`,
-            signedUrl: `${url.origin}/?path=${encodeURIComponent(`${listPrefix}${id}/playlist.m3u8`)}`
+            signedUrl: `${url.origin}/?path=${encodeURIComponent(`${listPrefix}${id}/playlist.m3u8`)}`,
           }
         })
 
-        return Response.json(result)
+        return withCors(Response.json(result))
       }
 
-      return new Response("Missing ?path= 或 ?prefix=", { status: 400 })
+      return withCors(new Response("Missing ?path= or ?prefix=", { status: 400 }))
     } catch (err) {
       console.error("Worker Error:", err)
-      return new Response("Internal error", { status: 500 })
+      return withCors(new Response("Internal error", { status: 500 }))
     }
   }
 }

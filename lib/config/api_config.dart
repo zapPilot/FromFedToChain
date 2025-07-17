@@ -14,7 +14,7 @@ class ApiConfig {
   static const Map<String, String> _streamingUrls = {
     'production': 'https://signed-url.davidtnfsh.workers.dev',
     'staging': 'https://staging-signed-url.davidtnfsh.workers.dev', // If available
-    'development': 'http://localhost:3000',
+    'development': 'https://signed-url.davidtnfsh.workers.dev',
     'test': 'http://mock-api.test',
   };
   
@@ -32,7 +32,7 @@ class ApiConfig {
       '$streamingBaseUrl/?path=${Uri.encodeComponent(path)}';
   
   // Configuration constants
-  static const Duration apiTimeout = Duration(seconds: 10);
+  static const Duration apiTimeout = Duration(seconds: 30);
   static const Duration streamTimeout = Duration(seconds: 30);
   static const int retryAttempts = 3;
   
