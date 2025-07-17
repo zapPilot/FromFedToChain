@@ -1,0 +1,674 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../models/audio_file.dart';
+import '../models/audio_content.dart';
+import '../services/audio_service.dart';
+import '../themes/app_theme.dart';
+import '../widgets/animated_background.dart';
+
+class CourseDetailScreen extends StatefulWidget {
+  final AudioFile audioFile;
+  final AudioContent? content;
+
+  const CourseDetailScreen({
+    super.key,
+    required this.audioFile,
+    this.content,
+  });
+
+  @override
+  State<CourseDetailScreen> createState() => _CourseDetailScreenState();
+}
+
+class _CourseDetailScreenState extends State<CourseDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  final ScrollController _scrollController = ScrollController();
+  bool _isHeaderCollapsed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    
+    _scrollController.addListener(_onScroll);
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    const double collapseOffset = 100.0;
+    final bool shouldCollapse = _scrollController.offset > collapseOffset;
+    
+    if (shouldCollapse != _isHeaderCollapsed) {
+      setState(() {
+        _isHeaderCollapsed = shouldCollapse;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppTheme.backgroundGradient,
+        ),
+        child: Stack(
+          children: [
+            // Animated background
+            const AnimatedBackground(),
+            
+            // Main content
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                // Custom app bar
+                _buildSliverAppBar(),
+                
+                // Course content
+                SliverToBoxAdapter(
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: _buildCourseContent(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            // Audio player overlay
+            _buildAudioPlayerOverlay(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      expandedHeight: 300.0,
+      floating: false,
+      pinned: true,
+      backgroundColor: AppTheme.surface.withOpacity(0.9),
+      elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back_ios,
+          color: Colors.white,
+        ),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(
+            Icons.share,
+            color: Colors.white,
+          ),
+          onPressed: _shareContent,
+        ),
+        IconButton(
+          icon: Icon(
+            Icons.favorite_border,
+            color: Colors.white,
+          ),
+          onPressed: _toggleFavorite,
+        ),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
+        title: AnimatedOpacity(
+          opacity: _isHeaderCollapsed ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: Text(
+            widget.content?.title ?? widget.audioFile.id,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Gradient background
+            Container(
+              decoration: BoxDecoration(
+                gradient: AppTheme.categoryGradient(widget.audioFile.category),
+              ),
+            ),
+            
+            // Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.3),
+                    Colors.black.withOpacity(0.7),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Course info
+            Positioned(
+              bottom: 60,
+              left: 20,
+              right: 20,
+              child: AnimatedOpacity(
+                opacity: _isHeaderCollapsed ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Category badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        widget.audioFile.categoryDisplayName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // Title
+                    Text(
+                      widget.content?.title ?? widget.audioFile.id,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 4),
+                    
+                    // Author and date
+                    Row(
+                      children: [
+                        Text(
+                          widget.content?.author ?? 'David Chang',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '•',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.audioFile.displayDate,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCourseContent() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Play button
+          _buildPlayButton(),
+          
+          const SizedBox(height: 24),
+          
+          // Course info
+          _buildCourseInfo(),
+          
+          const SizedBox(height: 24),
+          
+          // Description
+          if (widget.content?.content != null) ...[
+            _buildSectionTitle('Description'),
+            const SizedBox(height: 12),
+            _buildDescription(),
+            const SizedBox(height: 24),
+          ],
+          
+          // References
+          if (widget.content?.references.isNotEmpty == true) ...[
+            _buildSectionTitle('References'),
+            const SizedBox(height: 12),
+            _buildReferences(),
+            const SizedBox(height: 24),
+          ],
+          
+          // Social hook
+          if (widget.content?.socialHook != null) ...[
+            _buildSectionTitle('Social Hook'),
+            const SizedBox(height: 12),
+            _buildSocialHook(),
+            const SizedBox(height: 24),
+          ],
+          
+          // Extra space for bottom player
+          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayButton() {
+    return Consumer<AudioService>(
+      builder: (context, audioService, child) {
+        final isCurrentFile = audioService.currentAudioFile?.id == widget.audioFile.id;
+        final isPlaying = isCurrentFile && audioService.isPlaying;
+        final isLoading = isCurrentFile && audioService.isLoading;
+        
+        return Container(
+          width: double.infinity,
+          height: 60,
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.purplePrimary.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(30),
+              onTap: () {
+                if (isPlaying) {
+                  audioService.pause();
+                } else if (isCurrentFile && audioService.isPaused) {
+                  audioService.resume();
+                } else {
+                  audioService.playAudio(widget.audioFile);
+                }
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isLoading)
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  else
+                    Icon(
+                      isPlaying ? Icons.pause : Icons.play_arrow,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isPlaying ? 'Pause' : 'Play Episode',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCourseInfo() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.textTertiary.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          _buildInfoRow('Language', widget.audioFile.languageDisplayName),
+          const SizedBox(height: 12),
+          _buildInfoRow('Category', widget.audioFile.categoryDisplayName),
+          const SizedBox(height: 12),
+          _buildInfoRow('Size', widget.audioFile.sizeFormatted),
+          if (widget.audioFile.duration != null) ...[
+            const SizedBox(height: 12),
+            _buildInfoRow('Duration', widget.audioFile.durationFormatted),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppTheme.textTertiary,
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppTheme.textPrimary,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: AppTheme.textPrimary,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  Widget _buildDescription() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        widget.content!.content,
+        style: const TextStyle(
+          color: AppTheme.textSecondary,
+          fontSize: 16,
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReferences() {
+    return Column(
+      children: widget.content!.references.map((reference) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTheme.surface.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.link,
+                color: AppTheme.textTertiary,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  reference,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildSocialHook() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.accent.withOpacity(0.1),
+            AppTheme.accent.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppTheme.accent.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.share,
+            color: AppTheme.accent,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              widget.content!.socialHook!,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAudioPlayerOverlay() {
+    return Consumer<AudioService>(
+      builder: (context, audioService, child) {
+        final isCurrentFile = audioService.currentAudioFile?.id == widget.audioFile.id;
+        
+        if (!isCurrentFile || audioService.isIdle) {
+          return const SizedBox.shrink();
+        }
+        
+        return Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppTheme.surface.withOpacity(0.95),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Progress bar
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackHeight: 4,
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+                    ),
+                    child: Slider(
+                      value: audioService.progress,
+                      onChanged: (value) {
+                        final position = Duration(
+                          milliseconds: (value * audioService.totalDuration.inMilliseconds).toInt(),
+                        );
+                        audioService.seekTo(position);
+                      },
+                      activeColor: AppTheme.purplePrimary,
+                      inactiveColor: AppTheme.textTertiary.withOpacity(0.3),
+                    ),
+                  ),
+                  
+                  // Time indicators
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        audioService.formattedCurrentPosition,
+                        style: TextStyle(
+                          color: AppTheme.textTertiary,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        audioService.formattedTotalDuration,
+                        style: TextStyle(
+                          color: AppTheme.textTertiary,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Controls
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.replay_10),
+                        color: AppTheme.textSecondary,
+                        onPressed: () => audioService.skipBackward(const Duration(seconds: 10)),
+                      ),
+                      
+                      // Play/Pause button
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            audioService.isPlaying ? Icons.pause : Icons.play_arrow,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          onPressed: () {
+                            if (audioService.isPlaying) {
+                              audioService.pause();
+                            } else {
+                              audioService.resume();
+                            }
+                          },
+                        ),
+                      ),
+                      
+                      IconButton(
+                        icon: const Icon(Icons.forward_30),
+                        color: AppTheme.textSecondary,
+                        onPressed: () => audioService.skipForward(const Duration(seconds: 30)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _shareContent() {
+    // TODO: Implement sharing functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sharing feature coming soon!')),
+    );
+  }
+
+  void _toggleFavorite() {
+    // TODO: Implement favorites functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Favorites feature coming soon!')),
+    );
+  }
+}

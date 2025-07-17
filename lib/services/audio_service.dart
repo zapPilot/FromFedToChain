@@ -274,6 +274,19 @@ class AudioService extends ChangeNotifier {
     }
   }
 
+  // Seek relative to current position
+  Future<void> seekRelative(int seconds) async {
+    final newPosition = _currentPosition + Duration(seconds: seconds);
+    
+    if (newPosition < Duration.zero) {
+      await seekTo(Duration.zero);
+    } else if (newPosition > _totalDuration) {
+      await seekTo(_totalDuration);
+    } else {
+      await seekTo(newPosition);
+    }
+  }
+
   // Format duration for display
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');

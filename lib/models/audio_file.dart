@@ -44,14 +44,14 @@ class AudioFile {
   }
 
   /// Factory constructor for API response format
-  /// Expected format: {"id": "episode-id", "url": "https://..."}
+  /// Expected format: {"id": "episode-id", "playlistUrl": "https://..."}
   factory AudioFile.fromApiResponse(
     Map<String, dynamic> json,
     String language,
     String category,
   ) {
     final id = json['id'] as String;
-    final url = json['url'] as String; // Use 'url' as the direct source
+    final playlistUrl = json['playlistUrl'] as String; // New API format uses 'playlistUrl'
     DateTime createdDate = DateTime.now();
     try {
       final datePart = id.split('-').take(3).join('-');
@@ -67,7 +67,7 @@ class AudioFile {
       sizeInBytes: 0,
       created: createdDate,
       duration: null,
-      sourceUrl: url,
+      sourceUrl: playlistUrl,
     );
   }
 

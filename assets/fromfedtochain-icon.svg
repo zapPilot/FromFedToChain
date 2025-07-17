@@ -1,0 +1,74 @@
+<svg width="1024" height="1024" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main gradient (same as Zap Pilot) -->
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Chain gradient -->
+    <linearGradient id="chainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FBBF24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="iconGlow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Knowledge gradient -->
+    <linearGradient id="knowledgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="24" cy="24" r="20" fill="url(#iconGradient)" filter="url(#iconGlow)"/>
+  
+  <!-- Chain Links -->
+  <g fill="url(#chainGradient)" stroke="white" stroke-width="1.2" stroke-linejoin="round">
+    <!-- Left chain link -->
+    <path d="M12 20 C12 17, 15 14, 18 14 C21 14, 24 17, 24 20 C24 23, 21 26, 18 26 C15 26, 12 23, 12 20 Z" 
+          fill="none" stroke-width="2"/>
+    
+    <!-- Right chain link -->
+    <path d="M24 20 C24 17, 27 14, 30 14 C33 14, 36 17, 36 20 C36 23, 33 26, 30 26 C27 26, 24 23, 24 20 Z" 
+          fill="none" stroke-width="2"/>
+    
+    <!-- Connecting link -->
+    <path d="M20 18 L28 18 M20 22 L28 22" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Knowledge/Learning Symbol -->
+  <g fill="url(#knowledgeGradient)" opacity="0.8">
+    <!-- Book pages -->
+    <path d="M16 30 L32 30 L32 36 L16 36 Z" stroke="white" stroke-width="0.8" fill="none"/>
+    <path d="M18 32 L30 32 M18 34 L28 34" stroke="white" stroke-width="0.6" stroke-linecap="round"/>
+    
+    <!-- Learning arrow -->
+    <path d="M22 10 L26 10 L24 8 M24 8 L24 12" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Data flow nodes -->
+  <g opacity="0.4" fill="white">
+    <circle cx="14" cy="12" r="0.8"/>
+    <circle cx="34" cy="12" r="0.8"/>
+    <circle cx="38" cy="28" r="0.8"/>
+    <circle cx="10" cy="32" r="0.8"/>
+  </g>
+  
+  <!-- Data flow connections -->
+  <g opacity="0.3" stroke="white" stroke-width="0.6" fill="none">
+    <line x1="14" y1="12" x2="18" y2="16"/>
+    <line x1="30" y1="16" x2="34" y2="12"/>
+    <line x1="32" y1="24" x2="38" y2="28"/>
+    <line x1="16" y1="28" x2="10" y2="32"/>
+  </g>
+</svg>

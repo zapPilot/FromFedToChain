@@ -34,10 +34,10 @@ class ApiConfig {
   
   // API endpoints using production format
   static String getListUrl(String language, String category) =>
-      '$streamingBaseUrl/list?prefix=audio/$language/$category/';
+      '$streamingBaseUrl?prefix=audio/$language/$category/';
   
   static String getStreamUrl(String path) =>
-      '$streamingBaseUrl/?path=${Uri.encodeComponent(path)}';
+      '$streamingBaseUrl/proxy/$path';
   
   // Configuration constants
   static Duration get apiTimeout => Duration(seconds: int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));

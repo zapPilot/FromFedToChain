@@ -9,6 +9,7 @@ import '../widgets/animated_background.dart';
 import '../widgets/course_card.dart';
 import '../widgets/author_card.dart';
 import '../themes/app_theme.dart';
+import 'course_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -343,7 +344,14 @@ void _testM3U8Streaming() async {
                   isHorizontal: true,
                   showProgress: true,
                   onTap: () {
-                    // TODO: Navigate to course detail
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CourseDetailScreen(
+                          audioFile: audioFile,
+                          content: content,
+                        ),
+                      ),
+                    );
                   },
                 ),
               );
@@ -537,7 +545,14 @@ void _testM3U8Streaming() async {
                   content: content,
                   isVertical: true,
                   onTap: () {
-                    // TODO: Navigate to course detail
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CourseDetailScreen(
+                          audioFile: audioFile,
+                          content: content,
+                        ),
+                      ),
+                    );
                   },
                 ),
               );

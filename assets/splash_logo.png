@@ -1,0 +1,4 @@
+<!-- This is a placeholder for the PNG file. In a real implementation, 
+you would convert the SVG to a PNG using imagemagick or similar tool:
+convert fromfedtochain-icon.svg -resize 1024x1024 splash_logo.png
+-->
