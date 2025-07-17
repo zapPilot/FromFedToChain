@@ -92,7 +92,7 @@ class AudioService extends ChangeNotifier {
     });
   }
 
-  // Play audio file
+  // Play audio file (supports both local files and streaming URLs)
   Future<void> playAudio(AudioFile audioFile) async {
     try {
       _playbackState = PlaybackState.loading;
@@ -100,19 +100,47 @@ class AudioService extends ChangeNotifier {
       notifyListeners();
 
       // Stop current playback if playing different file
-      if (_currentAudioFile?.filePath != audioFile.filePath) {
+      final currentAudioId = _currentAudioFile?.id;
+      if (currentAudioId != audioFile.id) {
         await _audioPlayer.stop();
         _currentAudioFile = audioFile;
         _currentPosition = Duration.zero;
         _totalDuration = Duration.zero;
       }
 
-      await _audioPlayer.play(DeviceFileSource(audioFile.filePath));
+      // Use appropriate audio source based on file type
+      if (audioFile.isStreamingFile) {
+        // Use URL source for streaming files
+        final streamingUrl = audioFile.streamingUrl;
+        if (streamingUrl == null) {
+          throw Exception('Streaming URL not available for ${audioFile.id}');
+        }
+        
+        if (kDebugMode) {
+          print('Playing streaming audio: $streamingUrl');
+        }
+        
+        await _audioPlayer.play(UrlSource(streamingUrl));
+      } else {
+        // Use file source for local files
+        if (kDebugMode) {
+          print('Playing local audio: ${audioFile.filePath}');
+        }
+        
+        await _audioPlayer.play(DeviceFileSource(audioFile.filePath));
+      }
+      
       await _audioPlayer.setPlaybackRate(_playbackSpeed);
       
     } catch (e) {
       _playbackState = PlaybackState.error;
       _errorMessage = 'Failed to play audio: $e';
+      
+      if (kDebugMode) {
+        print('AudioService playback error: $e');
+        print('AudioFile: ${audioFile.id}, isStreaming: ${audioFile.isStreamingFile}');
+      }
+      
       notifyListeners();
     }
   }

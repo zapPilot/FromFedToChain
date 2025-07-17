@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
+import '../services/streaming_api_service.dart';
 
 class AudioFile {
   final String id;
@@ -9,6 +10,7 @@ class AudioFile {
   final int sizeInBytes;
   final DateTime created;
   final Duration? duration;
+  final String? streamingPath; // Path for streaming API
 
   AudioFile({
     required this.id,
@@ -19,6 +21,7 @@ class AudioFile {
     required this.sizeInBytes,
     required this.created,
     this.duration,
+    this.streamingPath,
   });
 
   factory AudioFile.fromFileInfo({
@@ -30,6 +33,7 @@ class AudioFile {
     required int sizeInBytes,
     required DateTime created,
     Duration? duration,
+    String? streamingPath,
   }) {
     return AudioFile(
       id: id,
@@ -40,6 +44,40 @@ class AudioFile {
       sizeInBytes: sizeInBytes,
       created: created,
       duration: duration,
+      streamingPath: streamingPath,
+    );
+  }
+
+  /// Factory constructor for API response format
+  /// Expected format: {"id": "episode-id", "path": "audio/zh-TW/startup/episode-id/playlist.m3u8"}
+  factory AudioFile.fromApiResponse(
+    Map<String, dynamic> json,
+    String language,
+    String category,
+  ) {
+    final id = json['id'] as String;
+    final path = json['path'] as String;
+    
+    // Parse date from ID (format: YYYY-MM-DD-title)
+    DateTime createdDate = DateTime.now();
+    try {
+      final datePart = id.split('-').take(3).join('-');
+      createdDate = DateTime.parse(datePart);
+    } catch (e) {
+      // If parsing fails, use current date
+      print('Warning: Could not parse date from ID: $id');
+    }
+    
+    return AudioFile(
+      id: id,
+      language: language,
+      category: category,
+      filePath: '', // Not used for streaming
+      fileName: '$id.m3u8',
+      sizeInBytes: 0, // Unknown for streaming files
+      created: createdDate,
+      duration: null, // Will be determined during playback
+      streamingPath: path,
     );
   }
 
@@ -95,6 +133,33 @@ class AudioFile {
   }
 
   bool get exists {
-    return File(filePath).existsSync();
+    // For web platform, we can't check file existence using File API
+    if (kIsWeb) {
+      // For streaming files, assume they exist if we have a streaming path
+      return isStreamingFile || filePath.isNotEmpty;
+    }
+    
+    // For mobile platforms, assume files exist (avoiding dart:io dependency)
+    // In a full implementation, you would use conditional imports here
+    return filePath.isNotEmpty;
+  }
+
+  /// Get the streaming URL for this audio file
+  String? get streamingUrl {
+    if (streamingPath == null) return null;
+    return StreamingApiService.getStreamingUrl(streamingPath!);
+  }
+
+  /// Check if this is a streaming file (from API) or local file
+  bool get isStreamingFile {
+    return streamingPath != null && streamingPath!.isNotEmpty;
+  }
+
+  /// Get the appropriate URL/path for audio playback
+  String get playbackUrl {
+    if (isStreamingFile) {
+      return streamingUrl!;
+    }
+    return filePath;
   }
 }

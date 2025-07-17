@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart' as path;
 import '../models/audio_content.dart';
 import '../models/audio_file.dart';
+import 'streaming_api_service.dart';
 
 class ContentService extends ChangeNotifier {
   static const String contentDir = 'content';
@@ -13,6 +12,7 @@ class ContentService extends ChangeNotifier {
   List<AudioFile> _audioFiles = [];
   bool _isLoading = false;
   String? _error;
+  bool _useApiData = kIsWeb ? true : true; // Force API on web, default to API on all platforms
   
   // Filters
   String? _selectedLanguage;
@@ -104,111 +104,121 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.wait([
-        _loadContentFiles(),
-        _loadAudioFiles(),
-      ]);
+      if (_useApiData || kIsWeb) {
+        // Always use API on web platform
+        await _loadDataFromApi();
+      } else {
+        // Local file loading only on non-web platforms
+        await Future.wait([
+          _loadContentFiles(),
+          _loadAudioFiles(),
+        ]);
+      }
     } catch (e) {
       _error = 'Failed to load content: $e';
+      print('ContentService error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  // Load content files from the content directory
-  Future<void> _loadContentFiles() async {
-    final contentDirectory = Directory(contentDir);
-    if (!contentDirectory.existsSync()) {
-      throw Exception('Content directory not found: $contentDir');
-    }
-
-    final contents = <AudioContent>[];
-
-    // Iterate through language directories
-    await for (final languageDir in contentDirectory.list()) {
-      if (languageDir is Directory) {
-        final language = path.basename(languageDir.path);
-        
-        // Iterate through category directories
-        await for (final categoryDir in languageDir.list()) {
-          if (categoryDir is Directory) {
-            final category = path.basename(categoryDir.path);
-            
-            // Iterate through JSON files
-            await for (final file in categoryDir.list()) {
-              if (file is File && file.path.endsWith('.json')) {
-                try {
-                  final jsonString = await file.readAsString();
-                  final jsonData = json.decode(jsonString);
-                  final content = AudioContent.fromJson(jsonData);
-                  contents.add(content);
-                } catch (e) {
-                  if (kDebugMode) {
-                    print('Error loading content file ${file.path}: $e');
-                  }
-                }
-              }
-            }
+  // Load data from streaming API
+  Future<void> _loadDataFromApi() async {
+    try {
+      // Get all episodes from the API
+      final episodesData = await StreamingApiService.getAllEpisodes();
+      
+      final audioFiles = <AudioFile>[];
+      
+      // Convert API response to AudioFile objects
+      for (final episodeData in episodesData) {
+        try {
+          final language = episodeData['language'] as String;
+          final category = episodeData['category'] as String;
+          
+          final audioFile = AudioFile.fromApiResponse(
+            episodeData,
+            language,
+            category,
+          );
+          
+          audioFiles.add(audioFile);
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error processing episode data: $episodeData, Error: $e');
           }
         }
       }
+      
+      _audioFiles = audioFiles;
+      
+      // For now, we'll create minimal content objects from audio files
+      // In the future, this could be enhanced to fetch actual content metadata
+      _contents = audioFiles.map((audioFile) => AudioContent(
+        id: audioFile.id,
+        status: 'published', // Assume published if available via API
+        category: audioFile.category,
+        date: audioFile.displayDate,
+        language: audioFile.language,
+        title: _generateTitleFromId(audioFile.id),
+        content: 'Content from streaming service', // Placeholder
+        references: [],
+        audioFile: audioFile.fileName,
+        socialHook: null,
+        updatedAt: DateTime.now(),
+      )).toList();
+      
+    } catch (e) {
+      throw Exception('Failed to load data from API: $e');
+    }
+  }
+
+  // Helper method to generate a readable title from episode ID
+  String _generateTitleFromId(String id) {
+    // Convert ID like "2025-07-03-crypto-startup-frameworks" to "Crypto Startup Frameworks"
+    final parts = id.split('-');
+    if (parts.length > 3) {
+      // Skip date parts (first 3) and capitalize words
+      return parts.skip(3).map((word) => 
+        word[0].toUpperCase() + word.substring(1)
+      ).join(' ');
+    }
+    return id; // Fallback to original ID
+  }
+
+  // Load content files from the content directory
+  Future<void> _loadContentFiles() async {
+    // Skip local file loading on web platform
+    if (kIsWeb) {
+      _contents = [];
+      return;
     }
 
-    _contents = contents;
+    // Local file loading is not available on web
+    // This method should only be called on mobile platforms
+    _contents = [];
+    
+    if (kDebugMode) {
+      print('Local content file loading not implemented for mobile platform');
+    }
   }
 
   // Load audio files from the audio directory
   Future<void> _loadAudioFiles() async {
-    final audioDirectory = Directory(audioDir);
-    if (!audioDirectory.existsSync()) {
-      throw Exception('Audio directory not found: $audioDir');
+    // Skip local file loading on web platform
+    if (kIsWeb) {
+      _audioFiles = [];
+      return;
     }
 
-    final audioFiles = <AudioFile>[];
-
-    // Iterate through language directories
-    await for (final languageDir in audioDirectory.list()) {
-      if (languageDir is Directory) {
-        final language = path.basename(languageDir.path);
-        
-        // Iterate through category directories
-        await for (final categoryDir in languageDir.list()) {
-          if (categoryDir is Directory) {
-            final category = path.basename(categoryDir.path);
-            
-            // Iterate through audio files
-            await for (final file in categoryDir.list()) {
-              if (file is File && file.path.endsWith('.wav')) {
-                try {
-                  final stat = await file.stat();
-                  final fileName = path.basename(file.path);
-                  final id = path.basenameWithoutExtension(fileName);
-                  
-                  final audioFile = AudioFile.fromFileInfo(
-                    id: id,
-                    language: language,
-                    category: category,
-                    filePath: file.path,
-                    fileName: fileName,
-                    sizeInBytes: stat.size,
-                    created: stat.changed,
-                  );
-                  
-                  audioFiles.add(audioFile);
-                } catch (e) {
-                  if (kDebugMode) {
-                    print('Error loading audio file ${file.path}: $e');
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    // Local file loading is not available on web
+    // This method should only be called on mobile platforms
+    _audioFiles = [];
+    
+    if (kDebugMode) {
+      print('Local audio file loading not implemented for mobile platform');
     }
-
-    _audioFiles = audioFiles;
   }
 
   // Filter methods
@@ -263,4 +273,18 @@ class ContentService extends ChangeNotifier {
         audioFile.id == content.id && audioFile.language == content.language);
     }).toList();
   }
+
+  // Toggle between API and local data
+  void setUseApiData(bool useApi) {
+    if (_useApiData != useApi) {
+      _useApiData = useApi;
+      // Clear current data and reload
+      _contents.clear();
+      _audioFiles.clear();
+      loadContent();
+    }
+  }
+
+  // Get current data source
+  bool get isUsingApiData => _useApiData;
 }
