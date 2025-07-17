@@ -115,7 +115,12 @@ class ContentService extends ChangeNotifier {
         ]);
       }
     } catch (e) {
-      _error = 'Failed to load content: $e';
+      final errorMessage = e.toString();
+      if (errorMessage.contains('CORS') || errorMessage.contains('connectivity')) {
+        _error = 'Network Error: Cannot connect to API. This may be a CORS issue in development.\n\nTry running: flutter run -d chrome --web-browser-flag="--disable-web-security"';
+      } else {
+        _error = 'Failed to load content: $errorMessage';
+      }
       print('ContentService error: $e');
     } finally {
       _isLoading = false;
@@ -126,8 +131,20 @@ class ContentService extends ChangeNotifier {
   // Load data from streaming API
   Future<void> _loadDataFromApi() async {
     try {
+      print('ContentService: Starting API data load...');
+      
+      // Test connectivity first
+      print('ContentService: Testing API connectivity...');
+      final isConnected = await StreamingApiService.testConnectivity();
+      if (!isConnected) {
+        throw Exception('API connectivity test failed - check CORS and network connection');
+      }
+      print('ContentService: API connectivity test passed');
+      
       // Get all episodes from the API
+      print('ContentService: Fetching all episodes...');
       final episodesData = await StreamingApiService.getAllEpisodes();
+      print('ContentService: Received ${episodesData.length} episodes from API');
       
       final audioFiles = <AudioFile>[];
       
@@ -151,6 +168,7 @@ class ContentService extends ChangeNotifier {
         }
       }
       
+      print('ContentService: Processed ${audioFiles.length} audio files');
       _audioFiles = audioFiles;
       
       // For now, we'll create minimal content objects from audio files
@@ -170,7 +188,9 @@ class ContentService extends ChangeNotifier {
         author: 'David Chang', // Hardcoded author for all episodes
       )).toList();
       
+      print('ContentService: API data load completed successfully');
     } catch (e) {
+      print('ContentService: API load failed: $e');
       throw Exception('Failed to load data from API: $e');
     }
   }

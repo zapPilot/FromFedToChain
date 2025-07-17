@@ -118,14 +118,17 @@ class AudioService extends ChangeNotifier {
         
         if (kDebugMode) {
           final urlType = audioFile.isUsingDirectSignedUrl ? 'pre-signed' : 'constructed';
-          print('Playing streaming audio ($urlType): $streamingUrl');
+          print('AudioService: Playing streaming audio ($urlType)');
+          print('AudioService: Streaming URL: $streamingUrl');
+          print('AudioService: Original streaming path: ${audioFile.streamingPath}');
+          print('AudioService: Direct signed URL: ${audioFile.directSignedUrl}');
         }
         
         await _audioPlayer.play(UrlSource(streamingUrl));
       } else {
         // Use file source for local files
         if (kDebugMode) {
-          print('Playing local audio: ${audioFile.filePath}');
+          print('AudioService: Playing local file: ${audioFile.filePath}');
         }
         
         await _audioPlayer.play(DeviceFileSource(audioFile.filePath));
@@ -135,11 +138,33 @@ class AudioService extends ChangeNotifier {
       
     } catch (e) {
       _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to play audio: $e';
+      
+      // Provide helpful error messages for common issues
+      if (e.toString().contains('NotSupportedError')) {
+        if (kIsWeb) {
+          _errorMessage = 'HLS playback not supported in web browsers. Use Android/iOS for streaming development.';
+        } else {
+          _errorMessage = 'Media format not supported on this platform.';
+        }
+        
+        if (kDebugMode) {
+          print('AudioService: HLS playback not supported');
+          print('AudioService: Current platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+          print('AudioService: Recommendation: Use Android/iOS for HLS streaming development');
+        }
+      } else if (e.toString().contains('NetworkError') || e.toString().contains('CORS')) {
+        _errorMessage = 'Network error: Cannot access streaming URL. Check CORS configuration.';
+      } else {
+        _errorMessage = 'Failed to play audio: $e';
+      }
       
       if (kDebugMode) {
         print('AudioService playback error: $e');
         print('AudioFile: ${audioFile.id}, isStreaming: ${audioFile.isStreamingFile}');
+        print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+        if (audioFile.isStreamingFile) {
+          print('AudioService: Streaming URL: ${audioFile.streamingUrl}');
+        }
       }
       
       notifyListeners();

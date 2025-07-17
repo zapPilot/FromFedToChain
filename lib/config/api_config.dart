@@ -29,7 +29,7 @@ class ApiConfig {
       '$streamingBaseUrl/list?prefix=audio/$language/$category/';
   
   static String getStreamUrl(String path) =>
-      '$streamingBaseUrl/?path=$path';
+      '$streamingBaseUrl/?path=${Uri.encodeComponent(path)}';
   
   // Configuration constants
   static const Duration apiTimeout = Duration(seconds: 10);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 
@@ -31,16 +32,31 @@ class StreamingApiService {
       if (response.statusCode == 200) {
         final dynamic responseData = json.decode(response.body);
         
+        if (kDebugMode) {
+          print('StreamingApiService: API response for $language/$category: $responseData');
+        }
+        
         // Handle both array and object responses
         if (responseData is List) {
-          return responseData.cast<Map<String, dynamic>>();
+          final episodes = responseData.cast<Map<String, dynamic>>();
+          if (kDebugMode && episodes.isNotEmpty) {
+            print('StreamingApiService: Sample episode data: ${episodes.first}');
+          }
+          return episodes;
         } else if (responseData is Map<String, dynamic>) {
           // If the API returns an object with episodes array
           final List<dynamic>? episodes = responseData['episodes'] ?? responseData['data'];
           if (episodes != null) {
-            return episodes.cast<Map<String, dynamic>>();
+            final episodeList = episodes.cast<Map<String, dynamic>>();
+            if (kDebugMode && episodeList.isNotEmpty) {
+              print('StreamingApiService: Sample episode data: ${episodeList.first}');
+            }
+            return episodeList;
           }
           // If the response is a single episode object
+          if (kDebugMode) {
+            print('StreamingApiService: Single episode data: $responseData');
+          }
           return [responseData];
         }
         
@@ -78,19 +94,42 @@ class StreamingApiService {
     return allEpisodes;
   }
 
-  /// Get all episodes across all languages and categories
+  /// Get all episodes across all languages and categories (parallel loading)
   static Future<List<Map<String, dynamic>>> getAllEpisodes() async {
-    final allEpisodes = <Map<String, dynamic>>[];
+    print('StreamingApiService: Starting parallel loading of all episodes...');
+    
+    // Create all API calls upfront
+    final futures = <Future<List<Map<String, dynamic>>>>[];
     
     for (final language in ApiConfig.supportedLanguages) {
-      try {
-        final languageEpisodes = await getAllEpisodesForLanguage(language);
-        allEpisodes.addAll(languageEpisodes);
-      } catch (e) {
-        print('Warning: Failed to load episodes for language $language: $e');
+      for (final category in ApiConfig.supportedCategories) {
+        final future = getEpisodeList(language, category).then((episodes) {
+          // Add metadata to each episode
+          for (final episode in episodes) {
+            episode['category'] = category;
+            episode['language'] = language;
+          }
+          return episodes;
+        }).catchError((error) {
+          print('Warning: Failed to load $language/$category: $error');
+          return <Map<String, dynamic>>[]; // Return empty list on error
+        });
+        futures.add(future);
       }
     }
     
+    print('StreamingApiService: Created ${futures.length} parallel requests');
+    
+    // Wait for all requests to complete (parallel execution)
+    final results = await Future.wait(futures);
+    
+    // Flatten results
+    final allEpisodes = <Map<String, dynamic>>[];
+    for (final episodeList in results) {
+      allEpisodes.addAll(episodeList);
+    }
+    
+    print('StreamingApiService: Parallel loading completed, got ${allEpisodes.length} total episodes');
     return allEpisodes;
   }
 

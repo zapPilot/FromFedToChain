@@ -129,7 +129,7 @@ npm run format
 
 ```bash
 # Web development
-flutter run -d chrome
+flutter run -d chrome --web-browser-flag="--disable-web-security"
 
 # Mobile development
 flutter run

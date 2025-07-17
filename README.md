@@ -6,6 +6,8 @@ Daily content pipeline for creating conversational Chinese explainers about cryp
 
 This project now includes a modern Flutter mobile/web app for browsing and playing TTS audio content. See [FLUTTER_README.md](./FLUTTER_README.md) for detailed Flutter app documentation.
 
+`flutter run -d chrome --web-browser-flag="--disable-web-security"`
+
 ## 🚀 Quick Start
 
 ### Node.js CLI Pipeline
