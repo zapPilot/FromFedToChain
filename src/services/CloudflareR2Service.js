@@ -7,7 +7,7 @@ export class CloudflareR2Service {
   static REMOTE_NAME = "r2"; // R2 remote name in rclone config
   static BUCKET_NAME = "fromfedtochain"; // R2 bucket name
   static RCLONE_BINARY = "rclone"; // Assumes rclone is in PATH
-  static BASE_URL = "https://fromfedtochain.your-domain.com"; // Update with your actual R2 domain
+  static BASE_URL = "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com"; // Actual R2 domain
 
   /**
    * Upload audio files (WAV and M3U8) to Cloudflare R2

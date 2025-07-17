@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../models/audio_file.dart';
 
 enum PlaybackState {
@@ -51,6 +53,44 @@ class AudioService extends ChangeNotifier {
 
   AudioService() {
     _initializePlayer();
+  }
+  
+  // Resolve signed URL from Cloudflare worker response
+  Future<String> _resolveSignedUrl(String workerUrl) async {
+    if (kDebugMode) {
+      print('AudioService: Resolving signed URL from: $workerUrl');
+    }
+    
+    try {
+      final response = await http.get(Uri.parse(workerUrl));
+      
+      if (response.statusCode == 200) {
+        // Check if response is JSON (signed URL response)
+        if (response.headers['content-type']?.contains('application/json') == true) {
+          final jsonData = json.decode(response.body);
+          final signedUrl = jsonData['url'] as String;
+          
+          if (kDebugMode) {
+            print('AudioService: Resolved signed URL: $signedUrl');
+          }
+          
+          return signedUrl;
+        } else {
+          // If not JSON, assume it's the direct content
+          if (kDebugMode) {
+            print('AudioService: Direct content, using original URL');
+          }
+          return workerUrl;
+        }
+      } else {
+        throw Exception('Failed to resolve signed URL: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('AudioService: Error resolving signed URL: $e');
+      }
+      throw Exception('Failed to resolve signed URL: $e');
+    }
   }
 
   void _initializePlayer() {
@@ -108,43 +148,23 @@ class AudioService extends ChangeNotifier {
         _totalDuration = Duration.zero;
       }
 
-      // Use appropriate audio source based on file type and platform
-      if (audioFile.isStreamingFile) {
-        final streamingUrl = audioFile.streamingUrl;
-        if (streamingUrl == null) {
-          throw Exception('Streaming URL not available for ${audioFile.id}');
-        }
-        
-        if (kDebugMode) {
-          final urlType = audioFile.isUsingDirectSignedUrl ? 'pre-signed' : 'constructed';
-          print('AudioService: Playing streaming audio ($urlType)');
-          print('AudioService: Streaming URL: $streamingUrl');
-          print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-        }
-        
-        if (kIsWeb) {
-          // Web platform: Show helpful message for HLS limitation
-          throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
-        } else {
-          // Mobile platform: Use native streaming
-          await _audioPlayer.setUrl(streamingUrl);
-          await _audioPlayer.play();
-        }
+      // Always use sourceUrl for playback
+      if (kDebugMode) {
+        print('AudioService: Playing audio from sourceUrl');
+        print('AudioService: sourceUrl:  [32m${audioFile.sourceUrl} [0m');
+        print('AudioService: Platform:  [36m${kIsWeb ? 'Web' : 'Mobile'} [0m');
+      }
+
+      if (kIsWeb) {
+        throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
       } else {
-        // Use file source for local files
-        if (kDebugMode) {
-          print('AudioService: Playing local file: ${audioFile.filePath}');
-        }
-        
-        await _audioPlayer.setFilePath(audioFile.filePath);
+        await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
         await _audioPlayer.play();
       }
-      
+
       await _audioPlayer.setSpeed(_playbackSpeed);
-      
     } catch (e) {
       _playbackState = PlaybackState.error;
-      
       // Provide helpful error messages for common issues
       if (e.toString().contains('HttpException') || e.toString().contains('SocketException')) {
         _errorMessage = 'Network error: Cannot access streaming URL. Check internet connection.';
@@ -155,16 +175,12 @@ class AudioService extends ChangeNotifier {
       } else {
         _errorMessage = 'Failed to play audio: $e';
       }
-      
       if (kDebugMode) {
         print('AudioService playback error: $e');
-        print('AudioFile: ${audioFile.id}, isStreaming: ${audioFile.isStreamingFile}');
+        print('AudioFile: ${audioFile.id}');
         print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-        if (audioFile.isStreamingFile) {
-          print('AudioService: Streaming URL: ${audioFile.streamingUrl}');
-        }
+        print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
       }
-      
       notifyListeners();
     }
   }

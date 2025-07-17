@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/content_service.dart';
 import '../services/audio_service.dart';
+import '../models/audio_file.dart';
 import '../widgets/animated_background.dart';
 import '../widgets/course_card.dart';
 import '../widgets/author_card.dart';
@@ -105,6 +108,27 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildStatCard('3', 'Languages', AppTheme.accent),
             ],
           ),
+          
+          // Test button for M3U8 streaming
+          const SizedBox(height: 16),
+          Center(
+            child: ElevatedButton.icon(
+              onPressed: _testM3U8Streaming,
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('Test M3U8 Streaming'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.accent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -151,6 +175,47 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  /// Test M3U8 streaming with local content
+void _testM3U8Streaming() async {
+  print('🎯 Testing M3U8 streaming via signed Worker URL...');
+
+  const workerUrl =
+      'https://signed-url.davidtnfsh.workers.dev/proxy/audio/zh-TW/startup/output/playlist.m3u8';
+
+  try {
+    final testAudioFile = AudioFile(
+      id: 'output',
+      language: 'zh-TW',
+      category: 'startup',
+      fileName: 'playlist.m3u8',
+      sizeInBytes: 0,
+      created: DateTime.now(),
+      duration: null,
+      sourceUrl: workerUrl,
+    );
+
+    print('🎯 Streaming Path: $workerUrl');
+
+    final audioService = context.read<AudioService>();
+    await audioService.playAudio(testAudioFile);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✅ M3U8 streaming started!'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  } catch (error) {
+    print('❌ Error during M3U8 streaming test: $error');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('❌ Failed to stream M3U8'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+}
 
   Widget _buildContent() {
     return Consumer<ContentService>(

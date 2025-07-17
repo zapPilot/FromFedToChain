@@ -39,6 +39,7 @@ dependencies:
   
   # Icons
   heroicons: ^0.9.0
+  mcp_toolkit: ^0.2.3
 
 dev_dependencies:
   flutter_test:

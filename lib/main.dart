@@ -1,3 +1,4 @@
+import 'dart:async';                    
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,12 +7,26 @@ import 'services/audio_service.dart';
 import 'services/content_service.dart';
 import 'services/auth_service.dart';
 import 'themes/app_theme.dart';
+import 'package:mcp_toolkit/mcp_toolkit.dart';
 
-void main() async {
-  // Load environment variables
+Future<void> main() async {
+  // Flutter initialize
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // load .env
   await dotenv.load(fileName: ".env");
-  
-  runApp(const FromFedToChainApp());
+
+  // initialize MCP Toolkit
+  MCPToolkitBinding.instance
+    ..initialize()
+    ..initializeFlutterToolkit();
+
+  // use runZonedGuarded to capture exceptions
+  runZonedGuarded(
+    () => runApp(const FromFedToChainApp()),
+    (error, stack) =>
+        MCPToolkitBinding.instance.handleZoneError(error, stack),
+  );
 }
 
 class FromFedToChainApp extends StatelessWidget {
