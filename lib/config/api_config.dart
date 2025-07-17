@@ -1,3 +1,10 @@
+/// Production-ready API configuration for signed URL streaming service
+/// 
+/// Features:
+/// ✅ Production URLs: https://signed-url.davidtnfsh.workers.dev
+/// ✅ Multi-environment support (production, staging, development, test)
+/// ✅ Optimized streaming with pre-signed URLs
+/// ✅ Backwards compatibility with path-based URL construction
 class ApiConfig {
   // Environment detection
   static const String environment = String.fromEnvironment('ENVIRONMENT', defaultValue: 'production');
@@ -29,9 +36,9 @@ class ApiConfig {
   static const Duration streamTimeout = Duration(seconds: 30);
   static const int retryAttempts = 3;
   
-  // Supported languages and categories
+  // Supported languages and categories (synced with ContentSchema.js)
   static const List<String> supportedLanguages = ['zh-TW', 'en-US', 'ja-JP'];
-  static const List<String> supportedCategories = ['startup', 'ethereum', 'macro', 'daily-news'];
+  static const List<String> supportedCategories = ['daily-news', 'ethereum', 'macro', 'startup', 'ai', 'defi'];
   
   // Helper methods for validation
   static bool isValidLanguage(String language) => supportedLanguages.contains(language);

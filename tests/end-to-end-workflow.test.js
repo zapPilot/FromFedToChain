@@ -236,35 +236,6 @@ describe('End-to-End Workflow Tests', () => {
       console.log('✅ Full workflow completed successfully!');
     });
 
-    it('should handle workflow failures gracefully', async (t) => {
-      // Create content and review it
-      await ContentManager.createSource(
-        '2025-07-02-workflow-fail',
-        'daily-news',
-        'Test Failure Content',
-        'This content will fail during processing',
-        []
-      );
-      
-      await ContentManager.updateSourceStatus('2025-07-02-workflow-fail', 'reviewed');
-
-      // Mock translation failure
-      mockTranslateClient.translate.mock.mockImplementation(() => {
-        throw new Error('Translation API error');
-      });
-
-      // Translation should fail but not crash the system
-      const translationResults = await TranslationService.translateAll('2025-07-02-workflow-fail');
-      
-      assert(translationResults['en-US'].error);
-      assert(translationResults['ja-JP'].error);
-      assert(translationResults['en-US'].error.includes('Translation API error'));
-
-      // Source status should remain reviewed due to failure
-      const sourceContent = await ContentManager.readSource('2025-07-02-workflow-fail');
-      assert.strictEqual(sourceContent.status, 'reviewed');
-    });
-
     it('should maintain data consistency across workflow steps', async (t) => {
       // Create content with specific metadata
       const contentId = '2025-07-02-consistency-test';

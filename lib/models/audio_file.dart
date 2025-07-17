@@ -11,6 +11,7 @@ class AudioFile {
   final DateTime created;
   final Duration? duration;
   final String? streamingPath; // Path for streaming API
+  final String? directSignedUrl; // Pre-signed URL from API response
 
   AudioFile({
     required this.id,
@@ -22,6 +23,7 @@ class AudioFile {
     required this.created,
     this.duration,
     this.streamingPath,
+    this.directSignedUrl,
   });
 
   factory AudioFile.fromFileInfo({
@@ -34,6 +36,7 @@ class AudioFile {
     required DateTime created,
     Duration? duration,
     String? streamingPath,
+    String? directSignedUrl,
   }) {
     return AudioFile(
       id: id,
@@ -45,11 +48,12 @@ class AudioFile {
       created: created,
       duration: duration,
       streamingPath: streamingPath,
+      directSignedUrl: directSignedUrl,
     );
   }
 
   /// Factory constructor for API response format
-  /// Expected format: {"id": "episode-id", "path": "audio/zh-TW/startup/episode-id/playlist.m3u8"}
+  /// Expected format: {"id": "episode-id", "path": "audio/zh-TW/startup/episode-id/playlist.m3u8", "signedUrl": "https://..."}
   factory AudioFile.fromApiResponse(
     Map<String, dynamic> json,
     String language,
@@ -57,6 +61,7 @@ class AudioFile {
   ) {
     final id = json['id'] as String;
     final path = json['path'] as String;
+    final signedUrl = json['signedUrl'] as String?; // Extract pre-signed URL
     
     // Parse date from ID (format: YYYY-MM-DD-title)
     DateTime createdDate = DateTime.now();
@@ -78,6 +83,7 @@ class AudioFile {
       created: createdDate,
       duration: null, // Will be determined during playback
       streamingPath: path,
+      directSignedUrl: signedUrl, // Use pre-signed URL if available
     );
   }
 
@@ -114,6 +120,10 @@ class AudioFile {
         return 'Macro';
       case 'startup':
         return 'Startup';
+      case 'ai':
+        return 'AI';
+      case 'defi':
+        return 'DeFi';
       default:
         return category.toUpperCase();
     }
@@ -145,14 +155,27 @@ class AudioFile {
   }
 
   /// Get the streaming URL for this audio file
+  /// Uses pre-signed URL if available, otherwise constructs from path
   String? get streamingUrl {
+    // Prefer pre-signed URL from API response (better performance)
+    if (directSignedUrl != null && directSignedUrl!.isNotEmpty) {
+      return directSignedUrl!;
+    }
+    
+    // Fallback to constructing URL from path (backwards compatibility)
     if (streamingPath == null) return null;
     return StreamingApiService.getStreamingUrl(streamingPath!);
   }
 
   /// Check if this is a streaming file (from API) or local file
   bool get isStreamingFile {
-    return streamingPath != null && streamingPath!.isNotEmpty;
+    return (directSignedUrl != null && directSignedUrl!.isNotEmpty) ||
+           (streamingPath != null && streamingPath!.isNotEmpty);
+  }
+
+  /// Check if using optimized pre-signed URL (better performance)
+  bool get isUsingDirectSignedUrl {
+    return directSignedUrl != null && directSignedUrl!.isNotEmpty;
   }
 
   /// Get the appropriate URL/path for audio playback

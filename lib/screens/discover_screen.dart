@@ -268,19 +268,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        // TODO: Implement author cards
         Container(
           height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 3, // Mock data
+            itemCount: 1, // Show only David Chang
             itemBuilder: (context, index) {
               return const Padding(
                 padding: EdgeInsets.only(right: 12),
                 child: AuthorCard(
-                  authorName: 'Coming Soon',
-                  authorBio: 'Author profiles will be available soon',
-                  subscriberCount: 0,
+                  authorName: 'David Chang',
+                  authorBio: 'Crypto and macro economics educator',
+                  subscriberCount: 1000,
                   isSubscribed: false,
                 ),
               );
@@ -365,6 +364,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         return 'Macro';
       case 'startup':
         return 'Startup';
+      case 'ai':
+        return 'AI';
+      case 'defi':
+        return 'DeFi';
       default:
         return category.toUpperCase();
     }

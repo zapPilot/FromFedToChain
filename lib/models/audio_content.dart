@@ -10,6 +10,7 @@ class AudioContent {
   final String content;
   final String status;
   final DateTime updatedAt;
+  final String author; // Hardcoded author name
 
   AudioContent({
     required this.id,
@@ -23,6 +24,7 @@ class AudioContent {
     required this.content,
     required this.status,
     required this.updatedAt,
+    required this.author,
   });
 
   factory AudioContent.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,7 @@ class AudioContent {
       content: json['content'] ?? '',
       status: json['status'] ?? '',
       updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
+      author: 'David Chang', // Hardcoded author
     );
   }
 
@@ -54,6 +57,7 @@ class AudioContent {
       'content': content,
       'status': status,
       'updated_at': updatedAt.toIso8601String(),
+      'author': author,
     };
   }
 
@@ -76,6 +80,10 @@ class AudioContent {
         return 'Macro';
       case 'startup':
         return 'Startup';
+      case 'ai':
+        return 'AI';
+      case 'defi':
+        return 'DeFi';
       default:
         return category.toUpperCase();
     }

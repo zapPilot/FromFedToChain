@@ -167,6 +167,7 @@ class ContentService extends ChangeNotifier {
         audioFile: audioFile.fileName,
         socialHook: null,
         updatedAt: DateTime.now(),
+        author: 'David Chang', // Hardcoded author for all episodes
       )).toList();
       
     } catch (e) {

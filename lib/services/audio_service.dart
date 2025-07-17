@@ -117,7 +117,8 @@ class AudioService extends ChangeNotifier {
         }
         
         if (kDebugMode) {
-          print('Playing streaming audio: $streamingUrl');
+          final urlType = audioFile.isUsingDirectSignedUrl ? 'pre-signed' : 'constructed';
+          print('Playing streaming audio ($urlType): $streamingUrl');
         }
         
         await _audioPlayer.play(UrlSource(streamingUrl));

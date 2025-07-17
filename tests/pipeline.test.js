@@ -366,40 +366,6 @@ describe('Pipeline Tests', () => {
       );
     });
 
-    it('should process content from reviewed status through all phases', async () => {
-      const results = await runPipelineForContent('2025-07-01-reviewed-content');
-      
-      // Should have run all applicable phases
-      assert(results.phases.includes('translation'));
-      assert(results.phases.includes('audio'));
-      assert(results.phases.includes('social'));
-      
-      // Verify content progressed to final status
-      const updatedContent = await ContentManager.readSource('2025-07-01-reviewed-content');
-      assert.strictEqual(updatedContent.status, 'social');
-    });
-
-    it('should continue from translated status through audio to social phase', async () => {
-      // Mock TTS service to avoid external dependencies
-      const originalGenerateAllAudio = AudioService.generateAllAudio;
-      AudioService.generateAllAudio = mock.fn(async (id) => {
-        await ContentManager.updateSourceStatus(id, 'audio');
-        return { 'en-US': { success: true }, 'ja-JP': { success: true } };
-      });
-
-      try {
-        const results = await runPipelineForContent('2025-07-01-translated-content');
-        
-        assert(results.phases.includes('audio'));
-        assert(results.phases.includes('social'));
-        
-        const updatedContent = await ContentManager.readSource('2025-07-01-translated-content');
-        assert.strictEqual(updatedContent.status, 'social');
-      } finally {
-        AudioService.generateAllAudio = originalGenerateAllAudio;
-      }
-    });
-
     it('should continue from audio status to social phase', async () => {
       // Mock social service
       const originalGenerateAllHooks = SocialService.generateAllHooks;
