@@ -24,15 +24,6 @@ async function main() {
       case 'pipeline':
         await handlePipeline();
         break;
-      case 'wav':
-        await handleWav();
-        break;
-      case 'm3u8':
-        await handleM3U8();
-        break;
-      case 'cloudflare':
-        await handleCloudflare();
-        break;
       default:
         showHelp();
     }
@@ -270,68 +261,8 @@ function showPipelineStatus(pendingContent) {
   });
 }
 
-async function handleWav() {
-  const id = args[1];
-  
-  if (!id) {
-    console.error(chalk.red("❌ Content ID is required"));
-    console.log(chalk.gray("Usage: npm run wav <content-id>"));
-    process.exit(1);
-  }
 
-  console.log(chalk.blue.bold("🎙️ WAV Audio Generation"));
-  console.log(chalk.gray("=".repeat(50)));
 
-  try {
-    await generateWavStep(id);
-    console.log(chalk.green(`✅ WAV generation completed for: ${id}`));
-  } catch (error) {
-    console.error(chalk.red(`❌ WAV generation failed for ${id}: ${error.message}`));
-    process.exit(1);
-  }
-}
-
-async function handleM3U8() {
-  const id = args[1];
-  
-  if (!id) {
-    console.error(chalk.red("❌ Content ID is required"));
-    console.log(chalk.gray("Usage: npm run m3u8 <content-id>"));
-    process.exit(1);
-  }
-
-  console.log(chalk.blue.bold("🎬 M3U8 Conversion"));
-  console.log(chalk.gray("=".repeat(50)));
-
-  try {
-    await generateM3U8Step(id);
-    console.log(chalk.green(`✅ M3U8 conversion completed for: ${id}`));
-  } catch (error) {
-    console.error(chalk.red(`❌ M3U8 conversion failed for ${id}: ${error.message}`));
-    process.exit(1);
-  }
-}
-
-async function handleCloudflare() {
-  const id = args[1];
-  
-  if (!id) {
-    console.error(chalk.red("❌ Content ID is required"));
-    console.log(chalk.gray("Usage: npm run cloudflare <content-id>"));
-    process.exit(1);
-  }
-
-  console.log(chalk.blue.bold("☁️ Cloudflare R2 Upload"));
-  console.log(chalk.gray("=".repeat(50)));
-
-  try {
-    await uploadToCloudflareStep(id);
-    console.log(chalk.green(`✅ Cloudflare upload completed for: ${id}`));
-  } catch (error) {
-    console.error(chalk.red(`❌ Cloudflare upload failed for ${id}: ${error.message}`));
-    process.exit(1);
-  }
-}
 
 async function runPipelineForContent(id) {
   try {
@@ -352,17 +283,19 @@ async function runPipelineForContent(id) {
     if (updatedContent.status === 'translated') {
       console.log(chalk.blue("2️⃣ WAV generation..."));
       await generateWavStep(id);
-      
+    }
+    if (updatedContent.status === 'wav') {
       console.log(chalk.blue("3️⃣ M3U8 conversion..."));
       await generateM3U8Step(id);
-      
+    }
+    if (updatedContent.status === 'm3u8') {
       console.log(chalk.blue("4️⃣ Cloudflare upload..."));
       await uploadToCloudflareStep(id);
     }
 
     // Check updated status for next phase
     const audioContent = await ContentManager.readSource(id);
-    if (audioContent.status === 'audio') {
+    if (audioContent.status === 'cloudflare') {
       console.log(chalk.blue("5️⃣ Social hooks..."));
       await SocialService.generateAllHooks(id);
     }
@@ -512,10 +445,10 @@ async function uploadToCloudflareStep(id) {
     }
   }
 
-  // Update source status to 'audio' if all uploads successful
+  // Update source status to 'cloudflare' if all uploads successful
   const allSuccessful = Object.values(results).every(r => r.success);
   if (allSuccessful && targetLanguages.length > 0) {
-    await ContentManager.updateSourceStatus(id, 'audio');
+    await ContentManager.updateSourceStatus(id, 'cloudflare');
   }
 
   return results;
@@ -549,10 +482,6 @@ function showHelp() {
   console.log("  npm run pipeline                               - Process all unfinished content");
   console.log("  npm run pipeline 2025-06-30-bitcoin           - Process specific content");
   
-  console.log(chalk.cyan("\nDiscrete Audio Steps:"));
-  console.log("  npm run wav <content-id>                       - Generate WAV audio files only");
-  console.log("  npm run m3u8 <content-id>                      - Convert WAV to M3U8 streaming format");
-  console.log("  npm run cloudflare <content-id>                - Upload M3U8 files to Cloudflare R2");
   
   console.log("");
   console.log(chalk.yellow("Review Controls:"));

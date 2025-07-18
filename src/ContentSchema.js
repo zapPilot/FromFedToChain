@@ -41,7 +41,7 @@ export class ContentSchema {
 
   // Get status workflow states
   static getStatuses() {
-    return ["draft", "reviewed", "translated", "audio", "social"];
+    return ["draft", "reviewed", "translated", "wav", "m3u8", "cloudflare", "social"];
   }
 
   // Get supported social platforms
