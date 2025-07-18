@@ -283,7 +283,10 @@ describe("ContentSchema Tests", () => {
         "draft",
         "reviewed",
         "translated",
-        "audio",
+        'wav',
+        'm3u8',
+        'cloudflare',
+        'content',
         "social",
       ]);
     });

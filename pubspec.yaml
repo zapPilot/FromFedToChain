@@ -52,6 +52,7 @@ flutter:
   
   # Assets
   assets:
+    - assets/
     - audio/
     - content/
     - .env

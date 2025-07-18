@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import fs from "fs/promises";
+import path from "path";
+import { exec } from "child_process";
 import chalk from "chalk";
 import { ContentManager } from "./ContentManager.js";
 import { TranslationService } from "./services/TranslationService.js";
@@ -296,7 +298,14 @@ async function runPipelineForContent(id) {
     // Check updated status for next phase
     const audioContent = await ContentManager.readSource(id);
     if (audioContent.status === 'cloudflare') {
-      console.log(chalk.blue("5️⃣ Social hooks..."));
+      console.log(chalk.blue("5️⃣ Content upload..."));
+      await uploadContentToCloudflareStep(id);
+    }
+    
+    // Check updated status for social hooks
+    const contentContent = await ContentManager.readSource(id);
+    if (contentContent.status === 'content') {
+      console.log(chalk.blue("6️⃣ Social hooks..."));
       await SocialService.generateAllHooks(id);
     }
 
@@ -454,8 +463,107 @@ async function uploadToCloudflareStep(id) {
   return results;
 }
 
+// Find all language/category versions of content
+async function findContentFiles(id) {
+  const contentFiles = [];
+  const contentDir = 'content';
+  
+  try {
+    const languages = await fs.readdir(contentDir);
+    
+    for (const lang of languages) {
+      const langPath = path.join(contentDir, lang);
+      const langStat = await fs.stat(langPath);
+      if (!langStat.isDirectory()) continue;
+      
+      const categories = await fs.readdir(langPath);
+      
+      for (const category of categories) {
+        const categoryPath = path.join(langPath, category);
+        const categoryStat = await fs.stat(categoryPath);
+        if (!categoryStat.isDirectory()) continue;
+        
+        const articlePath = path.join(categoryPath, `${id}.json`);
+        
+        try {
+          await fs.access(articlePath);
+          contentFiles.push({
+            localPath: articlePath,
+            r2Key: `content/${lang}/${category}/${id}.json`,
+            language: lang,
+            category: category,
+            id: id
+          });
+        } catch (error) {
+          // File doesn't exist in this language/category combination
+        }
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error finding content files:', error);
+  }
+  
+  return contentFiles;
+}
 
+// Upload single content file
+async function uploadSingleContentFile(contentFile) {
+  const { localPath, r2Key, language, category } = contentFile;
+  
+  console.log(chalk.gray(`Uploading: ${localPath} → r2:${process.env.R2_BUCKET_NAME}/${r2Key}`));
+  
+  const uploadCommand = `rclone copyto "${localPath}" "r2:${process.env.R2_BUCKET_NAME}/${r2Key}"`;
+  
+  try {
+    await execAsync(uploadCommand);
+    console.log(chalk.green(`✅ Uploaded: ${language}/${category}/${contentFile.id}.json`));
+  } catch (error) {
+    console.error(chalk.red(`❌ Upload failed: ${language}/${category}/${contentFile.id}.json - ${error.message}`));
+    throw error;
+  }
+}
 
+// Upload content files to Cloudflare R2
+async function uploadContentToCloudflareStep(id) {
+  console.log(chalk.blue(`📄 Uploading content to Cloudflare R2: ${id}`));
+  
+  try {
+    // Find all language versions of this content
+    const contentFiles = await findContentFiles(id);
+    
+    if (contentFiles.length === 0) {
+      throw new Error(`No content files found for: ${id}`);
+    }
+    
+    console.log(chalk.blue(`Found ${contentFiles.length} content file(s) to upload`));
+    
+    // Upload each language version
+    for (const contentFile of contentFiles) {
+      await uploadSingleContentFile(contentFile);
+    }
+    
+    console.log(chalk.green(`✅ Content uploaded successfully: ${contentFiles.length} files`));
+    await ContentManager.updateSourceStatus(id, 'content');
+    
+  } catch (error) {
+    console.error(chalk.red(`❌ Content upload failed: ${error.message}`));
+    throw error;
+  }
+}
+
+// Helper function for executing shell commands
+function execAsync(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(stdout);
+      }
+    });
+  });
+}
 
 
 
