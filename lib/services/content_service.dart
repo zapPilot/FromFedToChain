@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import '../models/audio_content.dart';
 import '../models/audio_file.dart';
+import '../config/api_config.dart';
 import 'streaming_api_service.dart';
 
 class ContentService extends ChangeNotifier {
@@ -274,6 +276,73 @@ class ContentService extends ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  // Fetch individual content by ID from API
+  Future<AudioContent?> fetchContentById(String id, String language, String category) async {
+    try {
+      if (kDebugMode) {
+        print('ContentService: Fetching content for $id ($language/$category)');
+      }
+      
+      final url = Uri.parse('${ApiConfig.streamingBaseUrl}/api/content/$language/$category/$id');
+      
+      final response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(ApiConfig.apiTimeout);
+      
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        final content = AudioContent.fromJson(jsonData);
+        
+        // Update the cached content list
+        final existingIndex = _contents.indexWhere(
+          (c) => c.id == id && c.language == language,
+        );
+        
+        if (existingIndex >= 0) {
+          _contents[existingIndex] = content;
+        } else {
+          _contents.add(content);
+        }
+        
+        notifyListeners();
+        
+        if (kDebugMode) {
+          print('ContentService: Successfully fetched content for $id');
+        }
+        
+        return content;
+      } else {
+        if (kDebugMode) {
+          print('ContentService: Failed to fetch content - HTTP ${response.statusCode}');
+        }
+        return null;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('ContentService: Error fetching content for $id: $e');
+      }
+      return null;
+    }
+  }
+
+  // Get content with lazy loading - fetches from API if not already loaded
+  Future<AudioContent?> getContentWithFetch(String id, String language, String category) async {
+    // First try to get from cache
+    final cachedContent = getContent(id, language);
+    
+    // If we have real content (not placeholder), return it
+    if (cachedContent != null && cachedContent.content != 'Content from streaming service') {
+      return cachedContent;
+    }
+    
+    // Otherwise, fetch from API
+    return await fetchContentById(id, language, category);
   }
 
   // Get audio file by ID and language

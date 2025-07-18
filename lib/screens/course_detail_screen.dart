@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/audio_file.dart';
 import '../models/audio_content.dart';
 import '../services/audio_service.dart';
+import '../services/content_service.dart';
 import '../themes/app_theme.dart';
 import '../widgets/animated_background.dart';
 
@@ -28,6 +29,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   late Animation<Offset> _slideAnimation;
   final ScrollController _scrollController = ScrollController();
   bool _isHeaderCollapsed = false;
+  AudioContent? _loadedContent;
+  bool _isLoadingContent = false;
 
   @override
   void initState() {
@@ -48,6 +51,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     
     _scrollController.addListener(_onScroll);
     _animationController.forward();
+    
+    // Load content when screen initializes
+    _loadContent();
   }
 
   @override
@@ -65,6 +71,40 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
       setState(() {
         _isHeaderCollapsed = shouldCollapse;
       });
+    }
+  }
+
+  Future<void> _loadContent() async {
+    if (_isLoadingContent) return;
+    
+    setState(() {
+      _isLoadingContent = true;
+    });
+    
+    try {
+      final contentService = context.read<ContentService>();
+      final content = await contentService.getContentWithFetch(
+        widget.audioFile.id,
+        widget.audioFile.language,
+        widget.audioFile.category,
+      );
+      
+      if (content != null && mounted) {
+        setState(() {
+          _loadedContent = content;
+          _isLoadingContent = false;
+        });
+      } else if (mounted) {
+        setState(() {
+          _isLoadingContent = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingContent = false;
+        });
+      }
     }
   }
 
@@ -144,7 +184,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           opacity: _isHeaderCollapsed ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),
           child: Text(
-            widget.content?.title ?? widget.audioFile.id,
+            _loadedContent?.title ?? widget.content?.title ?? widget.audioFile.id,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -211,7 +251,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                     
                     // Title
                     Text(
-                      widget.content?.title ?? widget.audioFile.id,
+                      _loadedContent?.title ?? widget.content?.title ?? widget.audioFile.id,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -227,7 +267,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                     Row(
                       children: [
                         Text(
-                          widget.content?.author ?? 'David Chang',
+                          _loadedContent?.author ?? widget.content?.author ?? 'David Chang',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -278,8 +318,18 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           
           const SizedBox(height: 24),
           
+          // Loading state
+          if (_isLoadingContent) ...[
+            _buildSectionTitle('Loading Content...'),
+            const SizedBox(height: 12),
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+            const SizedBox(height: 24),
+          ],
+          
           // Description
-          if (widget.content?.content != null) ...[
+          if (_loadedContent?.content != null || widget.content?.content != null) ...[
             _buildSectionTitle('Description'),
             const SizedBox(height: 12),
             _buildDescription(),
@@ -287,7 +337,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           ],
           
           // References
-          if (widget.content?.references.isNotEmpty == true) ...[
+          if (_loadedContent?.references.isNotEmpty == true || widget.content?.references.isNotEmpty == true) ...[
             _buildSectionTitle('References'),
             const SizedBox(height: 12),
             _buildReferences(),
@@ -295,7 +345,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           ],
           
           // Social hook
-          if (widget.content?.socialHook != null) ...[
+          if (_loadedContent?.socialHook != null || widget.content?.socialHook != null) ...[
             _buildSectionTitle('Social Hook'),
             const SizedBox(height: 12),
             _buildSocialHook(),
@@ -441,6 +491,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   }
 
   Widget _buildDescription() {
+    final content = _loadedContent?.content ?? widget.content?.content;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -448,7 +500,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        widget.content!.content,
+        content ?? 'No content available',
         style: const TextStyle(
           color: AppTheme.textSecondary,
           fontSize: 16,
@@ -459,8 +511,10 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   }
 
   Widget _buildReferences() {
+    final references = _loadedContent?.references ?? widget.content?.references ?? [];
+    
     return Column(
-      children: widget.content!.references.map((reference) {
+      children: references.map((reference) {
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
@@ -493,6 +547,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   }
 
   Widget _buildSocialHook() {
+    final socialHook = _loadedContent?.socialHook ?? widget.content?.socialHook;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -518,7 +574,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              widget.content!.socialHook!,
+              socialHook ?? 'No social hook available',
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 14,
