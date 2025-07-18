@@ -6,9 +6,8 @@
   "scripts": {
     "review": "node src/cli.js review",
     "pipeline": "node src/cli.js pipeline",
-    "check-deps": "node scripts/check-dependencies.js",
     "test": "node tests/run-tests.js",
-    "format": "prettier --write . --ignore-path .prettierignore"
+    "format": "prettier --write . --ignore-path .prettierignore",
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.846.0",

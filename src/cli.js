@@ -6,6 +6,8 @@ import { ContentManager } from "./ContentManager.js";
 import { TranslationService } from "./services/TranslationService.js";
 import { AudioService } from "./services/AudioService.js";
 import { SocialService } from "./services/SocialService.js";
+import { M3U8AudioService } from "./services/M3U8AudioService.js";
+import { CloudflareR2Service } from "./services/CloudflareR2Service.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -21,6 +23,15 @@ async function main() {
         break;
       case 'pipeline':
         await handlePipeline();
+        break;
+      case 'wav':
+        await handleWav();
+        break;
+      case 'm3u8':
+        await handleM3U8();
+        break;
+      case 'cloudflare':
+        await handleCloudflare();
         break;
       default:
         showHelp();
@@ -259,6 +270,69 @@ function showPipelineStatus(pendingContent) {
   });
 }
 
+async function handleWav() {
+  const id = args[1];
+  
+  if (!id) {
+    console.error(chalk.red("❌ Content ID is required"));
+    console.log(chalk.gray("Usage: npm run wav <content-id>"));
+    process.exit(1);
+  }
+
+  console.log(chalk.blue.bold("🎙️ WAV Audio Generation"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  try {
+    await generateWavStep(id);
+    console.log(chalk.green(`✅ WAV generation completed for: ${id}`));
+  } catch (error) {
+    console.error(chalk.red(`❌ WAV generation failed for ${id}: ${error.message}`));
+    process.exit(1);
+  }
+}
+
+async function handleM3U8() {
+  const id = args[1];
+  
+  if (!id) {
+    console.error(chalk.red("❌ Content ID is required"));
+    console.log(chalk.gray("Usage: npm run m3u8 <content-id>"));
+    process.exit(1);
+  }
+
+  console.log(chalk.blue.bold("🎬 M3U8 Conversion"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  try {
+    await generateM3U8Step(id);
+    console.log(chalk.green(`✅ M3U8 conversion completed for: ${id}`));
+  } catch (error) {
+    console.error(chalk.red(`❌ M3U8 conversion failed for ${id}: ${error.message}`));
+    process.exit(1);
+  }
+}
+
+async function handleCloudflare() {
+  const id = args[1];
+  
+  if (!id) {
+    console.error(chalk.red("❌ Content ID is required"));
+    console.log(chalk.gray("Usage: npm run cloudflare <content-id>"));
+    process.exit(1);
+  }
+
+  console.log(chalk.blue.bold("☁️ Cloudflare R2 Upload"));
+  console.log(chalk.gray("=".repeat(50)));
+
+  try {
+    await uploadToCloudflareStep(id);
+    console.log(chalk.green(`✅ Cloudflare upload completed for: ${id}`));
+  } catch (error) {
+    console.error(chalk.red(`❌ Cloudflare upload failed for ${id}: ${error.message}`));
+    process.exit(1);
+  }
+}
+
 async function runPipelineForContent(id) {
   try {
     // Determine what phase this content needs
@@ -276,14 +350,20 @@ async function runPipelineForContent(id) {
     // Check updated status for next phase
     const updatedContent = await ContentManager.readSource(id);
     if (updatedContent.status === 'translated') {
-      console.log(chalk.blue("2️⃣ Audio generation..."));
-      await AudioService.generateAllAudio(id);
+      console.log(chalk.blue("2️⃣ WAV generation..."));
+      await generateWavStep(id);
+      
+      console.log(chalk.blue("3️⃣ M3U8 conversion..."));
+      await generateM3U8Step(id);
+      
+      console.log(chalk.blue("4️⃣ Cloudflare upload..."));
+      await uploadToCloudflareStep(id);
     }
 
     // Check updated status for next phase
     const audioContent = await ContentManager.readSource(id);
     if (audioContent.status === 'audio') {
-      console.log(chalk.blue("3️⃣ Social hooks..."));
+      console.log(chalk.blue("5️⃣ Social hooks..."));
       await SocialService.generateAllHooks(id);
     }
 
@@ -294,6 +374,151 @@ async function runPipelineForContent(id) {
   } catch (error) {
     console.error(chalk.red(`❌ Pipeline failed for ${id}: ${error.message}`));
   }
+}
+
+// Separate step functions for modular audio processing
+
+async function generateWavStep(id) {
+  console.log(chalk.blue(`🎙️ Generating WAV audio for: ${id}`));
+  
+  // Check source status
+  const sourceContent = await ContentManager.readSource(id);
+  if (sourceContent.status !== 'translated') {
+    throw new Error(`Content must be translated before WAV generation. Current status: ${sourceContent.status}`);
+  }
+
+  // Generate WAV files using AudioService but only the WAV part
+  const result = await AudioService.generateWavOnly(id);
+  
+  console.log(chalk.green(`✅ WAV files generated for all languages`));
+  return result;
+}
+
+async function generateM3U8Step(id) {
+  console.log(chalk.blue(`🎬 Converting to M3U8 for: ${id}`));
+  
+  // Get available languages for this content
+  const availableLanguages = await ContentManager.getAvailableLanguages(id);
+  
+  // Import language configuration
+  const { getAudioLanguages, shouldGenerateM3U8, getM3U8Config } = await import("../config/languages.js");
+  
+  const audioLanguages = getAudioLanguages();
+  const targetLanguages = availableLanguages.filter(lang => 
+    audioLanguages.includes(lang) && shouldGenerateM3U8(lang)
+  );
+
+  if (targetLanguages.length === 0) {
+    console.log(chalk.yellow(`⚠️ No languages configured for M3U8 conversion`));
+    return;
+  }
+
+  console.log(chalk.blue(`📝 Converting M3U8 for ${targetLanguages.length} languages: ${targetLanguages.join(', ')}`));
+
+  const results = {};
+  
+  for (const language of targetLanguages) {
+    try {
+      const content = await ContentManager.read(id, language);
+      const audioPath = content.audio_file;
+      
+      if (!audioPath) {
+        throw new Error(`No audio file found for ${language}`);
+      }
+
+      const m3u8Config = getM3U8Config(language);
+      const m3u8Result = await M3U8AudioService.convertToM3U8(
+        audioPath,
+        id,
+        language,
+        content.category,
+        m3u8Config
+      );
+      
+      results[language] = { success: true, m3u8Result };
+      console.log(chalk.green(`✅ M3U8 converted for ${language}`));
+    } catch (error) {
+      console.error(chalk.red(`❌ M3U8 conversion failed for ${language}: ${error.message}`));
+      results[language] = { success: false, error: error.message };
+    }
+  }
+
+  return results;
+}
+
+async function uploadToCloudflareStep(id) {
+  console.log(chalk.blue(`☁️ Uploading to Cloudflare R2 for: ${id}`));
+  
+  // Check if rclone is available
+  const rcloneAvailable = await CloudflareR2Service.checkRcloneAvailability();
+  if (!rcloneAvailable) {
+    throw new Error("rclone not available. Please install and configure rclone for Cloudflare R2.");
+  }
+
+  // Get available languages for this content
+  const availableLanguages = await ContentManager.getAvailableLanguages(id);
+  
+  // Import language configuration
+  const { getAudioLanguages, shouldUploadToR2 } = await import("../config/languages.js");
+  
+  const audioLanguages = getAudioLanguages();
+  const targetLanguages = availableLanguages.filter(lang => 
+    audioLanguages.includes(lang) && shouldUploadToR2(lang)
+  );
+
+  if (targetLanguages.length === 0) {
+    console.log(chalk.yellow(`⚠️ No languages configured for R2 upload`));
+    return;
+  }
+
+  console.log(chalk.blue(`📤 Uploading to R2 for ${targetLanguages.length} languages: ${targetLanguages.join(', ')}`));
+
+  const results = {};
+  
+  for (const language of targetLanguages) {
+    try {
+      const content = await ContentManager.read(id, language);
+      
+      // Get M3U8 files for this content
+      const m3u8Info = await M3U8AudioService.getM3U8Files(id, language, content.category);
+      
+      if (!m3u8Info) {
+        throw new Error(`No M3U8 files found for ${language}. Run M3U8 conversion first.`);
+      }
+
+      // Upload only M3U8 files (no WAV files)
+      const uploadFiles = {
+        m3u8Data: m3u8Info
+      };
+      
+      const uploadResult = await CloudflareR2Service.uploadAudioFiles(
+        id,
+        language,
+        content.category,
+        uploadFiles
+      );
+      
+      if (uploadResult.success) {
+        // Update content with streaming URLs
+        await ContentManager.addAudio(id, language, content.audio_file, uploadResult.urls);
+        results[language] = { success: true, urls: uploadResult.urls };
+        console.log(chalk.green(`✅ R2 upload completed for ${language}`));
+      } else {
+        throw new Error(uploadResult.errors.join(', '));
+      }
+    } catch (error) {
+      console.error(chalk.red(`❌ R2 upload failed for ${language}: ${error.message}`));
+      results[language] = { success: false, error: error.message };
+    }
+  }
+
+  // Update source status to 'audio' if all uploads successful
+  const allSuccessful = Object.values(results).every(r => r.success);
+  if (allSuccessful && targetLanguages.length > 0) {
+    await ContentManager.updateSourceStatus(id, 'audio');
+  }
+
+  return results;
 }
 
 
@@ -323,6 +548,12 @@ function showHelp() {
   console.log(chalk.gray("\nPipeline Examples:"));
   console.log("  npm run pipeline                               - Process all unfinished content");
   console.log("  npm run pipeline 2025-06-30-bitcoin           - Process specific content");
+  
+  console.log(chalk.cyan("\nDiscrete Audio Steps:"));
+  console.log("  npm run wav <content-id>                       - Generate WAV audio files only");
+  console.log("  npm run m3u8 <content-id>                      - Convert WAV to M3U8 streaming format");
+  console.log("  npm run cloudflare <content-id>                - Upload M3U8 files to Cloudflare R2");
+  
   console.log("");
   console.log(chalk.yellow("Review Controls:"));
   console.log("  [a]ccept    - Approve content (optional feedback)");
@@ -334,6 +565,7 @@ function showHelp() {
   console.log("  • Auto-detects content phase: reviewed → translated → audio → social");
   console.log("  • Resumes from where you left off");
   console.log("  • Processes multiple content items in one command");
+  console.log("  • Discrete audio steps for testing and debugging");
 }
 
 main();

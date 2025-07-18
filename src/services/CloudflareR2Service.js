@@ -125,11 +125,12 @@ export class CloudflareR2Service {
       // Check if local file exists
       await fs.access(localPath);
       
-      // Build rclone command
+      // Build rclone command using 'copyto' instead of 'copy' to avoid path duplication
+      // This ensures the file is copied to the exact remote path specified
       const remoteFullPath = `${this.REMOTE_NAME}:${this.BUCKET_NAME}/${remotePath}`;
       const command = this.RCLONE_BINARY;
       const args = [
-        "copy",
+        "copyto",  // Use 'copyto' instead of 'copy' to prevent directory creation
         localPath,
         remoteFullPath,
         "--progress",

@@ -14,7 +14,7 @@
   "social_hook": null,
   "feedback": {
     "content_review": {
-      "status": "accepted",
+      "status": "rejected",
       "score": 4,
       "reviewer": "test_reviewer",
       "timestamp": "2025-07-13T13:40:33.574Z",
