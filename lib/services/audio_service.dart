@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:audio_service/audio_service.dart' as audio_service_pkg;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/audio_file.dart';
+import 'background_audio_handler.dart';
 
 enum PlaybackState {
   stopped,
@@ -14,6 +16,7 @@ enum PlaybackState {
 
 class AudioService extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
+  final BackgroundAudioHandler? _audioHandler;
   
   // Current playback state
   PlaybackState _playbackState = PlaybackState.stopped;
@@ -51,7 +54,8 @@ class AudioService extends ChangeNotifier {
     return _formatDuration(_totalDuration);
   }
 
-  AudioService() {
+  AudioService(this._audioHandler) {
+    print('🎧 AudioService: Initializing with background handler: ${_audioHandler != null}');
     _initializePlayer();
   }
   
@@ -94,139 +98,261 @@ class AudioService extends ChangeNotifier {
   }
 
   void _initializePlayer() {
-    _audioPlayer = AudioPlayer();
-    
-    // Listen to position changes
-    _audioPlayer.positionStream.listen((position) {
-      _currentPosition = position;
-      notifyListeners();
-    });
-    
-    // Listen to duration changes
-    _audioPlayer.durationStream.listen((duration) {
-      _totalDuration = duration ?? Duration.zero;
-      notifyListeners();
-    });
-    
-    // Listen to player state changes
-    _audioPlayer.playerStateStream.listen((state) {
-      switch (state.processingState) {
-        case ProcessingState.idle:
-          _playbackState = PlaybackState.stopped;
-          break;
-        case ProcessingState.loading:
-          _playbackState = PlaybackState.loading;
-          break;
-        case ProcessingState.buffering:
-          _playbackState = PlaybackState.loading;
-          break;
-        case ProcessingState.ready:
-          _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
-          break;
-        case ProcessingState.completed:
-          _playbackState = PlaybackState.stopped;
-          _currentPosition = Duration.zero;
-          break;
-      }
-      notifyListeners();
-    });
+    if (_audioHandler != null) {
+      print('🎧 AudioService: Using background audio handler');
+      
+      // Listen to background handler state changes
+      _audioHandler!.playbackState.listen((state) {
+        print('🔄 AudioService: Background state changed - playing: ${state.playing}');
+        
+        _currentPosition = state.updatePosition;
+        _totalDuration = _audioHandler!.duration;
+        _playbackSpeed = state.speed;
+        
+        // Map audio_service states to our internal states
+        switch (state.processingState) {
+          case audio_service_pkg.AudioProcessingState.idle:
+            _playbackState = PlaybackState.stopped;
+            break;
+          case audio_service_pkg.AudioProcessingState.loading:
+          case audio_service_pkg.AudioProcessingState.buffering:
+            _playbackState = PlaybackState.loading;
+            break;
+          case audio_service_pkg.AudioProcessingState.ready:
+            _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
+            break;
+          case audio_service_pkg.AudioProcessingState.completed:
+            _playbackState = PlaybackState.stopped;
+            _currentPosition = Duration.zero;
+            break;
+          case audio_service_pkg.AudioProcessingState.error:
+            _playbackState = PlaybackState.error;
+            _errorMessage = 'Background audio error';
+            break;
+        }
+        notifyListeners();
+      });
+      
+      // Listen to media item changes
+      _audioHandler!.mediaItem.listen((mediaItem) {
+        if (mediaItem != null) {
+          _totalDuration = mediaItem.duration ?? Duration.zero;
+          notifyListeners();
+        }
+      });
+      
+    } else {
+      print('🎧 AudioService: Falling back to local audio player');
+      
+      // Fallback to local player if background handler not available
+      _audioPlayer = AudioPlayer();
+      
+      // Listen to position changes
+      _audioPlayer.positionStream.listen((position) {
+        _currentPosition = position;
+        notifyListeners();
+      });
+      
+      // Listen to duration changes
+      _audioPlayer.durationStream.listen((duration) {
+        _totalDuration = duration ?? Duration.zero;
+        notifyListeners();
+      });
+      
+      // Listen to player state changes
+      _audioPlayer.playerStateStream.listen((state) {
+        switch (state.processingState) {
+          case ProcessingState.idle:
+            _playbackState = PlaybackState.stopped;
+            break;
+          case ProcessingState.loading:
+            _playbackState = PlaybackState.loading;
+            break;
+          case ProcessingState.buffering:
+            _playbackState = PlaybackState.loading;
+            break;
+          case ProcessingState.ready:
+            _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
+            break;
+          case ProcessingState.completed:
+            _playbackState = PlaybackState.stopped;
+            _currentPosition = Duration.zero;
+            break;
+        }
+        notifyListeners();
+      });
+    }
   }
 
   // Play audio file (supports both local files and streaming URLs)
   Future<void> playAudio(AudioFile audioFile) async {
-    try {
-      _playbackState = PlaybackState.loading;
-      _errorMessage = null;
-      notifyListeners();
-
-      // Stop current playback if playing different file
-      final currentAudioId = _currentAudioFile?.id;
-      if (currentAudioId != audioFile.id) {
-        await _audioPlayer.stop();
+    if (_audioHandler != null) {
+      print('🎵 AudioService: Playing via background handler - ${audioFile.displayTitle}');
+      
+      try {
+        _playbackState = PlaybackState.loading;
+        _errorMessage = null;
         _currentAudioFile = audioFile;
-        _currentPosition = Duration.zero;
-        _totalDuration = Duration.zero;
-      }
+        notifyListeners();
 
-      // Always use sourceUrl for playback
-      if (kDebugMode) {
-        print('AudioService: Playing audio from sourceUrl');
-        print('AudioService: sourceUrl:  [32m${audioFile.sourceUrl} [0m');
-        print('AudioService: Platform:  [36m${kIsWeb ? 'Web' : 'Mobile'} [0m');
+        await _audioHandler!.setAudioSource(
+          audioFile.sourceUrl,
+          title: audioFile.displayTitle,
+          artist: 'David Chang',
+        );
+        
+        await _audioHandler!.play();
+        print('✅ AudioService: Background playback started');
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Background audio failed: $e';
+        
+        if (kDebugMode) {
+          print('❌ AudioService: Background playback error: $e');
+          print('AudioFile: ${audioFile.id}');
+          print('sourceUrl: ${audioFile.sourceUrl}');
+        }
+        notifyListeners();
       }
+    } else {
+      print('🎵 AudioService: Playing via local player - ${audioFile.displayTitle}');
+      
+      // Fallback to original implementation
+      try {
+        _playbackState = PlaybackState.loading;
+        _errorMessage = null;
+        notifyListeners();
 
-      if (kIsWeb) {
-        throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
-      } else {
-        await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
-        await _audioPlayer.play();
-      }
+        // Stop current playback if playing different file
+        final currentAudioId = _currentAudioFile?.id;
+        if (currentAudioId != audioFile.id) {
+          await _audioPlayer.stop();
+          _currentAudioFile = audioFile;
+          _currentPosition = Duration.zero;
+          _totalDuration = Duration.zero;
+        }
 
-      await _audioPlayer.setSpeed(_playbackSpeed);
-    } catch (e) {
-      _playbackState = PlaybackState.error;
-      // Provide helpful error messages for common issues
-      if (e.toString().contains('HttpException') || e.toString().contains('SocketException')) {
-        _errorMessage = 'Network error: Cannot access streaming URL. Check internet connection.';
-      } else if (e.toString().contains('FormatException') || e.toString().contains('UnsupportedError')) {
-        _errorMessage = 'Unsupported media format. Please try a different audio source.';
-      } else if (e.toString().contains('PlayerException')) {
-        _errorMessage = 'Audio player error: ${e.toString()}';
-      } else {
-        _errorMessage = 'Failed to play audio: $e';
+        // Always use sourceUrl for playback
+        if (kDebugMode) {
+          print('AudioService: Playing audio from sourceUrl');
+          print('AudioService: sourceUrl:  [32m${audioFile.sourceUrl} [0m');
+          print('AudioService: Platform:  [36m${kIsWeb ? 'Web' : 'Mobile'} [0m');
+        }
+
+        if (kIsWeb) {
+          throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
+        } else {
+          await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
+          await _audioPlayer.play();
+        }
+
+        await _audioPlayer.setSpeed(_playbackSpeed);
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        // Provide helpful error messages for common issues
+        if (e.toString().contains('HttpException') || e.toString().contains('SocketException')) {
+          _errorMessage = 'Network error: Cannot access streaming URL. Check internet connection.';
+        } else if (e.toString().contains('FormatException') || e.toString().contains('UnsupportedError')) {
+          _errorMessage = 'Unsupported media format. Please try a different audio source.';
+        } else if (e.toString().contains('PlayerException')) {
+          _errorMessage = 'Audio player error: ${e.toString()}';
+        } else {
+          _errorMessage = 'Failed to play audio: $e';
+        }
+        if (kDebugMode) {
+          print('AudioService playback error: $e');
+          print('AudioFile: ${audioFile.id}');
+          print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+          print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
+        }
+        notifyListeners();
       }
-      if (kDebugMode) {
-        print('AudioService playback error: $e');
-        print('AudioFile: ${audioFile.id}');
-        print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-        print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
-      }
-      notifyListeners();
     }
   }
 
   // Resume playback
   Future<void> resume() async {
-    try {
-      await _audioPlayer.play();
-    } catch (e) {
-      _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to resume playback: $e';
-      notifyListeners();
+    if (_audioHandler != null) {
+      try {
+        await _audioHandler!.play();
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to resume background playback: $e';
+        notifyListeners();
+      }
+    } else {
+      try {
+        await _audioPlayer.play();
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to resume playback: $e';
+        notifyListeners();
+      }
     }
   }
 
   // Pause playback
   Future<void> pause() async {
-    try {
-      await _audioPlayer.pause();
-    } catch (e) {
-      _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to pause playback: $e';
-      notifyListeners();
+    if (_audioHandler != null) {
+      try {
+        await _audioHandler!.pause();
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to pause background playback: $e';
+        notifyListeners();
+      }
+    } else {
+      try {
+        await _audioPlayer.pause();
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to pause playback: $e';
+        notifyListeners();
+      }
     }
   }
 
   // Stop playback
   Future<void> stop() async {
-    try {
-      await _audioPlayer.stop();
-      _currentPosition = Duration.zero;
-    } catch (e) {
-      _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to stop playback: $e';
-      notifyListeners();
+    if (_audioHandler != null) {
+      try {
+        await _audioHandler!.stop();
+        _currentPosition = Duration.zero;
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to stop background playback: $e';
+        notifyListeners();
+      }
+    } else {
+      try {
+        await _audioPlayer.stop();
+        _currentPosition = Duration.zero;
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to stop playback: $e';
+        notifyListeners();
+      }
     }
   }
 
   // Seek to position
   Future<void> seekTo(Duration position) async {
-    try {
-      await _audioPlayer.seek(position);
-    } catch (e) {
-      _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to seek: $e';
-      notifyListeners();
+    if (_audioHandler != null) {
+      try {
+        await _audioHandler!.seek(position);
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to seek in background playback: $e';
+        notifyListeners();
+      }
+    } else {
+      try {
+        await _audioPlayer.seek(position);
+      } catch (e) {
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Failed to seek: $e';
+        notifyListeners();
+      }
     }
   }
 
@@ -234,7 +360,13 @@ class AudioService extends ChangeNotifier {
   Future<void> setPlaybackSpeed(double speed) async {
     try {
       _playbackSpeed = speed;
-      await _audioPlayer.setSpeed(speed);
+      
+      if (_audioHandler != null) {
+        await _audioHandler!.customAction('setSpeed', {'speed': speed});
+      } else {
+        await _audioPlayer.setSpeed(speed);
+      }
+      
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to set playback speed: $e';
@@ -243,25 +375,33 @@ class AudioService extends ChangeNotifier {
   }
 
   // Skip forward
-  Future<void> skipForward([Duration duration = const Duration(seconds: 15)]) async {
-    final newPosition = _currentPosition + duration;
-    final maxPosition = _totalDuration;
-    
-    if (newPosition < maxPosition) {
-      await seekTo(newPosition);
+  Future<void> skipForward([Duration duration = const Duration(seconds: 30)]) async {
+    if (_audioHandler != null) {
+      await _audioHandler!.skipToNext(); // Uses 30-second skip in background handler
     } else {
-      await seekTo(maxPosition);
+      final newPosition = _currentPosition + duration;
+      final maxPosition = _totalDuration;
+      
+      if (newPosition < maxPosition) {
+        await seekTo(newPosition);
+      } else {
+        await seekTo(maxPosition);
+      }
     }
   }
 
   // Skip backward
-  Future<void> skipBackward([Duration duration = const Duration(seconds: 15)]) async {
-    final newPosition = _currentPosition - duration;
-    
-    if (newPosition > Duration.zero) {
-      await seekTo(newPosition);
+  Future<void> skipBackward([Duration duration = const Duration(seconds: 10)]) async {
+    if (_audioHandler != null) {
+      await _audioHandler!.skipToPrevious(); // Uses 10-second skip in background handler
     } else {
-      await seekTo(Duration.zero);
+      final newPosition = _currentPosition - duration;
+      
+      if (newPosition > Duration.zero) {
+        await seekTo(newPosition);
+      } else {
+        await seekTo(Duration.zero);
+      }
     }
   }
 
@@ -303,7 +443,10 @@ class AudioService extends ChangeNotifier {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    // Only dispose local audio player if not using background handler
+    if (_audioHandler == null) {
+      _audioPlayer.dispose();
+    }
     super.dispose();
   }
 }
