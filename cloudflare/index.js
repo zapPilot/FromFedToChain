@@ -143,7 +143,7 @@ export default {
       })
     }
 
-    // ✨ 3. List available episodes under a language/category path
+    // ✨ 3. List available episodes under a language/category path with content metadata
     const prefix = url.searchParams.get("prefix")
     if (prefix) {
       const list = await env.R2_BUCKET.list({
@@ -151,19 +151,64 @@ export default {
         delimiter: "/", // 只列出下一層的資料夾
       })
 
-      const results = list.delimitedPrefixes.map((p) => {
-        const episodeId = p.replace(prefix, "").replace(/\/$/, "")
-        return {
-          id: episodeId,
-          path: `${prefix}${episodeId}/playlist.m3u8`,
-          playlistUrl: `${url.origin}/proxy/${prefix}${episodeId}/playlist.m3u8`,
-        }
-      })
+      // Extract language and category from prefix (e.g., "audio/en-US/daily-news/")
+      const prefixParts = prefix.split('/').filter(part => part.length > 0)
+      let language = null
+      let category = null
+      
+      if (prefixParts.length >= 3 && prefixParts[0] === 'audio') {
+        language = prefixParts[1]
+        category = prefixParts[2]
+      }
+
+      // Process each episode and fetch content metadata
+      const results = await Promise.all(
+        list.delimitedPrefixes.map(async (p) => {
+          const episodeId = p.replace(prefix, "").replace(/\/$/, "")
+          
+          let episodeData = {
+            id: episodeId,
+            path: `${prefix}${episodeId}/playlist.m3u8`,
+            playlistUrl: `${url.origin}/proxy/${prefix}${episodeId}/playlist.m3u8`,
+            title: episodeId, // Fallback to ID if content not found
+            hasContent: false
+          }
+
+          // Try to fetch content metadata if we have language and category
+          if (language && category) {
+            try {
+              const contentKey = `content/${language}/${category}/${episodeId}.json`
+              const contentObject = await env.R2_BUCKET.get(contentKey)
+              
+              if (contentObject) {
+                const contentText = await contentObject.text()
+                const contentData = JSON.parse(contentText)
+                
+                // Enrich episode data with content metadata
+                episodeData = {
+                  ...episodeData,
+                  title: contentData.title || episodeId,
+                  date: contentData.date,
+                  category: contentData.category,
+                  language: contentData.language,
+                  hasContent: true
+                }
+              }
+            } catch (error) {
+              // Continue with fallback data if content fetch fails
+              console.error(`Failed to fetch content for ${episodeId}:`, error)
+            }
+          }
+
+          return episodeData
+        })
+      )
 
       return Response.json(results, {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=1800' // 30-minute cache
         }
       })
     }

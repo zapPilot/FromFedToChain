@@ -173,15 +173,14 @@ class ContentService extends ChangeNotifier {
       print('ContentService: Processed ${audioFiles.length} audio files');
       _audioFiles = audioFiles;
       
-      // For now, we'll create minimal content objects from audio files
-      // In the future, this could be enhanced to fetch actual content metadata
+      // Create content objects from audio files with enhanced metadata
       _contents = audioFiles.map((audioFile) => AudioContent(
         id: audioFile.id,
         status: 'published', // Assume published if available via API
         category: audioFile.category,
         date: audioFile.displayDate,
         language: audioFile.language,
-        title: _generateTitleFromId(audioFile.id),
+        title: audioFile.displayTitle, // Use the enhanced display title from AudioFile
         content: 'Content from streaming service', // Placeholder
         references: [],
         audioFile: audioFile.fileName,

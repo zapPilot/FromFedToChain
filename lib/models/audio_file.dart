@@ -9,6 +9,8 @@ class AudioFile {
   final DateTime created;
   final Duration? duration;
   final String sourceUrl; // The only URL needed for playback
+  final String? title; // Optional localized title from content metadata
+  final bool hasContent; // Whether content metadata is available
 
   AudioFile({
     required this.id,
@@ -19,6 +21,8 @@ class AudioFile {
     required this.created,
     this.duration,
     required this.sourceUrl,
+    this.title,
+    this.hasContent = false,
   });
 
   factory AudioFile.fromFileInfo({
@@ -30,6 +34,8 @@ class AudioFile {
     required DateTime created,
     Duration? duration,
     required String sourceUrl,
+    String? title,
+    bool hasContent = false,
   }) {
     return AudioFile(
       id: id,
@@ -40,11 +46,13 @@ class AudioFile {
       created: created,
       duration: duration,
       sourceUrl: sourceUrl,
+      title: title,
+      hasContent: hasContent,
     );
   }
 
   /// Factory constructor for API response format
-  /// Expected format: {"id": "episode-id", "playlistUrl": "https://..."}
+  /// Expected format: {"id": "episode-id", "playlistUrl": "https://...", "title": "...", "hasContent": true}
   factory AudioFile.fromApiResponse(
     Map<String, dynamic> json,
     String language,
@@ -52,13 +60,22 @@ class AudioFile {
   ) {
     final id = json['id'] as String;
     final playlistUrl = json['playlistUrl'] as String; // New API format uses 'playlistUrl'
+    final title = json['title'] as String?; // Enhanced: localized title from content metadata
+    final hasContent = json['hasContent'] as bool? ?? false; // Whether content metadata was found
+    
     DateTime createdDate = DateTime.now();
     try {
-      final datePart = id.split('-').take(3).join('-');
-      createdDate = DateTime.parse(datePart);
+      // Try to parse date from content metadata first, then fallback to ID parsing
+      if (json['date'] != null) {
+        createdDate = DateTime.parse(json['date'] as String);
+      } else {
+        final datePart = id.split('-').take(3).join('-');
+        createdDate = DateTime.parse(datePart);
+      }
     } catch (e) {
       print('Warning: Could not parse date from ID: $id');
     }
+    
     return AudioFile(
       id: id,
       language: language,
@@ -68,6 +85,8 @@ class AudioFile {
       created: createdDate,
       duration: null,
       sourceUrl: playlistUrl,
+      title: title,
+      hasContent: hasContent,
     );
   }
 
@@ -132,4 +151,21 @@ class AudioFile {
   }
 
   String get playbackUrl => sourceUrl;
+
+  /// Get the display title - uses localized title if available, otherwise generates from ID
+  String get displayTitle {
+    if (title != null && title!.isNotEmpty) {
+      return title!;
+    }
+    
+    // Fallback: generate title from ID
+    final parts = id.split('-');
+    if (parts.length > 3) {
+      // Skip date parts (first 3) and capitalize words
+      return parts.skip(3).map((word) => 
+        word[0].toUpperCase() + word.substring(1)
+      ).join(' ');
+    }
+    return id; // Ultimate fallback to original ID
+  }
 }
