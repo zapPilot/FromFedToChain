@@ -375,7 +375,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   audioFile: audioFile,
                   content: content,
                   onTap: () {
-                    // TODO: Navigate to course detail
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CourseDetailScreen(
+                          audioFile: audioFile,
+                          content: content,
+                        ),
+                      ),
+                    );
                   },
                 ),
               );
