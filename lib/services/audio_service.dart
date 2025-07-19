@@ -58,44 +58,6 @@ class AudioService extends ChangeNotifier {
     print('🎧 AudioService: Initializing with background handler: ${_audioHandler != null}');
     _initializePlayer();
   }
-  
-  // Resolve signed URL from Cloudflare worker response
-  Future<String> _resolveSignedUrl(String workerUrl) async {
-    if (kDebugMode) {
-      print('AudioService: Resolving signed URL from: $workerUrl');
-    }
-    
-    try {
-      final response = await http.get(Uri.parse(workerUrl));
-      
-      if (response.statusCode == 200) {
-        // Check if response is JSON (signed URL response)
-        if (response.headers['content-type']?.contains('application/json') == true) {
-          final jsonData = json.decode(response.body);
-          final signedUrl = jsonData['url'] as String;
-          
-          if (kDebugMode) {
-            print('AudioService: Resolved signed URL: $signedUrl');
-          }
-          
-          return signedUrl;
-        } else {
-          // If not JSON, assume it's the direct content
-          if (kDebugMode) {
-            print('AudioService: Direct content, using original URL');
-          }
-          return workerUrl;
-        }
-      } else {
-        throw Exception('Failed to resolve signed URL: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('AudioService: Error resolving signed URL: $e');
-      }
-      throw Exception('Failed to resolve signed URL: $e');
-    }
-  }
 
   void _initializePlayer() {
     if (_audioHandler != null) {

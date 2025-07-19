@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:audio_service/audio_service.dart' as audio_service_pkg;
-import 'screens/main_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/audio_service.dart';
 import 'services/background_audio_handler.dart';
 import 'services/content_service.dart';
 import 'services/auth_service.dart';
+import 'services/language_service.dart';
 import 'themes/app_theme.dart';
 import 'package:mcp_toolkit/mcp_toolkit.dart';
 
@@ -16,7 +17,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // load .env
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: '.env');
 
   // initialize MCP Toolkit
   MCPToolkitBinding.instance
@@ -40,12 +41,7 @@ Future<void> main() async {
       ),
     );
     
-    // Ensure we got the correct handler type
-    if (handler is BackgroundAudioHandler) {
-      audioHandler = handler;
-    } else {
-      print('⚠️ Audio service returned unexpected handler type: ${handler.runtimeType}');
-    }
+    audioHandler = handler;
     
     print('✅ Audio service initialized successfully');
   } catch (e) {
@@ -70,14 +66,19 @@ class FromFedToChainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => LanguageService()),
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => AudioService(audioHandler)),
-        ChangeNotifierProvider(create: (_) => ContentService()),
+        ChangeNotifierProxyProvider<LanguageService, ContentService>(
+          create: (context) => ContentService(context.read<LanguageService>()),
+          update: (context, languageService, contentService) => 
+            contentService ?? ContentService(languageService),
+        ),
       ],
       child: MaterialApp(
         title: 'From Fed to Chain Learning',
         theme: AppTheme.darkTheme,
-        home: const MainScreen(),
+        home: const SplashScreen(),
         debugShowCheckedModeBanner: false,
       ),
     );

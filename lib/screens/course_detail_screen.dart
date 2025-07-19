@@ -5,8 +5,10 @@ import '../models/audio_file.dart';
 import '../models/audio_content.dart';
 import '../services/audio_service.dart';
 import '../services/content_service.dart';
+import '../services/language_service.dart';
 import '../themes/app_theme.dart';
 import '../widgets/animated_background.dart';
+import '../widgets/category_chip.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final AudioFile audioFile;
@@ -318,6 +320,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           
           const SizedBox(height: 24),
           
+          // Language selection
+          _buildLanguageSection(),
+          
+          const SizedBox(height: 24),
+          
           // Loading state
           if (_isLoadingContent) ...[
             _buildSectionTitle('Loading Content...'),
@@ -446,7 +453,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           const SizedBox(height: 12),
           _buildInfoRow('Category', widget.audioFile.categoryDisplayName),
           const SizedBox(height: 12),
-          _buildInfoRow('Size', widget.audioFile.sizeFormatted),
           if (widget.audioFile.duration != null) ...[
             const SizedBox(height: 12),
             _buildInfoRow('Duration', widget.audioFile.durationFormatted),
@@ -712,6 +718,242 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
         );
       },
     );
+  }
+
+  Widget _buildLanguageSection() {
+    return Consumer<LanguageService>(
+      builder: (context, languageService, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Available Languages'),
+            const SizedBox(height: 12),
+            
+            // Current language indicator
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surface.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppTheme.purplePrimary.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.language,
+                    color: AppTheme.purplePrimary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Current Language',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textTertiary,
+                        ),
+                      ),
+                      Text(
+                        '${languageService.getLanguageFlag(languageService.currentLanguage)} ${languageService.getLanguageDisplayName(languageService.currentLanguage)}',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: _showLanguageSelectionModal,
+                    child: Text(
+                      'Change',
+                      style: TextStyle(
+                        color: AppTheme.purplePrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Available languages chips
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: languageService.availableLanguages.map((language) {
+                  final isSelected = language['code'] == languageService.currentLanguage;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: CategoryChip(
+                      label: '${language['flag']} ${language['name']}',
+                      isSelected: isSelected,
+                      onTap: () => _changeLanguage(language['code']!),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLanguageSelectionModal() {
+    final languageService = context.read<LanguageService>();
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: const BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        child: Column(
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.textTertiary.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'Select Language',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+            ),
+            
+            // Language list
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: languageService.availableLanguages.length,
+                itemBuilder: (context, index) {
+                  final language = languageService.availableLanguages[index];
+                  final isSelected = language['code'] == languageService.currentLanguage;
+                  
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _changeLanguage(language['code']!);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isSelected 
+                              ? AppTheme.purplePrimary.withOpacity(0.1)
+                              : AppTheme.background.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected 
+                                ? AppTheme.purplePrimary
+                                : AppTheme.textTertiary.withOpacity(0.2),
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                language['flag'] ?? '🌐',
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      language['name'] ?? '',
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        color: AppTheme.textPrimary,
+                                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                      ),
+                                    ),
+                                    Text(
+                                      language['code'] ?? '',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppTheme.textTertiary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (isSelected)
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: AppTheme.purplePrimary,
+                                  size: 24,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _changeLanguage(String languageCode) async {
+    try {
+      final languageService = context.read<LanguageService>();
+      await languageService.setLanguage(languageCode);
+      
+      // Refresh content for new language
+      _loadContent();
+      
+      // Show feedback
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Language changed to ${languageService.getLanguageDisplayName(languageCode)}'),
+            backgroundColor: AppTheme.purplePrimary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error changing language: $e'),
+            backgroundColor: AppTheme.error,
+          ),
+        );
+      }
+    }
   }
 
   void _shareContent() {

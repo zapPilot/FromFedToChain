@@ -5,10 +5,13 @@ import '../models/audio_content.dart';
 import '../models/audio_file.dart';
 import '../config/api_config.dart';
 import 'streaming_api_service.dart';
+import 'language_service.dart';
 
 class ContentService extends ChangeNotifier {
   static const String contentDir = 'content';
   static const String audioDir = 'audio';
+  
+  final LanguageService? _languageService;
   
   List<AudioContent> _contents = [];
   List<AudioFile> _audioFiles = [];
@@ -20,6 +23,22 @@ class ContentService extends ChangeNotifier {
   String? _selectedLanguage;
   String? _selectedCategory;
   String _searchQuery = '';
+  
+  ContentService([this._languageService]) {
+    // Listen to language changes
+    _languageService?.addListener(_onLanguageChanged);
+  }
+  
+  @override
+  void dispose() {
+    _languageService?.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+  
+  void _onLanguageChanged() {
+    // Update content filtering when language changes
+    notifyListeners();
+  }
 
   // Getters
   List<AudioContent> get contents => _filteredContents;
@@ -46,8 +65,9 @@ class ContentService extends ChangeNotifier {
   // Filtered data
   List<AudioContent> get _filteredContents {
     var filtered = _contents.where((content) {
-      // Language filter
-      if (_selectedLanguage != null && content.language != _selectedLanguage) {
+      // Language filter - use LanguageService preference if available
+      final effectiveLanguage = _languageService?.currentLanguage ?? _selectedLanguage;
+      if (effectiveLanguage != null && content.language != effectiveLanguage) {
         return false;
       }
       
@@ -74,8 +94,9 @@ class ContentService extends ChangeNotifier {
 
   List<AudioFile> get _filteredAudioFiles {
     var filtered = _audioFiles.where((audioFile) {
-      // Language filter
-      if (_selectedLanguage != null && audioFile.language != _selectedLanguage) {
+      // Language filter - use LanguageService preference if available
+      final effectiveLanguage = _languageService?.currentLanguage ?? _selectedLanguage;
+      if (effectiveLanguage != null && audioFile.language != effectiveLanguage) {
         return false;
       }
       
@@ -196,18 +217,6 @@ class ContentService extends ChangeNotifier {
     }
   }
 
-  // Helper method to generate a readable title from episode ID
-  String _generateTitleFromId(String id) {
-    // Convert ID like "2025-07-03-crypto-startup-frameworks" to "Crypto Startup Frameworks"
-    final parts = id.split('-');
-    if (parts.length > 3) {
-      // Skip date parts (first 3) and capitalize words
-      return parts.skip(3).map((word) => 
-        word[0].toUpperCase() + word.substring(1)
-      ).join(' ');
-    }
-    return id; // Fallback to original ID
-  }
 
   // Load content files from the content directory
   Future<void> _loadContentFiles() async {

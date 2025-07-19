@@ -35,6 +35,9 @@ dependencies:
   # State management
   provider: ^6.1.1
   
+  # Storage
+  shared_preferences: ^2.2.2
+  
   # UI enhancements
   flutter_staggered_animations: ^1.1.1
   shimmer: ^3.0.0
