@@ -6,6 +6,7 @@ import '../widgets/animated_background.dart';
 import '../widgets/course_card.dart';
 import '../widgets/author_card.dart';
 import '../widgets/category_chip.dart';
+import 'course_detail_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
