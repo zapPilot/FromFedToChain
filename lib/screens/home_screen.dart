@@ -108,28 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 16),
               _buildStatCard('3', 'Languages', AppTheme.accent),
             ],
-          ),
-          
-          // Test button for M3U8 streaming
-          const SizedBox(height: 16),
-          Center(
-            child: ElevatedButton.icon(
-              onPressed: _testM3U8Streaming,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Test M3U8 Streaming'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
+          )
         ],
       ),
     );

@@ -1,6 +1,6 @@
 {
   "id": "2025-07-02-consistency-test",
-  "status": "social",
+  "status": "content",
   "category": "ethereum",
   "date": "2025-07-13",
   "language": "zh-TW",
@@ -15,7 +15,7 @@
   "feedback": {
     "content_review": null
   },
-  "updated_at": "2025-07-13T13:40:34.096Z",
+  "updated_at": "2025-07-19T01:15:06.423Z",
   "streaming_urls": {
     "wav": "https://mock-r2.fromfedtochain.com/audio/zh-TW/ethereum/2025-07-02-consistency-test/audio.wav",
     "m3u8": null,

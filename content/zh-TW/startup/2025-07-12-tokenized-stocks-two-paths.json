@@ -1,6 +1,6 @@
 {
   "id": "2025-07-12-tokenized-stocks-two-paths",
-  "status": "social",
+  "status": "content",
   "category": "startup",
   "date": "2025-07-12",
   "language": "zh-TW",
@@ -26,7 +26,7 @@
       "comments": "別在裡面tts 轉成音檔的時候用戶根本不想聽，我先手動刪掉了"
     }
   },
-  "updated_at": "2025-07-18T06:08:52.911Z",
+  "updated_at": "2025-07-19T01:15:23.820Z",
   "streaming_urls": {
     "m3u8": "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/startup/2025-07-12-tokenized-stocks-two-paths/playlist.m3u8",
     "segments": [

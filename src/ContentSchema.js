@@ -106,4 +106,76 @@ export class ContentSchema {
   static getAllLanguages() {
     return ["zh-TW", ...this.getSupportedLanguages()];
   }
+
+  // Get pipeline configuration for linear status progression
+  static getPipelineConfig() {
+    return [
+      {
+        status: 'reviewed',
+        nextStatus: 'translated',
+        service: 'TranslationService',
+        method: 'translateAll',
+        description: 'Content needs to be translated',
+        phase: 'translation'
+      },
+      {
+        status: 'translated',
+        nextStatus: 'wav',
+        service: 'AudioService',
+        method: 'generateWavOnly',
+        description: 'Generate WAV audio from translated text',
+        phase: 'audio'
+      },
+      {
+        status: 'wav',
+        nextStatus: 'm3u8',
+        service: 'M3U8AudioService',
+        method: 'convertToM3U8',
+        description: 'Generate HLS (M3U8) streaming format',
+        phase: 'audio'
+      },
+      {
+        status: 'm3u8',
+        nextStatus: 'cloudflare',
+        service: 'CloudflareR2Service',
+        method: 'uploadAudioFiles',
+        description: 'Upload audio files to Cloudflare R2',
+        phase: 'audio'
+      },
+      {
+        status: 'cloudflare',
+        nextStatus: 'content',
+        service: 'ContentUpload',
+        method: 'uploadContentToCloudflareStep',
+        description: 'Upload content files to Cloudflare R2',
+        phase: 'content'
+      },
+      {
+        status: 'content',
+        nextStatus: 'social',
+        service: 'SocialService',
+        method: 'generateAllHooks',
+        description: 'Generate social media hooks',
+        phase: 'social'
+      }
+    ];
+  }
+
+  // Get the next status in the pipeline
+  static getNextStatus(currentStatus) {
+    const step = this.getPipelineConfig().find(step => step.status === currentStatus);
+    return step ? step.nextStatus : null;
+  }
+
+  // Get all pipeline phases for grouping
+  static getPipelinePhases() {
+    const phases = new Set();
+    this.getPipelineConfig().forEach(step => phases.add(step.phase));
+    return Array.from(phases);
+  }
+
+  // Get pipeline step by status
+  static getPipelineStep(status) {
+    return this.getPipelineConfig().find(step => step.status === status);
+  }
 }
