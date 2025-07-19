@@ -930,7 +930,33 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   Future<void> _changeLanguage(String languageCode) async {
     try {
       final languageService = context.read<LanguageService>();
+      final audioService = context.read<AudioService>();
+      final contentService = context.read<ContentService>();
+      
+      // Update language service
       await languageService.setLanguage(languageCode);
+      
+      // Check if audio is currently playing for this content
+      final isCurrentlyPlaying = audioService.currentAudioFile?.id == widget.audioFile.id;
+      
+      if (isCurrentlyPlaying) {
+        // Get the audio file for the new language
+        try {
+          final newLanguageAudioFiles = await contentService.getAudioFilesByLanguage(languageCode);
+          final newLanguageAudioFile = newLanguageAudioFiles.firstWhere(
+            (file) => file.id == widget.audioFile.id,
+            orElse: () => throw Exception('Audio file not found in $languageCode'),
+          );
+          
+          // Switch audio stream seamlessly
+          await audioService.switchLanguage(newLanguageAudioFile);
+          
+          print('🔄 CourseDetailScreen: Audio language switched to $languageCode');
+        } catch (e) {
+          print('❌ CourseDetailScreen: Failed to switch audio language: $e');
+          // Continue with content refresh even if audio switch fails
+        }
+      }
       
       // Refresh content for new language
       _loadContent();

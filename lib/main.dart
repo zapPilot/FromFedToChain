@@ -68,11 +68,15 @@ class FromFedToChainApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LanguageService()),
         ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => AudioService(audioHandler)),
         ChangeNotifierProxyProvider<LanguageService, ContentService>(
           create: (context) => ContentService(context.read<LanguageService>()),
           update: (context, languageService, contentService) => 
             contentService ?? ContentService(languageService),
+        ),
+        ChangeNotifierProxyProvider<ContentService, AudioService>(
+          create: (context) => AudioService(audioHandler, context.read<ContentService>()),
+          update: (context, contentService, audioService) =>
+            audioService ?? AudioService(audioHandler, contentService),
         ),
       ],
       child: MaterialApp(

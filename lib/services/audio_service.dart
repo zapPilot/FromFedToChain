@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/audio_file.dart';
 import 'background_audio_handler.dart';
+import 'content_service.dart';
 
 enum PlaybackState {
   stopped,
@@ -17,6 +18,7 @@ enum PlaybackState {
 class AudioService extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   final BackgroundAudioHandler? _audioHandler;
+  final ContentService? _contentService;
   
   // Current playback state
   PlaybackState _playbackState = PlaybackState.stopped;
@@ -54,7 +56,10 @@ class AudioService extends ChangeNotifier {
     return _formatDuration(_totalDuration);
   }
 
-  AudioService(this._audioHandler) {
+  // Get current audio file ID for language switching
+  String? get currentAudioId => _currentAudioFile?.id;
+
+  AudioService(this._audioHandler, [this._contentService]) {
     print('🎧 AudioService: Initializing with background handler: ${_audioHandler != null}');
     _initializePlayer();
   }
@@ -62,6 +67,12 @@ class AudioService extends ChangeNotifier {
   void _initializePlayer() {
     if (_audioHandler != null) {
       print('🎧 AudioService: Using background audio handler');
+      
+      // Set up episode navigation callbacks
+      _audioHandler!.setEpisodeNavigationCallbacks(
+        onNext: _skipToNextEpisode,
+        onPrevious: _skipToPreviousEpisode,
+      );
       
       // Listen to background handler state changes
       _audioHandler!.playbackState.listen((state) {
@@ -161,6 +172,7 @@ class AudioService extends ChangeNotifier {
           audioFile.sourceUrl,
           title: audioFile.displayTitle,
           artist: 'David Chang',
+          audioFile: audioFile,
         );
         
         await _audioHandler!.play();
@@ -373,6 +385,112 @@ class AudioService extends ChangeNotifier {
       await pause();
     } else if (isPaused) {
       await resume();
+    }
+  }
+
+  // Episode navigation methods for lock screen controls
+  Future<void> _skipToNextEpisode(AudioFile currentEpisode) async {
+    if (_contentService == null) {
+      print('❌ AudioService: ContentService not available for episode navigation');
+      return;
+    }
+    
+    print('⏭️ AudioService: Skipping to next episode from ${currentEpisode.id}');
+    
+    final nextEpisode = _contentService!.getNextEpisode(currentEpisode);
+    if (nextEpisode != null) {
+      await playAudio(nextEpisode);
+      print('✅ AudioService: Switched to next episode: ${nextEpisode.id}');
+    } else {
+      print('📝 AudioService: No next episode available');
+    }
+  }
+
+  Future<void> _skipToPreviousEpisode(AudioFile currentEpisode) async {
+    if (_contentService == null) {
+      print('❌ AudioService: ContentService not available for episode navigation');
+      return;
+    }
+    
+    print('⏮️ AudioService: Skipping to previous episode from ${currentEpisode.id}');
+    
+    final previousEpisode = _contentService!.getPreviousEpisode(currentEpisode);
+    if (previousEpisode != null) {
+      await playAudio(previousEpisode);
+      print('✅ AudioService: Switched to previous episode: ${previousEpisode.id}');
+    } else {
+      print('📝 AudioService: No previous episode available');
+    }
+  }
+
+  // Switch audio to new language while maintaining playback position
+  Future<void> switchLanguage(AudioFile newLanguageAudioFile) async {
+    if (_currentAudioFile == null) {
+      // No audio currently playing, just load the new audio
+      await playAudio(newLanguageAudioFile);
+      return;
+    }
+
+    // Check if this is the same content in a different language
+    if (_currentAudioFile!.id != newLanguageAudioFile.id) {
+      // Different content, just play normally
+      await playAudio(newLanguageAudioFile);
+      return;
+    }
+
+    print('🔄 AudioService: Switching language for ${newLanguageAudioFile.id}');
+    
+    try {
+      // Capture current state
+      final wasPlaying = isPlaying;
+      final currentPosition = _currentPosition;
+      
+      // Set loading state
+      _playbackState = PlaybackState.loading;
+      _errorMessage = null;
+      notifyListeners();
+
+      if (_audioHandler != null) {
+        // Background audio handler
+        await _audioHandler!.setAudioSource(
+          newLanguageAudioFile.sourceUrl,
+          title: newLanguageAudioFile.displayTitle,
+          artist: 'David Chang',
+          initialPosition: currentPosition,
+          audioFile: newLanguageAudioFile,
+        );
+        
+        // Resume playback if it was playing
+        if (wasPlaying) {
+          await _audioHandler!.play();
+        }
+      } else {
+        // Local audio player
+        await _audioPlayer.setAudioSource(
+          AudioSource.uri(Uri.parse(newLanguageAudioFile.sourceUrl)),
+          initialPosition: currentPosition,
+        );
+        
+        // Resume playback if it was playing
+        if (wasPlaying) {
+          await _audioPlayer.play();
+        }
+      }
+
+      // Update current audio file
+      _currentAudioFile = newLanguageAudioFile;
+      
+      print('✅ AudioService: Language switched successfully');
+    } catch (e) {
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Failed to switch language: $e';
+      
+      if (kDebugMode) {
+        print('❌ AudioService: Language switch error: $e');
+        print('New AudioFile: ${newLanguageAudioFile.id}');
+        print('New sourceUrl: ${newLanguageAudioFile.sourceUrl}');
+      }
+      notifyListeners();
     }
   }
 

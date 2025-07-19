@@ -287,35 +287,6 @@ export class ContentManager {
 
 
 
-  // Get content summary for CLI display (single language format)
-  static formatSummary(content) {
-    const {
-      id,
-      status,
-      category,
-      date,
-      language,
-      title,
-      audio_file,
-      social_hook,
-      feedback,
-    } = content;
-
-    // Count feedback items
-    const feedbackCount = feedback && feedback.content_review ? 1 : 0;
-
-    return {
-      id: id.substring(0, 25) + (id.length > 25 ? "..." : ""),
-      language,
-      status,
-      category,
-      date,
-      title: title.substring(0, 40) + (title.length > 40 ? "..." : ""),
-      audio: audio_file ? 1 : 0,
-      social: social_hook ? 1 : 0,
-      feedback: feedbackCount,
-    };
-  }
 
   // Helper methods for review workflow (work with source language)
 

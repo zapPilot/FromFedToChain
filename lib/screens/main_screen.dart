@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../services/audio_service.dart';
 import '../themes/app_theme.dart';
 import '../widgets/mini_player.dart';
-import 'home_screen.dart';
 import 'discover_screen.dart';
 import 'my_courses_screen.dart';
 import 'profile_screen.dart';
@@ -19,7 +18,6 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(),
     const DiscoverScreen(),
     const MyCoursesScreen(),
     const ProfileScreen(),
@@ -99,11 +97,6 @@ class _MainScreenState extends State<MainScreen> {
             fontWeight: FontWeight.w500,
           ),
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.explore_outlined),
               activeIcon: Icon(Icons.explore),

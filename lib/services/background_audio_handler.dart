@@ -5,9 +5,15 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/audio_file.dart';
 
-class BackgroundAudioHandler extends BaseAudioHandler with SeekHandler {
+class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final _player = AudioPlayer();
+  
+  // Episode navigation callbacks
+  Function(AudioFile)? onSkipToNextEpisode;
+  Function(AudioFile)? onSkipToPreviousEpisode;
+  AudioFile? _currentAudioFile;
   
   BackgroundAudioHandler() {
     print('🎵 BackgroundAudioHandler: Initializing...');
@@ -109,7 +115,20 @@ class BackgroundAudioHandler extends BaseAudioHandler with SeekHandler {
   
   @override
   Future<void> skipToNext() async {
-    // Implement skip forward 30 seconds
+    print('⏭️ BackgroundAudioHandler.skipToNext() called');
+    
+    // Try episode navigation first
+    if (_currentAudioFile != null && onSkipToNextEpisode != null) {
+      try {
+        onSkipToNextEpisode!(_currentAudioFile!);
+        print('✅ Episode navigation: skipToNext completed');
+        return;
+      } catch (e) {
+        print('❌ Episode navigation failed, falling back to time skip: $e');
+      }
+    }
+    
+    // Fallback to time-based skip if episode navigation not available
     final currentPosition = _player.position;
     final duration = _player.duration ?? Duration.zero;
     final newPosition = currentPosition + const Duration(seconds: 30);
@@ -123,7 +142,20 @@ class BackgroundAudioHandler extends BaseAudioHandler with SeekHandler {
   
   @override
   Future<void> skipToPrevious() async {
-    // Implement skip backward 10 seconds
+    print('⏮️ BackgroundAudioHandler.skipToPrevious() called');
+    
+    // Try episode navigation first
+    if (_currentAudioFile != null && onSkipToPreviousEpisode != null) {
+      try {
+        onSkipToPreviousEpisode!(_currentAudioFile!);
+        print('✅ Episode navigation: skipToPrevious completed');
+        return;
+      } catch (e) {
+        print('❌ Episode navigation failed, falling back to time skip: $e');
+      }
+    }
+    
+    // Fallback to time-based skip if episode navigation not available
     final currentPosition = _player.position;
     final newPosition = currentPosition - const Duration(seconds: 10);
     
@@ -134,11 +166,14 @@ class BackgroundAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
   
-  Future<void> setAudioSource(String url, {String? title, String? artist}) async {
+  Future<void> setAudioSource(String url, {String? title, String? artist, Duration? initialPosition, AudioFile? audioFile}) async {
     print('🎧 Setting audio source: $url');
-    print('🎧 Title: $title, Artist: $artist');
+    print('🎧 Title: $title, Artist: $artist, InitialPosition: $initialPosition');
     
     try {
+      // Track current audio file for episode navigation
+      _currentAudioFile = audioFile;
+      
       String resolvedUrl = url;
       
       // Resolve signed URLs if needed
@@ -146,7 +181,10 @@ class BackgroundAudioHandler extends BaseAudioHandler with SeekHandler {
         resolvedUrl = await _resolveSignedUrl(url);
       }
       
-      await _player.setAudioSource(AudioSource.uri(Uri.parse(resolvedUrl)));
+      await _player.setAudioSource(
+        AudioSource.uri(Uri.parse(resolvedUrl)),
+        initialPosition: initialPosition,
+      );
       
       mediaItem.add(MediaItem(
         id: url,
@@ -161,6 +199,16 @@ class BackgroundAudioHandler extends BaseAudioHandler with SeekHandler {
       print('❌ Failed to set audio source: $e');
       rethrow;
     }
+  }
+  
+  // Set episode navigation callbacks
+  void setEpisodeNavigationCallbacks({
+    Function(AudioFile)? onNext,
+    Function(AudioFile)? onPrevious,
+  }) {
+    onSkipToNextEpisode = onNext;
+    onSkipToPreviousEpisode = onPrevious;
+    print('🎵 Episode navigation callbacks set');
   }
   
   // Resolve signed URL from Cloudflare worker response

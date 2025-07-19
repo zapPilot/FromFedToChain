@@ -385,4 +385,59 @@ class ContentService extends ChangeNotifier {
 
   // Get current data source
   bool get isUsingApiData => _useApiData;
+
+  // Get audio files by language for language switching
+  Future<List<AudioFile>> getAudioFilesByLanguage(String language) async {
+    return _audioFiles.where((audioFile) => audioFile.language == language).toList();
+  }
+
+  // Get episode navigation methods for lock screen controls
+  AudioFile? getNextEpisode(AudioFile currentEpisode) {
+    final currentLanguageFiles = _audioFiles
+        .where((file) => file.language == currentEpisode.language)
+        .toList();
+    
+    // Sort by creation date (newest first, same as _filteredAudioFiles)
+    currentLanguageFiles.sort((a, b) => b.created.compareTo(a.created));
+    
+    final currentIndex = currentLanguageFiles.indexWhere((file) => file.id == currentEpisode.id);
+    
+    if (currentIndex >= 0 && currentIndex < currentLanguageFiles.length - 1) {
+      return currentLanguageFiles[currentIndex + 1]; // Next episode (older)
+    }
+    
+    return null; // No next episode
+  }
+
+  AudioFile? getPreviousEpisode(AudioFile currentEpisode) {
+    final currentLanguageFiles = _audioFiles
+        .where((file) => file.language == currentEpisode.language)
+        .toList();
+    
+    // Sort by creation date (newest first, same as _filteredAudioFiles)
+    currentLanguageFiles.sort((a, b) => b.created.compareTo(a.created));
+    
+    final currentIndex = currentLanguageFiles.indexWhere((file) => file.id == currentEpisode.id);
+    
+    if (currentIndex > 0) {
+      return currentLanguageFiles[currentIndex - 1]; // Previous episode (newer)
+    }
+    
+    return null; // No previous episode
+  }
+
+  // Get all episodes for the current language in proper order for queue management
+  List<AudioFile> getCurrentLanguageEpisodes() {
+    final effectiveLanguage = _languageService?.currentLanguage ?? _selectedLanguage;
+    if (effectiveLanguage == null) return [];
+    
+    final currentLanguageFiles = _audioFiles
+        .where((file) => file.language == effectiveLanguage)
+        .toList();
+    
+    // Sort by creation date (newest first)
+    currentLanguageFiles.sort((a, b) => b.created.compareTo(a.created));
+    
+    return currentLanguageFiles;
+  }
 }

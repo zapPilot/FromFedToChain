@@ -288,19 +288,6 @@ async function runPipelineForContent(id) {
   }
 }
 
-// Legacy step functions - moved to ContentPipelineService
-// These are kept for backward compatibility but should use ContentPipelineService methods instead
-
-// All pipeline step functions have been moved to ContentPipelineService.js
-// This provides a cleaner, more maintainable architecture with data-driven pipeline processing
-
-
-
-
-
-
-
-
 
 function showHelp() {
   console.log(chalk.blue.bold("📖 From Fed to Chain CLI"));
