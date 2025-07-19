@@ -1,11 +1,8 @@
 #!/usr/bin/env node
-
-import fs from "fs/promises";
+import { ContentSchema } from "./ContentSchema.js";
 import chalk from "chalk";
 import { ContentManager } from "./ContentManager.js";
-import { TranslationService } from "./services/TranslationService.js";
-import { AudioService } from "./services/AudioService.js";
-import { SocialService } from "./services/SocialService.js";
+import { ContentPipelineService } from "./services/ContentPipelineService.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -208,49 +205,17 @@ async function handlePipeline() {
   console.log(chalk.green.bold("\n🎉 Pipeline completed!"));
 }
 
-// Get all content that needs processing at any phase
+// Get all content that needs processing at any phase (data-driven)
 async function getAllPendingContent() {
-  const pendingContent = [];
-
-  // Phase 1: Translation (reviewed → translated)
-  const needTranslation = await TranslationService.getContentNeedingTranslation();
-  needTranslation.forEach(content => {
-    pendingContent.push({ content, nextPhase: 'translation', currentStatus: 'reviewed' });
-  });
-
-  // Phase 2: Audio (translated → audio)  
-  const needAudio = await AudioService.getContentNeedingAudio();
-  needAudio.forEach(content => {
-    pendingContent.push({ content, nextPhase: 'audio', currentStatus: 'translated' });
-  });
-
-  // Phase 3: Social hooks (audio → social)
-  const needSocial = await SocialService.getContentNeedingSocial();
-  needSocial.forEach(content => {
-    pendingContent.push({ content, nextPhase: 'social', currentStatus: 'audio' });
-  });
-
-
-  // Sort by date (newest first)
-  return pendingContent.sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+  return await ContentPipelineService.getAllPendingContent();
 }
 
-// Show pipeline status summary
+// Show pipeline status summary (data-driven)
 function showPipelineStatus(pendingContent) {
-  const phaseGroups = {};
-  pendingContent.forEach(item => {
-    if (!phaseGroups[item.nextPhase]) {
-      phaseGroups[item.nextPhase] = [];
-    }
-    phaseGroups[item.nextPhase].push(item);
-  });
+  const phaseGroups = ContentPipelineService.getPhaseGroups(pendingContent);
 
   Object.entries(phaseGroups).forEach(([phase, items]) => {
-    const phaseColor = {
-      'translation': chalk.cyan,
-      'audio': chalk.green,
-      'social': chalk.magenta
-    }[phase] || chalk.white;
+    const phaseColor = ContentPipelineService.getPhaseColor(phase);
     
     console.log(phaseColor(`📋 ${phase.toUpperCase()}: ${items.length} items`));
     items.forEach(item => {
@@ -259,45 +224,75 @@ function showPipelineStatus(pendingContent) {
   });
 }
 
+
+
+
 async function runPipelineForContent(id) {
   try {
-    // Determine what phase this content needs
-    const sourceContent = await ContentManager.readSource(id);
-    const currentStatus = sourceContent.status;
+    console.log(chalk.blue.bold(`🔄 Running pipeline for: ${id}`));
     
-    console.log(chalk.gray(`Current status: ${currentStatus}`));
+    let currentContent = await ContentManager.readSource(id);
+    let currentStatus = currentContent.status;
+    let stepNumber = 1;
+    
+    console.log(chalk.gray(`Starting status: ${currentStatus}`));
 
-    // Run appropriate phases based on current status
-    if (currentStatus === 'reviewed') {
-      console.log(chalk.blue("1️⃣ Translation..."));
-      await TranslationService.translateAll(id);
+    // Continue processing until we reach the end of the pipeline or encounter an error
+    while (true) {
+      const step = ContentSchema.getPipelineStep(currentStatus);
+      
+      if (!step) {
+        console.log(chalk.yellow(`⚠️ No pipeline step found for status: ${currentStatus}`));
+        break;
+      }
+      
+      if (!step.nextStatus) {
+        console.log(chalk.green(`✅ Content ${id} has reached final status: ${currentStatus}`));
+        break;
+      }
+
+      console.log(chalk.blue(`${stepNumber}️⃣ ${step.description}...`));
+      console.log(chalk.gray(`   ${currentStatus} → ${step.nextStatus}`));
+      
+      // Process the next step
+      const success = await ContentPipelineService.processContentNextStep(id);
+      
+      if (!success) {
+        console.error(chalk.red(`❌ Pipeline step failed: ${step.description}`));
+        break;
+      }
+      
+      // Update current status for next iteration
+      currentContent = await ContentManager.readSource(id);
+      const newStatus = currentContent.status;
+      
+      if (newStatus === currentStatus) {
+        console.error(chalk.red(`❌ Status didn't change after processing. Stuck at: ${currentStatus}`));
+        break;
+      }
+      
+      currentStatus = newStatus;
+      stepNumber++;
+      
+      // Safety check to prevent infinite loops
+      if (stepNumber > 10) {
+        console.error(chalk.red(`❌ Pipeline exceeded maximum steps (10). Breaking to prevent infinite loop.`));
+        break;
+      }
     }
 
-    // Check updated status for next phase
-    const updatedContent = await ContentManager.readSource(id);
-    if (updatedContent.status === 'translated') {
-      console.log(chalk.blue("2️⃣ Audio generation..."));
-      await AudioService.generateAllAudio(id);
-    }
-
-    // Check updated status for next phase
-    const audioContent = await ContentManager.readSource(id);
-    if (audioContent.status === 'audio') {
-      console.log(chalk.blue("3️⃣ Social hooks..."));
-      await SocialService.generateAllHooks(id);
-    }
-
-    // Pipeline complete - content now has social hooks and is ready for manual publishing
-
-    console.log(chalk.green(`✅ Pipeline completed for: ${id}`));
+    console.log(chalk.green(`✅ Pipeline completed for: ${id} (final status: ${currentStatus})`));
 
   } catch (error) {
     console.error(chalk.red(`❌ Pipeline failed for ${id}: ${error.message}`));
   }
 }
 
+// Legacy step functions - moved to ContentPipelineService
+// These are kept for backward compatibility but should use ContentPipelineService methods instead
 
-
+// All pipeline step functions have been moved to ContentPipelineService.js
+// This provides a cleaner, more maintainable architecture with data-driven pipeline processing
 
 
 
@@ -323,6 +318,8 @@ function showHelp() {
   console.log(chalk.gray("\nPipeline Examples:"));
   console.log("  npm run pipeline                               - Process all unfinished content");
   console.log("  npm run pipeline 2025-06-30-bitcoin           - Process specific content");
+  
+  
   console.log("");
   console.log(chalk.yellow("Review Controls:"));
   console.log("  [a]ccept    - Approve content (optional feedback)");
@@ -334,6 +331,7 @@ function showHelp() {
   console.log("  • Auto-detects content phase: reviewed → translated → audio → social");
   console.log("  • Resumes from where you left off");
   console.log("  • Processes multiple content items in one command");
+  console.log("  • Discrete audio steps for testing and debugging");
 }
 
 main();

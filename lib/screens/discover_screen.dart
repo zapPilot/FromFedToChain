@@ -227,6 +227,37 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Language filters
+        Text(
+          'Languages',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              CategoryChip(
+                label: 'All Languages',
+                isSelected: contentService.selectedLanguage == null,
+                onTap: () => contentService.setLanguageFilter(null),
+              ),
+              ...contentService.availableLanguages.map((language) =>
+                CategoryChip(
+                  label: _getLanguageDisplayName(language),
+                  isSelected: contentService.selectedLanguage == language,
+                  onTap: () => contentService.setLanguageFilter(language),
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        const SizedBox(height: 24),
+        
+        // Category filters
         Text(
           'Categories',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -268,19 +299,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        // TODO: Implement author cards
         Container(
           height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 3, // Mock data
+            itemCount: 1, // Show only David Chang
             itemBuilder: (context, index) {
               return const Padding(
                 padding: EdgeInsets.only(right: 12),
                 child: AuthorCard(
-                  authorName: 'Coming Soon',
-                  authorBio: 'Author profiles will be available soon',
-                  subscriberCount: 0,
+                  authorName: 'David Chang',
+                  authorBio: 'Crypto and macro economics educator',
+                  subscriberCount: 1000,
                   isSubscribed: false,
                 ),
               );
@@ -355,6 +385,19 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
+  String _getLanguageDisplayName(String language) {
+    switch (language) {
+      case 'zh-TW':
+        return '繁體中文';
+      case 'en-US':
+        return 'English';
+      case 'ja-JP':
+        return '日本語';
+      default:
+        return language;
+    }
+  }
+
   String _getCategoryDisplayName(String category) {
     switch (category) {
       case 'daily-news':
@@ -365,6 +408,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         return 'Macro';
       case 'startup':
         return 'Startup';
+      case 'ai':
+        return 'AI';
+      case 'defi':
+        return 'DeFi';
       default:
         return category.toUpperCase();
     }

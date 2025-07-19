@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../models/audio_file.dart';
 
 enum PlaybackState {
@@ -52,47 +54,85 @@ class AudioService extends ChangeNotifier {
   AudioService() {
     _initializePlayer();
   }
+  
+  // Resolve signed URL from Cloudflare worker response
+  Future<String> _resolveSignedUrl(String workerUrl) async {
+    if (kDebugMode) {
+      print('AudioService: Resolving signed URL from: $workerUrl');
+    }
+    
+    try {
+      final response = await http.get(Uri.parse(workerUrl));
+      
+      if (response.statusCode == 200) {
+        // Check if response is JSON (signed URL response)
+        if (response.headers['content-type']?.contains('application/json') == true) {
+          final jsonData = json.decode(response.body);
+          final signedUrl = jsonData['url'] as String;
+          
+          if (kDebugMode) {
+            print('AudioService: Resolved signed URL: $signedUrl');
+          }
+          
+          return signedUrl;
+        } else {
+          // If not JSON, assume it's the direct content
+          if (kDebugMode) {
+            print('AudioService: Direct content, using original URL');
+          }
+          return workerUrl;
+        }
+      } else {
+        throw Exception('Failed to resolve signed URL: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('AudioService: Error resolving signed URL: $e');
+      }
+      throw Exception('Failed to resolve signed URL: $e');
+    }
+  }
 
   void _initializePlayer() {
     _audioPlayer = AudioPlayer();
     
     // Listen to position changes
-    _audioPlayer.onPositionChanged.listen((position) {
+    _audioPlayer.positionStream.listen((position) {
       _currentPosition = position;
       notifyListeners();
     });
     
     // Listen to duration changes
-    _audioPlayer.onDurationChanged.listen((duration) {
-      _totalDuration = duration;
+    _audioPlayer.durationStream.listen((duration) {
+      _totalDuration = duration ?? Duration.zero;
       notifyListeners();
     });
     
     // Listen to player state changes
-    _audioPlayer.onPlayerStateChanged.listen((state) {
-      switch (state) {
-        case PlayerState.playing:
-          _playbackState = PlaybackState.playing;
-          break;
-        case PlayerState.paused:
-          _playbackState = PlaybackState.paused;
-          break;
-        case PlayerState.stopped:
+    _audioPlayer.playerStateStream.listen((state) {
+      switch (state.processingState) {
+        case ProcessingState.idle:
           _playbackState = PlaybackState.stopped;
           break;
-        case PlayerState.completed:
+        case ProcessingState.loading:
+          _playbackState = PlaybackState.loading;
+          break;
+        case ProcessingState.buffering:
+          _playbackState = PlaybackState.loading;
+          break;
+        case ProcessingState.ready:
+          _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
+          break;
+        case ProcessingState.completed:
           _playbackState = PlaybackState.stopped;
           _currentPosition = Duration.zero;
-          break;
-        case PlayerState.disposed:
-          _playbackState = PlaybackState.stopped;
           break;
       }
       notifyListeners();
     });
   }
 
-  // Play audio file
+  // Play audio file (supports both local files and streaming URLs)
   Future<void> playAudio(AudioFile audioFile) async {
     try {
       _playbackState = PlaybackState.loading;
@@ -100,19 +140,47 @@ class AudioService extends ChangeNotifier {
       notifyListeners();
 
       // Stop current playback if playing different file
-      if (_currentAudioFile?.filePath != audioFile.filePath) {
+      final currentAudioId = _currentAudioFile?.id;
+      if (currentAudioId != audioFile.id) {
         await _audioPlayer.stop();
         _currentAudioFile = audioFile;
         _currentPosition = Duration.zero;
         _totalDuration = Duration.zero;
       }
 
-      await _audioPlayer.play(DeviceFileSource(audioFile.filePath));
-      await _audioPlayer.setPlaybackRate(_playbackSpeed);
-      
+      // Always use sourceUrl for playback
+      if (kDebugMode) {
+        print('AudioService: Playing audio from sourceUrl');
+        print('AudioService: sourceUrl:  [32m${audioFile.sourceUrl} [0m');
+        print('AudioService: Platform:  [36m${kIsWeb ? 'Web' : 'Mobile'} [0m');
+      }
+
+      if (kIsWeb) {
+        throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
+      } else {
+        await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
+        await _audioPlayer.play();
+      }
+
+      await _audioPlayer.setSpeed(_playbackSpeed);
     } catch (e) {
       _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to play audio: $e';
+      // Provide helpful error messages for common issues
+      if (e.toString().contains('HttpException') || e.toString().contains('SocketException')) {
+        _errorMessage = 'Network error: Cannot access streaming URL. Check internet connection.';
+      } else if (e.toString().contains('FormatException') || e.toString().contains('UnsupportedError')) {
+        _errorMessage = 'Unsupported media format. Please try a different audio source.';
+      } else if (e.toString().contains('PlayerException')) {
+        _errorMessage = 'Audio player error: ${e.toString()}';
+      } else {
+        _errorMessage = 'Failed to play audio: $e';
+      }
+      if (kDebugMode) {
+        print('AudioService playback error: $e');
+        print('AudioFile: ${audioFile.id}');
+        print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+        print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
+      }
       notifyListeners();
     }
   }
@@ -120,7 +188,7 @@ class AudioService extends ChangeNotifier {
   // Resume playback
   Future<void> resume() async {
     try {
-      await _audioPlayer.resume();
+      await _audioPlayer.play();
     } catch (e) {
       _playbackState = PlaybackState.error;
       _errorMessage = 'Failed to resume playback: $e';
@@ -166,7 +234,7 @@ class AudioService extends ChangeNotifier {
   Future<void> setPlaybackSpeed(double speed) async {
     try {
       _playbackSpeed = speed;
-      await _audioPlayer.setPlaybackRate(speed);
+      await _audioPlayer.setSpeed(speed);
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to set playback speed: $e';
@@ -203,6 +271,19 @@ class AudioService extends ChangeNotifier {
       await pause();
     } else if (isPaused) {
       await resume();
+    }
+  }
+
+  // Seek relative to current position
+  Future<void> seekRelative(int seconds) async {
+    final newPosition = _currentPosition + Duration(seconds: seconds);
+    
+    if (newPosition < Duration.zero) {
+      await seekTo(Duration.zero);
+    } else if (newPosition > _totalDuration) {
+      await seekTo(_totalDuration);
+    } else {
+      await seekTo(newPosition);
     }
   }
 

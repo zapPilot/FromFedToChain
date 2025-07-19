@@ -198,11 +198,25 @@ class CourseCard extends StatelessWidget {
   }
 
   Widget _buildSubtitle(BuildContext context) {
-    return Text(
-      '${audioFile.categoryDisplayName} • ${audioFile.languageDisplayName}',
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: AppTheme.textTertiary,
-      ),
+    final authorName = content?.author ?? 'David Chang';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'By $authorName',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppTheme.purplePrimary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          '${audioFile.categoryDisplayName} • ${audioFile.languageDisplayName}',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppTheme.textTertiary,
+          ),
+        ),
+      ],
     );
   }
 
@@ -319,6 +333,10 @@ class CourseCard extends StatelessWidget {
         return '📊';
       case 'startup':
         return '🚀';
+      case 'ai':
+        return '🤖';
+      case 'defi':
+        return '💎';
       default:
         return '🎵';
     }

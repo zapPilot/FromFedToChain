@@ -1,57 +1,173 @@
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-
 export default {
-  async fetch(req, env) {
-    try {
-      const url = new URL(req.url)
-      const path = url.searchParams.get("path")
-      const listPrefix = url.searchParams.get("prefix")
+  async fetch(request, env) {
+    const url = new URL(request.url)
 
-      // 1️⃣ 簽名播放網址
-      if (path) {
-        const s3 = new S3Client({
-          region: "auto",
-          endpoint: `https://${env.CF_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-          credentials: {
-            accessKeyId: env.R2_ACCESS_KEY_ID,
-            secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-          },
-        })
-
-        const cmd = new GetObjectCommand({
-          Bucket: "fromfedtochain",
-          Key: path,
-        })
-
-        const signed = await getSignedUrl(s3, cmd, { expiresIn: 3600 })
-
-        return Response.json({ url: signed })
-      }
-
-      // 2️⃣ 列出 prefix 下有哪些子資料夾（每集一個）
-      if (listPrefix) {
-        const list = await env.R2_BUCKET.list({
-          prefix: listPrefix,
-          delimiter: "/", // 只抓下一層資料夾，不列出所有 .ts 檔
-        })
-
-        const result = list.delimitedPrefixes.map((p) => {
-          const id = p.replace(listPrefix, "").replace(/\/$/, "")
-          return {
-            id,
-            path: `${listPrefix}${id}/playlist.m3u8`,
-            signedUrl: `${url.origin}/?path=${encodeURIComponent(`${listPrefix}${id}/playlist.m3u8`)}`
+    // ✨ 1. Content API - Serve JSON content from R2
+    if (url.pathname.startsWith("/api/content/")) {
+      const pathSegments = url.pathname.split('/');
+      
+      // Handle /api/content/:lang/:category/:id
+      if (pathSegments.length === 6) {
+        const lang = pathSegments[3];
+        const category = pathSegments[4];
+        const contentId = pathSegments[5];
+        
+        if (!lang || !category || !contentId) {
+          return Response.json({
+            error: 'Language, category, and content ID required',
+            format: '/api/content/{lang}/{category}/{id}'
+          }, {
+            status: 400,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+        
+        try {
+          const contentKey = `content/${lang}/${category}/${contentId}.json`;
+          const object = await env.R2_BUCKET.get(contentKey);
+          
+          if (!object) {
+            return Response.json({ error: 'Content not found' }, {
+              status: 404,
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+              }
+            });
           }
-        })
-
-        return Response.json(result)
+          
+          const contentText = await object.text();
+          const contentData = JSON.parse(contentText);
+          
+          return Response.json(contentData, {
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json',
+              'Cache-Control': 'public, max-age=3600'
+            }
+          });
+          
+        } catch (error) {
+          return Response.json({ error: 'Failed to fetch content' }, {
+            status: 500,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json'
+            }
+          });
+        }
       }
-
-      return new Response("Missing ?path= 或 ?prefix=", { status: 400 })
-    } catch (err) {
-      console.error("Worker Error:", err)
-      return new Response("Internal error", { status: 500 })
+      
+      // Handle /api/content/:id (simplified - tries to find in common paths)
+      if (pathSegments.length === 4) {
+        const contentId = pathSegments[3];
+        
+        if (!contentId) {
+          return Response.json({ error: 'Content ID required' }, {
+            status: 400,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+        
+        // Try to find content in common language/category combinations
+        const searchPaths = [
+          `content/zh-TW/bitcoin/${contentId}.json`,
+          `content/en/bitcoin/${contentId}.json`,
+          `content/zh-TW/economics/${contentId}.json`,
+          `content/en/economics/${contentId}.json`,
+          `content/zh-TW/daily-news/${contentId}.json`,
+          `content/en/daily-news/${contentId}.json`,
+          `content/zh-TW/ethereum/${contentId}.json`,
+          `content/en/ethereum/${contentId}.json`,
+          `content/zh-TW/macro/${contentId}.json`,
+          `content/en/macro/${contentId}.json`,
+          `content/zh-TW/startup/${contentId}.json`,
+          `content/en/startup/${contentId}.json`,
+          `content/zh-TW/ai/${contentId}.json`,
+          `content/en/ai/${contentId}.json`,
+          `content/zh-TW/defi/${contentId}.json`,
+          `content/en/defi/${contentId}.json`
+        ];
+        
+        for (const searchPath of searchPaths) {
+          try {
+            const object = await env.R2_BUCKET.get(searchPath);
+            if (object) {
+              const contentText = await object.text();
+              const contentData = JSON.parse(contentText);
+              
+              return Response.json(contentData, {
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                  'Content-Type': 'application/json',
+                  'Cache-Control': 'public, max-age=3600'
+                }
+              });
+            }
+          } catch (error) {
+            // Continue searching
+          }
+        }
+        
+        return Response.json({ error: 'Content not found' }, {
+          status: 404,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json'
+          }
+        });
+      }
     }
+
+    // ✨ 2. Proxy R2 public bucket with CORS
+    if (url.pathname.startsWith("/proxy")) {
+      const proxyPath = url.pathname.replace("/proxy", "")
+      const r2Url = `https://pub-c0fd079339f948e68440a1f2d8b14339.r2.dev${proxyPath}`
+
+      const response = await fetch(r2Url)
+
+      return new Response(response.body, {
+        status: response.status,
+        headers: {
+          ...Object.fromEntries(response.headers),
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        }
+      })
+    }
+
+    // ✨ 3. List available episodes under a language/category path
+    const prefix = url.searchParams.get("prefix")
+    if (prefix) {
+      const list = await env.R2_BUCKET.list({
+        prefix,
+        delimiter: "/", // 只列出下一層的資料夾
+      })
+
+      const results = list.delimitedPrefixes.map((p) => {
+        const episodeId = p.replace(prefix, "").replace(/\/$/, "")
+        return {
+          id: episodeId,
+          path: `${prefix}${episodeId}/playlist.m3u8`,
+          playlistUrl: `${url.origin}/proxy/${prefix}${episodeId}/playlist.m3u8`,
+        }
+      })
+
+      return Response.json(results, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        }
+      })
+    }
+
+    return new Response("Missing /proxy/... or ?prefix=...", { status: 400 })
   }
 }

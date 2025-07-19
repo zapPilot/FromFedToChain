@@ -44,8 +44,8 @@ export class SocialService {
     // Check source status first
     const sourceContent = await ContentManager.readSource(id);
     
-    if (sourceContent.status !== 'audio') {
-      throw new Error(`Content must have audio before social hooks. Current status: ${sourceContent.status}`);
+    if (sourceContent.status !== 'content') {
+      throw new Error(`Content must be uploaded before social hooks. Current status: ${sourceContent.status}`);
     }
 
     // Get all available languages for this content
@@ -188,8 +188,8 @@ export class SocialService {
     // Check source status first
     const sourceContent = await ContentManager.readSource(id);
     
-    if (sourceContent.status !== 'audio') {
-      throw new Error(`Content must have audio before social hooks. Current status: ${sourceContent.status}`);
+    if (sourceContent.status !== 'content') {
+      throw new Error(`Content must be uploaded before social hooks. Current status: ${sourceContent.status}`);
     }
 
     // Get all available languages for this content
@@ -271,7 +271,7 @@ Return only the hook, no explanations.`;
 
   // Get content needing social hooks
   static async getContentNeedingSocial() {
-    return ContentManager.getSourceByStatus('audio');
+    return ContentManager.getSourceByStatus('content');
   }
 
 }

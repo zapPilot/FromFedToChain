@@ -1,49 +1,76 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 class AudioFile {
   final String id;
   final String language;
   final String category;
-  final String filePath;
   final String fileName;
   final int sizeInBytes;
   final DateTime created;
   final Duration? duration;
+  final String sourceUrl; // The only URL needed for playback
 
   AudioFile({
     required this.id,
     required this.language,
     required this.category,
-    required this.filePath,
     required this.fileName,
     required this.sizeInBytes,
     required this.created,
     this.duration,
+    required this.sourceUrl,
   });
 
   factory AudioFile.fromFileInfo({
     required String id,
     required String language,
     required String category,
-    required String filePath,
     required String fileName,
     required int sizeInBytes,
     required DateTime created,
     Duration? duration,
+    required String sourceUrl,
   }) {
     return AudioFile(
       id: id,
       language: language,
       category: category,
-      filePath: filePath,
       fileName: fileName,
       sizeInBytes: sizeInBytes,
       created: created,
       duration: duration,
+      sourceUrl: sourceUrl,
     );
   }
 
-  // Helper methods
+  /// Factory constructor for API response format
+  /// Expected format: {"id": "episode-id", "playlistUrl": "https://..."}
+  factory AudioFile.fromApiResponse(
+    Map<String, dynamic> json,
+    String language,
+    String category,
+  ) {
+    final id = json['id'] as String;
+    final playlistUrl = json['playlistUrl'] as String; // New API format uses 'playlistUrl'
+    DateTime createdDate = DateTime.now();
+    try {
+      final datePart = id.split('-').take(3).join('-');
+      createdDate = DateTime.parse(datePart);
+    } catch (e) {
+      print('Warning: Could not parse date from ID: $id');
+    }
+    return AudioFile(
+      id: id,
+      language: language,
+      category: category,
+      fileName: '$id.m3u8',
+      sizeInBytes: 0,
+      created: createdDate,
+      duration: null,
+      sourceUrl: playlistUrl,
+    );
+  }
+
   String get sizeFormatted {
     if (sizeInBytes < 1024) {
       return '${sizeInBytes}B';
@@ -56,7 +83,6 @@ class AudioFile {
 
   String get durationFormatted {
     if (duration == null) return 'Unknown';
-    
     final minutes = duration!.inMinutes;
     final seconds = duration!.inSeconds.remainder(60);
     return '${minutes}:${seconds.toString().padLeft(2, '0')}';
@@ -76,6 +102,10 @@ class AudioFile {
         return 'Macro';
       case 'startup':
         return 'Startup';
+      case 'ai':
+        return 'AI';
+      case 'defi':
+        return 'DeFi';
       default:
         return category.toUpperCase();
     }
@@ -95,6 +125,11 @@ class AudioFile {
   }
 
   bool get exists {
-    return File(filePath).existsSync();
+    if (kIsWeb) {
+      return sourceUrl.isNotEmpty;
+    }
+    return sourceUrl.isNotEmpty;
   }
+
+  String get playbackUrl => sourceUrl;
 }

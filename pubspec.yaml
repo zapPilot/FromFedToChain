@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   
   # Audio playback
-  audioplayers: ^6.0.0
+  just_audio: ^0.9.36
   
   # File system access
   path: ^1.8.3
@@ -25,6 +25,10 @@ dependencies:
   
   # HTTP for potential future API calls
   http: ^1.1.0
+  dio: ^5.4.0
+  
+  # Environment variables
+  flutter_dotenv: ^5.1.0
   
   # State management
   provider: ^6.1.1
@@ -35,6 +39,8 @@ dependencies:
   
   # Icons
   heroicons: ^0.9.0
+  mcp_toolkit: ^0.2.3
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -46,8 +52,10 @@ flutter:
   
   # Assets
   assets:
+    - assets/
     - audio/
     - content/
+    - .env
   
   # Fonts (if needed for custom typography)
   # fonts:
