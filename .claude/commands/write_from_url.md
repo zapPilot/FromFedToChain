@@ -3,7 +3,7 @@
 3. Use `zen` to conduct additional research on this topic (deep dive / ultrathink).
 4. Use `claude` to conduct further research on the same topic (deep dive / ultrathink).
 5. `Collect` and keep all reference `URLs` from Steps 1 – 3.
-6. Write one conversational explainer article in Traditional Chinese. Choose the most appropriate writing framework from the guidelines/*.md files, bearing in mind that the audience is international. You may refer to a specific country as an example when appropriate, but do not assume that all readers are from the same country.
+6. Write one conversational explainer article in Traditional Chinese. Choose the most appropriate writing framework from the guidelines/\*.md files, bearing in mind that the audience is international. You may refer to a specific country as an example when appropriate, but do not assume that all readers are from the same country.
 7. `Categorize` the article `into one of the sub-folders` under `/content/zh-TW/*`, e.g.  
    `/content/zh-TW/daily-news`, `/content/zh-TW/ethereum`, `/content/zh-TW/macro`, `/content/zh-TW/startup`, `/content/zh-TW/ai`.
 8. Use the following content schema:
@@ -23,4 +23,5 @@ const content = ContentSchema.createContent(
 // Validate content
 ContentSchema.validate(content);
 ```
+
 9. Save the file to `/content/zh-TW/$CATEGORY/${YYYY-MM-DD}-topic-slug.json`.

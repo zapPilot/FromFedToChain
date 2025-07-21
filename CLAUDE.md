@@ -140,6 +140,30 @@ flutter build web
 # Build for mobile
 flutter build apk  # Android
 flutter build ios  # iOS
+
+# Testing and CI
+flutter test --coverage            # Run tests with coverage
+flutter analyze --no-congratulate  # Static analysis
+dart format lib/ test/             # Format code
+```
+
+### Unified Development Commands
+
+```bash
+# Run all tests (Node.js + Flutter)
+npm run test
+
+# Format all code (JS + Dart)
+npm run format
+
+# Lint all code (Node.js + Flutter)
+npm run lint
+
+# Install Flutter dependencies
+npm run install:flutter
+
+# Build Flutter for web
+npm run build:flutter
 ```
 
 ### Review Workflow
@@ -154,7 +178,6 @@ npm run review
 # [s]kip      - Skip this content
 # [q]uit      - Exit review session
 ```
-
 
 ## 📁 File Structure
 
@@ -219,12 +242,14 @@ npm run review
 ## 🔧 Pipeline Dependencies
 
 ### Required Dependencies
+
 - **Node.js** (v18+) - Runtime environment
 - **npm** - Package manager
 - **FFmpeg** - Audio processing and M3U8 conversion
 - **rclone** - Cloudflare R2 uploads for M3U8 streaming
 
 ### Installation Commands
+
 ```bash
 # macOS (using Homebrew)
 brew install ffmpeg
@@ -242,6 +267,7 @@ rclone config create r2 s3 \
 ```
 
 ### Dependency Verification
+
 ```bash
 # Check all dependencies
 npm run check-deps
@@ -292,6 +318,7 @@ This streamlined approach provides efficient content management and modern strea
 **Cause**: rclone is not properly configured for Cloudflare R2 uploads
 
 **Solutions**:
+
 1. **Check rclone configuration**: Run `npm run check-deps` to verify rclone setup
 2. **Configure rclone**: Follow the rclone configuration steps in the Pipeline Dependencies section
 3. **Verify remote name**: Ensure remote name matches `REMOTE_NAME` in `CloudflareR2Service.js`
@@ -301,6 +328,7 @@ This streamlined approach provides efficient content management and modern strea
 **Cause**: Content file already has `streaming_urls` populated or incorrect status
 
 **Solutions**:
+
 1. **Check content status**: Content must have `status: "reviewed"` to trigger pipeline
 2. **Remove streaming URLs**: Delete `streaming_urls` field from content JSON file to force re-processing
 3. **Manual testing**: Edit content file to remove `streaming_urls` and set `status: "reviewed"`
@@ -310,6 +338,7 @@ This streamlined approach provides efficient content management and modern strea
 **Problem**: Pipeline fails with dependency errors
 
 **Solutions**:
+
 1. **Check dependencies**: Run `npm run check-deps` to verify all tools are installed
 2. **Install missing tools**: Follow installation commands in the Pipeline Dependencies section
 3. **Path issues**: Ensure ffmpeg and rclone are in your system PATH
@@ -319,10 +348,86 @@ This streamlined approach provides efficient content management and modern strea
 **Problem**: Audio or M3U8 files not generated
 
 **Solutions**:
+
 1. **Check language configuration**: Verify language is enabled in `config/languages.js`
 2. **Verify content status**: Content must be in correct status for each pipeline phase
 3. **Check service accounts**: Ensure Google Cloud TTS credentials are configured
 
+## 🏗️ CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+The project uses GitHub Actions for continuous integration with support for both Node.js and Flutter ecosystems. The CI workflow (`.github/workflows/ci.yml`) includes:
+
+**Test Job:**
+
+- ✅ Node.js 18 setup with npm caching
+- ✅ Flutter 3.22.2 setup with pub caching
+- ✅ Node.js tests execution (`npm run test:node`)
+- ✅ Flutter tests with coverage (`flutter test --coverage`)
+- ✅ Code analysis (`flutter analyze`, `npm run lint:node`)
+- ✅ Coverage reporting to Codecov
+
+**Format Check Job:**
+
+- ✅ Code formatting validation for both ecosystems
+- ✅ Prettier for JavaScript/JSON/Markdown files
+- ✅ Dart format for Flutter code
+
+**Build Job:**
+
+- ✅ Flutter web build verification
+- ✅ Build artifacts upload
+
+### Pre-commit Hooks
+
+Husky and lint-staged provide pre-commit validation:
+
+```bash
+# Pre-commit hooks run automatically on git commit
+# - Format staged files (prettier for JS, dart format for Dart)
+# - Run Flutter analyze on Dart files
+# - Run Flutter tests when Dart files or pubspec.yaml change
+```
+
+**Configuration Files:**
+
+- `.husky/pre-commit` - Git hook script
+- `.lintstagedrc.json` - File-specific linting rules
+- `package.json` - Husky and lint-staged setup
+
+### Test Coverage
+
+**Current Test Status:**
+
+- **Node.js Tests**: 174 passing, 0 failing (12 skipped)
+- **Flutter Tests**: 16 passing, 0 failing
+- **Coverage**: Flutter coverage generated in `coverage/lcov.info`
+
+**Test Structure:**
+
+- Node.js: Comprehensive end-to-end pipeline tests
+- Flutter: Model tests and basic widget tests
+- Coverage reports uploaded to Codecov in CI
+
+### CI Troubleshooting
+
+**Problem**: CI fails with Flutter analysis errors
+
+**Solutions:**
+
+1. Run `flutter analyze --no-congratulate` locally to check for issues
+2. Fix critical errors (undefined getters, missing imports)
+3. Info-level warnings (prefer_const_constructors, withOpacity deprecation) won't fail CI
+
+**Problem**: Tests fail in CI but pass locally
+
+**Solutions:**
+
+1. Ensure Flutter SDK version matches CI (3.22.2)
+2. Run `flutter pub get` to update dependencies
+3. Check for platform-specific test failures
+
 ---
 
-_Last updated: 2025-07-16 - Simplified pipeline-focused workflow_
+_Last updated: 2025-07-21 - Added CI/CD documentation and testing infrastructure_

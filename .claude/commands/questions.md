@@ -1,4 +1,5 @@
 ultrathink
+
 1. review the existing content in `/content/zh-TW/**/*.json`, focusing on each item’s `title`, `content`, `feedback.content_review.status`, and `feedback.content_review.comments` as learning data. Avoid repeating the same knowledge points—it’s okay to use the same topic, but make sure to extend it or present different knowledge angles.
 2. Here's my questions: $ARGUMENTS
 3. Use `zen` to conduct additional research on this topic (deep dive / ultrathink).
@@ -24,4 +25,5 @@ const content = ContentSchema.createContent(
 // Validate content
 ContentSchema.validate(content);
 ```
+
 9. Save the file to `/content/zh-TW/$CATEGORY/${YYYY-MM-DD}-topic-slug.json`.
