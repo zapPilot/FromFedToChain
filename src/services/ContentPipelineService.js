@@ -107,10 +107,12 @@ export class ContentPipelineService {
       switch (step.status) {
         case 'reviewed':
           await TranslationService.translateAll(id);
+          await ContentManager.updateSourceStatus(id, 'translated');
           return true;
 
         case 'translated':
           await AudioService.generateWavOnly(id);
+          await ContentManager.updateSourceStatus(id, 'wav');
           return true;
 
         case 'wav':
