@@ -173,7 +173,7 @@ describe('Audio Architecture Tests', () => {
 
         const content = await ContentManager.read(id, language);
         if (!content) {
-          throw new Error(`No ${language} content found for ${id}`);
+          throw new Error(`Content not found in ${language}: ${id}`);
         }
 
         const ttsConfig = getTTSConfig(language);

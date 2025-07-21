@@ -173,17 +173,17 @@ describe('End-to-End Workflow Tests', () => {
       );
       await ContentManager.updateSourceStatus(contentId, 'reviewed');
 
-      // Mock partial failure (English succeeds, Japanese fails)
-      let callCount = 0;
-      mockTranslateClient.translate.mock.mockImplementation((text, options) => {
-        callCount++;
-        if (options.to === 'en') {
-          return Promise.resolve([`English: ${text}`]);
-        } else if (options.to === 'ja') {
-          throw new Error('Japanese translation service temporarily unavailable');
-        }
-        return Promise.resolve([text]);
-      });
+      // Mock partial failure using explicit sequence for CI reliability
+      // English calls succeed (title and content)
+      mockTranslateClient.translate.mock
+        .mockImplementation((text, options) => {
+          if (options.to === 'en') {
+            return Promise.resolve([`English: ${text}`]);
+          } else if (options.to === 'ja') {
+            throw new Error('Japanese translation service temporarily unavailable');
+          }
+          return Promise.resolve([text]);
+        });
 
       const results = await TranslationService.translateAll(contentId);
       
