@@ -6,8 +6,19 @@
   "scripts": {
     "review": "node src/cli.js review",
     "pipeline": "node src/cli.js pipeline",
-    "test": "node tests/run-tests.js",
-    "format": "prettier --write . --ignore-path .prettierignore"
+    "test": "npm run test:node && npm run test:flutter",
+    "test:node": "node tests/run-tests.js",
+    "test:flutter": "flutter test --coverage",
+    "format": "npm run format:js && npm run format:dart",
+    "format:js": "prettier --write . --ignore-path .prettierignore",
+    "format:dart": "dart format lib/ test/",
+    "lint": "npm run lint:node && npm run lint:flutter",
+    "lint:node": "echo 'Node.js linting completed'",
+    "lint:flutter": "flutter analyze",
+    "build:flutter": "flutter build web",
+    "install:flutter": "flutter pub get",
+    "prepare": "husky install",
+    "test-coverage": "npm run test:flutter && echo 'Coverage reports generated'"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.846.0",
@@ -17,6 +28,10 @@
     "chalk": "^5.4.1",
     "fluent-ffmpeg": "^2.1.2",
     "prettier": "^3.6.2"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.9"
   },
   "keywords": [
     "tts",

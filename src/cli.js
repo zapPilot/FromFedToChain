@@ -16,7 +16,7 @@ async function main() {
       case "review":
         await handleReview();
         break;
-      case 'pipeline':
+      case "pipeline":
         await handlePipeline();
         break;
       default:
@@ -174,7 +174,9 @@ async function handlePipeline() {
   const id = args[1];
 
   console.log(chalk.blue.bold("🔄 Running Smart Pipeline"));
-  console.log(chalk.gray("Automatically detects and processes unfinished phases"));
+  console.log(
+    chalk.gray("Automatically detects and processes unfinished phases"),
+  );
   console.log(chalk.gray("=".repeat(50)));
 
   if (id) {
@@ -183,7 +185,7 @@ async function handlePipeline() {
   } else {
     // Check all phases and find content that needs processing
     const allPendingContent = await getAllPendingContent();
-    
+
     if (allPendingContent.length === 0) {
       console.log(chalk.green("✅ No content needs processing"));
       console.log(chalk.gray("💡 Use 'npm run review' to approve new content"));
@@ -191,13 +193,21 @@ async function handlePipeline() {
     }
 
     // Show what was found
-    console.log(chalk.blue(`Found ${allPendingContent.length} content items needing processing:`));
+    console.log(
+      chalk.blue(
+        `Found ${allPendingContent.length} content items needing processing:`,
+      ),
+    );
     showPipelineStatus(allPendingContent);
     console.log("");
 
     // Process each content item
     for (const item of allPendingContent) {
-      console.log(chalk.cyan(`\n🔄 Processing: ${item.content.id} (needs ${item.nextPhase})`));
+      console.log(
+        chalk.cyan(
+          `\n🔄 Processing: ${item.content.id} (needs ${item.nextPhase})`,
+        ),
+      );
       await runPipelineForContent(item.content.id);
     }
   }
@@ -216,97 +226,127 @@ function showPipelineStatus(pendingContent) {
 
   Object.entries(phaseGroups).forEach(([phase, items]) => {
     const phaseColor = ContentPipelineService.getPhaseColor(phase);
-    
+
     console.log(phaseColor(`📋 ${phase.toUpperCase()}: ${items.length} items`));
-    items.forEach(item => {
-      console.log(chalk.gray(`   • ${item.content.id}: ${item.content.title.substring(0, 50)}...`));
+    items.forEach((item) => {
+      console.log(
+        chalk.gray(
+          `   • ${item.content.id}: ${item.content.title.substring(0, 50)}...`,
+        ),
+      );
     });
   });
 }
 
-
-
-
 async function runPipelineForContent(id) {
   try {
     console.log(chalk.blue.bold(`🔄 Running pipeline for: ${id}`));
-    
+
     let currentContent = await ContentManager.readSource(id);
     let currentStatus = currentContent.status;
     let stepNumber = 1;
-    
+
     console.log(chalk.gray(`Starting status: ${currentStatus}`));
 
     // Continue processing until we reach the end of the pipeline or encounter an error
     while (true) {
       const step = ContentSchema.getPipelineStep(currentStatus);
-      
+
       if (!step) {
-        console.log(chalk.yellow(`⚠️ No pipeline step found for status: ${currentStatus}`));
+        console.log(
+          chalk.yellow(
+            `⚠️ No pipeline step found for status: ${currentStatus}`,
+          ),
+        );
         break;
       }
-      
+
       if (!step.nextStatus) {
-        console.log(chalk.green(`✅ Content ${id} has reached final status: ${currentStatus}`));
+        console.log(
+          chalk.green(
+            `✅ Content ${id} has reached final status: ${currentStatus}`,
+          ),
+        );
         break;
       }
 
       console.log(chalk.blue(`${stepNumber}️⃣ ${step.description}...`));
       console.log(chalk.gray(`   ${currentStatus} → ${step.nextStatus}`));
-      
+
       // Process the next step
       const success = await ContentPipelineService.processContentNextStep(id);
-      
+
       if (!success) {
-        console.error(chalk.red(`❌ Pipeline step failed: ${step.description}`));
+        console.error(
+          chalk.red(`❌ Pipeline step failed: ${step.description}`),
+        );
         break;
       }
-      
+
       // Update current status for next iteration
       currentContent = await ContentManager.readSource(id);
       const newStatus = currentContent.status;
-      
+
       if (newStatus === currentStatus) {
-        console.error(chalk.red(`❌ Status didn't change after processing. Stuck at: ${currentStatus}`));
+        console.error(
+          chalk.red(
+            `❌ Status didn't change after processing. Stuck at: ${currentStatus}`,
+          ),
+        );
         break;
       }
-      
+
       currentStatus = newStatus;
       stepNumber++;
-      
+
       // Safety check to prevent infinite loops
       if (stepNumber > 10) {
-        console.error(chalk.red(`❌ Pipeline exceeded maximum steps (10). Breaking to prevent infinite loop.`));
+        console.error(
+          chalk.red(
+            `❌ Pipeline exceeded maximum steps (10). Breaking to prevent infinite loop.`,
+          ),
+        );
         break;
       }
     }
 
-    console.log(chalk.green(`✅ Pipeline completed for: ${id} (final status: ${currentStatus})`));
-
+    console.log(
+      chalk.green(
+        `✅ Pipeline completed for: ${id} (final status: ${currentStatus})`,
+      ),
+    );
   } catch (error) {
     console.error(chalk.red(`❌ Pipeline failed for ${id}: ${error.message}`));
   }
 }
 
-
 function showHelp() {
   console.log(chalk.blue.bold("📖 From Fed to Chain CLI"));
   console.log(chalk.gray("=".repeat(50)));
   console.log(chalk.cyan("Streamlined Workflow:"));
-  console.log("  npm run review                                 - Interactive review of draft content");
-  console.log("  npm run pipeline                               - Process content through translation → audio → social");
-      
+  console.log(
+    "  npm run review                                 - Interactive review of draft content",
+  );
+  console.log(
+    "  npm run pipeline                               - Process content through translation → audio → social",
+  );
+
   console.log(chalk.gray("\nWorkflow Steps:"));
   console.log("  1️⃣ Create content files in content/zh-TW/");
   console.log("  2️⃣ npm run review        - Review and approve content");
-  console.log("  3️⃣ npm run pipeline      - Auto-process: translate → audio → social hooks");
+  console.log(
+    "  3️⃣ npm run pipeline      - Auto-process: translate → audio → social hooks",
+  );
   console.log("  4️⃣ Manual publishing     - Content ready for distribution");
-  
+
   console.log(chalk.gray("\nPipeline Examples:"));
-  console.log("  npm run pipeline                               - Process all unfinished content");
-  console.log("  npm run pipeline 2025-06-30-bitcoin           - Process specific content");
-  
-  
+  console.log(
+    "  npm run pipeline                               - Process all unfinished content",
+  );
+  console.log(
+    "  npm run pipeline 2025-06-30-bitcoin           - Process specific content",
+  );
+
   console.log("");
   console.log(chalk.yellow("Review Controls:"));
   console.log("  [a]ccept    - Approve content (optional feedback)");
@@ -315,7 +355,9 @@ function showHelp() {
   console.log("  [q]uit      - Exit review session");
   console.log("");
   console.log(chalk.gray("Smart Pipeline Features:"));
-  console.log("  • Auto-detects content phase: reviewed → translated → audio → social");
+  console.log(
+    "  • Auto-detects content phase: reviewed → translated → audio → social",
+  );
   console.log("  • Resumes from where you left off");
   console.log("  • Processes multiple content items in one command");
   console.log("  • Discrete audio steps for testing and debugging");

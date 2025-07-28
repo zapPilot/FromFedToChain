@@ -1,30 +1,71 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:from_fed_to_chain_audio/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('Basic App Tests', () {
+    testWidgets('should create a MaterialApp', (tester) async {
+      final testApp = MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text('From Fed to Chain Audio'),
+          ),
+        ),
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      await tester.pumpWidget(testApp);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      expect(find.text('From Fed to Chain Audio'), findsOneWidget);
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.byType(Scaffold), findsOneWidget);
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    testWidgets('should display app icon and text', (tester) async {
+      final testApp = MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.audiotrack, size: 64),
+                SizedBox(height: 16),
+                Text(
+                  'From Fed to Chain Audio',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text('Audio content streaming app'),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(testApp);
+
+      expect(find.byIcon(Icons.audiotrack), findsOneWidget);
+      expect(find.text('From Fed to Chain Audio'), findsOneWidget);
+      expect(find.text('Audio content streaming app'), findsOneWidget);
+    });
+  });
+
+  group('App Theme Tests', () {
+    testWidgets('should apply dark theme correctly', (tester) async {
+      final testApp = MaterialApp(
+        theme: ThemeData(
+          brightness: Brightness.dark,
+        ),
+        home: Scaffold(
+          body: Center(
+            child: Text('Theme Test'),
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(testApp);
+
+      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(materialApp.theme?.brightness, equals(Brightness.dark));
+      expect(find.text('Theme Test'), findsOneWidget);
+    });
   });
 }

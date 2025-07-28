@@ -1,4 +1,4 @@
-import 'dart:async';                    
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,13 +26,14 @@ Future<void> main() async {
 
   // Initialize audio service for background playback
   print('🚀 Initializing audio service...');
-  
+
   BackgroundAudioHandler? audioHandler;
   try {
     final handler = await audio_service_pkg.AudioService.init(
       builder: () => BackgroundAudioHandler(),
       config: audio_service_pkg.AudioServiceConfig(
-        androidNotificationChannelId: 'com.example.fromFedToChainAudio.channel.audio',
+        androidNotificationChannelId:
+            'com.example.from_fed_to_chain_audio.channel.audio',
         androidNotificationChannelName: 'From Fed to Chain Audio',
         androidNotificationOngoing: true,
         androidNotificationIcon: 'drawable/ic_notification',
@@ -40,9 +41,9 @@ Future<void> main() async {
         androidStopForegroundOnPause: false, // Keep service alive when paused
       ),
     );
-    
+
     audioHandler = handler;
-    
+
     print('✅ Audio service initialized successfully');
   } catch (e) {
     print('❌ Audio service initialization failed: $e');
@@ -52,14 +53,13 @@ Future<void> main() async {
   // use runZonedGuarded to capture exceptions
   runZonedGuarded(
     () => runApp(FromFedToChainApp(audioHandler: audioHandler)),
-    (error, stack) =>
-        MCPToolkitBinding.instance.handleZoneError(error, stack),
+    (error, stack) => MCPToolkitBinding.instance.handleZoneError(error, stack),
   );
 }
 
 class FromFedToChainApp extends StatelessWidget {
   final BackgroundAudioHandler? audioHandler;
-  
+
   const FromFedToChainApp({super.key, this.audioHandler});
 
   @override
@@ -70,13 +70,14 @@ class FromFedToChainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProxyProvider<LanguageService, ContentService>(
           create: (context) => ContentService(context.read<LanguageService>()),
-          update: (context, languageService, contentService) => 
-            contentService ?? ContentService(languageService),
+          update: (context, languageService, contentService) =>
+              contentService ?? ContentService(languageService),
         ),
         ChangeNotifierProxyProvider<ContentService, AudioService>(
-          create: (context) => AudioService(audioHandler, context.read<ContentService>()),
+          create: (context) =>
+              AudioService(audioHandler, context.read<ContentService>()),
           update: (context, contentService, audioService) =>
-            audioService ?? AudioService(audioHandler, contentService),
+              audioService ?? AudioService(audioHandler, contentService),
         ),
       ],
       child: MaterialApp(

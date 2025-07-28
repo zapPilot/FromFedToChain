@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart' as audio_service_pkg;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../models/audio_file.dart';
 import 'background_audio_handler.dart';
 import 'content_service.dart';
@@ -19,7 +17,7 @@ class AudioService extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   final BackgroundAudioHandler? _audioHandler;
   final ContentService? _contentService;
-  
+
   // Current playback state
   PlaybackState _playbackState = PlaybackState.stopped;
   AudioFile? _currentAudioFile;
@@ -27,6 +25,7 @@ class AudioService extends ChangeNotifier {
   Duration _totalDuration = Duration.zero;
   double _playbackSpeed = 1.0;
   String? _errorMessage;
+  bool _autoplayEnabled = true; // Default autoplay enabled
 
   // Getters
   PlaybackState get playbackState => _playbackState;
@@ -35,14 +34,15 @@ class AudioService extends ChangeNotifier {
   Duration get totalDuration => _totalDuration;
   double get playbackSpeed => _playbackSpeed;
   String? get errorMessage => _errorMessage;
-  
+  bool get autoplayEnabled => _autoplayEnabled;
+
   // Computed properties
   bool get isPlaying => _playbackState == PlaybackState.playing;
   bool get isPaused => _playbackState == PlaybackState.paused;
   bool get isLoading => _playbackState == PlaybackState.loading;
   bool get hasError => _playbackState == PlaybackState.error;
   bool get isIdle => _playbackState == PlaybackState.stopped;
-  
+
   double get progress {
     if (_totalDuration.inMilliseconds == 0) return 0.0;
     return _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
@@ -60,28 +60,30 @@ class AudioService extends ChangeNotifier {
   String? get currentAudioId => _currentAudioFile?.id;
 
   AudioService(this._audioHandler, [this._contentService]) {
-    print('🎧 AudioService: Initializing with background handler: ${_audioHandler != null}');
+    print(
+        '🎧 AudioService: Initializing with background handler: ${_audioHandler != null}');
     _initializePlayer();
   }
 
   void _initializePlayer() {
     if (_audioHandler != null) {
       print('🎧 AudioService: Using background audio handler');
-      
+
       // Set up episode navigation callbacks
       _audioHandler!.setEpisodeNavigationCallbacks(
         onNext: _skipToNextEpisode,
         onPrevious: _skipToPreviousEpisode,
       );
-      
+
       // Listen to background handler state changes
       _audioHandler!.playbackState.listen((state) {
-        print('🔄 AudioService: Background state changed - playing: ${state.playing}');
-        
+        print(
+            '🔄 AudioService: Background state changed - playing: ${state.playing}');
+
         _currentPosition = state.updatePosition;
         _totalDuration = _audioHandler!.duration;
         _playbackSpeed = state.speed;
-        
+
         // Map audio_service states to our internal states
         switch (state.processingState) {
           case audio_service_pkg.AudioProcessingState.idle:
@@ -92,11 +94,13 @@ class AudioService extends ChangeNotifier {
             _playbackState = PlaybackState.loading;
             break;
           case audio_service_pkg.AudioProcessingState.ready:
-            _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
+            _playbackState =
+                state.playing ? PlaybackState.playing : PlaybackState.paused;
             break;
           case audio_service_pkg.AudioProcessingState.completed:
             _playbackState = PlaybackState.stopped;
             _currentPosition = Duration.zero;
+            _handleAudioCompletion();
             break;
           case audio_service_pkg.AudioProcessingState.error:
             _playbackState = PlaybackState.error;
@@ -105,7 +109,7 @@ class AudioService extends ChangeNotifier {
         }
         notifyListeners();
       });
-      
+
       // Listen to media item changes
       _audioHandler!.mediaItem.listen((mediaItem) {
         if (mediaItem != null) {
@@ -113,25 +117,24 @@ class AudioService extends ChangeNotifier {
           notifyListeners();
         }
       });
-      
     } else {
       print('🎧 AudioService: Falling back to local audio player');
-      
+
       // Fallback to local player if background handler not available
       _audioPlayer = AudioPlayer();
-      
+
       // Listen to position changes
       _audioPlayer.positionStream.listen((position) {
         _currentPosition = position;
         notifyListeners();
       });
-      
+
       // Listen to duration changes
       _audioPlayer.durationStream.listen((duration) {
         _totalDuration = duration ?? Duration.zero;
         notifyListeners();
       });
-      
+
       // Listen to player state changes
       _audioPlayer.playerStateStream.listen((state) {
         switch (state.processingState) {
@@ -145,11 +148,13 @@ class AudioService extends ChangeNotifier {
             _playbackState = PlaybackState.loading;
             break;
           case ProcessingState.ready:
-            _playbackState = state.playing ? PlaybackState.playing : PlaybackState.paused;
+            _playbackState =
+                state.playing ? PlaybackState.playing : PlaybackState.paused;
             break;
           case ProcessingState.completed:
             _playbackState = PlaybackState.stopped;
             _currentPosition = Duration.zero;
+            _handleAudioCompletion();
             break;
         }
         notifyListeners();
@@ -160,8 +165,9 @@ class AudioService extends ChangeNotifier {
   // Play audio file (supports both local files and streaming URLs)
   Future<void> playAudio(AudioFile audioFile) async {
     if (_audioHandler != null) {
-      print('🎵 AudioService: Playing via background handler - ${audioFile.displayTitle}');
-      
+      print(
+          '🎵 AudioService: Playing via background handler - ${audioFile.displayTitle}');
+
       try {
         _playbackState = PlaybackState.loading;
         _errorMessage = null;
@@ -174,13 +180,13 @@ class AudioService extends ChangeNotifier {
           artist: 'David Chang',
           audioFile: audioFile,
         );
-        
+
         await _audioHandler!.play();
         print('✅ AudioService: Background playback started');
       } catch (e) {
         _playbackState = PlaybackState.error;
         _errorMessage = 'Background audio failed: $e';
-        
+
         if (kDebugMode) {
           print('❌ AudioService: Background playback error: $e');
           print('AudioFile: ${audioFile.id}');
@@ -189,8 +195,9 @@ class AudioService extends ChangeNotifier {
         notifyListeners();
       }
     } else {
-      print('🎵 AudioService: Playing via local player - ${audioFile.displayTitle}');
-      
+      print(
+          '🎵 AudioService: Playing via local player - ${audioFile.displayTitle}');
+
       // Fallback to original implementation
       try {
         _playbackState = PlaybackState.loading;
@@ -210,13 +217,16 @@ class AudioService extends ChangeNotifier {
         if (kDebugMode) {
           print('AudioService: Playing audio from sourceUrl');
           print('AudioService: sourceUrl:  [32m${audioFile.sourceUrl} [0m');
-          print('AudioService: Platform:  [36m${kIsWeb ? 'Web' : 'Mobile'} [0m');
+          print(
+              'AudioService: Platform:  [36m${kIsWeb ? 'Web' : 'Mobile'} [0m');
         }
 
         if (kIsWeb) {
-          throw Exception('HLS streaming not supported on web. Use Android/iOS for full functionality.');
+          throw Exception(
+              'HLS streaming not supported on web. Use Android/iOS for full functionality.');
         } else {
-          await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
+          await _audioPlayer
+              .setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
           await _audioPlayer.play();
         }
 
@@ -224,10 +234,14 @@ class AudioService extends ChangeNotifier {
       } catch (e) {
         _playbackState = PlaybackState.error;
         // Provide helpful error messages for common issues
-        if (e.toString().contains('HttpException') || e.toString().contains('SocketException')) {
-          _errorMessage = 'Network error: Cannot access streaming URL. Check internet connection.';
-        } else if (e.toString().contains('FormatException') || e.toString().contains('UnsupportedError')) {
-          _errorMessage = 'Unsupported media format. Please try a different audio source.';
+        if (e.toString().contains('HttpException') ||
+            e.toString().contains('SocketException')) {
+          _errorMessage =
+              'Network error: Cannot access streaming URL. Check internet connection.';
+        } else if (e.toString().contains('FormatException') ||
+            e.toString().contains('UnsupportedError')) {
+          _errorMessage =
+              'Unsupported media format. Please try a different audio source.';
         } else if (e.toString().contains('PlayerException')) {
           _errorMessage = 'Audio player error: ${e.toString()}';
         } else {
@@ -334,13 +348,13 @@ class AudioService extends ChangeNotifier {
   Future<void> setPlaybackSpeed(double speed) async {
     try {
       _playbackSpeed = speed;
-      
+
       if (_audioHandler != null) {
         await _audioHandler!.customAction('setSpeed', {'speed': speed});
       } else {
         await _audioPlayer.setSpeed(speed);
       }
-      
+
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Failed to set playback speed: $e';
@@ -349,13 +363,15 @@ class AudioService extends ChangeNotifier {
   }
 
   // Skip forward
-  Future<void> skipForward([Duration duration = const Duration(seconds: 30)]) async {
+  Future<void> skipForward(
+      [Duration duration = const Duration(seconds: 30)]) async {
     if (_audioHandler != null) {
-      await _audioHandler!.skipToNext(); // Uses 30-second skip in background handler
+      await _audioHandler!
+          .skipToNext(); // Uses 30-second skip in background handler
     } else {
       final newPosition = _currentPosition + duration;
       final maxPosition = _totalDuration;
-      
+
       if (newPosition < maxPosition) {
         await seekTo(newPosition);
       } else {
@@ -365,12 +381,14 @@ class AudioService extends ChangeNotifier {
   }
 
   // Skip backward
-  Future<void> skipBackward([Duration duration = const Duration(seconds: 10)]) async {
+  Future<void> skipBackward(
+      [Duration duration = const Duration(seconds: 10)]) async {
     if (_audioHandler != null) {
-      await _audioHandler!.skipToPrevious(); // Uses 10-second skip in background handler
+      await _audioHandler!
+          .skipToPrevious(); // Uses 10-second skip in background handler
     } else {
       final newPosition = _currentPosition - duration;
-      
+
       if (newPosition > Duration.zero) {
         await seekTo(newPosition);
       } else {
@@ -391,12 +409,14 @@ class AudioService extends ChangeNotifier {
   // Episode navigation methods for lock screen controls
   Future<void> _skipToNextEpisode(AudioFile currentEpisode) async {
     if (_contentService == null) {
-      print('❌ AudioService: ContentService not available for episode navigation');
+      print(
+          '❌ AudioService: ContentService not available for episode navigation');
       return;
     }
-    
-    print('⏭️ AudioService: Skipping to next episode from ${currentEpisode.id}');
-    
+
+    print(
+        '⏭️ AudioService: Skipping to next episode from ${currentEpisode.id}');
+
     final nextEpisode = _contentService!.getNextEpisode(currentEpisode);
     if (nextEpisode != null) {
       await playAudio(nextEpisode);
@@ -408,16 +428,19 @@ class AudioService extends ChangeNotifier {
 
   Future<void> _skipToPreviousEpisode(AudioFile currentEpisode) async {
     if (_contentService == null) {
-      print('❌ AudioService: ContentService not available for episode navigation');
+      print(
+          '❌ AudioService: ContentService not available for episode navigation');
       return;
     }
-    
-    print('⏮️ AudioService: Skipping to previous episode from ${currentEpisode.id}');
-    
+
+    print(
+        '⏮️ AudioService: Skipping to previous episode from ${currentEpisode.id}');
+
     final previousEpisode = _contentService!.getPreviousEpisode(currentEpisode);
     if (previousEpisode != null) {
       await playAudio(previousEpisode);
-      print('✅ AudioService: Switched to previous episode: ${previousEpisode.id}');
+      print(
+          '✅ AudioService: Switched to previous episode: ${previousEpisode.id}');
     } else {
       print('📝 AudioService: No previous episode available');
     }
@@ -439,12 +462,12 @@ class AudioService extends ChangeNotifier {
     }
 
     print('🔄 AudioService: Switching language for ${newLanguageAudioFile.id}');
-    
+
     try {
       // Capture current state
       final wasPlaying = isPlaying;
       final currentPosition = _currentPosition;
-      
+
       // Set loading state
       _playbackState = PlaybackState.loading;
       _errorMessage = null;
@@ -459,7 +482,7 @@ class AudioService extends ChangeNotifier {
           initialPosition: currentPosition,
           audioFile: newLanguageAudioFile,
         );
-        
+
         // Resume playback if it was playing
         if (wasPlaying) {
           await _audioHandler!.play();
@@ -470,7 +493,7 @@ class AudioService extends ChangeNotifier {
           AudioSource.uri(Uri.parse(newLanguageAudioFile.sourceUrl)),
           initialPosition: currentPosition,
         );
-        
+
         // Resume playback if it was playing
         if (wasPlaying) {
           await _audioPlayer.play();
@@ -479,12 +502,12 @@ class AudioService extends ChangeNotifier {
 
       // Update current audio file
       _currentAudioFile = newLanguageAudioFile;
-      
+
       print('✅ AudioService: Language switched successfully');
     } catch (e) {
       _playbackState = PlaybackState.error;
       _errorMessage = 'Failed to switch language: $e';
-      
+
       if (kDebugMode) {
         print('❌ AudioService: Language switch error: $e');
         print('New AudioFile: ${newLanguageAudioFile.id}');
@@ -497,7 +520,7 @@ class AudioService extends ChangeNotifier {
   // Seek relative to current position
   Future<void> seekRelative(int seconds) async {
     final newPosition = _currentPosition + Duration(seconds: seconds);
-    
+
     if (newPosition < Duration.zero) {
       await seekTo(Duration.zero);
     } else if (newPosition > _totalDuration) {
@@ -507,13 +530,64 @@ class AudioService extends ChangeNotifier {
     }
   }
 
+  // Handle audio completion - triggers autoplay if enabled
+  Future<void> _handleAudioCompletion() async {
+    print(
+        '🔄 AudioService: Audio completed. Autoplay enabled: $_autoplayEnabled');
+
+    if (!_autoplayEnabled) {
+      print('📝 AudioService: Autoplay disabled, stopping playback');
+      return;
+    }
+
+    if (_contentService == null) {
+      print('❌ AudioService: ContentService not available for autoplay');
+      return;
+    }
+
+    if (_currentAudioFile == null) {
+      print('❌ AudioService: No current audio file for autoplay');
+      return;
+    }
+
+    try {
+      final nextEpisode = _contentService!.getNextEpisode(_currentAudioFile!);
+      if (nextEpisode != null) {
+        print(
+            '⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
+
+        // Small delay to ensure smooth transition
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        await playAudio(nextEpisode);
+        print('✅ AudioService: Autoplay completed successfully');
+      } else {
+        print('📝 AudioService: No next episode available for autoplay');
+      }
+    } catch (e) {
+      print('❌ AudioService: Autoplay failed: $e');
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Autoplay failed: $e';
+      notifyListeners();
+    }
+  }
+
+  // Set autoplay preference
+  void setAutoplayEnabled(bool enabled) {
+    if (_autoplayEnabled != enabled) {
+      _autoplayEnabled = enabled;
+      print('🔄 AudioService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
+      notifyListeners();
+    }
+  }
+
   // Format duration for display
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
-    
+
     if (hours > 0) {
       return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
     } else {

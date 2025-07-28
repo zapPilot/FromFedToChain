@@ -2,9 +2,9 @@ name: Code Quality
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   quality:
@@ -17,25 +17,45 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "23"
+          node-version: "18"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Node.js dependencies
         run: npm ci
 
-      - name: Check code formatting
-        run: npm run format -- --check
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Check Node.js code formatting
+        run: npx prettier --check "src/**/*.{js,mjs,json}" "tests/**/*.{js,mjs}" "*.{js,mjs,json,md}"
+
+      - name: Check Flutter code formatting
+        run: dart format --set-exit-if-changed lib/ test/
+
+      - name: Run Flutter analysis
+        run: flutter analyze --no-congratulate
 
       - name: Run tests
         run: npm run test
 
-      - name: Security audit
+      - name: Security audit (Node.js)
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
-      - name: Check for secrets (full scan)
+      - name: Security audit (Flutter)
+        run: flutter pub deps --json | jq '.packages[] | select(.kind == "direct") | "\(.name)@\(.version)"' | head -10
+        continue-on-error: true
+
+      - name: Check for secrets (comprehensive scan)
         if: github.event_name == 'push'
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          extra_args: --debug --only-verified
+          extra_args: --debug --only-verified --include="*.dart,*.js,*.mjs,*.json,*.yaml,*.yml"

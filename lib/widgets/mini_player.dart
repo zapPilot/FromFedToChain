@@ -52,7 +52,7 @@ class MiniPlayer extends StatelessWidget {
                     ),
                   ),
                 ),
-              
+
               // Player controls
               SafeArea(
                 top: false,
@@ -74,9 +74,9 @@ class MiniPlayer extends StatelessWidget {
                           size: 24,
                         ),
                       ),
-                      
+
                       const SizedBox(width: 12),
-                      
+
                       // Track info
                       Expanded(
                         child: Column(
@@ -84,9 +84,12 @@ class MiniPlayer extends StatelessWidget {
                           children: [
                             Text(
                               content?.title ?? audioFile.id,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -95,30 +98,39 @@ class MiniPlayer extends StatelessWidget {
                               children: [
                                 Text(
                                   audioFile.languageDisplayName,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.textTertiary,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: AppTheme.textTertiary,
+                                      ),
                                 ),
                                 Text(
                                   ' • ',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.textTertiary,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: AppTheme.textTertiary,
+                                      ),
                                 ),
                                 Text(
                                   audioFile.categoryDisplayName,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.textTertiary,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: AppTheme.textTertiary,
+                                      ),
                                 ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(width: 12),
-                      
+
                       // Control buttons
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -129,7 +141,7 @@ class MiniPlayer extends StatelessWidget {
                             icon: const Icon(Icons.replay_10),
                             color: AppTheme.textSecondary,
                           ),
-                          
+
                           // Play/Pause
                           Container(
                             width: 48,
@@ -139,7 +151,8 @@ class MiniPlayer extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.purplePrimary.withOpacity(0.3),
+                                  color:
+                                      AppTheme.purplePrimary.withOpacity(0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -148,20 +161,39 @@ class MiniPlayer extends StatelessWidget {
                             child: IconButton(
                               onPressed: audioService.togglePlayPause,
                               icon: Icon(
-                                audioService.isPlaying ? Icons.pause : Icons.play_arrow,
+                                audioService.isPlaying
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
                                 color: Colors.white,
                                 size: 24,
                               ),
                             ),
                           ),
-                          
+
                           // Skip forward
                           IconButton(
                             onPressed: audioService.skipForward,
                             icon: const Icon(Icons.forward_10),
                             color: AppTheme.textSecondary,
                           ),
-                          
+
+                          // Autoplay toggle
+                          IconButton(
+                            onPressed: () => audioService.setAutoplayEnabled(
+                                !audioService.autoplayEnabled),
+                            icon: Icon(
+                              audioService.autoplayEnabled
+                                  ? Icons.playlist_play
+                                  : Icons.playlist_play_outlined,
+                              color: audioService.autoplayEnabled
+                                  ? AppTheme.purplePrimary
+                                  : AppTheme.textTertiary,
+                            ),
+                            tooltip: audioService.autoplayEnabled
+                                ? 'Autoplay On'
+                                : 'Autoplay Off',
+                          ),
+
                           // Playback speed
                           PopupMenuButton<double>(
                             child: Container(
@@ -203,7 +235,7 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Time display and seek bar (expanded view)
               if (audioService.totalDuration.inSeconds > 0)
                 Padding(
@@ -214,40 +246,47 @@ class MiniPlayer extends StatelessWidget {
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: AppTheme.purplePrimary,
-                          inactiveTrackColor: AppTheme.textTertiary.withOpacity(0.2),
+                          inactiveTrackColor:
+                              AppTheme.textTertiary.withOpacity(0.2),
                           thumbColor: AppTheme.purplePrimary,
-                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+                          thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 6),
+                          overlayShape:
+                              const RoundSliderOverlayShape(overlayRadius: 12),
                           trackHeight: 3,
                         ),
                         child: Slider(
                           value: audioService.progress.clamp(0.0, 1.0),
                           onChanged: (value) {
                             final position = Duration(
-                              milliseconds: (value * audioService.totalDuration.inMilliseconds).round(),
+                              milliseconds: (value *
+                                      audioService.totalDuration.inMilliseconds)
+                                  .round(),
                             );
                             audioService.seekTo(position);
                           },
                         ),
                       ),
-                      
+
                       // Time labels
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             audioService.formattedCurrentPosition,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textTertiary,
-                              fontSize: 10,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.textTertiary,
+                                      fontSize: 10,
+                                    ),
                           ),
                           Text(
                             audioService.formattedTotalDuration,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textTertiary,
-                              fontSize: 10,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.textTertiary,
+                                      fontSize: 10,
+                                    ),
                           ),
                         ],
                       ),

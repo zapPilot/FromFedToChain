@@ -442,7 +442,6 @@ describe("Review Command Tests", () => {
     });
   });
 
-
   describe("Error Handling", () => {
     it("should handle missing content files gracefully", async () => {
       try {

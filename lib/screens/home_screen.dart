@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/content_service.dart';
@@ -38,14 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Animated background
             const AnimatedBackground(),
-            
+
             // Main content
             SafeArea(
               child: Column(
                 children: [
                   // Header
                   _buildHeader(),
-                  
+
                   // Content
                   Expanded(
                     child: _buildContent(),
@@ -81,22 +79,23 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Greeting
           ShaderMask(
-            shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
+            shaderCallback: (bounds) =>
+                AppTheme.primaryGradient.createShader(bounds),
             child: Text(
               'Good ${_getGreeting()},',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Ready to learn something new?',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppTheme.textTertiary,
-              fontWeight: FontWeight.w500,
-            ),
+                  color: AppTheme.textTertiary,
+                  fontWeight: FontWeight.w500,
+                ),
           ),
           const SizedBox(height: 16),
           // Stats row
@@ -181,15 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   'Error Loading Content',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppTheme.error,
-                  ),
+                        color: AppTheme.error,
+                      ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   contentService.error!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textTertiary,
-                  ),
+                        color: AppTheme.textTertiary,
+                      ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -209,22 +208,22 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Continue Learning
               _buildContinueLearningSection(contentService),
-              
+
               const SizedBox(height: 32),
-              
+
               // Featured Course
               _buildFeaturedCourseSection(contentService),
-              
+
               const SizedBox(height: 32),
-              
+
               // New Releases
               _buildNewReleasesSection(contentService),
-              
+
               const SizedBox(height: 32),
-              
+
               // Trending Authors
               _buildTrendingAuthorsSection(),
-              
+
               const SizedBox(height: 100), // Extra space for mini player
             ],
           ),
@@ -235,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildContinueLearningSection(ContentService contentService) {
     final audioFiles = contentService.audioFiles.take(2).toList();
-    
+
     if (audioFiles.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -248,8 +247,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               'Continue Learning',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const Spacer(),
             TextButton(
@@ -272,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 audioFile.id,
                 audioFile.language,
               );
-              
+
               return Container(
                 width: 280,
                 margin: const EdgeInsets.only(right: 12),
@@ -302,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildFeaturedCourseSection(ContentService contentService) {
     final audioFiles = contentService.audioFiles;
-    
+
     if (audioFiles.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -319,8 +318,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           'Featured Course',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+                fontWeight: FontWeight.w600,
+              ),
         ),
         const SizedBox(height: 16),
         Container(
@@ -354,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              
+
               // Content
               Padding(
                 padding: const EdgeInsets.all(24),
@@ -380,32 +379,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Title
                     Text(
                       content?.title ?? featuredCourse.id,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Subtitle
                     Text(
                       '${featuredCourse.categoryDisplayName} • ${featuredCourse.languageDisplayName}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.8),
-                      ),
+                            color: Colors.white.withOpacity(0.8),
+                          ),
                     ),
-                    
+
                     const Spacer(),
-                    
+
                     // Play button
                     ElevatedButton.icon(
                       onPressed: () {
@@ -437,7 +437,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildNewReleasesSection(ContentService contentService) {
     final audioFiles = contentService.audioFiles.take(5).toList();
-    
+
     if (audioFiles.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -450,8 +450,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               'New Releases',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const Spacer(),
             TextButton(
@@ -474,7 +474,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 audioFile.id,
                 audioFile.language,
               );
-              
+
               return Container(
                 width: 160,
                 margin: const EdgeInsets.only(right: 12),
@@ -508,8 +508,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           'Trending Authors',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+                fontWeight: FontWeight.w600,
+              ),
         ),
         const SizedBox(height: 16),
         SizedBox(

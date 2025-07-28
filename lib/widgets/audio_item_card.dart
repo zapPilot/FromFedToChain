@@ -21,12 +21,12 @@ class AudioItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AudioService>(
       builder: (context, audioService, child) {
-        final isCurrentFile = audioService.currentAudioFile?.filePath == audioFile.filePath;
+        final isCurrentFile = audioService.currentAudioFile?.id == audioFile.id;
         final isPlaying = isCurrentFile && audioService.isPlaying;
-        
+
         return Container(
           decoration: BoxDecoration(
-            gradient: isCurrentFile 
+            gradient: isCurrentFile
                 ? AppTheme.categoryGradient(audioFile.category)
                 : LinearGradient(
                     begin: Alignment.topLeft,
@@ -38,22 +38,31 @@ class AudioItemCard extends StatelessWidget {
                   ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isCurrentFile 
-                  ? AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.5)
+              color: isCurrentFile
+                  ? AppTheme.categoryGradient(audioFile.category)
+                      .colors
+                      .first
+                      .withOpacity(0.5)
                   : AppTheme.textTertiary.withOpacity(0.1),
               width: isCurrentFile ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: isCurrentFile 
-                    ? AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.2)
+                color: isCurrentFile
+                    ? AppTheme.categoryGradient(audioFile.category)
+                        .colors
+                        .first
+                        .withOpacity(0.2)
                     : Colors.black.withOpacity(0.1),
                 blurRadius: isCurrentFile ? 16 : 6,
                 offset: const Offset(0, 4),
               ),
               if (isCurrentFile)
                 BoxShadow(
-                  color: AppTheme.categoryGradient(audioFile.category).colors.first.withOpacity(0.1),
+                  color: AppTheme.categoryGradient(audioFile.category)
+                      .colors
+                      .first
+                      .withOpacity(0.1),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -69,10 +78,13 @@ class AudioItemCard extends StatelessWidget {
                 child: Row(
                   children: [
                     // Play button
-                    _buildPlayButton(isPlaying, audioService.isLoading && isCurrentFile, audioFile.category),
-                    
+                    _buildPlayButton(
+                        isPlaying,
+                        audioService.isLoading && isCurrentFile,
+                        audioFile.category),
+
                     const SizedBox(width: 16),
-                    
+
                     // Content info
                     Expanded(
                       child: Column(
@@ -81,16 +93,21 @@ class AudioItemCard extends StatelessWidget {
                           // Title
                           Text(
                             content?.title ?? audioFile.id,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: isCurrentFile ? AppTheme.textPrimary : AppTheme.textSecondary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: isCurrentFile
+                                      ? AppTheme.textPrimary
+                                      : AppTheme.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          
+
                           const SizedBox(height: 4),
-                          
+
                           // Metadata row
                           Row(
                             children: [
@@ -99,29 +116,34 @@ class AudioItemCard extends StatelessWidget {
                                 audioFile.languageDisplayName,
                                 AppTheme.bluePrimary,
                               ),
-                              
+
                               const SizedBox(width: 8),
-                              
+
                               // Category
                               _buildChip(
                                 audioFile.categoryDisplayName,
-                                AppTheme.categoryGradient(audioFile.category).colors.first,
+                                AppTheme.categoryGradient(audioFile.category)
+                                    .colors
+                                    .first,
                               ),
-                              
+
                               const Spacer(),
-                              
+
                               // File size
                               Text(
                                 audioFile.sizeFormatted,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppTheme.textTertiary,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppTheme.textTertiary,
+                                    ),
                               ),
                             ],
                           ),
-                          
+
                           const SizedBox(height: 8),
-                          
+
                           // Date and duration
                           Row(
                             children: [
@@ -133,11 +155,13 @@ class AudioItemCard extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 audioFile.displayDate,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppTheme.textTertiary,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppTheme.textTertiary,
+                                    ),
                               ),
-                              
                               if (audioFile.duration != null) ...[
                                 const SizedBox(width: 16),
                                 Icon(
@@ -148,44 +172,56 @@ class AudioItemCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   audioFile.durationFormatted,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.textTertiary,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: AppTheme.textTertiary,
+                                      ),
                                 ),
                               ],
                             ],
                           ),
-                          
+
                           // Progress bar for current file
-                          if (isCurrentFile && audioService.totalDuration.inSeconds > 0)
+                          if (isCurrentFile &&
+                              audioService.totalDuration.inSeconds > 0)
                             Padding(
                               padding: const EdgeInsets.only(top: 12),
                               child: Column(
                                 children: [
                                   LinearProgressIndicator(
                                     value: audioService.progress,
-                                    backgroundColor: AppTheme.textTertiary.withOpacity(0.2),
+                                    backgroundColor:
+                                        AppTheme.textTertiary.withOpacity(0.2),
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                       AppTheme.purplePrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         audioService.formattedCurrentPosition,
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: AppTheme.textTertiary,
-                                          fontSize: 10,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: AppTheme.textTertiary,
+                                              fontSize: 10,
+                                            ),
                                       ),
                                       Text(
                                         audioService.formattedTotalDuration,
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: AppTheme.textTertiary,
-                                          fontSize: 10,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: AppTheme.textTertiary,
+                                              fontSize: 10,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -195,7 +231,7 @@ class AudioItemCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // More actions button
                     IconButton(
                       onPressed: () => _showMoreActions(context),
@@ -297,20 +333,20 @@ class AudioItemCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Title
             Text(
               content?.title ?? audioFile.id,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Actions
             ListTile(
               leading: const Icon(Icons.info_outline),
@@ -320,7 +356,7 @@ class AudioItemCard extends StatelessWidget {
                 _showDetails(context);
               },
             ),
-            
+
             ListTile(
               leading: const Icon(Icons.share),
               title: const Text('Share'),

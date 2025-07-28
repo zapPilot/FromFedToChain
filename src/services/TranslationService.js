@@ -2,11 +2,11 @@ import { Translate } from "@google-cloud/translate/build/src/v2/index.js";
 import chalk from "chalk";
 import { ContentManager } from "../ContentManager.js";
 import path from "path";
-import { 
-  getTranslationTargets, 
+import {
+  getTranslationTargets,
   getTranslationConfig,
   LANGUAGES,
-  PATHS 
+  PATHS,
 } from "../../config/languages.js";
 
 export class TranslationService {
@@ -16,9 +16,12 @@ export class TranslationService {
   // Initialize Google Cloud Translate client
   static getTranslateClient() {
     if (!this.translate_client) {
-      const serviceAccountPath = path.resolve(process.cwd(), PATHS.SERVICE_ACCOUNT);
+      const serviceAccountPath = path.resolve(
+        process.cwd(),
+        PATHS.SERVICE_ACCOUNT,
+      );
       this.translate_client = new Translate({
-        keyFilename: serviceAccountPath
+        keyFilename: serviceAccountPath,
         // projectId will be automatically inferred from service account file
       });
     }
@@ -35,9 +38,11 @@ export class TranslationService {
 
     // Get the source content (zh-TW)
     const sourceContent = await ContentManager.readSource(id);
-    
-    if (sourceContent.status !== 'reviewed') {
-      throw new Error(`Content must be reviewed before translation. Current status: ${sourceContent.status}`);
+
+    if (sourceContent.status !== "reviewed") {
+      throw new Error(
+        `Content must be reviewed before translation. Current status: ${sourceContent.status}`,
+      );
     }
 
     const { title, content } = sourceContent;
@@ -47,30 +52,39 @@ export class TranslationService {
     const translatedContent = await this.translateText(content, targetLanguage);
 
     // Add translation to content (creates new language file)
-    await ContentManager.addTranslation(id, targetLanguage, translatedTitle, translatedContent);
+    await ContentManager.addTranslation(
+      id,
+      targetLanguage,
+      translatedTitle,
+      translatedContent,
+    );
 
     // Update source status if all translations are complete
     const availableLanguages = await ContentManager.getAvailableLanguages(id);
-    const targetLanguages = ['zh-TW', ...this.SUPPORTED_LANGUAGES]; // Source + translations
-    
+    const targetLanguages = ["zh-TW", ...this.SUPPORTED_LANGUAGES]; // Source + translations
+
     if (availableLanguages.length === targetLanguages.length) {
-      await ContentManager.updateSourceStatus(id, 'translated');
+      await ContentManager.updateSourceStatus(id, "translated");
     }
 
-    console.log(chalk.green(`✅ Translation completed: ${id} (${targetLanguage})`));
+    console.log(
+      chalk.green(`✅ Translation completed: ${id} (${targetLanguage})`),
+    );
     return { translatedTitle, translatedContent };
   }
 
   // Translate all supported languages for content
   static async translateAll(id) {
     const results = {};
-    
+
     for (const language of this.SUPPORTED_LANGUAGES) {
       try {
         const result = await this.translate(id, language);
         results[language] = result;
       } catch (error) {
-        console.error(chalk.red(`❌ Translation failed for ${language}: ${error.message}`));
+        console.error(
+          chalk.red(`❌ Translation failed for ${language}: ${error.message}`),
+        );
         results[language] = { error: error.message };
       }
     }
@@ -83,29 +97,35 @@ export class TranslationService {
     // Get translation configurations
     const sourceConfig = getTranslationConfig(LANGUAGES.PRIMARY);
     const targetConfig = getTranslationConfig(targetLanguage);
-    
+
     const sourceLanguage = sourceConfig.languageCode;
     const targetLangCode = targetConfig.languageCode;
-    
+
     if (!targetConfig.isTarget) {
-      throw new Error(`Language ${targetLanguage} is not configured as a translation target`);
+      throw new Error(
+        `Language ${targetLanguage} is not configured as a translation target`,
+      );
     }
 
     try {
       const translateClient = this.getTranslateClient();
-      
+
       const [translation] = await translateClient.translate(text, {
         from: sourceLanguage,
         to: targetLangCode,
-        format: 'text'
+        format: "text",
       });
 
       return translation;
     } catch (error) {
-      if (error.code === 'ENOENT') {
-        throw new Error('Google Cloud service account file not found. Please ensure service-account.json exists in the project root.');
-      } else if (error.code === 'EACCES') {
-        throw new Error('Google Cloud authentication failed. Please check your service-account.json credentials.');
+      if (error.code === "ENOENT") {
+        throw new Error(
+          "Google Cloud service account file not found. Please ensure service-account.json exists in the project root.",
+        );
+      } else if (error.code === "EACCES") {
+        throw new Error(
+          "Google Cloud authentication failed. Please check your service-account.json credentials.",
+        );
       } else {
         throw new Error(`Translation failed: ${error.message}`);
       }
@@ -115,27 +135,40 @@ export class TranslationService {
   // Translate social hook text
   static async translateSocialHook(hookText, targetLanguage) {
     if (!hookText || !hookText.trim()) {
-      throw new Error('Hook text cannot be empty');
+      throw new Error("Hook text cannot be empty");
     }
 
     if (!this.SUPPORTED_LANGUAGES.includes(targetLanguage)) {
-      throw new Error(`Unsupported language for social hook translation: ${targetLanguage}`);
+      throw new Error(
+        `Unsupported language for social hook translation: ${targetLanguage}`,
+      );
     }
 
-    console.log(chalk.blue(`🔄 Translating social hook to ${targetLanguage}...`));
-    
+    console.log(
+      chalk.blue(`🔄 Translating social hook to ${targetLanguage}...`),
+    );
+
     try {
-      const translatedHook = await this.translateText(hookText.trim(), targetLanguage);
-      console.log(chalk.green(`✅ Social hook translated to ${targetLanguage}`));
+      const translatedHook = await this.translateText(
+        hookText.trim(),
+        targetLanguage,
+      );
+      console.log(
+        chalk.green(`✅ Social hook translated to ${targetLanguage}`),
+      );
       return translatedHook;
     } catch (error) {
-      console.error(chalk.red(`❌ Social hook translation failed for ${targetLanguage}: ${error.message}`));
+      console.error(
+        chalk.red(
+          `❌ Social hook translation failed for ${targetLanguage}: ${error.message}`,
+        ),
+      );
       throw error;
     }
   }
 
   // Get content needing translation
   static async getContentNeedingTranslation() {
-    return ContentManager.getSourceByStatus('reviewed');
+    return ContentManager.getSourceByStatus("reviewed");
   }
 }

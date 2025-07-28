@@ -13,7 +13,7 @@ export class M3U8AudioService {
     "/usr/local/bin/ffmpeg",
     "/opt/homebrew/bin/ffmpeg",
     "/usr/bin/ffmpeg",
-    "ffmpeg" // Default PATH lookup
+    "ffmpeg", // Default PATH lookup
   ];
 
   /**
@@ -32,7 +32,7 @@ export class M3U8AudioService {
         // Continue to next path
       }
     }
-    
+
     console.error(chalk.red("❌ FFmpeg not found in any common locations"));
     console.error(chalk.yellow("💡 Please install FFmpeg:"));
     console.error(chalk.yellow("   macOS: brew install ffmpeg"));
@@ -62,19 +62,19 @@ export class M3U8AudioService {
       });
 
       process.on("close", (code) => {
-        resolve({ 
-          success: code === 0, 
-          output: stdout, 
+        resolve({
+          success: code === 0,
+          output: stdout,
           error: stderr,
-          code 
+          code,
         });
       });
 
       process.on("error", (error) => {
-        resolve({ 
-          success: false, 
+        resolve({
+          success: false,
           error: error.message,
-          code: -1
+          code: -1,
         });
       });
     });
@@ -90,7 +90,8 @@ export class M3U8AudioService {
    * @returns {Promise<Object>} - M3U8 conversion result
    */
   static async convertToM3U8(wavPath, id, language, category, options = {}) {
-    const segmentDuration = options.segmentDuration || this.DEFAULT_SEGMENT_DURATION;
+    const segmentDuration =
+      options.segmentDuration || this.DEFAULT_SEGMENT_DURATION;
     const segmentFormat = options.segmentFormat || this.DEFAULT_SEGMENT_FORMAT;
 
     console.log(chalk.blue(`🎬 Converting to M3U8: ${id} (${language})`));
@@ -98,7 +99,9 @@ export class M3U8AudioService {
     // Check if ffmpeg is available
     const ffmpegPath = await this.detectFFmpegPath();
     if (!ffmpegPath) {
-      throw new Error("FFmpeg not found. Please install FFmpeg to enable M3U8 conversion.");
+      throw new Error(
+        "FFmpeg not found. Please install FFmpeg to enable M3U8 conversion.",
+      );
     }
 
     // Set ffmpeg path for fluent-ffmpeg
@@ -115,20 +118,30 @@ export class M3U8AudioService {
 
     try {
       // Convert WAV to M3U8 using ffmpeg
-      await this.runFFmpegConversion(wavPath, playlistPath, segmentPattern, segmentDuration);
+      await this.runFFmpegConversion(
+        wavPath,
+        playlistPath,
+        segmentPattern,
+        segmentDuration,
+      );
 
       // Generate segment list for easier management
       const segments = await this.generateSegmentList(m3u8Dir, segmentFormat);
-      await fs.writeFile(segmentListPath, segments.join('\n'));
+      await fs.writeFile(segmentListPath, segments.join("\n"));
 
       // Generate metadata
-      const metadata = await this.generateM3U8Metadata(wavPath, playlistPath, segments, {
-        id,
-        language,
-        category,
-        segmentDuration,
-        segmentFormat
-      });
+      const metadata = await this.generateM3U8Metadata(
+        wavPath,
+        playlistPath,
+        segments,
+        {
+          id,
+          language,
+          category,
+          segmentDuration,
+          segmentFormat,
+        },
+      );
 
       console.log(chalk.green(`✅ M3U8 conversion completed: ${playlistPath}`));
       console.log(chalk.gray(`   Segments: ${segments.length}`));
@@ -139,12 +152,13 @@ export class M3U8AudioService {
         playlistPath,
         segmentDir: m3u8Dir,
         segments,
-        metadata
+        metadata,
       };
-
     } catch (error) {
       console.error(chalk.red(`❌ M3U8 conversion failed: ${error.message}`));
-      throw new Error(`M3U8 conversion failed for ${id} (${language}): ${error.message}`);
+      throw new Error(
+        `M3U8 conversion failed for ${id} (${language}): ${error.message}`,
+      );
     }
   }
 
@@ -156,34 +170,41 @@ export class M3U8AudioService {
    * @param {number} segmentDuration - Duration of each segment in seconds
    * @returns {Promise<void>}
    */
-  static async runFFmpegConversion(inputPath, playlistPath, segmentPattern, segmentDuration) {
+  static async runFFmpegConversion(
+    inputPath,
+    playlistPath,
+    segmentPattern,
+    segmentDuration,
+  ) {
     return new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .audioCodec('aac')
+        .audioCodec("aac")
         .audioBitrate(128) // 128kbps for good quality streaming
         .audioFrequency(44100) // Standard frequency for audio streaming
-        .format('hls')
+        .format("hls")
         .outputOptions([
           `-hls_time ${segmentDuration}`,
           `-hls_list_size 0`, // Keep all segments in playlist
           `-hls_segment_filename ${segmentPattern}`,
           `-hls_playlist_type vod`, // Video On Demand type
-          `-hls_flags independent_segments` // Make segments independent
+          `-hls_flags independent_segments`, // Make segments independent
         ])
         .output(playlistPath)
-        .on('start', (commandLine) => {
+        .on("start", (commandLine) => {
           console.log(chalk.gray(`   FFmpeg command: ${commandLine}`));
         })
-        .on('progress', (progress) => {
+        .on("progress", (progress) => {
           if (progress.percent) {
-            console.log(chalk.gray(`   Progress: ${Math.round(progress.percent)}%`));
+            console.log(
+              chalk.gray(`   Progress: ${Math.round(progress.percent)}%`),
+            );
           }
         })
-        .on('end', () => {
+        .on("end", () => {
           console.log(chalk.green(`   FFmpeg conversion completed`));
           resolve();
         })
-        .on('error', (error) => {
+        .on("error", (error) => {
           console.error(chalk.red(`   FFmpeg error: ${error.message}`));
           reject(error);
         })
@@ -200,9 +221,9 @@ export class M3U8AudioService {
   static async generateSegmentList(segmentDir, segmentFormat) {
     const files = await fs.readdir(segmentDir);
     const segments = files
-      .filter(file => file.endsWith(`.${segmentFormat}`))
+      .filter((file) => file.endsWith(`.${segmentFormat}`))
       .sort();
-    
+
     return segments;
   }
 
@@ -214,14 +235,19 @@ export class M3U8AudioService {
    * @param {Object} conversionInfo - Conversion information
    * @returns {Promise<Object>} - Metadata object
    */
-  static async generateM3U8Metadata(originalPath, playlistPath, segments, conversionInfo) {
+  static async generateM3U8Metadata(
+    originalPath,
+    playlistPath,
+    segments,
+    conversionInfo,
+  ) {
     const originalStats = await fs.stat(originalPath);
     const playlistStats = await fs.stat(playlistPath);
-    
+
     // Calculate total segment file size
     const segmentDir = path.dirname(playlistPath);
     let totalSegmentSize = 0;
-    
+
     for (const segment of segments) {
       const segmentPath = path.join(segmentDir, segment);
       const segmentStats = await fs.stat(segmentPath);
@@ -232,7 +258,7 @@ export class M3U8AudioService {
       original: {
         path: originalPath,
         size: originalStats.size,
-        created: originalStats.birthtime.toISOString()
+        created: originalStats.birthtime.toISOString(),
       },
       m3u8: {
         playlistPath,
@@ -240,12 +266,12 @@ export class M3U8AudioService {
         segments: segments.length,
         totalSegmentSize,
         playlistSize: playlistStats.size,
-        created: playlistStats.birthtime.toISOString()
+        created: playlistStats.birthtime.toISOString(),
       },
       conversion: {
         ...conversionInfo,
-        convertedAt: new Date().toISOString()
-      }
+        convertedAt: new Date().toISOString(),
+      },
     };
   }
 
@@ -262,14 +288,17 @@ export class M3U8AudioService {
 
     try {
       const stats = await fs.stat(playlistPath);
-      const segments = await this.generateSegmentList(m3u8Dir, this.DEFAULT_SEGMENT_FORMAT);
-      
+      const segments = await this.generateSegmentList(
+        m3u8Dir,
+        this.DEFAULT_SEGMENT_FORMAT,
+      );
+
       return {
         playlistPath,
         segmentDir: m3u8Dir,
         segments,
         created: stats.birthtime.toISOString(),
-        size: stats.size
+        size: stats.size,
       };
     } catch (error) {
       return null;
@@ -283,68 +312,86 @@ export class M3U8AudioService {
   static async listM3U8Files() {
     try {
       const m3u8Files = [];
-      
+
       // Check if M3U8_DIR exists
       try {
         await fs.access(this.M3U8_DIR);
       } catch (error) {
-        console.log(chalk.yellow(`⚠️ M3U8 directory does not exist: ${this.M3U8_DIR}`));
+        console.log(
+          chalk.yellow(`⚠️ M3U8 directory does not exist: ${this.M3U8_DIR}`),
+        );
         return [];
       }
-      
+
       const languages = await fs.readdir(this.M3U8_DIR);
 
       for (const language of languages) {
         try {
           const languageDir = path.join(this.M3U8_DIR, language);
           const languageStat = await fs.stat(languageDir);
-          
+
           if (!languageStat.isDirectory()) continue;
 
           const categories = await fs.readdir(languageDir);
-          
+
           for (const category of categories) {
             try {
               const categoryDir = path.join(languageDir, category);
               const categoryStat = await fs.stat(categoryDir);
-              
+
               if (!categoryStat.isDirectory()) continue;
 
               const contentIds = await fs.readdir(categoryDir);
-              
+
               for (const id of contentIds) {
                 try {
                   const idDir = path.join(categoryDir, id);
                   const idStat = await fs.stat(idDir);
-                  
+
                   if (!idStat.isDirectory()) continue;
 
-                  const m3u8Info = await this.getM3U8Files(id, language, category);
+                  const m3u8Info = await this.getM3U8Files(
+                    id,
+                    language,
+                    category,
+                  );
                   if (m3u8Info) {
                     m3u8Files.push({
                       id,
                       language,
                       category,
-                      ...m3u8Info
+                      ...m3u8Info,
                     });
                   }
                 } catch (error) {
                   // Skip individual content directories that have issues
-                  console.log(chalk.yellow(`⚠️ Skipping ${language}/${category}/${id}: ${error.message}`));
+                  console.log(
+                    chalk.yellow(
+                      `⚠️ Skipping ${language}/${category}/${id}: ${error.message}`,
+                    ),
+                  );
                 }
               }
             } catch (error) {
-              // Skip individual category directories that have issues  
-              console.log(chalk.yellow(`⚠️ Skipping ${language}/${category}: ${error.message}`));
+              // Skip individual category directories that have issues
+              console.log(
+                chalk.yellow(
+                  `⚠️ Skipping ${language}/${category}: ${error.message}`,
+                ),
+              );
             }
           }
         } catch (error) {
           // Skip individual language directories that have issues
-          console.log(chalk.yellow(`⚠️ Skipping ${language}: ${error.message}`));
+          console.log(
+            chalk.yellow(`⚠️ Skipping ${language}: ${error.message}`),
+          );
         }
       }
 
-      return m3u8Files.sort((a, b) => new Date(b.created) - new Date(a.created));
+      return m3u8Files.sort(
+        (a, b) => new Date(b.created) - new Date(a.created),
+      );
     } catch (error) {
       console.error(chalk.red(`Error listing M3U8 files: ${error.message}`));
       return [];
@@ -360,13 +407,15 @@ export class M3U8AudioService {
    */
   static async cleanupM3U8Files(id, language, category) {
     const m3u8Dir = path.join(this.M3U8_DIR, language, category, id);
-    
+
     try {
       await fs.rm(m3u8Dir, { recursive: true, force: true });
       console.log(chalk.green(`🗑️ Cleaned up M3U8 files: ${id} (${language})`));
       return true;
     } catch (error) {
-      console.error(chalk.red(`Failed to cleanup M3U8 files: ${error.message}`));
+      console.error(
+        chalk.red(`Failed to cleanup M3U8 files: ${error.message}`),
+      );
       return false;
     }
   }
