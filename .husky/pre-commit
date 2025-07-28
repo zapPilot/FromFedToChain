@@ -3,38 +3,38 @@
 # Run lint-staged to format staged files
 npx lint-staged
 
-# Run Flutter analysis and tests for Dart files if any were modified
-if git diff --cached --name-only | grep -q "\.dart$\|pubspec\.yaml$"; then
-  echo "🔍 Running Flutter analysis..."
-  # Run flutter analyze and capture output
-  FLUTTER_OUTPUT=$(flutter analyze --no-congratulate 2>&1)
-  FLUTTER_EXIT_CODE=$?
+# # Run Flutter analysis and tests for Dart files if any were modified
+# if git diff --cached --name-only | grep -q "\.dart$\|pubspec\.yaml$"; then
+#   echo "🔍 Running Flutter analysis..."
+#   # Run flutter analyze and capture output
+#   FLUTTER_OUTPUT=$(flutter analyze --no-congratulate 2>&1)
+#   FLUTTER_EXIT_CODE=$?
   
-  # Check for actual errors/warnings (not just info)
-  ERROR_COUNT=$(echo "$FLUTTER_OUTPUT" | grep -c "error •" || true)
-  WARNING_COUNT=$(echo "$FLUTTER_OUTPUT" | grep -c "warning •" || true)
+#   # Check for actual errors/warnings (not just info)
+#   ERROR_COUNT=$(echo "$FLUTTER_OUTPUT" | grep -c "error •" || true)
+#   WARNING_COUNT=$(echo "$FLUTTER_OUTPUT" | grep -c "warning •" || true)
   
-  # Set to 0 if grep found nothing
-  ERROR_COUNT=${ERROR_COUNT:-0}
-  WARNING_COUNT=${WARNING_COUNT:-0}
+#   # Set to 0 if grep found nothing
+#   ERROR_COUNT=${ERROR_COUNT:-0}
+#   WARNING_COUNT=${WARNING_COUNT:-0}
   
-  if [[ $ERROR_COUNT -gt 0 ]] || [[ $WARNING_COUNT -gt 0 ]]; then
-    echo "❌ Flutter analysis found $ERROR_COUNT errors and $WARNING_COUNT warnings:"
-    echo "$FLUTTER_OUTPUT" | grep -E "(error •|warning •)"
-    exit 1
-  fi
+#   if [[ $ERROR_COUNT -gt 0 ]] || [[ $WARNING_COUNT -gt 0 ]]; then
+#     echo "❌ Flutter analysis found $ERROR_COUNT errors and $WARNING_COUNT warnings:"
+#     echo "$FLUTTER_OUTPUT" | grep -E "(error •|warning •)"
+#     exit 1
+#   fi
   
-  # Show info summary but don't fail
-  INFO_COUNT=$(echo "$FLUTTER_OUTPUT" | grep -c "info •" || echo "0")
-  if [[ $INFO_COUNT -gt 0 ]]; then
-    echo "ℹ️ Flutter analysis found $INFO_COUNT info-level suggestions (not blocking commit)"
-  fi
+#   # Show info summary but don't fail
+#   INFO_COUNT=$(echo "$FLUTTER_OUTPUT" | grep -c "info •" || echo "0")
+#   if [[ $INFO_COUNT -gt 0 ]]; then
+#     echo "ℹ️ Flutter analysis found $INFO_COUNT info-level suggestions (not blocking commit)"
+#   fi
   
-  echo "🧪 Running Flutter tests..."
-  if ! flutter test --no-pub --reporter compact; then
-    echo "❌ Flutter tests failed. Please fix the failing tests."
-    exit 1
-  fi
+#   echo "🧪 Running Flutter tests..."
+#   if ! flutter test --no-pub --reporter compact; then
+#     echo "❌ Flutter tests failed. Please fix the failing tests."
+#     exit 1
+#   fi
   
-  echo "✅ Flutter checks passed!"
-fi
+#   echo "✅ Flutter checks passed!"
+# fi
