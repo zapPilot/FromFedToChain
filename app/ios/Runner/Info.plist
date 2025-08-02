@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app does not record audio. Microphone access may be requested by the system for playback or framework compatibility.</string>
 </dict>
 </plist>
