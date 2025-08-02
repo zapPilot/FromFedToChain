@@ -258,7 +258,6 @@ describe("ContentManager Nested Structure Tests", () => {
       assert.equal(content.feedback.content_review.comments, "Good content");
       assert.equal(content.feedback.content_review.score, 4);
     });
-
   });
 
   describe("Performance and Edge Cases", () => {

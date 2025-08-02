@@ -121,7 +121,7 @@ export class ContentManager {
   // Update content (finds existing file and updates it)
   static async update(id, updates, language = null) {
     const content = await this.read(id, language);
-    
+
     const updatedContent = {
       ...content,
       ...updates,
@@ -236,12 +236,12 @@ export class ContentManager {
   static async addAudio(id, language, audioPath, streamingUrls = {}) {
     const content = await this.read(id, language);
     const updateData = { audio_file: audioPath };
-    
+
     // Add streaming URLs if provided
     if (streamingUrls && Object.keys(streamingUrls).length > 0) {
       updateData.streaming_urls = streamingUrls;
     }
-    
+
     return this.update(id, updateData, language);
   }
 
@@ -252,13 +252,7 @@ export class ContentManager {
   }
 
   // Add feedback for content review (applies to source language file)
-  static async addContentFeedback(
-    id,
-    status,
-    score,
-    reviewer,
-    comments,
-  ) {
+  static async addContentFeedback(id, status, score, reviewer, comments) {
     // Validate that rejection requires feedback
     if (status === "rejected" && (!comments || comments.trim() === "")) {
       throw new Error("Feedback comment is required when rejecting content");
@@ -284,10 +278,6 @@ export class ContentManager {
     return this.update(id, contentData, "zh-TW");
   }
 
-
-
-
-
   // Helper methods for review workflow (work with source language)
 
   // Get all source content needing review
@@ -298,9 +288,9 @@ export class ContentManager {
   // Get source content for review (excludes rejected content)
   static async getSourceForReview() {
     const draftContent = await this.getSourceByStatus("draft");
-    
+
     // Filter out content that has been rejected
-    return draftContent.filter(content => {
+    return draftContent.filter((content) => {
       const review = content.feedback?.content_review;
       return !review || review.status !== "rejected";
     });

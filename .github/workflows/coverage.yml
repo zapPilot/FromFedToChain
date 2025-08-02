@@ -1,0 +1,84 @@
+name: Coverage Analysis
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Run weekly coverage analysis
+    - cron: '0 2 * * 1'
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for trend analysis
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Generate Flutter coverage
+        run: flutter test --coverage
+
+      - name: Install lcov for coverage parsing
+        run: sudo apt-get install -y lcov
+
+      - name: Check Flutter coverage threshold
+        run: |
+          # Extract coverage percentage from lcov.info
+          COVERAGE_INFO=$(lcov --summary coverage/lcov.info 2>&1)
+          COVERAGE_PCT=$(echo "$COVERAGE_INFO" | grep -oP 'lines\.*: \K[\d.]+(?=%)')
+          THRESHOLD=25.0
+          
+          echo "🎯 Current Flutter Coverage: ${COVERAGE_PCT}%"
+          echo "📊 Minimum Required: ${THRESHOLD}%"
+          
+          if (( $(echo "$COVERAGE_PCT < $THRESHOLD" | bc -l) )); then
+            echo "❌ Coverage ($COVERAGE_PCT%) is below required threshold ($THRESHOLD%)"
+            echo "::error::Flutter test coverage is below the minimum threshold"
+            exit 1
+          else
+            echo "✅ Coverage requirement met!"
+          fi
+
+      - name: Generate detailed coverage report
+        run: |
+          # Generate HTML coverage report
+          genhtml coverage/lcov.info -o coverage/html
+          echo "📋 Detailed coverage report generated"
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage/
+          retention-days: 30
+
+      - name: Coverage summary comment
+        if: github.event_name == 'push'
+        run: |
+          COVERAGE_PCT=$(lcov --summary coverage/lcov.info 2>&1 | grep -oP 'lines\.*: \K[\d.]+(?=%)')
+          echo "## 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "**Flutter Coverage:** ${COVERAGE_PCT}%" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ✅ Threshold met (≥25%)" >> $GITHUB_STEP_SUMMARY
+          echo "**Files Analyzed:** $(find lib -name "*.dart" | wc -l) Dart files" >> $GITHUB_STEP_SUMMARY

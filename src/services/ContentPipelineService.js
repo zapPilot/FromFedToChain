@@ -25,7 +25,11 @@ export class ContentPipelineService {
       const content = await ContentManager.getByStatus(status);
       return content;
     } catch (error) {
-      console.error(chalk.red(`❌ Error getting pending content for ${status}: ${error.message}`));
+      console.error(
+        chalk.red(
+          `❌ Error getting pending content for ${status}: ${error.message}`,
+        ),
+      );
       return [];
     }
   }
@@ -40,19 +44,21 @@ export class ContentPipelineService {
 
     for (const step of pipelineConfig) {
       const content = await this.getPendingContent(step.status);
-      content.forEach(item => {
+      content.forEach((item) => {
         pendingContent.push({
           content: item,
           nextPhase: step.phase,
           currentStatus: step.status,
           nextStatus: step.nextStatus,
-          description: step.description
+          description: step.description,
         });
       });
     }
 
     // Sort by date (newest first)
-    return pendingContent.sort((a, b) => new Date(b.content.date) - new Date(a.content.date));
+    return pendingContent.sort(
+      (a, b) => new Date(b.content.date) - new Date(a.content.date),
+    );
   }
 
   /**
@@ -64,7 +70,7 @@ export class ContentPipelineService {
     try {
       const sourceContent = await ContentManager.readSource(id);
       const currentStatus = sourceContent.status;
-      
+
       const step = ContentSchema.getPipelineStep(currentStatus);
       if (!step) {
         console.warn(`No pipeline step found for status: ${currentStatus}`);
@@ -72,24 +78,33 @@ export class ContentPipelineService {
       }
 
       if (!step.nextStatus) {
-        console.log(`Content ${id} is in final pipeline stage (${currentStatus}). No next step.`);
+        console.log(
+          `Content ${id} is in final pipeline stage (${currentStatus}). No next step.`,
+        );
         return true;
       }
 
-      console.log(chalk.blue(`🔄 Processing ${id}: ${currentStatus} → ${step.nextStatus}`));
+      console.log(
+        chalk.blue(
+          `🔄 Processing ${id}: ${currentStatus} → ${step.nextStatus}`,
+        ),
+      );
       console.log(chalk.gray(`   ${step.description}`));
 
       // Execute the appropriate processing step
       const success = await this.executeProcessingStep(id, step);
-      
+
       if (success) {
-        console.log(chalk.green(`✅ ${id}: ${currentStatus} → ${step.nextStatus}`));
+        console.log(
+          chalk.green(`✅ ${id}: ${currentStatus} → ${step.nextStatus}`),
+        );
         return true;
       } else {
-        console.error(chalk.red(`❌ Failed to process ${id} from ${currentStatus}`));
+        console.error(
+          chalk.red(`❌ Failed to process ${id} from ${currentStatus}`),
+        );
         return false;
       }
-
     } catch (error) {
       console.error(chalk.red(`❌ Error processing ${id}: ${error.message}`));
       return false;
@@ -105,26 +120,26 @@ export class ContentPipelineService {
   static async executeProcessingStep(id, step) {
     try {
       switch (step.status) {
-        case 'reviewed':
+        case "reviewed":
           await TranslationService.translateAll(id);
-          await ContentManager.updateSourceStatus(id, 'translated');
+          await ContentManager.updateSourceStatus(id, "translated");
           return true;
 
-        case 'translated':
+        case "translated":
           await AudioService.generateWavOnly(id);
-          await ContentManager.updateSourceStatus(id, 'wav');
+          await ContentManager.updateSourceStatus(id, "wav");
           return true;
 
-        case 'wav':
+        case "wav":
           return await this.generateM3U8Step(id);
 
-        case 'm3u8':
+        case "m3u8":
           return await this.uploadToCloudflareStep(id);
 
-        case 'cloudflare':
+        case "cloudflare":
           return await this.uploadContentToCloudflareStep(id);
 
-        case 'content':
+        case "content":
           await SocialService.generateAllHooks(id);
           return true;
 
@@ -143,33 +158,40 @@ export class ContentPipelineService {
    */
   static async generateM3U8Step(id) {
     console.log(chalk.blue(`🎬 Converting to M3U8 for: ${id}`));
-    
+
     try {
       // Get available languages for this content
       const availableLanguages = await ContentManager.getAvailableLanguages(id);
-      
+
       // Import language configuration
-      const { getAudioLanguages, shouldGenerateM3U8, getM3U8Config } = await import("../../config/languages.js");
-      
+      const { getAudioLanguages, shouldGenerateM3U8, getM3U8Config } =
+        await import("../../config/languages.js");
+
       const audioLanguages = getAudioLanguages();
-      const targetLanguages = availableLanguages.filter(lang => 
-        audioLanguages.includes(lang) && shouldGenerateM3U8(lang)
+      const targetLanguages = availableLanguages.filter(
+        (lang) => audioLanguages.includes(lang) && shouldGenerateM3U8(lang),
       );
 
       if (targetLanguages.length === 0) {
-        console.log(chalk.yellow(`⚠️ No languages configured for M3U8 conversion`));
+        console.log(
+          chalk.yellow(`⚠️ No languages configured for M3U8 conversion`),
+        );
         return false;
       }
 
-      console.log(chalk.blue(`📝 Converting M3U8 for ${targetLanguages.length} languages: ${targetLanguages.join(', ')}`));
+      console.log(
+        chalk.blue(
+          `📝 Converting M3U8 for ${targetLanguages.length} languages: ${targetLanguages.join(", ")}`,
+        ),
+      );
 
       let allSuccessful = true;
-      
+
       for (const language of targetLanguages) {
         try {
           const content = await ContentManager.read(id, language);
           const audioPath = content.audio_file;
-          
+
           if (!audioPath) {
             throw new Error(`No audio file found for ${language}`);
           }
@@ -180,18 +202,22 @@ export class ContentPipelineService {
             id,
             language,
             content.category,
-            m3u8Config
+            m3u8Config,
           );
-          
+
           console.log(chalk.green(`✅ M3U8 converted for ${language}`));
         } catch (error) {
-          console.error(chalk.red(`❌ M3U8 conversion failed for ${language}: ${error.message}`));
+          console.error(
+            chalk.red(
+              `❌ M3U8 conversion failed for ${language}: ${error.message}`,
+            ),
+          );
           allSuccessful = false;
         }
       }
 
       if (allSuccessful) {
-        await ContentManager.updateSourceStatus(id, 'm3u8');
+        await ContentManager.updateSourceStatus(id, "m3u8");
       }
 
       return allSuccessful;
@@ -206,23 +232,28 @@ export class ContentPipelineService {
    */
   static async uploadToCloudflareStep(id) {
     console.log(chalk.blue(`☁️ Uploading to Cloudflare R2 for: ${id}`));
-    
+
     try {
       // Check if rclone is available
-      const rcloneAvailable = await CloudflareR2Service.checkRcloneAvailability();
+      const rcloneAvailable =
+        await CloudflareR2Service.checkRcloneAvailability();
       if (!rcloneAvailable) {
-        throw new Error("rclone not available. Please install and configure rclone for Cloudflare R2.");
+        throw new Error(
+          "rclone not available. Please install and configure rclone for Cloudflare R2.",
+        );
       }
 
       // Get available languages for this content
       const availableLanguages = await ContentManager.getAvailableLanguages(id);
-      
+
       // Import language configuration
-      const { getAudioLanguages, shouldUploadToR2 } = await import("../../config/languages.js");
-      
+      const { getAudioLanguages, shouldUploadToR2 } = await import(
+        "../../config/languages.js"
+      );
+
       const audioLanguages = getAudioLanguages();
-      const targetLanguages = availableLanguages.filter(lang => 
-        audioLanguages.includes(lang) && shouldUploadToR2(lang)
+      const targetLanguages = availableLanguages.filter(
+        (lang) => audioLanguages.includes(lang) && shouldUploadToR2(lang),
       );
 
       if (targetLanguages.length === 0) {
@@ -230,54 +261,73 @@ export class ContentPipelineService {
         return false;
       }
 
-      console.log(chalk.blue(`📤 Uploading to R2 for ${targetLanguages.length} languages: ${targetLanguages.join(', ')}`));
+      console.log(
+        chalk.blue(
+          `📤 Uploading to R2 for ${targetLanguages.length} languages: ${targetLanguages.join(", ")}`,
+        ),
+      );
 
       let allSuccessful = true;
-      
+
       for (const language of targetLanguages) {
         try {
           const content = await ContentManager.read(id, language);
-          
+
           // Get M3U8 files for this content
-          const m3u8Info = await M3U8AudioService.getM3U8Files(id, language, content.category);
-          
+          const m3u8Info = await M3U8AudioService.getM3U8Files(
+            id,
+            language,
+            content.category,
+          );
+
           if (!m3u8Info) {
-            throw new Error(`No M3U8 files found for ${language}. Run M3U8 conversion first.`);
+            throw new Error(
+              `No M3U8 files found for ${language}. Run M3U8 conversion first.`,
+            );
           }
 
           // Upload only M3U8 files (no WAV files)
           const uploadFiles = {
-            m3u8Data: m3u8Info
+            m3u8Data: m3u8Info,
           };
-          
+
           const uploadResult = await CloudflareR2Service.uploadAudioFiles(
             id,
             language,
             content.category,
-            uploadFiles
+            uploadFiles,
           );
-          
+
           if (uploadResult.success) {
             // Update content with streaming URLs
-            await ContentManager.addAudio(id, language, content.audio_file, uploadResult.urls);
+            await ContentManager.addAudio(
+              id,
+              language,
+              content.audio_file,
+              uploadResult.urls,
+            );
             console.log(chalk.green(`✅ R2 upload completed for ${language}`));
           } else {
-            throw new Error(uploadResult.errors.join(', '));
+            throw new Error(uploadResult.errors.join(", "));
           }
         } catch (error) {
-          console.error(chalk.red(`❌ R2 upload failed for ${language}: ${error.message}`));
+          console.error(
+            chalk.red(`❌ R2 upload failed for ${language}: ${error.message}`),
+          );
           allSuccessful = false;
         }
       }
 
       // Update source status to 'cloudflare' if all uploads successful
       if (allSuccessful && targetLanguages.length > 0) {
-        await ContentManager.updateSourceStatus(id, 'cloudflare');
+        await ContentManager.updateSourceStatus(id, "cloudflare");
       }
 
       return allSuccessful;
     } catch (error) {
-      console.error(chalk.red(`❌ Cloudflare upload step failed: ${error.message}`));
+      console.error(
+        chalk.red(`❌ Cloudflare upload step failed: ${error.message}`),
+      );
       return false;
     }
   }
@@ -287,25 +337,31 @@ export class ContentPipelineService {
    */
   static async uploadContentToCloudflareStep(id) {
     console.log(chalk.blue(`📄 Uploading content to Cloudflare R2: ${id}`));
-    
+
     try {
       // Find all language versions of this content
       const contentFiles = await this.findContentFiles(id);
-      
+
       if (contentFiles.length === 0) {
         throw new Error(`No content files found for: ${id}`);
       }
-      
-      console.log(chalk.blue(`Found ${contentFiles.length} content file(s) to upload`));
-      
+
+      console.log(
+        chalk.blue(`Found ${contentFiles.length} content file(s) to upload`),
+      );
+
       // Upload each language version
       for (const contentFile of contentFiles) {
         await this.uploadSingleContentFile(contentFile);
       }
-      
-      console.log(chalk.green(`✅ Content uploaded successfully: ${contentFiles.length} files`));
-      await ContentManager.updateSourceStatus(id, 'content');
-      
+
+      console.log(
+        chalk.green(
+          `✅ Content uploaded successfully: ${contentFiles.length} files`,
+        ),
+      );
+      await ContentManager.updateSourceStatus(id, "content");
+
       return true;
     } catch (error) {
       console.error(chalk.red(`❌ Content upload failed: ${error.message}`));
@@ -319,27 +375,27 @@ export class ContentPipelineService {
   static async findContentFiles(id) {
     const fs = await import("fs/promises");
     const path = await import("path");
-    
+
     const contentFiles = [];
-    const contentDir = 'content';
-    
+    const contentDir = "content";
+
     try {
       const languages = await fs.readdir(contentDir);
-      
+
       for (const lang of languages) {
         const langPath = path.join(contentDir, lang);
         const langStat = await fs.stat(langPath);
         if (!langStat.isDirectory()) continue;
-        
+
         const categories = await fs.readdir(langPath);
-        
+
         for (const category of categories) {
           const categoryPath = path.join(langPath, category);
           const categoryStat = await fs.stat(categoryPath);
           if (!categoryStat.isDirectory()) continue;
-          
+
           const articlePath = path.join(categoryPath, `${id}.json`);
-          
+
           try {
             await fs.access(articlePath);
             contentFiles.push({
@@ -347,18 +403,17 @@ export class ContentPipelineService {
               r2Key: `content/${lang}/${category}/${id}.json`,
               language: lang,
               category: category,
-              id: id
+              id: id,
             });
           } catch (error) {
             // File doesn't exist in this language/category combination
           }
         }
       }
-      
     } catch (error) {
-      console.error('Error finding content files:', error);
+      console.error("Error finding content files:", error);
     }
-    
+
     return contentFiles;
   }
 
@@ -369,18 +424,30 @@ export class ContentPipelineService {
     const { exec } = await import("child_process");
     const { promisify } = await import("util");
     const execAsync = promisify(exec);
-    
+
     const { localPath, r2Key, language, category } = contentFile;
-    
-    console.log(chalk.gray(`Uploading: ${localPath} → r2:${CloudflareR2Service.BUCKET_NAME}/${r2Key}`));
-    
+
+    console.log(
+      chalk.gray(
+        `Uploading: ${localPath} → r2:${CloudflareR2Service.BUCKET_NAME}/${r2Key}`,
+      ),
+    );
+
     const uploadCommand = `rclone copyto "${localPath}" "r2:${CloudflareR2Service.BUCKET_NAME}/${r2Key}"`;
-    
+
     try {
       await execAsync(uploadCommand);
-      console.log(chalk.green(`✅ Uploaded: ${language}/${category}/${contentFile.id}.json`));
+      console.log(
+        chalk.green(
+          `✅ Uploaded: ${language}/${category}/${contentFile.id}.json`,
+        ),
+      );
     } catch (error) {
-      console.error(chalk.red(`❌ Upload failed: ${language}/${category}/${contentFile.id}.json - ${error.message}`));
+      console.error(
+        chalk.red(
+          `❌ Upload failed: ${language}/${category}/${contentFile.id}.json - ${error.message}`,
+        ),
+      );
       throw error;
     }
   }
@@ -392,7 +459,7 @@ export class ContentPipelineService {
    */
   static getPhaseGroups(pendingContent) {
     const phaseGroups = {};
-    pendingContent.forEach(item => {
+    pendingContent.forEach((item) => {
       if (!phaseGroups[item.nextPhase]) {
         phaseGroups[item.nextPhase] = [];
       }
@@ -408,10 +475,10 @@ export class ContentPipelineService {
    */
   static getPhaseColor(phase) {
     const colors = {
-      'translation': chalk.cyan,
-      'audio': chalk.green,
-      'content': chalk.blue,
-      'social': chalk.magenta
+      translation: chalk.cyan,
+      audio: chalk.green,
+      content: chalk.blue,
+      social: chalk.magenta,
     };
     return colors[phase] || chalk.white;
   }

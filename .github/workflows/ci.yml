@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-nodejs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install Node.js dependencies
+      run: npm ci
+
+    - name: Run Node.js linting
+      run: npm run lint:node
+
+    - name: Run Node.js tests
+      run: npm run test:node
+
+  test-flutter:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.2'
+        channel: 'stable'
+        cache: true
+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+
+    - name: Run Flutter tests with coverage
+      run: flutter test --coverage --reporter compact
+
+    - name: Upload Flutter coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage/lcov.info
+        flags: flutter
+        name: flutter-coverage
+        fail_ci_if_error: false
+
+    - name: Archive Flutter coverage results
+      uses: actions/upload-artifact@v4
+      with:
+        name: flutter-coverage-report
+        path: coverage/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test-nodejs, test-flutter]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.2'
+        channel: 'stable'
+        cache: true
+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+
+    - name: Build Flutter web
+      run: flutter build web --release
+
+    - name: Archive Flutter web build
+      uses: actions/upload-artifact@v4
+      with:
+        name: flutter-web-build
+        path: build/web/

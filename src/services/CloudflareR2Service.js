@@ -7,7 +7,8 @@ export class CloudflareR2Service {
   static REMOTE_NAME = "r2"; // R2 remote name in rclone config
   static BUCKET_NAME = "fromfedtochain"; // R2 bucket name
   static RCLONE_BINARY = "rclone"; // Assumes rclone is in PATH
-  static BASE_URL = "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com"; // Actual R2 domain
+  static BASE_URL =
+    "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com"; // Actual R2 domain
 
   /**
    * Upload audio files (WAV and M3U8) to Cloudflare R2
@@ -19,35 +20,50 @@ export class CloudflareR2Service {
    */
   static async uploadAudioFiles(id, language, category, files) {
     console.log(chalk.blue(`☁️ Uploading to R2: ${id} (${language})`));
-    console.log(chalk.gray(`   Files to upload: ${Object.keys(files).join(', ')}`));
+    console.log(
+      chalk.gray(`   Files to upload: ${Object.keys(files).join(", ")}`),
+    );
 
     const uploadResults = {
       success: true,
       urls: {},
-      errors: []
+      errors: [],
     };
 
     try {
       // Create R2 directory structure: audio/{language}/{category}/{id}/
       const r2BasePath = `audio/${language}/${category}/${id}`;
-      
+
       // WAV files are stored locally only, not uploaded to R2 for streaming
 
       // Upload M3U8 files if provided
       if (files.m3u8Data) {
         console.log(chalk.blue(`🎬 Uploading M3U8 files...`));
         console.log(chalk.gray(`   Playlist: ${files.m3u8Data.playlistPath}`));
-        console.log(chalk.gray(`   Segments: ${files.m3u8Data.segments.length}`));
-        
-        const m3u8Result = await this.uploadM3U8Files(files.m3u8Data, r2BasePath);
+        console.log(
+          chalk.gray(`   Segments: ${files.m3u8Data.segments.length}`),
+        );
+
+        const m3u8Result = await this.uploadM3U8Files(
+          files.m3u8Data,
+          r2BasePath,
+        );
         if (m3u8Result.success) {
           uploadResults.urls.m3u8 = `${this.BASE_URL}/${r2BasePath}/playlist.m3u8`;
           uploadResults.urls.segments = m3u8Result.segmentUrls;
           console.log(chalk.green(`✅ M3U8 files uploaded successfully`));
-          console.log(chalk.gray(`   Playlist URL: ${uploadResults.urls.m3u8}`));
-          console.log(chalk.gray(`   Segments uploaded: ${m3u8Result.segmentUrls.length}`));
+          console.log(
+            chalk.gray(`   Playlist URL: ${uploadResults.urls.m3u8}`),
+          );
+          console.log(
+            chalk.gray(
+              `   Segments uploaded: ${m3u8Result.segmentUrls.length}`,
+            ),
+          );
         } else {
-          console.error(chalk.red(`❌ M3U8 upload failed: ${m3u8Result.error}`));
+          console.error(
+            chalk.red(`❌ M3U8 upload failed: ${m3u8Result.error}`),
+          );
           uploadResults.errors.push(`M3U8 upload failed: ${m3u8Result.error}`);
           uploadResults.success = false;
         }
@@ -57,19 +73,22 @@ export class CloudflareR2Service {
 
       if (uploadResults.success) {
         console.log(chalk.green(`✅ R2 upload completed: ${id} (${language})`));
-        console.log(chalk.gray(`   M3U8: ${uploadResults.urls.m3u8 || 'N/A'}`));
+        console.log(chalk.gray(`   M3U8: ${uploadResults.urls.m3u8 || "N/A"}`));
       } else {
-        console.error(chalk.red(`❌ R2 upload had errors: ${uploadResults.errors.join(', ')}`));
+        console.error(
+          chalk.red(
+            `❌ R2 upload had errors: ${uploadResults.errors.join(", ")}`,
+          ),
+        );
       }
 
       return uploadResults;
-
     } catch (error) {
       console.error(chalk.red(`❌ R2 upload failed: ${error.message}`));
       return {
         success: false,
         urls: {},
-        errors: [error.message]
+        errors: [error.message],
       };
     }
   }
@@ -83,30 +102,41 @@ export class CloudflareR2Service {
   static async uploadM3U8Files(m3u8Data, r2BasePath) {
     try {
       const segmentUrls = [];
-      
+
       // Upload playlist file
-      const playlistResult = await this.uploadFile(m3u8Data.playlistPath, `${r2BasePath}/playlist.m3u8`);
+      const playlistResult = await this.uploadFile(
+        m3u8Data.playlistPath,
+        `${r2BasePath}/playlist.m3u8`,
+      );
       if (!playlistResult.success) {
-        return { success: false, error: `Playlist upload failed: ${playlistResult.error}` };
+        return {
+          success: false,
+          error: `Playlist upload failed: ${playlistResult.error}`,
+        };
       }
 
       // Upload all segment files
       for (const segment of m3u8Data.segments) {
         const segmentPath = path.join(m3u8Data.segmentDir, segment);
-        const segmentResult = await this.uploadFile(segmentPath, `${r2BasePath}/${segment}`);
-        
+        const segmentResult = await this.uploadFile(
+          segmentPath,
+          `${r2BasePath}/${segment}`,
+        );
+
         if (segmentResult.success) {
           segmentUrls.push(`${this.BASE_URL}/${r2BasePath}/${segment}`);
         } else {
-          return { success: false, error: `Segment upload failed: ${segmentResult.error}` };
+          return {
+            success: false,
+            error: `Segment upload failed: ${segmentResult.error}`,
+          };
         }
       }
 
       return {
         success: true,
-        segmentUrls
+        segmentUrls,
       };
-
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -119,35 +149,38 @@ export class CloudflareR2Service {
    * @returns {Promise<Object>} - Upload result
    */
   static async uploadFile(localPath, remotePath) {
-    console.log(chalk.gray(`   Uploading: ${path.basename(localPath)} → ${remotePath}`));
+    console.log(
+      chalk.gray(`   Uploading: ${path.basename(localPath)} → ${remotePath}`),
+    );
 
     try {
       // Check if local file exists
       await fs.access(localPath);
-      
+
       // Build rclone command using 'copyto' instead of 'copy' to avoid path duplication
       // This ensures the file is copied to the exact remote path specified
       const remoteFullPath = `${this.REMOTE_NAME}:${this.BUCKET_NAME}/${remotePath}`;
       const command = this.RCLONE_BINARY;
       const args = [
-        "copyto",  // Use 'copyto' instead of 'copy' to prevent directory creation
+        "copyto", // Use 'copyto' instead of 'copy' to prevent directory creation
         localPath,
         remoteFullPath,
         "--progress",
-        "--stats-one-line"
+        "--stats-one-line",
       ];
 
       // Execute rclone command
       const result = await this.executeRcloneCommand(command, args);
-      
+
       if (result.success) {
-        console.log(chalk.green(`     ✅ Uploaded: ${path.basename(localPath)}`));
+        console.log(
+          chalk.green(`     ✅ Uploaded: ${path.basename(localPath)}`),
+        );
         return { success: true };
       } else {
         console.error(chalk.red(`     ❌ Upload failed: ${result.error}`));
         return { success: false, error: result.error };
       }
-
     } catch (error) {
       console.error(chalk.red(`     ❌ Upload error: ${error.message}`));
       return { success: false, error: error.message };
@@ -178,18 +211,18 @@ export class CloudflareR2Service {
         if (code === 0) {
           resolve({ success: true, output: stdout });
         } else {
-          resolve({ 
-            success: false, 
+          resolve({
+            success: false,
             error: `rclone exited with code ${code}: ${stderr}`,
-            output: stdout
+            output: stdout,
           });
         }
       });
 
       process.on("error", (error) => {
-        resolve({ 
-          success: false, 
-          error: `Failed to execute rclone: ${error.message}` 
+        resolve({
+          success: false,
+          error: `Failed to execute rclone: ${error.message}`,
         });
       });
     });
@@ -206,7 +239,7 @@ export class CloudflareR2Service {
 
     try {
       let remotePath = `${this.REMOTE_NAME}:${this.BUCKET_NAME}/audio`;
-      
+
       if (language) {
         remotePath += `/${language}`;
         if (category) {
@@ -225,7 +258,6 @@ export class CloudflareR2Service {
         console.error(chalk.red(`❌ Failed to list R2 files: ${result.error}`));
         return [];
       }
-
     } catch (error) {
       console.error(chalk.red(`❌ Error listing R2 files: ${error.message}`));
       return [];
@@ -239,15 +271,15 @@ export class CloudflareR2Service {
    */
   static parseRcloneListOutput(output) {
     const files = [];
-    const lines = output.split('\n').filter(line => line.trim());
+    const lines = output.split("\n").filter((line) => line.trim());
 
     for (const line of lines) {
       const match = line.match(/^\s*(\d+)\s+(.+)$/);
       if (match) {
         const size = parseInt(match[1]);
         const filePath = match[2];
-        const pathParts = filePath.split('/');
-        
+        const pathParts = filePath.split("/");
+
         if (pathParts.length >= 4) {
           files.push({
             path: filePath,
@@ -256,7 +288,7 @@ export class CloudflareR2Service {
             category: pathParts[2],
             id: pathParts[3],
             filename: pathParts[pathParts.length - 1],
-            url: `${this.BASE_URL}/${filePath}`
+            url: `${this.BASE_URL}/${filePath}`,
           });
         }
       }
@@ -278,17 +310,18 @@ export class CloudflareR2Service {
     try {
       const remotePath = `${this.REMOTE_NAME}:${this.BUCKET_NAME}/audio/${language}/${category}/${id}`;
       const args = ["purge", remotePath];
-      
+
       const result = await this.executeRcloneCommand(this.RCLONE_BINARY, args);
 
       if (result.success) {
         console.log(chalk.green(`✅ Deleted R2 files: ${id} (${language})`));
         return true;
       } else {
-        console.error(chalk.red(`❌ Failed to delete R2 files: ${result.error}`));
+        console.error(
+          chalk.red(`❌ Failed to delete R2 files: ${result.error}`),
+        );
         return false;
       }
-
     } catch (error) {
       console.error(chalk.red(`❌ Error deleting R2 files: ${error.message}`));
       return false;
@@ -302,39 +335,70 @@ export class CloudflareR2Service {
   static async checkRcloneAvailability() {
     try {
       console.log(chalk.blue(`🔍 Checking rclone availability...`));
-      const result = await this.executeRcloneCommand(this.RCLONE_BINARY, ["version"]);
-      
+      const result = await this.executeRcloneCommand(this.RCLONE_BINARY, [
+        "version",
+      ]);
+
       if (result.success) {
         console.log(chalk.green(`✅ rclone found and working`));
-        
+
         // Check if remote is configured
-        const configResult = await this.executeRcloneCommand(this.RCLONE_BINARY, ["listremotes"]);
+        const configResult = await this.executeRcloneCommand(
+          this.RCLONE_BINARY,
+          ["listremotes"],
+        );
         if (configResult.success) {
-          const remotes = configResult.output.split('\n').filter(line => line.trim());
-          console.log(chalk.blue(`📋 Available remotes: ${remotes.join(', ')}`));
-          
+          const remotes = configResult.output
+            .split("\n")
+            .filter((line) => line.trim());
+          console.log(
+            chalk.blue(`📋 Available remotes: ${remotes.join(", ")}`),
+          );
+
           if (configResult.output.includes(this.REMOTE_NAME)) {
-            console.log(chalk.green(`✅ Remote '${this.REMOTE_NAME}' is configured`));
+            console.log(
+              chalk.green(`✅ Remote '${this.REMOTE_NAME}' is configured`),
+            );
             return true;
           } else {
-            console.error(chalk.red(`❌ rclone remote '${this.REMOTE_NAME}' not configured`));
+            console.error(
+              chalk.red(
+                `❌ rclone remote '${this.REMOTE_NAME}' not configured`,
+              ),
+            );
             console.error(chalk.yellow(`💡 Configure remote with:`));
-            console.error(chalk.yellow(`   rclone config create ${this.REMOTE_NAME} s3 \\`));
+            console.error(
+              chalk.yellow(`   rclone config create ${this.REMOTE_NAME} s3 \\`),
+            );
             console.error(chalk.yellow(`     provider=Cloudflare \\`));
-            console.error(chalk.yellow(`     access_key_id=YOUR_ACCESS_KEY \\`));
-            console.error(chalk.yellow(`     secret_access_key=YOUR_SECRET_KEY \\`));
-            console.error(chalk.yellow(`     endpoint=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com \\`));
+            console.error(
+              chalk.yellow(`     access_key_id=YOUR_ACCESS_KEY \\`),
+            );
+            console.error(
+              chalk.yellow(`     secret_access_key=YOUR_SECRET_KEY \\`),
+            );
+            console.error(
+              chalk.yellow(
+                `     endpoint=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com \\`,
+              ),
+            );
             console.error(chalk.yellow(`     region=auto`));
             return false;
           }
         } else {
-          console.error(chalk.red(`❌ Failed to list rclone remotes: ${configResult.error}`));
+          console.error(
+            chalk.red(
+              `❌ Failed to list rclone remotes: ${configResult.error}`,
+            ),
+          );
           return false;
         }
       } else {
         console.error(chalk.red(`❌ rclone not available: ${result.error}`));
         console.error(chalk.yellow(`💡 Install rclone:`));
-        console.error(chalk.yellow(`   curl https://rclone.org/install.sh | sudo bash`));
+        console.error(
+          chalk.yellow(`   curl https://rclone.org/install.sh | sudo bash`),
+        );
         return false;
       }
     } catch (error) {
