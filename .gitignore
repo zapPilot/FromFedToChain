@@ -15,7 +15,6 @@ gcp-creds.json
 .env.development.local
 .env.test.local
 .env.production.local
-# Keep .env tracked for Flutter (contains non-sensitive config)
 
 # Audio files
 *.mp3
@@ -132,7 +131,6 @@ unlinked_spec.ds
 # Coverage
 coverage/
 
-
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
@@ -152,7 +150,6 @@ ios/Pods/
 ios/.symlinks/
 ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
-
 
 # Miscellaneous
 *.class
@@ -174,11 +171,6 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -199,3 +191,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Exception: Keep app/.env for Flutter assets but ignore root .env
+!app/.envG
+
+# serena
+.serena/cache
+
+# app
+app/.env

@@ -35,9 +35,11 @@ jobs:
 
       - name: Install Flutter dependencies
         run: flutter pub get
+        working-directory: app
 
       - name: Generate Flutter coverage
         run: flutter test --coverage
+        working-directory: app
 
       - name: Install lcov for coverage parsing
         run: sudo apt-get install -y lcov
@@ -45,7 +47,7 @@ jobs:
       - name: Check Flutter coverage threshold
         run: |
           # Extract coverage percentage from lcov.info
-          COVERAGE_INFO=$(lcov --summary coverage/lcov.info 2>&1)
+          COVERAGE_INFO=$(lcov --summary app/coverage/lcov.info 2>&1)
           COVERAGE_PCT=$(echo "$COVERAGE_INFO" | grep -oP 'lines\.*: \K[\d.]+(?=%)')
           THRESHOLD=25.0
           
@@ -63,7 +65,7 @@ jobs:
       - name: Generate detailed coverage report
         run: |
           # Generate HTML coverage report
-          genhtml coverage/lcov.info -o coverage/html
+          genhtml app/coverage/lcov.info -o app/coverage/html
           echo "📋 Detailed coverage report generated"
 
       - name: Upload coverage reports
@@ -71,14 +73,14 @@ jobs:
         with:
           name: coverage-reports
           path: |
-            coverage/
+            app/coverage/
           retention-days: 30
 
       - name: Coverage summary comment
         if: github.event_name == 'push'
         run: |
-          COVERAGE_PCT=$(lcov --summary coverage/lcov.info 2>&1 | grep -oP 'lines\.*: \K[\d.]+(?=%)')
+          COVERAGE_PCT=$(lcov --summary app/coverage/lcov.info 2>&1 | grep -oP 'lines\.*: \K[\d.]+(?=%)')
           echo "## 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "**Flutter Coverage:** ${COVERAGE_PCT}%" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ✅ Threshold met (≥25%)" >> $GITHUB_STEP_SUMMARY
-          echo "**Files Analyzed:** $(find lib -name "*.dart" | wc -l) Dart files" >> $GITHUB_STEP_SUMMARY
+          echo "**Files Analyzed:** $(find app/lib -name "*.dart" | wc -l) Dart files" >> $GITHUB_STEP_SUMMARY

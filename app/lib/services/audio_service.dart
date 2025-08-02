@@ -29,6 +29,7 @@ class AudioService extends ChangeNotifier {
   double _playbackSpeed = 1.0;
   String? _errorMessage;
   bool _autoplayEnabled = true;
+  bool _repeatEnabled = false; // New: repeat current episode
 
   // Getters
   PlaybackState get playbackState => _playbackState;
@@ -38,6 +39,7 @@ class AudioService extends ChangeNotifier {
   double get playbackSpeed => _playbackSpeed;
   String? get errorMessage => _errorMessage;
   bool get autoplayEnabled => _autoplayEnabled;
+  bool get repeatEnabled => _repeatEnabled;
 
   // Computed properties
   bool get isPlaying => _playbackState == PlaybackState.playing;
@@ -556,10 +558,26 @@ class AudioService extends ChangeNotifier {
     }
   }
 
-  /// Handle audio completion - triggers autoplay if enabled
+  /// Handle audio completion - triggers repeat or autoplay if enabled
   Future<void> _handleAudioCompletion() async {
     print(
-        '🔄 AudioService: Audio completed. Autoplay enabled: $_autoplayEnabled');
+        '🔄 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+
+    // Repeat mode takes precedence over autoplay
+    if (_repeatEnabled && _currentAudioFile != null) {
+      print('🔁 AudioService: Repeating current episode');
+      try {
+        await Future.delayed(const Duration(milliseconds: 500));
+        await playAudio(_currentAudioFile!);
+        print('✅ AudioService: Repeat completed successfully');
+      } catch (e) {
+        print('❌ AudioService: Repeat failed: $e');
+        _playbackState = PlaybackState.error;
+        _errorMessage = 'Repeat failed: $e';
+        notifyListeners();
+      }
+      return;
+    }
 
     if (!_autoplayEnabled) {
       print('📝 AudioService: Autoplay disabled, stopping playback');
@@ -603,6 +621,15 @@ class AudioService extends ChangeNotifier {
     if (_autoplayEnabled != enabled) {
       _autoplayEnabled = enabled;
       print('🔄 AudioService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
+      notifyListeners();
+    }
+  }
+
+  /// Set repeat preference
+  void setRepeatEnabled(bool enabled) {
+    if (_repeatEnabled != enabled) {
+      _repeatEnabled = enabled;
+      print('🔄 AudioService: Repeat ${enabled ? 'enabled' : 'disabled'}');
       notifyListeners();
     }
   }

@@ -7,6 +7,7 @@ import '../services/content_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/audio_controls.dart';
 import '../widgets/playback_speed_selector.dart';
+import '../widgets/content_display.dart';
 
 /// Full-screen audio player with enhanced controls
 class PlayerScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   late AnimationController _animationController;
   late Animation<double> _albumArtAnimation;
   bool _showSpeedSelector = false;
+  bool _showContentScript = false;
 
   @override
   void initState() {
@@ -62,32 +64,9 @@ class _PlayerScreenState extends State<PlayerScreen>
           }
 
           return SafeArea(
-            child: Column(
-              children: [
-                // Header with back button and options
-                _buildHeader(context, currentAudio),
-
-                // Album art and visualizer
-                Expanded(
-                  flex: 3,
-                  child: _buildAlbumArtSection(currentAudio, audioService),
-                ),
-
-                // Track info
-                _buildTrackInfo(currentAudio),
-
-                // Progress bar
-                _buildProgressSection(audioService),
-
-                // Main controls
-                _buildMainControls(audioService, contentService),
-
-                // Additional controls
-                _buildAdditionalControls(audioService),
-
-                const SizedBox(height: AppTheme.spacingL),
-              ],
-            ),
+            child: _showContentScript
+                ? _buildExpandedLayout(context, currentAudio, audioService, contentService)
+                : _buildCompactLayout(context, currentAudio, audioService, contentService),
           );
         },
       ),
@@ -388,94 +367,278 @@ class _PlayerScreenState extends State<PlayerScreen>
   Widget _buildAdditionalControls(AudioService audioService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
         children: [
-          // Playback speed
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showSpeedSelector = !_showSpeedSelector;
-              });
-            },
-            icon: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.speed),
-                const SizedBox(width: AppTheme.spacingXS),
-                Text(
-                  '${audioService.playbackSpeed}x',
-                  style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor,
-                  ),
+          // Speed selector (show when toggled)
+          if (_showSpeedSelector) ...[
+            PlaybackSpeedSelector(
+              currentSpeed: audioService.playbackSpeed,
+              onSpeedChanged: (speed) {
+                audioService.setPlaybackSpeed(speed);
+                setState(() {
+                  _showSpeedSelector = false;
+                });
+              },
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+          ],
+          
+          // Control buttons row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Content script toggle
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _showContentScript = !_showContentScript;
+                  });
+                },
+                icon: const Icon(Icons.article),
+                style: IconButton.styleFrom(
+                  backgroundColor: _showContentScript
+                      ? AppTheme.primaryColor.withOpacity(0.2)
+                      : AppTheme.cardColor.withOpacity(0.5),
+                  foregroundColor: _showContentScript
+                      ? AppTheme.primaryColor
+                      : AppTheme.onSurfaceColor,
                 ),
-              ],
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor: _showSpeedSelector
-                  ? AppTheme.primaryColor.withOpacity(0.2)
-                  : AppTheme.cardColor.withOpacity(0.5),
-              foregroundColor: _showSpeedSelector
-                  ? AppTheme.primaryColor
-                  : AppTheme.onSurfaceColor,
-            ),
-          ),
+              ),
 
-          // Autoplay toggle
-          IconButton(
-            onPressed: () {
-              audioService.setAutoplayEnabled(!audioService.autoplayEnabled);
-            },
-            icon: Icon(
-              audioService.autoplayEnabled ? Icons.repeat : Icons.repeat_one,
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor: audioService.autoplayEnabled
-                  ? AppTheme.primaryColor.withOpacity(0.2)
-                  : AppTheme.cardColor.withOpacity(0.5),
-              foregroundColor: audioService.autoplayEnabled
-                  ? AppTheme.primaryColor
-                  : AppTheme.onSurfaceColor,
-            ),
-          ),
+              // Playback speed
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _showSpeedSelector = !_showSpeedSelector;
+                  });
+                },
+                icon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.speed),
+                    const SizedBox(width: AppTheme.spacingXS),
+                    Text(
+                      '${audioService.playbackSpeed}x',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.onSurfaceColor,
+                      ),
+                    ),
+                  ],
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: _showSpeedSelector
+                      ? AppTheme.primaryColor.withOpacity(0.2)
+                      : AppTheme.cardColor.withOpacity(0.5),
+                  foregroundColor: _showSpeedSelector
+                      ? AppTheme.primaryColor
+                      : AppTheme.onSurfaceColor,
+                ),
+              ),
 
-          // Share
-          IconButton(
-            onPressed: () {
-              // TODO: Implement sharing
-            },
-            icon: const Icon(Icons.share),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
-              foregroundColor: AppTheme.onSurfaceColor,
-            ),
-          ),
+              // Repeat toggle
+              IconButton(
+                onPressed: () {
+                  audioService.setRepeatEnabled(!audioService.repeatEnabled);
+                },
+                icon: Icon(
+                  audioService.repeatEnabled ? Icons.repeat_one : Icons.repeat,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: audioService.repeatEnabled
+                      ? AppTheme.primaryColor.withOpacity(0.2)
+                      : AppTheme.cardColor.withOpacity(0.5),
+                  foregroundColor: audioService.repeatEnabled
+                      ? AppTheme.primaryColor
+                      : AppTheme.onSurfaceColor,
+                ),
+              ),
 
-          // Add to playlist
-          IconButton(
-            onPressed: () {
-              final currentAudio = audioService.currentAudioFile;
-              if (currentAudio != null) {
-                context
-                    .read<ContentService>()
-                    .addToCurrentPlaylist(currentAudio);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        'Added "${currentAudio.displayTitle}" to playlist'),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              }
-            },
-            icon: const Icon(Icons.playlist_add),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
-              foregroundColor: AppTheme.onSurfaceColor,
-            ),
+              // Autoplay toggle
+              IconButton(
+                onPressed: () {
+                  audioService.setAutoplayEnabled(!audioService.autoplayEnabled);
+                },
+                icon: Icon(
+                  audioService.autoplayEnabled ? Icons.skip_next : Icons.playlist_play,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: audioService.autoplayEnabled
+                      ? AppTheme.primaryColor.withOpacity(0.2)
+                      : AppTheme.cardColor.withOpacity(0.5),
+                  foregroundColor: audioService.autoplayEnabled
+                      ? AppTheme.primaryColor
+                      : AppTheme.onSurfaceColor,
+                ),
+              ),
+
+              // Share
+              IconButton(
+                onPressed: () {
+                  // TODO: Implement sharing
+                },
+                icon: const Icon(Icons.share),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+                  foregroundColor: AppTheme.onSurfaceColor,
+                ),
+              ),
+
+              // Add to playlist
+              IconButton(
+                onPressed: () {
+                  final currentAudio = audioService.currentAudioFile;
+                  if (currentAudio != null) {
+                    context
+                        .read<ContentService>()
+                        .addToCurrentPlaylist(currentAudio);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Added "${currentAudio.displayTitle}" to playlist'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.playlist_add),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+                  foregroundColor: AppTheme.onSurfaceColor,
+                ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  /// Build compact layout (without content script)
+  Widget _buildCompactLayout(BuildContext context, AudioFile currentAudio, 
+      AudioService audioService, ContentService contentService) {
+    return Column(
+      children: [
+        // Header with back button and options
+        _buildHeader(context, currentAudio),
+
+        // Album art and visualizer
+        Expanded(
+          flex: 3,
+          child: _buildAlbumArtSection(currentAudio, audioService),
+        ),
+
+        // Track info
+        _buildTrackInfo(currentAudio),
+
+        // Content script display (collapsed)
+        ContentDisplay(
+          currentAudioFile: currentAudio,
+          contentService: contentService,
+          isExpanded: _showContentScript,
+          onToggleExpanded: () {
+            setState(() {
+              _showContentScript = !_showContentScript;
+            });
+          },
+        ),
+
+        // Progress bar
+        _buildProgressSection(audioService),
+
+        // Main controls
+        _buildMainControls(audioService, contentService),
+
+        // Additional controls
+        _buildAdditionalControls(audioService),
+
+        const SizedBox(height: AppTheme.spacingL),
+      ],
+    );
+  }
+
+  /// Build expanded layout (with content script)
+  Widget _buildExpandedLayout(BuildContext context, AudioFile currentAudio, 
+      AudioService audioService, ContentService contentService) {
+    return CustomScrollView(
+      slivers: [
+        // Fixed header
+        SliverToBoxAdapter(
+          child: _buildHeader(context, currentAudio),
+        ),
+        
+        // Compact album art
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 200,
+            child: Center(
+              child: RotationTransition(
+                turns: audioService.isPlaying
+                    ? _albumArtAnimation
+                    : const AlwaysStoppedAnimation(0.0),
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppTheme.primaryGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryColor.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    _getAudioIcon(currentAudio),
+                    size: 60,
+                    color: AppTheme.onPrimaryColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // Track info
+        SliverToBoxAdapter(
+          child: _buildTrackInfo(currentAudio),
+        ),
+
+        // Content script display (expanded)
+        SliverToBoxAdapter(
+          child: ContentDisplay(
+            currentAudioFile: currentAudio,
+            contentService: contentService,
+            isExpanded: _showContentScript,
+            onToggleExpanded: () {
+              setState(() {
+                _showContentScript = !_showContentScript;
+              });
+            },
+          ),
+        ),
+
+        // Bottom controls (sticky)
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // Progress bar
+              _buildProgressSection(audioService),
+
+              // Main controls
+              _buildMainControls(audioService, contentService),
+
+              // Additional controls
+              _buildAdditionalControls(audioService),
+
+              const SizedBox(height: AppTheme.spacingL),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -567,17 +730,19 @@ class _PlayerScreenState extends State<PlayerScreen>
 
           const SizedBox(height: AppTheme.spacingL),
 
-          // Playback speed selector
-          if (_showSpeedSelector)
-            PlaybackSpeedSelector(
-              currentSpeed: context.read<AudioService>().playbackSpeed,
-              onSpeedChanged: (speed) {
-                context.read<AudioService>().setPlaybackSpeed(speed);
-                setState(() {
-                  _showSpeedSelector = false;
-                });
-              },
-            ),
+          // Audio details
+          Text(
+            'Audio Details',
+            style: AppTheme.headlineSmall,
+          ),
+          
+          const SizedBox(height: AppTheme.spacingM),
+          
+          Text(
+            currentAudio.displayTitle,
+            style: AppTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
 
           const SizedBox(height: AppTheme.spacingM),
         ],

@@ -45,8 +45,11 @@ jobs:
         run: flutter analyze --no-congratulate
         working-directory: app
 
-      - name: Run tests
-        run: npm run test
+      - name: Run Node.js tests
+        run: npm run test:node
+
+      - name: Run Flutter tests
+        run: npm run test:flutter
 
       - name: Security audit (Node.js)
         run: npm audit --audit-level=moderate
@@ -54,6 +57,7 @@ jobs:
 
       - name: Security audit (Flutter)
         run: flutter pub deps --json | jq '.packages[] | select(.kind == "direct") | "\(.name)@\(.version)"' | head -10
+        working-directory: app
         continue-on-error: true
 
       - name: Check for secrets (comprehensive scan)

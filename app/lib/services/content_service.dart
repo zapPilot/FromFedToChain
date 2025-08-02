@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import '../models/audio_file.dart';
+import '../models/audio_content.dart';
 import '../models/playlist.dart';
 import '../config/api_config.dart';
 import 'streaming_api_service.dart';
@@ -18,6 +20,10 @@ class ContentService extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
   String? _errorMessage;
+  
+  // Content cache for language learning scripts
+  final Map<String, AudioContent> _contentCache = {};
+  static final _httpClient = http.Client();
 
   // Getters
   List<AudioFile> get allEpisodes => _allEpisodes;
@@ -60,6 +66,106 @@ class ContentService extends ChangeNotifier {
       await prefs.setString('selected_category', _selectedCategory);
     } catch (e) {
       print('ContentService: Failed to save preferences: $e');
+    }
+  }
+
+  /// Fetch content/script for a specific episode from Cloudflare API
+  /// This provides the actual content text for language learning
+  Future<AudioContent?> fetchContentById(String id, String language, String category) async {
+    final cacheKey = '$language/$category/$id';
+    
+    // Return cached content if available
+    if (_contentCache.containsKey(cacheKey)) {
+      if (kDebugMode) {
+        print('ContentService: Returning cached content for $cacheKey');
+      }
+      return _contentCache[cacheKey];
+    }
+
+    try {
+      if (kDebugMode) {
+        print('ContentService: Fetching content for $cacheKey from API');
+      }
+      
+      final url = Uri.parse('${ApiConfig.streamingBaseUrl}/api/content/$language/$category/$id');
+      
+      final response = await _httpClient.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'FromFedToChain/1.0.0 (Flutter)',
+        },
+      ).timeout(ApiConfig.apiTimeout);
+      
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        final content = AudioContent.fromJson(jsonData);
+        
+        // Cache the content
+        _contentCache[cacheKey] = content;
+        
+        if (kDebugMode) {
+          print('ContentService: Successfully fetched and cached content for $cacheKey');
+        }
+        
+        return content;
+      } else {
+        if (kDebugMode) {
+          print('ContentService: Failed to fetch content - HTTP ${response.statusCode}');
+          print('ContentService: Response body: ${response.body}');
+        }
+        return null;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('ContentService: Error fetching content for $cacheKey: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Get content for an audio file with lazy loading
+  /// This is the main method for getting content/scripts for language learning
+  Future<AudioContent?> getContentForAudioFile(AudioFile audioFile) async {
+    return await fetchContentById(audioFile.id, audioFile.language, audioFile.category);
+  }
+
+  /// Get cached content without fetching (synchronous)
+  AudioContent? getCachedContent(String id, String language, String category) {
+    final cacheKey = '$language/$category/$id';
+    return _contentCache[cacheKey];
+  }
+
+  /// Pre-fetch content for multiple episodes (useful for preloading)
+  Future<void> prefetchContent(List<AudioFile> audioFiles) async {
+    if (audioFiles.isEmpty) return;
+    
+    if (kDebugMode) {
+      print('ContentService: Pre-fetching content for ${audioFiles.length} episodes');
+    }
+    
+    final futures = audioFiles.map((audioFile) => 
+      fetchContentById(audioFile.id, audioFile.language, audioFile.category)
+    );
+    
+    try {
+      await Future.wait(futures);
+      if (kDebugMode) {
+        print('ContentService: Pre-fetch completed, cached ${_contentCache.length} content items');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('ContentService: Pre-fetch failed: $e');
+      }
+    }
+  }
+
+  /// Clear content cache
+  void clearContentCache() {
+    _contentCache.clear();
+    if (kDebugMode) {
+      print('ContentService: Content cache cleared');
     }
   }
 
@@ -405,6 +511,8 @@ class ContentService extends ChangeNotifier {
   @override
   void dispose() {
     StreamingApiService.dispose();
+    _httpClient.close();
+    _contentCache.clear();
     super.dispose();
   }
 }

@@ -1,5 +1,5 @@
 {
   "*.{js,mjs,json,md}": ["prettier --write"],
-  "*.dart": ["dart format"],
-  "pubspec.yaml": ["flutter pub get"]
+  "app/**/*.dart": ["cd app && dart format"],
+  "app/pubspec.yaml": ["cd app && flutter pub get"]
 }
