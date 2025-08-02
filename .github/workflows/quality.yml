@@ -32,15 +32,18 @@ jobs:
 
       - name: Install Flutter dependencies
         run: flutter pub get
+        working-directory: app
 
       - name: Check Node.js code formatting
         run: npx prettier --check "src/**/*.{js,mjs,json}" "tests/**/*.{js,mjs}" "*.{js,mjs,json,md}"
 
       - name: Check Flutter code formatting
         run: dart format --set-exit-if-changed lib/ test/
+        working-directory: app
 
       - name: Run Flutter analysis
         run: flutter analyze --no-congratulate
+        working-directory: app
 
       - name: Run tests
         run: npm run test

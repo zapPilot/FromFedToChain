@@ -45,14 +45,16 @@ jobs:
 
     - name: Install Flutter dependencies
       run: flutter pub get
+      working-directory: app
 
     - name: Run Flutter tests with coverage
       run: flutter test --coverage --reporter compact
+      working-directory: app
 
     - name: Upload Flutter coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: ./coverage/lcov.info
+        file: ./app/coverage/lcov.info
         flags: flutter
         name: flutter-coverage
         fail_ci_if_error: false
@@ -61,7 +63,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: flutter-coverage-report
-        path: coverage/
+        path: app/coverage/
 
   build:
     runs-on: ubuntu-latest
@@ -80,12 +82,14 @@ jobs:
 
     - name: Install Flutter dependencies
       run: flutter pub get
+      working-directory: app
 
     - name: Build Flutter web
       run: flutter build web --release
+      working-directory: app
 
     - name: Archive Flutter web build
       uses: actions/upload-artifact@v4
       with:
         name: flutter-web-build
-        path: build/web/
+        path: app/build/web/
