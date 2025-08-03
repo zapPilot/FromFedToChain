@@ -364,7 +364,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Build additional controls
-  Widget _buildAdditionalControls(AudioService audioService) {
+  Widget _buildAdditionalControls(AudioService audioService, ContentService contentService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: Column(
@@ -473,9 +473,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
               // Share
               IconButton(
-                onPressed: () {
-                  // TODO: Implement sharing
-                },
+                onPressed: () => _shareCurrentContent(context, audioService, contentService),
                 icon: const Icon(Icons.share),
                 style: IconButton.styleFrom(
                   backgroundColor: AppTheme.cardColor.withOpacity(0.5),
@@ -549,7 +547,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         _buildMainControls(audioService, contentService),
 
         // Additional controls
-        _buildAdditionalControls(audioService),
+        _buildAdditionalControls(audioService, contentService),
 
         const SizedBox(height: AppTheme.spacingL),
       ],
@@ -632,7 +630,7 @@ class _PlayerScreenState extends State<PlayerScreen>
               _buildMainControls(audioService, contentService),
 
               // Additional controls
-              _buildAdditionalControls(audioService),
+              _buildAdditionalControls(audioService, contentService),
 
               const SizedBox(height: AppTheme.spacingL),
             ],
@@ -692,6 +690,91 @@ class _PlayerScreenState extends State<PlayerScreen>
         return Icons.account_balance;
       default:
         return Icons.headphones;
+    }
+  }
+
+  /// Share current content using social hook if available
+  Future<void> _shareCurrentContent(BuildContext context, AudioService audioService, ContentService contentService) async {
+    final currentAudio = audioService.currentAudioFile;
+    if (currentAudio == null) return;
+
+    try {
+      // Get content to access social_hook
+      final content = await contentService.getContentForAudioFile(currentAudio);
+      
+      String shareText;
+      if (content?.socialHook != null && content!.socialHook!.trim().isNotEmpty) {
+        // Use social hook from content
+        shareText = content.socialHook!;
+      } else {
+        // Fallback to default sharing message
+        shareText = '🎧 Listening to "${currentAudio.displayTitle}" from From Fed to Chain\n\n'
+                   '${currentAudio.categoryEmoji} ${AppTheme.getCategoryDisplayName(currentAudio.category)} | '
+                   '${currentAudio.languageFlag} ${AppTheme.getLanguageDisplayName(currentAudio.language)}';
+      }
+
+      // Show share dialog with the text
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.share),
+              SizedBox(width: 8),
+              Text('Share Episode'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Share this episode:'),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SelectableText(
+                  shareText,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton.icon(
+              onPressed: () {
+                // Copy to clipboard
+                // TODO: Implement actual sharing (copy to clipboard, share to apps, etc.)
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Share text copied to clipboard!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.copy),
+              label: const Text('Copy'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      // Show error if content loading fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load sharing content: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/audio_file.dart';
 import '../models/audio_content.dart';
@@ -27,6 +28,7 @@ class _ContentDisplayState extends State<ContentDisplay> {
   AudioContent? _currentContent;
   bool _isLoading = false;
   String? _error;
+  String? _rawJson; // Debug: Store raw JSON response
 
   @override
   void initState() {
@@ -58,16 +60,29 @@ class _ContentDisplayState extends State<ContentDisplay> {
     setState(() {
       _isLoading = true;
       _error = null;
+      _rawJson = null;
     });
 
     try {
-      final content = await widget.contentService.getContentForAudioFile(widget.currentAudioFile!);
+      final rawResult = await widget.contentService.getContentForAudioFile(widget.currentAudioFile!);
       
       if (mounted) {
         setState(() {
-          _currentContent = content;
+          _currentContent = rawResult;
           _isLoading = false;
-          _error = content == null ? 'Content not available' : null;
+          // DEBUG: Store raw JSON for debugging
+          _rawJson = const JsonEncoder.withIndent('  ').convert({
+            'result': rawResult?.toJson(),
+            'resultType': rawResult.runtimeType.toString(),
+            'isNull': rawResult == null,
+            'audioFile': {
+              'id': widget.currentAudioFile!.id,
+              'title': widget.currentAudioFile!.title,
+              'language': widget.currentAudioFile!.language,
+              'category': widget.currentAudioFile!.category,
+            }
+          });
+          _error = rawResult == null ? 'Content not available' : null;
         });
       }
     } catch (e) {
@@ -75,6 +90,16 @@ class _ContentDisplayState extends State<ContentDisplay> {
         setState(() {
           _currentContent = null;
           _isLoading = false;
+          _rawJson = const JsonEncoder.withIndent('  ').convert({
+            'error': e.toString(),
+            'errorType': e.runtimeType.toString(),
+            'audioFile': {
+              'id': widget.currentAudioFile?.id,
+              'title': widget.currentAudioFile?.title,
+              'language': widget.currentAudioFile?.language,
+              'category': widget.currentAudioFile?.category,
+            }
+          });
           _error = 'Failed to load content: $e';
         });
       }
@@ -121,24 +146,12 @@ class _ContentDisplayState extends State<ContentDisplay> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  if (_currentContent != null)
-                    Text(
-                      _currentContent!.displayTitle,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  else if (widget.currentAudioFile != null)
-                    Text(
-                      widget.currentAudioFile!.title,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  Text(
+                    'Read along with the audio content',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -184,46 +197,67 @@ class _ContentDisplayState extends State<ContentDisplay> {
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _error!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.error,
+      return Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.errorContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Theme.of(context).colorScheme.onErrorContainer,
+                  size: 32,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: _loadContent,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  'Failed to load content',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _error!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _loadContent,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+          ),
+        ],
       );
     }
 
     if (_currentContent == null) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text(
-            'No script available for this episode',
-            style: TextStyle(
-              fontStyle: FontStyle.italic,
+      return Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.article_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
             ),
-          ),
+            const SizedBox(height: 16),
+            Text(
+              'No content available',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -231,76 +265,145 @@ class _ContentDisplayState extends State<ContentDisplay> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Metadata row
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          children: [
-            _buildMetadataChip(
-              icon: Icons.language,
-              label: _currentContent!.languageFlag,
+        // Content text
+        if (_currentContent!.description != null && _currentContent!.description!.trim().isNotEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              ),
             ),
-            _buildMetadataChip(
-              icon: Icons.category,
-              label: '${_currentContent!.categoryEmoji} ${_currentContent!.category}',
+            child: SelectableText(
+              _currentContent!.description!,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                height: 1.6,
+                fontSize: 16,
+              ),
             ),
-            _buildMetadataChip(
-              icon: Icons.calendar_today,
-              label: _currentContent!.formattedDate,
+          )
+        else
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              ),
             ),
-          ],
-        ),
+            child: Text(
+              'Content text not available for this episode.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        
         const SizedBox(height: 16),
         
-        // Content text
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-            ),
-          ),
-          child: SelectableText(
-            _currentContent!.description ?? 'No content available',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              height: 1.6,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        
-        // References if available
+        // References section
         if (_currentContent!.references.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          Text(
-            'References',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _showReferences(context),
+                  icon: const Icon(Icons.link),
+                  label: Text('References (${_currentContent!.references.length})'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                    foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          ...(_currentContent!.references.map((ref) => Padding(
-            padding: const EdgeInsets.only(bottom: 4),
+        ] else ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('• ', style: Theme.of(context).textTheme.bodySmall),
-                Expanded(
-                  child: SelectableText(
-                    ref,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                    ),
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'No references available',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
-          ))),
+          ),
         ],
       ],
+    );
+  }
+
+  /// Show references in a dialog
+  void _showReferences(BuildContext context) {
+    if (_currentContent == null || _currentContent!.references.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.link),
+            const SizedBox(width: 8),
+            const Text('References'),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: _currentContent!.references.length,
+            separatorBuilder: (context, index) => const Divider(),
+            itemBuilder: (context, index) {
+              final reference = _currentContent!.references[index];
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  child: Text(
+                    '${index + 1}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                title: SelectableText(
+                  reference,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                contentPadding: EdgeInsets.zero,
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 

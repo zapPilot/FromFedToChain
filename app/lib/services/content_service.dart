@@ -87,7 +87,8 @@ class ContentService extends ChangeNotifier {
         print('ContentService: Fetching content for $cacheKey from API');
       }
       
-      final url = Uri.parse('${ApiConfig.streamingBaseUrl}/api/content/$language/$category/$id');
+      // DEBUG: Hardcoded URL for testing
+      final url = Uri.parse('https://signed-url.davidtnfsh.workers.dev/api/content/zh-TW/startup/2025-07-05-blockchain-private-equity-tokenization');
       
       final response = await _httpClient.get(
         url,
@@ -492,6 +493,29 @@ class ContentService extends ChangeNotifier {
 
   /// Check if current filter has results
   bool get hasFilteredResults => _filteredEpisodes.isNotEmpty;
+
+  /// Get debug information for an audio file
+  Map<String, dynamic> getDebugInfo(AudioFile? audioFile) {
+    if (audioFile == null) {
+      return {'error': 'No audio file provided'};
+    }
+    
+    return {
+      'id': audioFile.id,
+      'title': audioFile.title,
+      'language': audioFile.language,
+      'category': audioFile.category,
+      'streamingUrl': audioFile.streamingUrl,
+      'totalEpisodes': _allEpisodes.length,
+      'filteredEpisodes': _filteredEpisodes.length,
+      'selectedLanguage': _selectedLanguage,
+      'selectedCategory': _selectedCategory,
+      'searchQuery': _searchQuery,
+      'isLoading': _isLoading,
+      'hasError': _errorMessage != null,
+      'errorMessage': _errorMessage,
+    };
+  }
 
   // Helper methods
   void _setLoading(bool loading) {
