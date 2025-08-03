@@ -41,6 +41,9 @@ class ApiConfig {
 
   static String getStreamUrl(String path) => '$streamingBaseUrl/proxy/$path';
 
+  static String getContentUrl(String language, String category, String id) =>
+      '$streamingBaseUrl/api/content/$language/$category/$id';
+
   // Configuration constants
   static Duration get apiTimeout => Duration(
       seconds: int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));

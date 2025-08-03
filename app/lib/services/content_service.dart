@@ -87,8 +87,7 @@ class ContentService extends ChangeNotifier {
         print('ContentService: Fetching content for $cacheKey from API');
       }
       
-      // DEBUG: Hardcoded URL for testing
-      final url = Uri.parse('https://signed-url.davidtnfsh.workers.dev/api/content/zh-TW/startup/2025-07-05-blockchain-private-equity-tokenization');
+      final url = Uri.parse(ApiConfig.getContentUrl(language, category, id));
       
       final response = await _httpClient.get(
         url,

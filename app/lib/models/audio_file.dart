@@ -29,15 +29,13 @@ class AudioFile extends Equatable {
 
   /// Create AudioFile from streaming API response
   factory AudioFile.fromApiResponse(Map<String, dynamic> json) {
-    // Extract ID from path (e.g., "audio/en-US/startup/2025-07-25-startup-news.m3u8" -> "2025-07-25-startup-news")
+    // Use ID directly from API response - it contains the proper slug format
+    final id = json['id'] as String;
     final path = json['path'] as String;
-    final pathParts = path.split('/');
-    final fileName = pathParts.last;
-    final id = fileName.replaceAll('.m3u8', '').replaceAll('.wav', '');
 
-    // Extract language and category from path
-    final language = pathParts.length > 1 ? pathParts[1] : 'unknown';
-    final category = pathParts.length > 2 ? pathParts[2] : 'unknown';
+    // Use language and category directly from API response
+    final language = json['language'] as String? ?? 'unknown';
+    final category = json['category'] as String? ?? 'unknown';
 
     return AudioFile(
       id: id,
