@@ -59,6 +59,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - .env
 
   # Custom fonts (optional)
   # fonts:
