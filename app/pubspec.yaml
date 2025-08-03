@@ -43,6 +43,7 @@ dependencies:
   # Utils
   path: ^1.8.3
   equatable: ^2.0.5
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

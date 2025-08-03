@@ -211,6 +211,25 @@ class AudioFile extends Equatable {
     }
   }
 
+  /// Parse publish date from ID (format: YYYY-MM-DD-title)
+  /// Returns the publish date if parseable, otherwise falls back to lastModified
+  DateTime get publishDate {
+    try {
+      // ID format: "2025-07-05-blockchain-private-equity-tokenization"
+      // Extract first 10 characters: "2025-07-05"
+      if (id.length >= 10) {
+        final datePart = id.substring(0, 10);
+        // Check if it matches YYYY-MM-DD pattern
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(datePart)) {
+          return DateTime.parse(datePart);
+        }
+      }
+    } catch (e) {
+      // If parsing fails, fall back to lastModified
+    }
+    return lastModified;
+  }
+
   @override
   List<Object?> get props => [
         id,

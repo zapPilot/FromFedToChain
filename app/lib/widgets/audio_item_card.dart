@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../themes/app_theme.dart';
 import '../models/audio_file.dart';
 import '../config/api_config.dart';
@@ -147,7 +148,7 @@ class AudioItemCard extends StatelessWidget {
           children: [
             // Date
             Text(
-              _formatDate(audioFile.lastModified),
+              _formatDate(audioFile.publishDate),
               style: AppTheme.bodySmall.copyWith(
                 color: AppTheme.onSurfaceColor.withOpacity(0.6),
               ),
@@ -325,7 +326,7 @@ class AudioItemCard extends StatelessWidget {
     }
   }
 
-  /// Format date for display
+  /// Format date for display with localization
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
@@ -340,7 +341,8 @@ class AudioItemCard extends StatelessWidget {
       final weeks = (difference.inDays / 7).floor();
       return '$weeks week${weeks > 1 ? 's' : ''} ago';
     } else {
-      return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      // Use localized date format for older dates (without time)
+      return DateFormat.yMMMd().format(date);
     }
   }
 }

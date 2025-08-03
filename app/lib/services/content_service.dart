@@ -23,6 +23,10 @@ class ContentService extends ChangeNotifier {
   
   // Content cache for language learning scripts
   final Map<String, AudioContent> _contentCache = {};
+  
+  // Episode completion tracking (episodeId -> completion percentage 0.0-1.0)
+  final Map<String, double> _episodeCompletion = {};
+  
   static final _httpClient = http.Client();
 
   // Getters
@@ -36,6 +40,15 @@ class ContentService extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasError => _errorMessage != null;
 
+  // Sorting and filtering options
+  String _sortOrder = 'newest'; // 'newest', 'oldest', 'alphabetical'
+  String get sortOrder => _sortOrder;
+  
+  // Episode completion getters
+  double getEpisodeCompletion(String episodeId) => _episodeCompletion[episodeId] ?? 0.0;
+  bool isEpisodeFinished(String episodeId) => getEpisodeCompletion(episodeId) >= 0.9;
+  bool isEpisodeUnfinished(String episodeId) => getEpisodeCompletion(episodeId) > 0.0 && getEpisodeCompletion(episodeId) < 0.9;
+
   ContentService() {
     _loadPreferences();
   }
@@ -46,6 +59,17 @@ class ContentService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       _selectedLanguage = prefs.getString('selected_language') ?? 'zh-TW';
       _selectedCategory = prefs.getString('selected_category') ?? 'all';
+      _sortOrder = prefs.getString('sort_order') ?? 'newest';
+      
+      // Load episode completion data
+      final completionJson = prefs.getString('episode_completion');
+      if (completionJson != null) {
+        final completionData = json.decode(completionJson) as Map<String, dynamic>;
+        _episodeCompletion.clear();
+        completionData.forEach((key, value) {
+          _episodeCompletion[key] = (value as num).toDouble();
+        });
+      }
 
       // Validate loaded language
       if (!ApiConfig.isValidLanguage(_selectedLanguage)) {
@@ -64,6 +88,11 @@ class ContentService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selected_language', _selectedLanguage);
       await prefs.setString('selected_category', _selectedCategory);
+      await prefs.setString('sort_order', _sortOrder);
+      
+      // Save episode completion data
+      final completionJson = json.encode(_episodeCompletion);
+      await prefs.setString('episode_completion', completionJson);
     } catch (e) {
       print('ContentService: Failed to save preferences: $e');
     }
@@ -169,6 +198,49 @@ class ContentService extends ChangeNotifier {
     }
   }
 
+  /// Update episode completion percentage (0.0 to 1.0)
+  Future<void> updateEpisodeCompletion(String episodeId, double completion) async {
+    _episodeCompletion[episodeId] = completion.clamp(0.0, 1.0);
+    await _savePreferences();
+    notifyListeners();
+  }
+
+  /// Mark episode as finished (completion = 1.0)
+  Future<void> markEpisodeAsFinished(String episodeId) async {
+    await updateEpisodeCompletion(episodeId, 1.0);
+  }
+
+  /// Get unfinished episodes (started but not completed)
+  List<AudioFile> getUnfinishedEpisodes() {
+    return _allEpisodes.where((episode) => isEpisodeUnfinished(episode.id)).toList();
+  }
+
+  /// Set sort order and apply filters
+  Future<void> setSortOrder(String sortOrder) async {
+    if (_sortOrder != sortOrder) {
+      _sortOrder = sortOrder;
+      _applySorting();
+      await _savePreferences();
+      notifyListeners();
+    }
+  }
+
+  /// Apply sorting to filtered episodes
+  void _applySorting() {
+    switch (_sortOrder) {
+      case 'oldest':
+        _filteredEpisodes.sort((a, b) => a.publishDate.compareTo(b.publishDate));
+        break;
+      case 'alphabetical':
+        _filteredEpisodes.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+        break;
+      case 'newest':
+      default:
+        _filteredEpisodes.sort((a, b) => b.publishDate.compareTo(a.publishDate));
+        break;
+    }
+  }
+
   /// Load all episodes from the streaming API
   Future<void> loadAllEpisodes() async {
     if (_isLoading) return;
@@ -234,7 +306,7 @@ class ContentService extends ChangeNotifier {
     _allEpisodes.addAll(newEpisodes);
 
     // Sort by date (newest first)
-    _allEpisodes.sort((a, b) => b.lastModified.compareTo(a.lastModified));
+    _allEpisodes.sort((a, b) => b.publishDate.compareTo(a.publishDate));
   }
 
   /// Set selected language filter
@@ -313,6 +385,7 @@ class ContentService extends ChangeNotifier {
     }
 
     _filteredEpisodes = filtered;
+    _applySorting();
   }
 
   /// Create playlist from current filtered episodes

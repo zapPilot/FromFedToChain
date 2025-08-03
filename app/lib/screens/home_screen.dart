@@ -60,6 +60,9 @@ class _HomeScreenState extends State<HomeScreen>
 
                 // Filter bar
                 _buildFilterBar(context, contentService),
+                
+                // Sort selector
+                _buildSortSelector(context, contentService),
 
                 // Main content area
                 Expanded(
@@ -231,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen>
             tabs: const [
               Tab(text: 'Recent'),
               Tab(text: 'All'),
-              Tab(text: 'Favorites'),
+              Tab(text: 'Unfinished'),
             ],
             labelColor: AppTheme.primaryColor,
             unselectedLabelColor: AppTheme.onSurfaceColor.withOpacity(0.6),
@@ -250,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen>
             children: [
               _buildRecentTab(contentService, audioService),
               _buildAllTab(contentService, audioService),
-              _buildFavoritesTab(contentService, audioService),
+              _buildUnfinishedTab(contentService, audioService),
             ],
           ),
         ),
@@ -286,34 +289,47 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  /// Build favorites tab (placeholder)
-  Widget _buildFavoritesTab(
+  /// Build unfinished episodes tab
+  Widget _buildUnfinishedTab(
       ContentService contentService, AudioService audioService) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.favorite_border,
-            size: 80,
-            color: AppTheme.onSurfaceColor.withOpacity(0.3),
-          ),
-          const SizedBox(height: AppTheme.spacingL),
-          Text(
-            'No Favorites Yet',
-            style: AppTheme.headlineSmall.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.6),
+    final unfinishedEpisodes = contentService.getUnfinishedEpisodes();
+
+    if (unfinishedEpisodes.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.pending_actions,
+              size: 80,
+              color: AppTheme.onSurfaceColor.withOpacity(0.3),
             ),
-          ),
-          const SizedBox(height: AppTheme.spacingS),
-          Text(
-            'Long press episodes to add them to favorites',
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.5),
+            const SizedBox(height: AppTheme.spacingL),
+            Text(
+              'No Unfinished Episodes',
+              style: AppTheme.headlineSmall.copyWith(
+                color: AppTheme.onSurfaceColor.withOpacity(0.6),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: AppTheme.spacingS),
+            Text(
+              'Episodes you\'ve started listening to will appear here',
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppTheme.onSurfaceColor.withOpacity(0.5),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return AnimationLimiter(
+      child: AudioList(
+        episodes: unfinishedEpisodes,
+        onEpisodeTap: (episode) => _playEpisode(episode, audioService),
+        onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
+        scrollController: _scrollController,
       ),
     );
   }
@@ -540,6 +556,72 @@ class _HomeScreenState extends State<HomeScreen>
           ),
 
           const SizedBox(height: AppTheme.spacingM),
+        ],
+      ),
+    );
+  }
+
+  /// Build sort selector dropdown
+  Widget _buildSortSelector(BuildContext context, ContentService contentService) {
+    return Container(
+      margin: AppTheme.safeHorizontalPadding,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingM,
+        vertical: AppTheme.spacingS,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.sort,
+            size: 16,
+            color: AppTheme.onSurfaceColor.withOpacity(0.6),
+          ),
+          const SizedBox(width: AppTheme.spacingS),
+          Text(
+            'Sort by:',
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.onSurfaceColor.withOpacity(0.6),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacingS),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: contentService.sortOrder,
+                isDense: true,
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.onSurfaceColor,
+                  fontWeight: FontWeight.w500,
+                ),
+                dropdownColor: AppTheme.surfaceColor,
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 16,
+                  color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'newest',
+                    child: Text('Newest First'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'oldest',
+                    child: Text('Oldest First'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'alphabetical',
+                    child: Text('A-Z'),
+                  ),
+                ],
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    contentService.setSortOrder(newValue);
+                  }
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
