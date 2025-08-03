@@ -65,8 +65,10 @@ class _PlayerScreenState extends State<PlayerScreen>
 
           return SafeArea(
             child: _showContentScript
-                ? _buildExpandedLayout(context, currentAudio, audioService, contentService)
-                : _buildCompactLayout(context, currentAudio, audioService, contentService),
+                ? _buildExpandedLayout(
+                    context, currentAudio, audioService, contentService)
+                : _buildCompactLayout(
+                    context, currentAudio, audioService, contentService),
           );
         },
       ),
@@ -364,7 +366,8 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Build additional controls
-  Widget _buildAdditionalControls(AudioService audioService, ContentService contentService) {
+  Widget _buildAdditionalControls(
+      AudioService audioService, ContentService contentService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: Column(
@@ -382,7 +385,7 @@ class _PlayerScreenState extends State<PlayerScreen>
             ),
             const SizedBox(height: AppTheme.spacingM),
           ],
-          
+
           // Control buttons row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -456,10 +459,13 @@ class _PlayerScreenState extends State<PlayerScreen>
               // Autoplay toggle
               IconButton(
                 onPressed: () {
-                  audioService.setAutoplayEnabled(!audioService.autoplayEnabled);
+                  audioService
+                      .setAutoplayEnabled(!audioService.autoplayEnabled);
                 },
                 icon: Icon(
-                  audioService.autoplayEnabled ? Icons.skip_next : Icons.playlist_play,
+                  audioService.autoplayEnabled
+                      ? Icons.skip_next
+                      : Icons.playlist_play,
                 ),
                 style: IconButton.styleFrom(
                   backgroundColor: audioService.autoplayEnabled
@@ -473,7 +479,8 @@ class _PlayerScreenState extends State<PlayerScreen>
 
               // Share
               IconButton(
-                onPressed: () => _shareCurrentContent(context, audioService, contentService),
+                onPressed: () =>
+                    _shareCurrentContent(context, audioService, contentService),
                 icon: const Icon(Icons.share),
                 style: IconButton.styleFrom(
                   backgroundColor: AppTheme.cardColor.withOpacity(0.5),
@@ -512,7 +519,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Build compact layout (without content script)
-  Widget _buildCompactLayout(BuildContext context, AudioFile currentAudio, 
+  Widget _buildCompactLayout(BuildContext context, AudioFile currentAudio,
       AudioService audioService, ContentService contentService) {
     return Column(
       children: [
@@ -555,7 +562,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Build expanded layout (with content script)
-  Widget _buildExpandedLayout(BuildContext context, AudioFile currentAudio, 
+  Widget _buildExpandedLayout(BuildContext context, AudioFile currentAudio,
       AudioService audioService, ContentService contentService) {
     return CustomScrollView(
       slivers: [
@@ -563,7 +570,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         SliverToBoxAdapter(
           child: _buildHeader(context, currentAudio),
         ),
-        
+
         // Compact album art
         SliverToBoxAdapter(
           child: SizedBox(
@@ -694,23 +701,26 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Share current content using social hook if available
-  Future<void> _shareCurrentContent(BuildContext context, AudioService audioService, ContentService contentService) async {
+  Future<void> _shareCurrentContent(BuildContext context,
+      AudioService audioService, ContentService contentService) async {
     final currentAudio = audioService.currentAudioFile;
     if (currentAudio == null) return;
 
     try {
       // Get content to access social_hook
       final content = await contentService.getContentForAudioFile(currentAudio);
-      
+
       String shareText;
-      if (content?.socialHook != null && content!.socialHook!.trim().isNotEmpty) {
+      if (content?.socialHook != null &&
+          content!.socialHook!.trim().isNotEmpty) {
         // Use social hook from content
         shareText = content.socialHook!;
       } else {
         // Fallback to default sharing message
-        shareText = '🎧 Listening to "${currentAudio.displayTitle}" from From Fed to Chain\n\n'
-                   '${currentAudio.categoryEmoji} ${AppTheme.getCategoryDisplayName(currentAudio.category)} | '
-                   '${currentAudio.languageFlag} ${AppTheme.getLanguageDisplayName(currentAudio.language)}';
+        shareText =
+            '🎧 Listening to "${currentAudio.displayTitle}" from From Fed to Chain\n\n'
+            '${currentAudio.categoryEmoji} ${AppTheme.getCategoryDisplayName(currentAudio.category)} | '
+            '${currentAudio.languageFlag} ${AppTheme.getLanguageDisplayName(currentAudio.language)}';
       }
 
       // Show share dialog with the text
@@ -818,9 +828,9 @@ class _PlayerScreenState extends State<PlayerScreen>
             'Audio Details',
             style: AppTheme.headlineSmall,
           ),
-          
+
           const SizedBox(height: AppTheme.spacingM),
-          
+
           Text(
             currentAudio.displayTitle,
             style: AppTheme.bodyLarge,

@@ -39,10 +39,11 @@ class _ContentDisplayState extends State<ContentDisplay> {
   @override
   void didUpdateWidget(ContentDisplay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Load content when audio file changes
     if (oldWidget.currentAudioFile?.id != widget.currentAudioFile?.id ||
-        oldWidget.currentAudioFile?.language != widget.currentAudioFile?.language) {
+        oldWidget.currentAudioFile?.language !=
+            widget.currentAudioFile?.language) {
       _loadContent();
     }
   }
@@ -64,8 +65,9 @@ class _ContentDisplayState extends State<ContentDisplay> {
     });
 
     try {
-      final rawResult = await widget.contentService.getContentForAudioFile(widget.currentAudioFile!);
-      
+      final rawResult = await widget.contentService
+          .getContentForAudioFile(widget.currentAudioFile!);
+
       if (mounted) {
         setState(() {
           _currentContent = rawResult;
@@ -143,14 +145,17 @@ class _ContentDisplayState extends State<ContentDisplay> {
                   Text(
                     'Content Script',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                   ),
                   Text(
                     'Read along with the audio content',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                    ),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
                   ),
                 ],
               ),
@@ -217,15 +222,15 @@ class _ContentDisplayState extends State<ContentDisplay> {
                 Text(
                   'Failed to load content',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _error!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -254,8 +259,11 @@ class _ContentDisplayState extends State<ContentDisplay> {
             Text(
               'No content available',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
+                  ),
             ),
           ],
         ),
@@ -266,7 +274,8 @@ class _ContentDisplayState extends State<ContentDisplay> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Content text
-        if (_currentContent!.description != null && _currentContent!.description!.trim().isNotEmpty)
+        if (_currentContent!.description != null &&
+            _currentContent!.description!.trim().isNotEmpty)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -280,9 +289,9 @@ class _ContentDisplayState extends State<ContentDisplay> {
             child: SelectableText(
               _currentContent!.description!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                height: 1.6,
-                fontSize: 16,
-              ),
+                    height: 1.6,
+                    fontSize: 16,
+                  ),
             ),
           )
         else
@@ -299,15 +308,18 @@ class _ContentDisplayState extends State<ContentDisplay> {
             child: Text(
               'Content text not available for this episode.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                fontStyle: FontStyle.italic,
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
+                    fontStyle: FontStyle.italic,
+                  ),
               textAlign: TextAlign.center,
             ),
           ),
-        
+
         const SizedBox(height: 16),
-        
+
         // References section
         if (_currentContent!.references.isNotEmpty) ...[
           Row(
@@ -316,10 +328,13 @@ class _ContentDisplayState extends State<ContentDisplay> {
                 child: ElevatedButton.icon(
                   onPressed: () => _showReferences(context),
                   icon: const Icon(Icons.link),
-                  label: Text('References (${_currentContent!.references.length})'),
+                  label: Text(
+                      'References (${_currentContent!.references.length})'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-                    foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
                 ),
               ),
@@ -344,8 +359,8 @@ class _ContentDisplayState extends State<ContentDisplay> {
                 Text(
                   'No references available',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
               ],
             ),
@@ -379,7 +394,8 @@ class _ContentDisplayState extends State<ContentDisplay> {
               final reference = _currentContent!.references[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
                   child: Text(
                     '${index + 1}',
                     style: TextStyle(
@@ -407,33 +423,5 @@ class _ContentDisplayState extends State<ContentDisplay> {
     );
   }
 
-  Widget _buildMetadataChip({
-    required IconData icon,
-    required String label,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 14,
-            color: Theme.of(context).colorScheme.onSecondaryContainer,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 }

@@ -20,13 +20,13 @@ class ContentService extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
   String? _errorMessage;
-  
+
   // Content cache for language learning scripts
   final Map<String, AudioContent> _contentCache = {};
-  
+
   // Episode completion tracking (episodeId -> completion percentage 0.0-1.0)
   final Map<String, double> _episodeCompletion = {};
-  
+
   static final _httpClient = http.Client();
 
   // Getters
@@ -43,11 +43,15 @@ class ContentService extends ChangeNotifier {
   // Sorting and filtering options
   String _sortOrder = 'newest'; // 'newest', 'oldest', 'alphabetical'
   String get sortOrder => _sortOrder;
-  
+
   // Episode completion getters
-  double getEpisodeCompletion(String episodeId) => _episodeCompletion[episodeId] ?? 0.0;
-  bool isEpisodeFinished(String episodeId) => getEpisodeCompletion(episodeId) >= 0.9;
-  bool isEpisodeUnfinished(String episodeId) => getEpisodeCompletion(episodeId) > 0.0 && getEpisodeCompletion(episodeId) < 0.9;
+  double getEpisodeCompletion(String episodeId) =>
+      _episodeCompletion[episodeId] ?? 0.0;
+  bool isEpisodeFinished(String episodeId) =>
+      getEpisodeCompletion(episodeId) >= 0.9;
+  bool isEpisodeUnfinished(String episodeId) =>
+      getEpisodeCompletion(episodeId) > 0.0 &&
+      getEpisodeCompletion(episodeId) < 0.9;
 
   ContentService() {
     _loadPreferences();
@@ -60,11 +64,12 @@ class ContentService extends ChangeNotifier {
       _selectedLanguage = prefs.getString('selected_language') ?? 'zh-TW';
       _selectedCategory = prefs.getString('selected_category') ?? 'all';
       _sortOrder = prefs.getString('sort_order') ?? 'newest';
-      
+
       // Load episode completion data
       final completionJson = prefs.getString('episode_completion');
       if (completionJson != null) {
-        final completionData = json.decode(completionJson) as Map<String, dynamic>;
+        final completionData =
+            json.decode(completionJson) as Map<String, dynamic>;
         _episodeCompletion.clear();
         completionData.forEach((key, value) {
           _episodeCompletion[key] = (value as num).toDouble();
@@ -89,7 +94,7 @@ class ContentService extends ChangeNotifier {
       await prefs.setString('selected_language', _selectedLanguage);
       await prefs.setString('selected_category', _selectedCategory);
       await prefs.setString('sort_order', _sortOrder);
-      
+
       // Save episode completion data
       final completionJson = json.encode(_episodeCompletion);
       await prefs.setString('episode_completion', completionJson);
@@ -100,9 +105,10 @@ class ContentService extends ChangeNotifier {
 
   /// Fetch content/script for a specific episode from Cloudflare API
   /// This provides the actual content text for language learning
-  Future<AudioContent?> fetchContentById(String id, String language, String category) async {
+  Future<AudioContent?> fetchContentById(
+      String id, String language, String category) async {
     final cacheKey = '$language/$category/$id';
-    
+
     // Return cached content if available
     if (_contentCache.containsKey(cacheKey)) {
       if (kDebugMode) {
@@ -115,9 +121,9 @@ class ContentService extends ChangeNotifier {
       if (kDebugMode) {
         print('ContentService: Fetching content for $cacheKey from API');
       }
-      
+
       final url = Uri.parse(ApiConfig.getContentUrl(language, category, id));
-      
+
       final response = await _httpClient.get(
         url,
         headers: {
@@ -126,22 +132,24 @@ class ContentService extends ChangeNotifier {
           'User-Agent': 'FromFedToChain/1.0.0 (Flutter)',
         },
       ).timeout(ApiConfig.apiTimeout);
-      
+
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final content = AudioContent.fromJson(jsonData);
-        
+
         // Cache the content
         _contentCache[cacheKey] = content;
-        
+
         if (kDebugMode) {
-          print('ContentService: Successfully fetched and cached content for $cacheKey');
+          print(
+              'ContentService: Successfully fetched and cached content for $cacheKey');
         }
-        
+
         return content;
       } else {
         if (kDebugMode) {
-          print('ContentService: Failed to fetch content - HTTP ${response.statusCode}');
+          print(
+              'ContentService: Failed to fetch content - HTTP ${response.statusCode}');
           print('ContentService: Response body: ${response.body}');
         }
         return null;
@@ -157,7 +165,8 @@ class ContentService extends ChangeNotifier {
   /// Get content for an audio file with lazy loading
   /// This is the main method for getting content/scripts for language learning
   Future<AudioContent?> getContentForAudioFile(AudioFile audioFile) async {
-    return await fetchContentById(audioFile.id, audioFile.language, audioFile.category);
+    return await fetchContentById(
+        audioFile.id, audioFile.language, audioFile.category);
   }
 
   /// Get cached content without fetching (synchronous)
@@ -169,19 +178,20 @@ class ContentService extends ChangeNotifier {
   /// Pre-fetch content for multiple episodes (useful for preloading)
   Future<void> prefetchContent(List<AudioFile> audioFiles) async {
     if (audioFiles.isEmpty) return;
-    
+
     if (kDebugMode) {
-      print('ContentService: Pre-fetching content for ${audioFiles.length} episodes');
+      print(
+          'ContentService: Pre-fetching content for ${audioFiles.length} episodes');
     }
-    
-    final futures = audioFiles.map((audioFile) => 
-      fetchContentById(audioFile.id, audioFile.language, audioFile.category)
-    );
-    
+
+    final futures = audioFiles.map((audioFile) =>
+        fetchContentById(audioFile.id, audioFile.language, audioFile.category));
+
     try {
       await Future.wait(futures);
       if (kDebugMode) {
-        print('ContentService: Pre-fetch completed, cached ${_contentCache.length} content items');
+        print(
+            'ContentService: Pre-fetch completed, cached ${_contentCache.length} content items');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -199,7 +209,8 @@ class ContentService extends ChangeNotifier {
   }
 
   /// Update episode completion percentage (0.0 to 1.0)
-  Future<void> updateEpisodeCompletion(String episodeId, double completion) async {
+  Future<void> updateEpisodeCompletion(
+      String episodeId, double completion) async {
     _episodeCompletion[episodeId] = completion.clamp(0.0, 1.0);
     await _savePreferences();
     notifyListeners();
@@ -212,7 +223,9 @@ class ContentService extends ChangeNotifier {
 
   /// Get unfinished episodes (started but not completed)
   List<AudioFile> getUnfinishedEpisodes() {
-    return _allEpisodes.where((episode) => isEpisodeUnfinished(episode.id)).toList();
+    return _allEpisodes
+        .where((episode) => isEpisodeUnfinished(episode.id))
+        .toList();
   }
 
   /// Set sort order and apply filters
@@ -229,14 +242,17 @@ class ContentService extends ChangeNotifier {
   void _applySorting() {
     switch (_sortOrder) {
       case 'oldest':
-        _filteredEpisodes.sort((a, b) => a.publishDate.compareTo(b.publishDate));
+        _filteredEpisodes
+            .sort((a, b) => a.publishDate.compareTo(b.publishDate));
         break;
       case 'alphabetical':
-        _filteredEpisodes.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+        _filteredEpisodes.sort(
+            (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
         break;
       case 'newest':
       default:
-        _filteredEpisodes.sort((a, b) => b.publishDate.compareTo(a.publishDate));
+        _filteredEpisodes
+            .sort((a, b) => b.publishDate.compareTo(a.publishDate));
         break;
     }
   }
@@ -571,7 +587,7 @@ class ContentService extends ChangeNotifier {
     if (audioFile == null) {
       return {'error': 'No audio file provided'};
     }
-    
+
     return {
       'id': audioFile.id,
       'title': audioFile.title,

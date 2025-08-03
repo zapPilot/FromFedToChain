@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                 // Filter bar
                 _buildFilterBar(context, contentService),
-                
+
                 // Sort selector
                 _buildSortSelector(context, contentService),
 
@@ -562,7 +562,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build sort selector dropdown
-  Widget _buildSortSelector(BuildContext context, ContentService contentService) {
+  Widget _buildSortSelector(
+      BuildContext context, ContentService contentService) {
     return Container(
       margin: AppTheme.safeHorizontalPadding,
       padding: const EdgeInsets.symmetric(
