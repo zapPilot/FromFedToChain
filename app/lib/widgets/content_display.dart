@@ -422,6 +422,4 @@ class _ContentDisplayState extends State<ContentDisplay> {
       ),
     );
   }
-
-
 }
