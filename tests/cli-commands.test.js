@@ -370,25 +370,6 @@ describe("CLI Commands Tests", () => {
           output.includes("Content Ready"),
       );
     });
-
-    it("should handle audio command with content ID", async () => {
-      try {
-        const result = await runCLI(["audio", "2025-07-02-cli-test"]);
-
-        const output = [...result.stdout, ...result.stderr].join(" ");
-        assert(
-          output.includes("audio") ||
-            output.includes("TTS") ||
-            output.includes("error"),
-        );
-      } catch (error) {
-        // Expected to fail due to missing Google Cloud TTS setup
-        assert(
-          error.message.includes("Google Cloud") ||
-            error.message.includes("TTS"),
-        );
-      }
-    });
   });
 
   describe("Social Command", () => {

@@ -47,6 +47,10 @@ jobs:
       run: flutter pub get
       working-directory: app
 
+    - name: Create .env file for tests
+      run: cp .env.example .env
+      working-directory: app
+
     - name: Run Flutter tests with coverage
       run: flutter test --coverage --reporter compact
       working-directory: app
@@ -82,6 +86,10 @@ jobs:
 
     - name: Install Flutter dependencies
       run: flutter pub get
+      working-directory: app
+
+    - name: Create .env file for build
+      run: cp .env.example .env
       working-directory: app
 
     - name: Build Flutter web
