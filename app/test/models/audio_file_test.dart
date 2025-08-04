@@ -369,8 +369,6 @@ void main() {
         );
         expect(audioFile.publishDate, lastModified);
       });
-
-
     });
 
     group('Equality', () {
@@ -419,8 +417,6 @@ void main() {
         expect(audioFile.formattedFileSize, 'Unknown size');
         expect(audioFile.formattedDuration, '');
       });
-
-
 
       test('handles very long durations', () {
         final audioFile = TestUtils.createSampleAudioFile(

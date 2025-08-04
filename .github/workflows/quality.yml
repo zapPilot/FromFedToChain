@@ -41,6 +41,9 @@ jobs:
         run: cp .env.example .env
         working-directory: app
 
+      - name: Create service account file for tests
+        run: cp service-account.json.example service-account.json
+
       - name: Run comprehensive Flutter quality checks
         run: npm run precommit:test
 

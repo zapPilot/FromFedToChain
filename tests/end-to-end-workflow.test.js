@@ -53,6 +53,9 @@ describe("End-to-End Workflow Tests", () => {
       translate: mock.fn(),
     };
 
+    // Reset the cache to ensure mock is used
+    TranslationService.translate_client = null;
+
     const originalGetTranslateClient = TranslationService.getTranslateClient;
     TranslationService.getTranslateClient = mock.fn(() => mockTranslateClient);
     TranslationService.translate_client = mockTranslateClient;
@@ -69,6 +72,7 @@ describe("End-to-End Workflow Tests", () => {
   async function restoreMocks() {
     // Restore original services
     TranslationService.translate_client = null;
+    // Note: mock.restoreAll() will restore the mocked methods
   }
 
   function createMockAudioContent(size = 1000) {

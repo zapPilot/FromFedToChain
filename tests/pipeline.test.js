@@ -108,6 +108,10 @@ describe("Pipeline Tests", () => {
     mockTranslateClient = {
       translate: mock.fn(),
     };
+
+    // Reset the cache to ensure mock is used
+    TranslationService.translate_client = null;
+
     originalGetTranslateClient = TranslationService.getTranslateClient;
     TranslationService.getTranslateClient = mock.fn(() => mockTranslateClient);
     TranslationService.translate_client = mockTranslateClient;

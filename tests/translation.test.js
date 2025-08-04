@@ -23,6 +23,9 @@ describe("TranslationService Tests", () => {
     };
 
     // Mock the getTranslateClient method
+    // Reset the cache to ensure mock is used
+    TranslationService.translate_client = null;
+
     originalGetTranslateClient = TranslationService.getTranslateClient;
     TranslationService.getTranslateClient = mock.fn(() => mockTranslateClient);
     TranslationService.translate_client = mockTranslateClient; // Reset static client

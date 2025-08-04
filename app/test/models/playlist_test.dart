@@ -502,7 +502,7 @@ void main() {
         expect(playlist1.currentIndex, equals(playlist2.currentIndex));
         expect(playlist1.shuffleEnabled, equals(playlist2.shuffleEnabled));
         expect(playlist1.repeatMode, equals(playlist2.repeatMode));
-        
+
         // Note: Hash codes will be different due to different timestamps
         // This is expected behavior since timestamps are part of the equality comparison
       });

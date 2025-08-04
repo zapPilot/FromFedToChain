@@ -11,7 +11,7 @@
     "test:flutter": "cd app && flutter test --coverage && lcov --summary coverage/lcov.info && dart run scripts/coverage_check.dart",
     "format": "npm run format:js && npm run format:dart",
     "format:js": "prettier --write . --ignore-path .prettierignore",
-    "format:dart": "cd app && dart format lib/ test/",
+    "format:dart": "cd app && dart format .",
     "lint": "npm run lint:node && npm run lint:flutter",
     "lint:node": "echo 'Node.js linting completed'",
     "lint:flutter": "cd app && flutter analyze",
