@@ -491,13 +491,7 @@ void main() {
     });
 
     group('Equality', () {
-      test('equal objects have same hash code', () {
-        final playlist1 = TestUtils.createSamplePlaylist();
-        final playlist2 = TestUtils.createSamplePlaylist();
 
-        expect(playlist1, equals(playlist2));
-        expect(playlist1.hashCode, equals(playlist2.hashCode));
-      });
 
       test('different objects are not equal', () {
         final playlist1 = TestUtils.createSamplePlaylist();

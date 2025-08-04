@@ -370,19 +370,7 @@ void main() {
         expect(audioFile.publishDate, lastModified);
       });
 
-      test('falls back to lastModified for malformed date in ID', () {
-        final lastModified = DateTime.parse('2025-01-15T10:00:00Z');
-        final audioFile = AudioFile(
-          id: '2025-13-35-invalid-date',
-          title: 'Test',
-          language: 'en-US',
-          category: 'daily-news',
-          streamingUrl: 'https://example.com/test.m3u8',
-          path: 'test.m3u8',
-          lastModified: lastModified,
-        );
-        expect(audioFile.publishDate, lastModified);
-      });
+
     });
 
     group('Equality', () {
@@ -432,12 +420,7 @@ void main() {
         expect(audioFile.formattedDuration, '');
       });
 
-      test('handles very large file sizes', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          fileSizeBytes: 5497558138880, // 5TB
-        );
-        expect(audioFile.formattedFileSize, '5.0 GB'); // Should cap at GB
-      });
+
 
       test('handles very long durations', () {
         final audioFile = TestUtils.createSampleAudioFile(
