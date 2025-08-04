@@ -37,6 +37,9 @@ jobs:
       - name: Check Node.js code formatting
         run: npx prettier --check "src/**/*.{js,mjs,json}" "tests/**/*.{js,mjs}" "*.{js,mjs,json,md}"
 
+      - name: Create .env file for tests
+        run: cp .env.example .env
+        working-directory: app
       - name: Check Flutter code formatting
         run: dart format --set-exit-if-changed lib/ test/
         working-directory: app
