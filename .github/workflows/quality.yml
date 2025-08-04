@@ -40,19 +40,12 @@ jobs:
       - name: Create .env file for tests
         run: cp .env.example .env
         working-directory: app
-      - name: Check Flutter code formatting
-        run: dart format --set-exit-if-changed lib/ test/
-        working-directory: app
 
-      - name: Run Flutter analysis
-        run: flutter analyze --no-congratulate || exit_code=$?; if [ ${exit_code:-0} -le 1 ]; then exit 0; else exit $exit_code; fi
-        working-directory: app
+      - name: Run comprehensive Flutter quality checks
+        run: npm run precommit:test
 
       - name: Run Node.js tests
         run: npm run test:node
-
-      - name: Run Flutter tests
-        run: npm run test:flutter
 
       - name: Security audit (Node.js)
         run: npm audit --audit-level=moderate

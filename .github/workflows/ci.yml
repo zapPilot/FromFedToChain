@@ -52,8 +52,7 @@ jobs:
       working-directory: app
 
     - name: Run Flutter tests with coverage
-      run: flutter test --coverage --reporter compact
-      working-directory: app
+      run: npm run test:flutter
 
     - name: Upload Flutter coverage to Codecov
       uses: codecov/codecov-action@v4
