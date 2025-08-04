@@ -33,11 +33,10 @@ jobs:
     - name: Run Node.js linting
       run: npm run lint:node
 
-    - name: Run Node.js tests with simple runner (fallback)
-      if: failure()
+    - name: Run Node.js tests with verbose output
       run: |
-        echo "Running tests with simple runner as fallback..."
-        npm run test:node:simple
+        echo "Running tests with verbose output..."
+        node --test tests/contentmanager-nested.test.js
       env:
         NODE_OPTIONS: "--max-old-space-size=4096"
 
