@@ -8,6 +8,7 @@
     "pipeline": "node src/cli.js pipeline",
     "test": "npm run test:node && npm run test:flutter",
     "test:node": "node tests/run-tests.js",
+    "test:node:simple": "node tests/run-tests-simple.js",
     "test:flutter": "cd app && flutter test --coverage && lcov --summary coverage/lcov.info && dart run scripts/coverage_check.dart",
     "format": "npm run format:js && npm run format:dart",
     "format:js": "prettier --write . --ignore-path .prettierignore",

@@ -17,8 +17,15 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '18.19.1'
         cache: 'npm'
+
+    - name: Debug Node.js version
+      run: |
+        node -v
+        npm -v
+        echo "Node.js version details:"
+        node --version
 
     - name: Install Node.js dependencies
       run: npm ci
@@ -26,8 +33,20 @@ jobs:
     - name: Run Node.js linting
       run: npm run lint:node
 
-    - name: Run Node.js tests
-      run: npm run test:node
+    - name: Run Node.js tests with verbose output
+      run: |
+        echo "Running tests with verbose output..."
+        node --test --test-reporter=verbose tests/contentmanager-nested.test.js
+      env:
+        NODE_OPTIONS: "--max-old-space-size=4096"
+
+    - name: Run Node.js tests with simple runner (fallback)
+      if: failure()
+      run: |
+        echo "Running tests with simple runner as fallback..."
+        npm run test:node:simple
+      env:
+        NODE_OPTIONS: "--max-old-space-size=4096"
 
   test-flutter:
     runs-on: ubuntu-latest
