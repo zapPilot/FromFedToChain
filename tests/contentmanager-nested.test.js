@@ -4,7 +4,6 @@ import fs from "fs/promises";
 import path from "path";
 import { TestUtils } from "./setup.js";
 import { ContentManager } from "../src/ContentManager.js";
-import { ContentSchema } from "../src/ContentSchema.js";
 
 describe("ContentManager Nested Structure Tests", () => {
   let tempDir;
