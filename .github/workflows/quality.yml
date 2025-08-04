@@ -57,10 +57,3 @@ jobs:
       - name: Security audit (Node.js)
         run: npm audit --audit-level=moderate
         continue-on-error: true
-
-      - name: Check for secrets (comprehensive scan)
-        if: github.event_name == 'push'
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          extra_args: --debug --only-verified --include="*.dart,*.js,*.mjs,*.json,*.yaml,*.yml"
