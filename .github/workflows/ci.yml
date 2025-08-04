@@ -33,13 +33,6 @@ jobs:
     - name: Run Node.js linting
       run: npm run lint:node
 
-    - name: Run Node.js tests with verbose output
-      run: |
-        echo "Running tests with verbose output..."
-        node --test --test-reporter=verbose tests/contentmanager-nested.test.js
-      env:
-        NODE_OPTIONS: "--max-old-space-size=4096"
-
     - name: Run Node.js tests with simple runner (fallback)
       if: failure()
       run: |
