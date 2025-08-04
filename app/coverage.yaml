@@ -1,0 +1,27 @@
+coverage_options:
+  enabled: true
+  
+  # Coverage thresholds (percentage)
+  thresholds:
+    global:
+      statements: 26
+      branches: 26
+      functions: 26
+      lines: 26
+
+  # Exclude files/directories from coverage
+  excludes:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated_plugin_registrant.dart"
+    - "**/main.dart"
+    - "**/test/**"
+    - "**/coverage/**"
+    - "**/.dart_tool/**"
+    - "**/build/**"
+  
+  # HTML report output directory
+  html_dir: "coverage/html"
+  
+  # LCOV report output file
+  lcov_dir: "coverage" 
