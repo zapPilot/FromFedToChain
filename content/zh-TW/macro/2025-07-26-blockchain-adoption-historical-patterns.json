@@ -1,6 +1,6 @@
 {
   "id": "2025-07-26-blockchain-adoption-historical-patterns",
-  "status": "draft",
+  "status": "social",
   "category": "macro",
   "date": "2025-07-26",
   "language": "zh-TW",
@@ -15,10 +15,55 @@
     "https://legalnodes.com/article/mica-regulation-explained",
     "https://www.ledgerinsights.com/singapores-mas-expands-guardian-vision-for-commercializing-asset-tokenization/"
   ],
-  "audio_file": null,
-  "social_hook": null,
+  "audio_file": "audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns.wav",
+  "social_hook": "🚗➡️🏦 你的曾祖父看到第一輛汽車時，可能想「這玩意兒永遠不會取代馬車」，結果只用了二十年。現在比特幣、以太坊、Solana 會不會也是這個時代的「汽車革命」？歷史總是驚人地相似... 📖 完整分析 | Eng 中 日 播客 Apple Podcasts & Spotify",
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-05T01:08:46.154Z",
+      "comments": "我喜歡這種從歷史走向帶我們看現在跟未來分析"
+    }
   },
-  "updated_at": "2025-07-26T02:16:08.659Z"
+  "updated_at": "2025-08-05T01:34:15.198Z",
+  "streaming_urls": {
+    "m3u8": "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/playlist.m3u8",
+    "segments": [
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment000.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment001.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment002.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment003.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment004.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment005.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment006.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment007.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment008.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment009.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment010.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment011.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment012.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment013.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment014.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment015.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment016.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment017.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment018.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment019.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment020.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment021.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment022.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment023.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment024.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment025.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment026.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment027.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment028.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment029.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment030.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment031.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment032.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/macro/2025-07-26-blockchain-adoption-historical-patterns/segment033.ts"
+    ]
+  }
 }
