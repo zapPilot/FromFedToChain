@@ -114,10 +114,11 @@ export class ContentSchema {
     return this.createContent(
       "2025-06-30-example-content",
       "daily-news",
-      "Example Bitcoin Analysis",
-      "This is example content about Bitcoin trends...",
-      ["Example Source 1", "Example Source 2"],
-      "萬維鋼風格.md", // example framework
+      "zh-TW", // correct language parameter
+      "Example Bitcoin Analysis", // correct title parameter
+      "This is example content about Bitcoin trends...", // correct content parameter
+      ["Example Source 1", "Example Source 2"], // correct references parameter
+      "万维钢风格.md", // example framework parameter
     );
   }
 
