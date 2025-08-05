@@ -3,7 +3,7 @@
 3. Use `zen` to conduct additional research on this topic (deep dive / ultrathink).
 4. Use `claude` to conduct further research on the same topic (deep dive / ultrathink).
 5. `Collect` and keep all reference `URLs` from Steps 1 – 3.
-6. Write one conversational explainer article in Traditional Chinese. Choose the most appropriate writing framework from the guidelines/\*.md files, bearing in mind that the audience is international. You may refer to a specific country as an example when appropriate, but do not assume that all readers are from the same country.
+6. Write one conversational explainer article in Traditional Chinese. Choose the most appropriate writing framework from the guidelines/\*.md files, bearing in mind that the audience is international. You may refer to a specific country as an example when appropriate, but do not assume that all readers are from the same country. And assign the framework file name to $FRAMEWORK.
 7. `Categorize` the article `into one of the sub-folders` under `/content/zh-TW/*`, e.g.  
    `/content/zh-TW/daily-news`, `/content/zh-TW/ethereum`, `/content/zh-TW/macro`, `/content/zh-TW/startup`, `/content/zh-TW/ai`.
 8. Use the following content schema:
@@ -14,10 +14,12 @@ import { ContentSchema } from "./src/ContentSchema.js";
 // Create new content
 const content = ContentSchema.createContent(
   "2025-06-30-bitcoin-surge", // id (YYYY-MM-DD-topic-slug)
-  "$CATEGORY", // category (chosen in Step 6)
+  "$CATEGORY", // category (chosen in Step 7)
   "Bitcoin機構投資者大舉進場", // title (Chinese)
   "你有沒有想過，當全世界最保守的錢...", // content (Chinese)
-  ["https://bloomberg.com/", "https://www.coindesk.com/"], // references
+  ["https://bloomberg.com/", "https://www.coindesk.com/"], // references,
+  "$FRAMEWORK", // framework (chosen in step 6, e.q. 萬維鋼風格.md, 每天聽本書.md, 得到頭條.md)
+  "zh-TW", // language
 );
 
 // Validate content

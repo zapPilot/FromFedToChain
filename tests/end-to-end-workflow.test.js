@@ -98,6 +98,7 @@ describe("End-to-End Workflow Tests", () => {
         "Ethereum升級測試",
         "這是一個用於測試數據一致性的以太坊內容",
         ["Ethereum Foundation", "Vitalik Blog"],
+        "萬維鋼風格.md",
       );
 
       // Review content
@@ -149,6 +150,7 @@ describe("End-to-End Workflow Tests", () => {
         "Timestamp Test",
         "Testing timestamp tracking",
         [],
+        "萬維鋼風格.md",
       );
       const afterCreate = new Date().toISOString();
 
@@ -180,6 +182,7 @@ describe("End-to-End Workflow Tests", () => {
         "Recovery Test",
         "Testing error recovery",
         [],
+        "萬維鋼風格.md",
       );
       await ContentManager.updateSourceStatus(contentId, "reviewed");
 
@@ -241,6 +244,7 @@ describe("End-to-End Workflow Tests", () => {
         "Validation Test",
         "Testing schema validation",
         [],
+        "萬維鋼風格.md",
       );
 
       // Should pass validation

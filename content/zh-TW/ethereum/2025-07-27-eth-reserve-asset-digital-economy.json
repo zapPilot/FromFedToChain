@@ -1,6 +1,6 @@
 {
   "id": "2025-07-27-eth-reserve-asset-digital-economy",
-  "status": "draft",
+  "status": "social",
   "category": "ethereum",
   "date": "2025-07-27",
   "language": "zh-TW",
@@ -24,10 +24,64 @@
     "https://ec.europa.eu/info/business-economy-euro/banking-and-finance/digital-finance/digital-finance-package_en",
     "https://www.federalreserve.gov/publications/files/money-and-payments-20220120.pdf"
   ],
-  "audio_file": null,
-  "social_hook": null,
+  "audio_file": "audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy.wav",
+  "social_hook": "🤯 從黃金到美元，現在輪到以太幣當全球銀行的「底牌」？大多數人還搞不懂的ETH，憑什麼成為數位經濟新儲備資產？\n\n這個「誤解」背後的真相會顛覆你的認知 👀\n\n🎧 完整解析 | Eng | 中 | 日 播客已上線\nApple Podcasts、Spotify 同步收聽\n\n#以太幣 #數位資產 #區塊鏈 #投資",
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-05T01:08:03.795Z",
+      "comments": "Approved for translation"
+    }
   },
-  "updated_at": "2025-07-27T14:30:00.000Z"
+  "updated_at": "2025-08-05T01:29:18.903Z",
+  "streaming_urls": {
+    "m3u8": "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/playlist.m3u8",
+    "segments": [
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment000.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment001.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment002.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment003.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment004.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment005.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment006.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment007.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment008.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment009.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment010.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment011.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment012.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment013.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment014.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment015.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment016.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment017.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment018.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment019.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment020.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment021.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment022.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment023.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment024.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment025.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment026.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment027.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment028.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment029.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment030.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment031.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment032.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment033.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment034.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment035.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment036.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment037.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment038.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment039.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment040.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment041.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/ethereum/2025-07-27-eth-reserve-asset-digital-economy/segment042.ts"
+    ]
+  }
 }

@@ -98,6 +98,7 @@ describe("ContentManager Nested Structure Tests", () => {
         "新測試文章",
         "新的測試內容...",
         ["新來源"],
+        "萬維鋼風格.md",
       );
 
       assert.equal(newContent.language, "zh-TW");
@@ -138,6 +139,7 @@ describe("ContentManager Nested Structure Tests", () => {
         "en-US",
         "Test Article Title",
         "This is test article content...",
+        "萬維鋼風格.md",
       );
 
       assert.equal(translation.language, "en-US");
@@ -165,6 +167,7 @@ describe("ContentManager Nested Structure Tests", () => {
         "en-US",
         "Test Title",
         "Test content...",
+        "萬維鋼風格.md",
       );
 
       const languages = await ContentManager.getAvailableLanguages(
@@ -182,6 +185,7 @@ describe("ContentManager Nested Structure Tests", () => {
         "en-US",
         "Test Title",
         "Test content...",
+        "萬維鋼風格.md",
       );
 
       const allVersions = await ContentManager.getAllLanguagesForId(
@@ -203,6 +207,7 @@ describe("ContentManager Nested Structure Tests", () => {
         "en-US",
         "Test Title",
         "Test content...",
+        "萬維鋼風格.md",
       );
     });
 

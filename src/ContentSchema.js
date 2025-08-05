@@ -10,6 +10,7 @@ export class ContentSchema {
     title,
     content,
     references = [],
+    framework = "",
   ) {
     return {
       id,
@@ -20,6 +21,7 @@ export class ContentSchema {
       title,
       content,
       references,
+      framework,
       audio_file: null,
       social_hook: null,
       feedback: {
@@ -96,6 +98,14 @@ export class ContentSchema {
       throw new Error("Title and content are required");
     }
 
+    // Framework field is optional - validate only if present
+    if (
+      content.framework !== undefined &&
+      typeof content.framework !== "string"
+    ) {
+      throw new Error("Framework must be a string if provided");
+    }
+
     return true;
   }
 
@@ -104,10 +114,11 @@ export class ContentSchema {
     return this.createContent(
       "2025-06-30-example-content",
       "daily-news",
-      "zh-TW",
-      "Example Bitcoin Analysis",
-      "This is example content about Bitcoin trends...",
-      ["Example Source 1", "Example Source 2"],
+      "zh-TW", // correct language parameter
+      "Example Bitcoin Analysis", // correct title parameter
+      "This is example content about Bitcoin trends...", // correct content parameter
+      ["Example Source 1", "Example Source 2"], // correct references parameter
+      "万维钢风格.md", // example framework parameter
     );
   }
 

@@ -51,6 +51,7 @@ async function setupTestContent() {
         "CoinGecko",
         "Federal Reserve Economic Data",
       ],
+      framework: "萬維鋼風格.md",
     },
     {
       title: "DeFi協議治理代幣的價值重估",
@@ -83,6 +84,7 @@ async function setupTestContent() {
 這個轉變的速度，可能比我們想像的更快。`,
       category: "ethereum",
       references: ["DefiLlama", "Snapshot.org", "Dune Analytics"],
+      framework: "萬維鋼風格.md",
     },
   ];
 
@@ -96,6 +98,7 @@ async function setupTestContent() {
       content.title,
       content.content,
       content.references,
+      content.framework,
     );
   }
 
