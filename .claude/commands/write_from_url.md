@@ -14,10 +14,12 @@ import { ContentSchema } from "./src/ContentSchema.js";
 // Create new content
 const content = ContentSchema.createContent(
   "2025-06-30-bitcoin-surge", // id (YYYY-MM-DD-topic-slug)
-  "$CATEGORY", // category (chosen in Step 6)
+  "$CATEGORY", // category (chosen in Step 7)
   "Bitcoin機構投資者大舉進場", // title (Chinese)
   "你有沒有想過，當全世界最保守的錢...", // content (Chinese)
-  ["https://bloomberg.com/", "https://www.coindesk.com/"], // references
+  ["https://bloomberg.com/", "https://www.coindesk.com/"], // references,
+  "$FRAMEWORK", // framework (chosen in step 6)
+  "zh-TW", // language
 );
 
 // Validate content
