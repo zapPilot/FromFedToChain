@@ -6,11 +6,11 @@ export class ContentSchema {
   static createContent(
     id,
     category,
+    language,
     title,
     content,
     references = [],
     framework = "",
-    language = "zh-TW",
   ) {
     return {
       id,
@@ -117,7 +117,7 @@ export class ContentSchema {
       "Example Bitcoin Analysis",
       "This is example content about Bitcoin trends...",
       ["Example Source 1", "Example Source 2"],
-      "educational", // example framework
+      "萬維鋼風格.md", // example framework
     );
   }
 

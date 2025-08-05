@@ -57,6 +57,7 @@ export class TranslationService {
       targetLanguage,
       translatedTitle,
       translatedContent,
+      sourceContent.framework,
     );
 
     // Update source status if all translations are complete

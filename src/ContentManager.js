@@ -8,7 +8,15 @@ export class ContentManager {
   static AUDIO_DIR = "./audio";
 
   // Create new content using schema (single language file)
-  static async create(id, category, language, title, content, references = []) {
+  static async create(
+    id,
+    category,
+    language,
+    title,
+    content,
+    references = [],
+    framework = "",
+  ) {
     const contentData = ContentSchema.createContent(
       id,
       category,
@@ -16,6 +24,7 @@ export class ContentManager {
       title,
       content,
       references,
+      framework,
     );
 
     // Validate the content
@@ -196,7 +205,7 @@ export class ContentManager {
   }
 
   // Add translation (creates new file in target language)
-  static async addTranslation(id, targetLanguage, title, content) {
+  static async addTranslation(id, targetLanguage, title, content, framework) {
     // Read source content to get category and references
     const sourceContent = await this.read(id, "zh-TW");
 
@@ -208,6 +217,7 @@ export class ContentManager {
       title,
       content,
       sourceContent.references,
+      framework,
     );
 
     // Set status to translated
@@ -297,8 +307,23 @@ export class ContentManager {
   }
 
   // Create source content (simplified method for Claude commands)
-  static async createSource(id, category, title, content, references = []) {
-    return this.create(id, category, "zh-TW", title, content, references);
+  static async createSource(
+    id,
+    category,
+    title,
+    content,
+    references = [],
+    framework = "",
+  ) {
+    return this.create(
+      id,
+      category,
+      "zh-TW",
+      title,
+      content,
+      references,
+      framework,
+    );
   }
 
   // Read source content specifically
