@@ -316,7 +316,8 @@ class ContentService extends ChangeNotifier {
       _applyFilters();
 
       if (kDebugMode) {
-        print('ContentService: Loaded ${episodes.length} episodes for $language');
+        print(
+            'ContentService: Loaded ${episodes.length} episodes for $language');
       }
     } catch (e) {
       if (kDebugMode) {

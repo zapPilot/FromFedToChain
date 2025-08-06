@@ -158,5 +158,3 @@ class FromFedToChainApp extends StatelessWidget {
     );
   }
 }
-
-

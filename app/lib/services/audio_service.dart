@@ -27,6 +27,9 @@ class AudioService extends ChangeNotifier {
   Duration _currentPosition = Duration.zero;
   Duration _totalDuration = Duration.zero;
   double _playbackSpeed = 1.0;
+
+  // Progress tracking throttling
+  DateTime _lastProgressUpdate = DateTime(0);
   String? _errorMessage;
   bool _autoplayEnabled = true;
   bool _repeatEnabled = false; // New: repeat current episode
@@ -86,8 +89,8 @@ class AudioService extends ChangeNotifier {
 
       // Set up episode navigation callbacks
       _audioHandler!.setEpisodeNavigationCallbacks(
-        onNext: _skipToNextEpisode,
-        onPrevious: _skipToPreviousEpisode,
+        onNext: (audioFile) => _skipToNextEpisode(),
+        onPrevious: (audioFile) => _skipToPreviousEpisode(),
       );
 
       // Listen to background handler state changes
@@ -100,6 +103,7 @@ class AudioService extends ChangeNotifier {
         _currentPosition = state.updatePosition;
         _totalDuration = _audioHandler!.duration;
         _playbackSpeed = state.speed;
+        _updateEpisodeProgress();
 
         // Map audio_service states to our internal states
         switch (state.processingState) {
@@ -145,6 +149,7 @@ class AudioService extends ChangeNotifier {
       // Listen to position changes
       _audioPlayer.positionStream.listen((position) {
         _currentPosition = position;
+        _updateEpisodeProgress();
         notifyListeners();
       });
 
@@ -183,428 +188,149 @@ class AudioService extends ChangeNotifier {
 
   /// Play audio file (supports both local files and streaming URLs)
   Future<void> playAudio(AudioFile audioFile) async {
-    if (kDebugMode) {
-      print('🎵 AudioService: playAudio() called for ${audioFile.displayTitle}');
-      print('🎵 Audio URL: ${audioFile.sourceUrl}');
-    }
-
-    if (_audioHandler != null) {
+    try {
       if (kDebugMode) {
-        print('🎵 ✅ Using BACKGROUND HANDLER - Media session will be available');
-        print('🎵 Handler type: ${_audioHandler.runtimeType}');
+        print('▶️ AudioService: Playing audio: ${audioFile.title}');
+        print('🎵 Audio URL: ${audioFile.streamingUrl}');
       }
 
-      try {
-        _playbackState = PlaybackState.loading;
-        _errorMessage = null;
-        _currentAudioFile = audioFile;
-        notifyListeners();
+      _playbackState = PlaybackState.loading;
+      _currentAudioFile = audioFile;
+      _errorMessage = null;
+      notifyListeners();
 
+      if (_audioHandler != null) {
+        // Use background audio handler
         await _audioHandler!.setAudioSource(
-          audioFile.sourceUrl,
-          title: audioFile.displayTitle,
+          audioFile.streamingUrl,
+          title: audioFile.title,
           artist: 'From Fed to Chain',
           audioFile: audioFile,
         );
-
         await _audioHandler!.play();
-        if (kDebugMode) {
-          print('✅ AudioService: Background playback started');
-        }
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Background audio failed: $e';
-
-        if (kDebugMode) {
-          if (kDebugMode) {
-            print('❌ AudioService: Background playback error: $e');
-            print('AudioFile: ${audioFile.id}');
-            print('sourceUrl: ${audioFile.sourceUrl}');
-          }
-        }
-        notifyListeners();
-      }
-    } else {
-      if (kDebugMode) {
-        print('🎵 ⚠️  Using LOCAL PLAYER - NO media session support');
-        print('🎵 ❌ Lock screen controls will NOT appear');
-        print('🎵 Title: ${audioFile.displayTitle}');
-      }
-
-      // Fallback to original implementation
-      try {
-        _playbackState = PlaybackState.loading;
-        _errorMessage = null;
-        notifyListeners();
-
-        // Stop current playback if playing different file
-        final currentAudioId = _currentAudioFile?.id;
-        if (currentAudioId != audioFile.id) {
-          await _audioPlayer.stop();
-          _currentAudioFile = audioFile;
-          _currentPosition = Duration.zero;
-          _totalDuration = Duration.zero;
-        }
-
-        // Always use sourceUrl for playback
-        if (kDebugMode) {
-          if (kDebugMode) {
-            print('AudioService: Playing audio from sourceUrl');
-            print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
-            print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-          }
-        }
-
-        if (kIsWeb) {
-          throw Exception(
-              'HLS streaming not supported on web. Use Android/iOS for full functionality.');
-        } else {
-          await _audioPlayer
-              .setAudioSource(AudioSource.uri(Uri.parse(audioFile.sourceUrl)));
-          await _audioPlayer.play();
-        }
-
-        await _audioPlayer.setSpeed(_playbackSpeed);
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        // Provide helpful error messages for common issues
-        if (e.toString().contains('HttpException') ||
-            e.toString().contains('SocketException')) {
-          _errorMessage =
-              'Network error: Cannot access streaming URL. Check internet connection.';
-        } else if (e.toString().contains('FormatException') ||
-            e.toString().contains('UnsupportedError')) {
-          _errorMessage =
-              'Unsupported media format. Please try a different audio source.';
-        } else if (e.toString().contains('PlayerException')) {
-          _errorMessage = 'Audio player error: ${e.toString()}';
-        } else {
-          _errorMessage = 'Failed to play audio: $e';
-        }
-        if (kDebugMode) {
-          if (kDebugMode) {
-            print('AudioService playback error: $e');
-            print('AudioFile: ${audioFile.id}');
-            print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-            print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
-          }
-        }
-        notifyListeners();
-      }
-    }
-  }
-
-  /// Resume playback
-  Future<void> resume() async {
-    if (_audioHandler != null) {
-      try {
-        await _audioHandler!.play();
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to resume background playback: $e';
-        notifyListeners();
-      }
-    } else {
-      try {
+      } else {
+        // Fallback to local audio player
+        await _audioPlayer.setUrl(audioFile.streamingUrl);
         await _audioPlayer.play();
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to resume playback: $e';
-        notifyListeners();
-      }
-    }
-  }
-
-  /// Pause playback
-  Future<void> pause() async {
-    if (_audioHandler != null) {
-      try {
-        await _audioHandler!.pause();
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to pause background playback: $e';
-        notifyListeners();
-      }
-    } else {
-      try {
-        await _audioPlayer.pause();
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to pause playback: $e';
-        notifyListeners();
-      }
-    }
-  }
-
-  /// Stop playback
-  Future<void> stop() async {
-    if (_audioHandler != null) {
-      try {
-        await _audioHandler!.stop();
-        _currentPosition = Duration.zero;
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to stop background playback: $e';
-        notifyListeners();
-      }
-    } else {
-      try {
-        await _audioPlayer.stop();
-        _currentPosition = Duration.zero;
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to stop playback: $e';
-        notifyListeners();
-      }
-    }
-  }
-
-  /// Seek to position
-  Future<void> seekTo(Duration position) async {
-    if (_audioHandler != null) {
-      try {
-        await _audioHandler!.seek(position);
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to seek in background playback: $e';
-        notifyListeners();
-      }
-    } else {
-      try {
-        await _audioPlayer.seek(position);
-      } catch (e) {
-        _playbackState = PlaybackState.error;
-        _errorMessage = 'Failed to seek: $e';
-        notifyListeners();
-      }
-    }
-  }
-
-  /// Set playback speed
-  Future<void> setPlaybackSpeed(double speed) async {
-    try {
-      _playbackSpeed = speed;
-
-      if (_audioHandler != null) {
-        await _audioHandler!.customAction('setSpeed', {'speed': speed});
-      } else {
-        await _audioPlayer.setSpeed(speed);
       }
 
-      notifyListeners();
+      if (kDebugMode) {
+        print('✅ AudioService: Successfully started playback for: ${audioFile.title}');
+      }
     } catch (e) {
-      _errorMessage = 'Failed to set playback speed: $e';
+      if (kDebugMode) {
+        print('❌ AudioService: Failed to play audio: $e');
+      }
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Failed to play audio: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  /// Set autoplay preference
+  void setAutoplayEnabled(bool enabled) {
+    if (_autoplayEnabled != enabled) {
+      _autoplayEnabled = enabled;
+      if (kDebugMode) {
+        print('🔄 AudioService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
+      }
       notifyListeners();
     }
   }
 
-  /// Skip forward by duration
-  Future<void> skipForward(
-      [Duration duration = const Duration(seconds: 30)]) async {
-    if (_audioHandler != null) {
-      await _audioHandler!
-          .skipToNext(); // Uses 30-second skip in background handler
-    } else {
-      final newPosition = _currentPosition + duration;
-      final maxPosition = _totalDuration;
-
-      if (newPosition < maxPosition) {
-        await seekTo(newPosition);
-      } else {
-        await seekTo(maxPosition);
+  /// Set repeat preference
+  void setRepeatEnabled(bool enabled) {
+    if (_repeatEnabled != enabled) {
+      _repeatEnabled = enabled;
+      if (kDebugMode) {
+        print('🔄 AudioService: Repeat ${enabled ? 'enabled' : 'disabled'}');
       }
-    }
-  }
-
-  /// Skip backward by duration
-  Future<void> skipBackward(
-      [Duration duration = const Duration(seconds: 10)]) async {
-    if (_audioHandler != null) {
-      await _audioHandler!
-          .skipToPrevious(); // Uses 10-second skip in background handler
-    } else {
-      final newPosition = _currentPosition - duration;
-
-      if (newPosition > Duration.zero) {
-        await seekTo(newPosition);
-      } else {
-        await seekTo(Duration.zero);
-      }
+      notifyListeners();
     }
   }
 
   /// Toggle play/pause
   Future<void> togglePlayPause() async {
-    if (isPlaying) {
-      await pause();
-    } else if (isPaused) {
-      await resume();
-    }
-  }
-
-  /// Skip to next episode
-  Future<void> skipToNextEpisode() async {
-    if (_currentAudioFile != null) {
-      await _skipToNextEpisode(_currentAudioFile!);
-    }
-  }
-
-  /// Skip to previous episode
-  Future<void> skipToPreviousEpisode() async {
-    if (_currentAudioFile != null) {
-      await _skipToPreviousEpisode(_currentAudioFile!);
-    }
-  }
-
-  /// Episode navigation methods for lock screen controls
-  Future<void> _skipToNextEpisode(AudioFile currentEpisode) async {
-    if (_contentService == null) {
-      if (kDebugMode) {
-        print(
-            '❌ AudioService: ContentService not available for episode navigation');
-      }
-      return;
-    }
-
-    if (kDebugMode) {
-      print(
-          '⏭️ AudioService: Skipping to next episode from ${currentEpisode.id}');
-    }
-
-    final nextEpisode = _contentService!.getNextEpisode(currentEpisode);
-    if (nextEpisode != null) {
-      await playAudio(nextEpisode);
-      if (kDebugMode) {
-        print('✅ AudioService: Switched to next episode: ${nextEpisode.id}');
-      }
-    } else {
-      if (kDebugMode) {
-        print('📝 AudioService: No next episode available');
-      }
-    }
-  }
-
-  Future<void> _skipToPreviousEpisode(AudioFile currentEpisode) async {
-    if (_contentService == null) {
-      if (kDebugMode) {
-        print(
-            '❌ AudioService: ContentService not available for episode navigation');
-      }
-      return;
-    }
-
-    if (kDebugMode) {
-      print(
-          '⏮️ AudioService: Skipping to previous episode from ${currentEpisode.id}');
-    }
-
-    final previousEpisode = _contentService!.getPreviousEpisode(currentEpisode);
-    if (previousEpisode != null) {
-      await playAudio(previousEpisode);
-      print(
-          '✅ AudioService: Switched to previous episode: ${previousEpisode.id}');
-    } else {
-      if (kDebugMode) {
-        print('📝 AudioService: No previous episode available');
-      }
-    }
-  }
-
-  /// Switch audio to new language while maintaining playback position
-  Future<void> switchLanguage(AudioFile newLanguageAudioFile) async {
-    if (_currentAudioFile == null) {
-      // No audio currently playing, just load the new audio
-      await playAudio(newLanguageAudioFile);
-      return;
-    }
-
-    // Check if this is the same content in a different language
-    if (_currentAudioFile!.id != newLanguageAudioFile.id) {
-      // Different content, just play normally
-      await playAudio(newLanguageAudioFile);
-      return;
-    }
-
-    if (kDebugMode) {
-      print('🔄 AudioService: Switching language for ${newLanguageAudioFile.id}');
-    }
-
-    try {
-      // Capture current state
-      final wasPlaying = isPlaying;
-      final currentPosition = _currentPosition;
-
-      // Set loading state
-      _playbackState = PlaybackState.loading;
-      _errorMessage = null;
-      notifyListeners();
-
-      if (_audioHandler != null) {
-        // Background audio handler
-        await _audioHandler!.setAudioSource(
-          newLanguageAudioFile.sourceUrl,
-          title: newLanguageAudioFile.displayTitle,
-          artist: 'From Fed to Chain',
-          initialPosition: currentPosition,
-          audioFile: newLanguageAudioFile,
-        );
-
-        // Resume playback if it was playing
-        if (wasPlaying) {
-          await _audioHandler!.play();
-        }
+    if (_audioHandler != null) {
+      if (isPlaying) {
+        await _audioHandler!.pause();
       } else {
-        // Local audio player
-        await _audioPlayer.setAudioSource(
-          AudioSource.uri(Uri.parse(newLanguageAudioFile.sourceUrl)),
-          initialPosition: currentPosition,
-        );
-
-        // Resume playback if it was playing
-        if (wasPlaying) {
-          await _audioPlayer.play();
-        }
+        await _audioHandler!.play();
       }
-
-      // Update current audio file
-      _currentAudioFile = newLanguageAudioFile;
-
-      if (kDebugMode) {
-        print('✅ AudioService: Language switched successfully');
-      }
-    } catch (e) {
-      _playbackState = PlaybackState.error;
-      _errorMessage = 'Failed to switch language: $e';
-
-      if (kDebugMode) {
-        if (kDebugMode) {
-          print('❌ AudioService: Language switch error: $e');
-          print('New AudioFile: ${newLanguageAudioFile.id}');
-          print('New sourceUrl: ${newLanguageAudioFile.sourceUrl}');
-        }
-      }
-      notifyListeners();
-    }
-  }
-
-  /// Seek relative to current position
-  Future<void> seekRelative(int seconds) async {
-    final newPosition = _currentPosition + Duration(seconds: seconds);
-
-    if (newPosition < Duration.zero) {
-      await seekTo(Duration.zero);
-    } else if (newPosition > _totalDuration) {
-      await seekTo(_totalDuration);
     } else {
-      await seekTo(newPosition);
+      if (isPlaying) {
+        await _audioPlayer.pause();
+      } else {
+        await _audioPlayer.play();
+      }
     }
   }
 
-  /// Handle audio completion - triggers repeat or autoplay if enabled
+  /// Public method to skip to next episode
+  Future<void> skipToNextEpisode() async {
+    await _skipToNextEpisode();
+  }
+
+  /// Public method to skip to previous episode
+  Future<void> skipToPreviousEpisode() async {
+    await _skipToPreviousEpisode();
+  }
+
+  /// Seek to specific position
+  Future<void> seekTo(Duration position) async {
+    if (_audioHandler != null) {
+      await _audioHandler!.seek(position);
+    } else {
+      await _audioPlayer.seek(position);
+    }
+  }
+
+  /// Skip forward by 30 seconds
+  Future<void> skipForward() async {
+    if (_audioHandler != null) {
+      await _audioHandler!.fastForward();
+    } else {
+      final newPosition = _currentPosition + const Duration(seconds: 30);
+      final seekPosition = newPosition < _totalDuration ? newPosition : _totalDuration;
+      await _audioPlayer.seek(seekPosition);
+    }
+  }
+
+  /// Skip backward by 10 seconds
+  Future<void> skipBackward() async {
+    if (_audioHandler != null) {
+      await _audioHandler!.rewind();
+    } else {
+      final newPosition = _currentPosition - const Duration(seconds: 10);
+      final seekPosition = newPosition > Duration.zero ? newPosition : Duration.zero;
+      await _audioPlayer.seek(seekPosition);
+    }
+  }
+
+  /// Set playback speed
+  Future<void> setPlaybackSpeed(double speed) async {
+    if (_audioHandler != null) {
+      await _audioHandler!.customAction('setSpeed', {'speed': speed});
+    } else {
+      await _audioPlayer.setSpeed(speed);
+    }
+    _playbackSpeed = speed;
+    notifyListeners();
+  }
+
+  /// Handle audio completion (repeat, autoplay, or stop)
   Future<void> _handleAudioCompletion() async {
     if (kDebugMode) {
-      print(
-          '🔄 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+      print('🎵 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+    }
+
+    // Mark episode as finished in ContentService
+    if (_contentService != null && _currentAudioFile != null) {
+      await _contentService!.markEpisodeAsFinished(_currentAudioFile!.id);
+      if (kDebugMode) {
+        print('✅ AudioService: Episode marked as finished: ${_currentAudioFile!.id}');
+      }
     }
 
     // Repeat mode takes precedence over autoplay
@@ -654,8 +380,7 @@ class AudioService extends ChangeNotifier {
       final nextEpisode = _contentService!.getNextEpisode(_currentAudioFile!);
       if (nextEpisode != null) {
         if (kDebugMode) {
-          print(
-              '⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
+          print('⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
         }
 
         // Small delay to ensure smooth transition
@@ -680,28 +405,6 @@ class AudioService extends ChangeNotifier {
     }
   }
 
-  /// Set autoplay preference
-  void setAutoplayEnabled(bool enabled) {
-    if (_autoplayEnabled != enabled) {
-      _autoplayEnabled = enabled;
-      if (kDebugMode) {
-        print('🔄 AudioService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
-      }
-      notifyListeners();
-    }
-  }
-
-  /// Set repeat preference
-  void setRepeatEnabled(bool enabled) {
-    if (_repeatEnabled != enabled) {
-      _repeatEnabled = enabled;
-      if (kDebugMode) {
-        print('🔄 AudioService: Repeat ${enabled ? 'enabled' : 'disabled'}');
-      }
-      notifyListeners();
-    }
-  }
-
   /// Format duration for display
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -712,7 +415,7 @@ class AudioService extends ChangeNotifier {
     if (hours > 0) {
       return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
     } else {
-      return '${minutes}:${twoDigits(seconds)}';
+      return '$minutes:${twoDigits(seconds)}';
     }
   }
 
@@ -726,6 +429,96 @@ class AudioService extends ChangeNotifier {
     } else {
       if (kDebugMode) {
         print('❌ Cannot test media session - no background handler available');
+      }
+    }
+  }
+
+  /// Skip to next episode
+  Future<void> _skipToNextEpisode() async {
+    if (_contentService == null || _currentAudioFile == null) {
+      if (kDebugMode) {
+        print('❌ AudioService: Cannot skip to next - no content service or current audio');
+      }
+      return;
+    }
+
+    try {
+      final nextEpisode = _contentService!.getNextEpisode(_currentAudioFile!);
+      if (nextEpisode != null) {
+        if (kDebugMode) {
+          print('⏭️ AudioService: Skipping to next episode: ${nextEpisode.id}');
+        }
+        await playAudio(nextEpisode);
+      } else {
+        if (kDebugMode) {
+          print('📝 AudioService: No next episode available');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ AudioService: Failed to skip to next episode: $e');
+      }
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Failed to skip to next episode: $e';
+      notifyListeners();
+    }
+  }
+
+  /// Skip to previous episode
+  Future<void> _skipToPreviousEpisode() async {
+    if (_contentService == null || _currentAudioFile == null) {
+      if (kDebugMode) {
+        print('❌ AudioService: Cannot skip to previous - no content service or current audio');
+      }
+      return;
+    }
+
+    try {
+      final previousEpisode = _contentService!.getPreviousEpisode(_currentAudioFile!);
+      if (previousEpisode != null) {
+        if (kDebugMode) {
+          print('⏮️ AudioService: Skipping to previous episode: ${previousEpisode.id}');
+        }
+        await playAudio(previousEpisode);
+      } else {
+        if (kDebugMode) {
+          print('📝 AudioService: No previous episode available');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ AudioService: Failed to skip to previous episode: $e');
+      }
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Failed to skip to previous episode: $e';
+      notifyListeners();
+    }
+  }
+
+  /// Update episode progress in ContentService
+  void _updateEpisodeProgress() {
+    if (_contentService == null || _currentAudioFile == null) {
+      return;
+    }
+
+    // Throttle progress updates to avoid excessive calls
+    final now = DateTime.now();
+    if (now.difference(_lastProgressUpdate).inMilliseconds < 1000) {
+      return;
+    }
+    _lastProgressUpdate = now;
+
+    if (_totalDuration.inMilliseconds > 0) {
+      final progress = _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
+      final clampedProgress = progress.clamp(0.0, 1.0);
+      
+      // Only update if progress is significant (avoid spam)
+      if (clampedProgress >= 0.01) {
+        _contentService!.updateEpisodeCompletion(_currentAudioFile!.id, clampedProgress);
+        
+        if (kDebugMode && clampedProgress % 0.1 < 0.01) { // Log every 10% progress
+          print('📊 AudioService: Episode ${_currentAudioFile!.id} progress: ${(clampedProgress * 100).toInt()}%');
+        }
       }
     }
   }

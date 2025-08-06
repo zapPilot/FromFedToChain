@@ -119,8 +119,8 @@ class StreamingApiService {
         final path = episodeJson['path'] as String?;
         if (path == null || path.isEmpty) {
           if (kDebugMode) {
-          print('Warning: Skipping episode with missing path: $episodeJson');
-        }
+            print('Warning: Skipping episode with missing path: $episodeJson');
+          }
           continue;
         }
 
@@ -198,7 +198,8 @@ class StreamingApiService {
   /// Get all episodes across all languages and categories (parallel loading)
   static Future<List<AudioFile>> getAllEpisodes() async {
     if (kDebugMode) {
-      print('StreamingApiService: Starting parallel loading of all episodes...');
+      print(
+          'StreamingApiService: Starting parallel loading of all episodes...');
     }
 
     final allEpisodes = <AudioFile>[];
