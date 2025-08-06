@@ -3,7 +3,7 @@ description: Modern Flutter audio streaming app for From Fed to Chain crypto/mac
 
 publish_to: "none"
 
-version: 1.0.1+2
+version: 1.0.2+2
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -53,6 +53,7 @@ dev_dependencies:
   build_runner: ^2.4.8
   coverage: ^1.6.3
   yaml: ^3.1.2
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -72,3 +73,13 @@ flutter:
   #         weight: 500
   #       - asset: fonts/Inter-SemiBold.ttf
   #         weight: 600
+
+# Flutter Launcher Icons configuration
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  web:
+    generate: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  remove_alpha_ios: true # Remove alpha channel for iOS icons
