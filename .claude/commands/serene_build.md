@@ -13,7 +13,7 @@ using the `serena` toolkit and specialized sub-agents.
 ## Process
 
 1. **Global Index First**  
-   Use `serena.component_inventory` as the primary reference to understand existing components.  
+   Use `serena.project_overview, system_architecture, flutter_app_components` as the primary reference to understand existing components.  
    Treat this as the authoritative map of the project — avoid re-analyzing unless necessary.
 
 2. **Targeted Pattern Lookup**  
@@ -21,7 +21,7 @@ using the `serena` toolkit and specialized sub-agents.
    Prioritize using existing components or patterns over introducing new ones.
 
 3. **Anti-Duplication Check (lightweight)**  
-   Before implementation, **briefly check** `component_inventory` and project memory  
+   Before implementation, **briefly check** `project_overview, system_architecture` and project memory  
    for overlaps. Avoid generating detailed refactor analysis unless explicitly required.
 
 4. **Implementation Coordination**  
@@ -30,7 +30,7 @@ using the `serena` toolkit and specialized sub-agents.
 
 5. **Selective Memory Update**  
    After implementation:
-   - Update `component_inventory` if and only if a new component is introduced.
+   - Update `project_overview, system_architecture, flutter_app_components` if and only if a new component is introduced.
    - Avoid saving analysis files (e.g. refactor results) unless tagged as reusable knowledge.
 
 ## Output Format

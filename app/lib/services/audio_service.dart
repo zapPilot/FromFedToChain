@@ -215,7 +215,8 @@ class AudioService extends ChangeNotifier {
       }
 
       if (kDebugMode) {
-        print('✅ AudioService: Successfully started playback for: ${audioFile.title}');
+        print(
+            '✅ AudioService: Successfully started playback for: ${audioFile.title}');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -292,7 +293,8 @@ class AudioService extends ChangeNotifier {
       await _audioHandler!.fastForward();
     } else {
       final newPosition = _currentPosition + const Duration(seconds: 30);
-      final seekPosition = newPosition < _totalDuration ? newPosition : _totalDuration;
+      final seekPosition =
+          newPosition < _totalDuration ? newPosition : _totalDuration;
       await _audioPlayer.seek(seekPosition);
     }
   }
@@ -303,7 +305,8 @@ class AudioService extends ChangeNotifier {
       await _audioHandler!.rewind();
     } else {
       final newPosition = _currentPosition - const Duration(seconds: 10);
-      final seekPosition = newPosition > Duration.zero ? newPosition : Duration.zero;
+      final seekPosition =
+          newPosition > Duration.zero ? newPosition : Duration.zero;
       await _audioPlayer.seek(seekPosition);
     }
   }
@@ -322,14 +325,16 @@ class AudioService extends ChangeNotifier {
   /// Handle audio completion (repeat, autoplay, or stop)
   Future<void> _handleAudioCompletion() async {
     if (kDebugMode) {
-      print('🎵 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+      print(
+          '🎵 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
     }
 
     // Mark episode as finished in ContentService
     if (_contentService != null && _currentAudioFile != null) {
       await _contentService!.markEpisodeAsFinished(_currentAudioFile!.id);
       if (kDebugMode) {
-        print('✅ AudioService: Episode marked as finished: ${_currentAudioFile!.id}');
+        print(
+            '✅ AudioService: Episode marked as finished: ${_currentAudioFile!.id}');
       }
     }
 
@@ -380,7 +385,8 @@ class AudioService extends ChangeNotifier {
       final nextEpisode = _contentService!.getNextEpisode(_currentAudioFile!);
       if (nextEpisode != null) {
         if (kDebugMode) {
-          print('⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
+          print(
+              '⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
         }
 
         // Small delay to ensure smooth transition
@@ -437,7 +443,8 @@ class AudioService extends ChangeNotifier {
   Future<void> _skipToNextEpisode() async {
     if (_contentService == null || _currentAudioFile == null) {
       if (kDebugMode) {
-        print('❌ AudioService: Cannot skip to next - no content service or current audio');
+        print(
+            '❌ AudioService: Cannot skip to next - no content service or current audio');
       }
       return;
     }
@@ -468,16 +475,19 @@ class AudioService extends ChangeNotifier {
   Future<void> _skipToPreviousEpisode() async {
     if (_contentService == null || _currentAudioFile == null) {
       if (kDebugMode) {
-        print('❌ AudioService: Cannot skip to previous - no content service or current audio');
+        print(
+            '❌ AudioService: Cannot skip to previous - no content service or current audio');
       }
       return;
     }
 
     try {
-      final previousEpisode = _contentService!.getPreviousEpisode(_currentAudioFile!);
+      final previousEpisode =
+          _contentService!.getPreviousEpisode(_currentAudioFile!);
       if (previousEpisode != null) {
         if (kDebugMode) {
-          print('⏮️ AudioService: Skipping to previous episode: ${previousEpisode.id}');
+          print(
+              '⏮️ AudioService: Skipping to previous episode: ${previousEpisode.id}');
         }
         await playAudio(previousEpisode);
       } else {
@@ -509,15 +519,19 @@ class AudioService extends ChangeNotifier {
     _lastProgressUpdate = now;
 
     if (_totalDuration.inMilliseconds > 0) {
-      final progress = _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
+      final progress =
+          _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
       final clampedProgress = progress.clamp(0.0, 1.0);
-      
+
       // Only update if progress is significant (avoid spam)
       if (clampedProgress >= 0.01) {
-        _contentService!.updateEpisodeCompletion(_currentAudioFile!.id, clampedProgress);
-        
-        if (kDebugMode && clampedProgress % 0.1 < 0.01) { // Log every 10% progress
-          print('📊 AudioService: Episode ${_currentAudioFile!.id} progress: ${(clampedProgress * 100).toInt()}%');
+        _contentService!
+            .updateEpisodeCompletion(_currentAudioFile!.id, clampedProgress);
+
+        if (kDebugMode && clampedProgress % 0.1 < 0.01) {
+          // Log every 10% progress
+          print(
+              '📊 AudioService: Episode ${_currentAudioFile!.id} progress: ${(clampedProgress * 100).toInt()}%');
         }
       }
     }
