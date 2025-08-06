@@ -12,26 +12,26 @@ using the `serena` toolkit and specialized sub-agents.
 
 ## Process
 
-1. **Quick Context Check**  
-   Use `serena` to determine if relevant memories or prior components already exist for this feature
-   area.
+1. **Global Index First**  
+   Use `serena.component_inventory` as the primary reference to understand existing components.  
+   Treat this as the authoritative map of the project — avoid re-analyzing unless necessary.
 
-2. **Targeted Pattern Search**  
-   Use `serena.search_for_pattern` and `serena.find_symbol` to locate similar functionality,
-   patterns, or components in existing codebases or memory.
+2. **Targeted Pattern Lookup**  
+   When needed, use `serena.search_for_pattern` or `serena.find_symbol` to locate relevant examples.  
+   Prioritize using existing components or patterns over introducing new ones.
 
-3. **Anti-Duplication Analysis**  
-   Use `serena` to follow the `duplicate-prevention-guide` checklist and ensure no functionality
-   overlap or redundant implementations.
+3. **Anti-Duplication Check (lightweight)**  
+   Before implementation, **briefly check** `component_inventory` and project memory  
+   for overlaps. Avoid generating detailed refactor analysis unless explicitly required.
 
-4. **Implementation via Subagents**  
-   Coordinate available sub-agents to implement the solution.  
-   Use `/agents` to view or select from the list of available agents.
+4. **Implementation Coordination**  
+   Use sub-agents via `/agents` to execute tasks as needed.  
+   Only create memory files if you're introducing **a net-new reusable component**.
 
-5. **Memory Update**  
-   After implementation, use `serena` to:
-   - Add any new components to the `component-inventory`.
-   - Record any new patterns discovered during the process.
+5. **Selective Memory Update**  
+   After implementation:
+   - Update `component_inventory` if and only if a new component is introduced.
+   - Avoid saving analysis files (e.g. refactor results) unless tagged as reusable knowledge.
 
 ## Output Format
 

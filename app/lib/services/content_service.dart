@@ -83,7 +83,9 @@ class ContentService extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print('ContentService: Failed to load preferences: $e');
+      if (kDebugMode) {
+        print('ContentService: Failed to load preferences: $e');
+      }
     }
   }
 
@@ -99,7 +101,9 @@ class ContentService extends ChangeNotifier {
       final completionJson = json.encode(_episodeCompletion);
       await prefs.setString('episode_completion', completionJson);
     } catch (e) {
-      print('ContentService: Failed to save preferences: $e');
+      if (kDebugMode) {
+        print('ContentService: Failed to save preferences: $e');
+      }
     }
   }
 
@@ -265,17 +269,23 @@ class ContentService extends ChangeNotifier {
     _clearError();
 
     try {
-      print('ContentService: Loading all episodes...');
+      if (kDebugMode) {
+        print('ContentService: Loading all episodes...');
+      }
       _allEpisodes = await StreamingApiService.getAllEpisodes();
 
       if (_allEpisodes.isEmpty) {
         _setError('No episodes found. Please check your internet connection.');
       } else {
-        print('ContentService: Loaded ${_allEpisodes.length} episodes');
+        if (kDebugMode) {
+          print('ContentService: Loaded ${_allEpisodes.length} episodes');
+        }
         _applyFilters();
       }
     } catch (e) {
-      print('ContentService: Failed to load episodes: $e');
+      if (kDebugMode) {
+        print('ContentService: Failed to load episodes: $e');
+      }
       _setError('Failed to load episodes: $e');
     } finally {
       _setLoading(false);
@@ -295,7 +305,9 @@ class ContentService extends ChangeNotifier {
     _clearError();
 
     try {
-      print('ContentService: Loading episodes for language: $language');
+      if (kDebugMode) {
+        print('ContentService: Loading episodes for language: $language');
+      }
       final episodes =
           await StreamingApiService.getAllEpisodesForLanguage(language);
 
@@ -303,9 +315,13 @@ class ContentService extends ChangeNotifier {
       _updateEpisodesForLanguage(language, episodes);
       _applyFilters();
 
-      print('ContentService: Loaded ${episodes.length} episodes for $language');
+      if (kDebugMode) {
+        print('ContentService: Loaded ${episodes.length} episodes for $language');
+      }
     } catch (e) {
-      print('ContentService: Failed to load episodes for $language: $e');
+      if (kDebugMode) {
+        print('ContentService: Failed to load episodes for $language: $e');
+      }
       _setError('Failed to load episodes for $language: $e');
     } finally {
       _setLoading(false);
@@ -571,7 +587,9 @@ class ContentService extends ChangeNotifier {
       // Otherwise, search via API
       return await StreamingApiService.searchEpisodes(query);
     } catch (e) {
-      print('ContentService: Search failed: $e');
+      if (kDebugMode) {
+        print('ContentService: Search failed: $e');
+      }
       return [];
     }
   }

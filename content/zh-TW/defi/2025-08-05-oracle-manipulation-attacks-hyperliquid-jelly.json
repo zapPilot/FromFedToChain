@@ -1,6 +1,6 @@
 {
   "id": "2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly",
-  "status": "draft",
+  "status": "social",
   "category": "defi",
   "date": "2025-08-05",
   "language": "zh-TW",
@@ -16,10 +16,71 @@
     "https://coinshares.com/us/insights/research-data/the-great-leap-forward-dexs/"
   ],
   "framework": "萬維鋼風格.md",
-  "audio_file": null,
-  "social_hook": null,
+  "audio_file": "audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly.wav",
+  "social_hook": "🏛️ 當赫耳墨斯被收買時，整個奧林匹斯山都會崩塌？預言機操控攻擊正在重寫DeFi遊戲規則，從神話中的信使背叛看現代金融基礎設施的脆弱性 💸\n\n🎧 深度解析現已上線 Apple Podcasts & Spotify\n📻 Eng | 中 | 日 三語播客同步更新\n\n#DeFi #預言機攻擊 #區塊鏈安全",
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-06T02:46:57.725Z",
+      "comments": "用舉例的方式解釋這個 oracle 操縱怎麼做的"
+    }
   },
-  "updated_at": "2025-08-05T12:00:00.000Z"
+  "updated_at": "2025-08-06T03:03:34.598Z",
+  "streaming_urls": {
+    "m3u8": "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/playlist.m3u8",
+    "segments": [
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment000.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment001.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment002.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment003.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment004.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment005.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment006.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment007.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment008.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment009.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment010.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment011.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment012.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment013.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment014.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment015.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment016.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment017.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment018.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment019.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment020.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment021.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment022.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment023.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment024.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment025.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment026.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment027.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment028.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment029.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment030.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment031.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment032.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment033.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment034.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment035.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment036.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment037.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment038.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment039.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment040.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment041.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment042.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment043.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment044.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment045.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment046.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment047.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment048.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-05-oracle-manipulation-attacks-hyperliquid-jelly/segment049.ts"
+    ]
+  }
 }

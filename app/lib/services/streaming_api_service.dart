@@ -118,7 +118,9 @@ class StreamingApiService {
         // Ensure required fields are present
         final path = episodeJson['path'] as String?;
         if (path == null || path.isEmpty) {
+          if (kDebugMode) {
           print('Warning: Skipping episode with missing path: $episodeJson');
+        }
           continue;
         }
 
@@ -140,7 +142,9 @@ class StreamingApiService {
               'StreamingApiService: Sample AudioFile created: ${audioFile.toString()}');
         }
       } catch (e) {
-        print('Warning: Failed to parse episode: $episodeJson, error: $e');
+        if (kDebugMode) {
+          print('Warning: Failed to parse episode: $episodeJson, error: $e');
+        }
       }
     }
 
@@ -193,7 +197,9 @@ class StreamingApiService {
 
   /// Get all episodes across all languages and categories (parallel loading)
   static Future<List<AudioFile>> getAllEpisodes() async {
-    print('StreamingApiService: Starting parallel loading of all episodes...');
+    if (kDebugMode) {
+      print('StreamingApiService: Starting parallel loading of all episodes...');
+    }
 
     final allEpisodes = <AudioFile>[];
     final errors = <String>[];
@@ -211,7 +217,9 @@ class StreamingApiService {
       }
     }
 
-    print('StreamingApiService: Created ${futures.length} parallel requests');
+    if (kDebugMode) {
+      print('StreamingApiService: Created ${futures.length} parallel requests');
+    }
 
     // Wait for all requests to complete (parallel execution)
     final results = await Future.wait(futures);
@@ -228,8 +236,10 @@ class StreamingApiService {
     // Sort by date (newest first)
     allEpisodes.sort((a, b) => b.lastModified.compareTo(a.lastModified));
 
-    print(
-        'StreamingApiService: Parallel loading completed, got ${allEpisodes.length} total episodes');
+    if (kDebugMode) {
+      print(
+          'StreamingApiService: Parallel loading completed, got ${allEpisodes.length} total episodes');
+    }
     return allEpisodes;
   }
 
@@ -276,7 +286,9 @@ class StreamingApiService {
       final episodes = await getEpisodeList('zh-TW', 'startup');
       return episodes.isNotEmpty;
     } catch (e) {
-      print('API connectivity test failed: $e');
+      if (kDebugMode) {
+        print('API connectivity test failed: $e');
+      }
       return false;
     }
   }

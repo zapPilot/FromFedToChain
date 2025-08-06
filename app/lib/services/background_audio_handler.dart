@@ -16,14 +16,18 @@ class BackgroundAudioHandler extends BaseAudioHandler
   AudioFile? _currentAudioFile;
 
   BackgroundAudioHandler() {
-    print('🎵 BackgroundAudioHandler: Constructor called');
-    print('🎵 Starting initialization for media session support...');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: Constructor called');
+      print('🎵 Starting initialization for media session support...');
+    }
     _init();
   }
 
   Future<void> _init() async {
     // Configure audio session for background playback and Control Center
-    print('🎵 Configuring audio session for media notifications...');
+    if (kDebugMode) {
+      print('🎵 Configuring audio session for media notifications...');
+    }
 
     try {
       final session = await AudioSession.instance;
@@ -34,26 +38,36 @@ class BackgroundAudioHandler extends BaseAudioHandler
       // Handle audio interruptions for better iOS integration
       session.interruptionEventStream.listen((event) {
         if (event.begin) {
-          print('🍎 Audio interruption began (phone call, etc.)');
+          if (kDebugMode) {
+            print('🍎 Audio interruption began (phone call, etc.)');
+          }
           pause();
         } else {
-          print('🍎 Audio interruption ended, resuming playback');
+          if (kDebugMode) {
+            print('🍎 Audio interruption ended, resuming playback');
+          }
           if (event.type == AudioInterruptionType.pause) {
             play();
           }
         }
       });
 
-      print('✅ Audio session configured for media notifications');
+      if (kDebugMode) {
+        print('✅ Audio session configured for media notifications');
+      }
     } catch (e) {
-      print('❌ Audio session configuration failed: $e');
+      if (kDebugMode) {
+        print('❌ Audio session configuration failed: $e');
+      }
     }
 
     // Listen to player events
     _player.playbackEventStream.listen(_broadcastState);
     _player.playerStateStream.listen((state) {
-      print(
-          '🔄 Player state changed: ${state.playing ? 'PLAYING' : 'PAUSED'} (${state.processingState})');
+      if (kDebugMode) {
+        print(
+            '🔄 Player state changed: ${state.playing ? 'PLAYING' : 'PAUSED'} (${state.processingState})');
+      }
     });
 
     // Listen to duration changes to update MediaItem
@@ -63,7 +77,9 @@ class BackgroundAudioHandler extends BaseAudioHandler
           duration != null &&
           currentMediaItem.duration != duration) {
         mediaItem.add(currentMediaItem.copyWith(duration: duration));
-        print('🎵 MediaItem updated with duration: $duration');
+        if (kDebugMode) {
+          print('🎵 MediaItem updated with duration: $duration');
+        }
       }
     });
 
@@ -99,8 +115,10 @@ class BackgroundAudioHandler extends BaseAudioHandler
       queueIndex: 0,
     ));
 
-    print('✅ BackgroundAudioHandler: Initialization complete');
-    print('🎵 Media session is ready for lock screen controls');
+    if (kDebugMode) {
+      print('✅ BackgroundAudioHandler: Initialization complete');
+      print('🎵 Media session is ready for lock screen controls');
+    }
   }
 
   /// Set episode navigation callbacks
@@ -110,7 +128,9 @@ class BackgroundAudioHandler extends BaseAudioHandler
   }) {
     onSkipToNextEpisode = onNext;
     onSkipToPreviousEpisode = onPrevious;
-    print('🎵 Episode navigation callbacks set');
+    if (kDebugMode) {
+      print('🎵 Episode navigation callbacks set');
+    }
   }
 
   /// Set audio source and MediaItem
@@ -121,9 +141,11 @@ class BackgroundAudioHandler extends BaseAudioHandler
     Duration? initialPosition,
     AudioFile? audioFile,
   }) async {
-    print('🎵 BackgroundAudioHandler: setAudioSource called');
-    print('🎵 URL: $url');
-    print('🎵 Title: $title');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: setAudioSource called');
+      print('🎵 URL: $url');
+      print('🎵 Title: $title');
+    }
 
     try {
       // Store current audio file for navigation
@@ -153,9 +175,13 @@ class BackgroundAudioHandler extends BaseAudioHandler
         initialPosition: initialPosition ?? Duration.zero,
       );
 
-      print('✅ BackgroundAudioHandler: Audio source set successfully');
+      if (kDebugMode) {
+        print('✅ BackgroundAudioHandler: Audio source set successfully');
+      }
     } catch (e) {
-      print('❌ BackgroundAudioHandler: Failed to set audio source: $e');
+      if (kDebugMode) {
+        print('❌ BackgroundAudioHandler: Failed to set audio source: $e');
+      }
       // Update playback state to show error
       playbackState.add(playbackState.value.copyWith(
         processingState: AudioProcessingState.error,
@@ -169,11 +195,15 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> play() async {
-    print('🎵 BackgroundAudioHandler: play() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: play() called');
+    }
     try {
       await _player.play();
     } catch (e) {
-      print('❌ BackgroundAudioHandler: Play failed: $e');
+      if (kDebugMode) {
+        print('❌ BackgroundAudioHandler: Play failed: $e');
+      }
       playbackState.add(playbackState.value.copyWith(
         processingState: AudioProcessingState.error,
       ));
@@ -182,13 +212,17 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> pause() async {
-    print('🎵 BackgroundAudioHandler: pause() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: pause() called');
+    }
     await _player.pause();
   }
 
   @override
   Future<void> stop() async {
-    print('🎵 BackgroundAudioHandler: stop() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: stop() called');
+    }
     await _player.stop();
     await _player.seek(Duration.zero);
 
@@ -204,21 +238,29 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> seek(Duration position) async {
-    print('🎵 BackgroundAudioHandler: seek($position) called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: seek($position) called');
+    }
     await _player.seek(position);
   }
 
   @override
   Future<void> skipToNext() async {
-    print('🎵 BackgroundAudioHandler: skipToNext() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: skipToNext() called');
+    }
 
     // If we have episode navigation callback and current episode, use it
     if (onSkipToNextEpisode != null && _currentAudioFile != null) {
-      print('🎵 Using episode navigation for next');
+      if (kDebugMode) {
+        print('🎵 Using episode navigation for next');
+      }
       onSkipToNextEpisode!(_currentAudioFile!);
     } else {
       // Fallback to 30-second skip forward
-      print('🎵 Using 30-second skip forward');
+      if (kDebugMode) {
+        print('🎵 Using 30-second skip forward');
+      }
       final currentPosition = _player.position;
       final duration = _player.duration ?? Duration.zero;
       final newPosition = currentPosition + const Duration(seconds: 30);
@@ -233,15 +275,21 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToPrevious() async {
-    print('🎵 BackgroundAudioHandler: skipToPrevious() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: skipToPrevious() called');
+    }
 
     // If we have episode navigation callback and current episode, use it
     if (onSkipToPreviousEpisode != null && _currentAudioFile != null) {
-      print('🎵 Using episode navigation for previous');
+      if (kDebugMode) {
+        print('🎵 Using episode navigation for previous');
+      }
       onSkipToPreviousEpisode!(_currentAudioFile!);
     } else {
       // Fallback to 10-second skip backward
-      print('🎵 Using 10-second skip backward');
+      if (kDebugMode) {
+        print('🎵 Using 10-second skip backward');
+      }
       final currentPosition = _player.position;
       final newPosition = currentPosition - const Duration(seconds: 10);
 
@@ -255,7 +303,9 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> fastForward() async {
-    print('🎵 BackgroundAudioHandler: fastForward() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: fastForward() called');
+    }
     final currentPosition = _player.position;
     final duration = _player.duration ?? Duration.zero;
     final newPosition = currentPosition + const Duration(seconds: 30);
@@ -269,7 +319,9 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> rewind() async {
-    print('🎵 BackgroundAudioHandler: rewind() called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: rewind() called');
+    }
     final currentPosition = _player.position;
     final newPosition = currentPosition - const Duration(seconds: 10);
 
@@ -283,13 +335,17 @@ class BackgroundAudioHandler extends BaseAudioHandler
   @override
   Future<dynamic> customAction(String name,
       [Map<String, dynamic>? extras]) async {
-    print('🎵 BackgroundAudioHandler: customAction($name) called');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: customAction($name) called');
+    }
 
     switch (name) {
       case 'setSpeed':
         final speed = extras?['speed'] as double? ?? 1.0;
         await _player.setSpeed(speed);
-        print('🎵 Playback speed set to ${speed}x');
+        if (kDebugMode) {
+          print('🎵 Playback speed set to ${speed}x');
+        }
         break;
 
       case 'getPosition':
@@ -299,7 +355,9 @@ class BackgroundAudioHandler extends BaseAudioHandler
         return _player.duration;
 
       default:
-        print('🎵 Unknown custom action: $name');
+        if (kDebugMode) {
+          print('🎵 Unknown custom action: $name');
+        }
     }
 
     return super.customAction(name, extras);
@@ -307,7 +365,9 @@ class BackgroundAudioHandler extends BaseAudioHandler
 
   /// Test method to verify media session is working
   Future<void> testMediaSession() async {
-    print('🧪 BackgroundAudioHandler: Testing media session...');
+    if (kDebugMode) {
+      print('🧪 BackgroundAudioHandler: Testing media session...');
+    }
 
     // Create test MediaItem
     final testMediaItem = MediaItem(
@@ -341,8 +401,10 @@ class BackgroundAudioHandler extends BaseAudioHandler
       speed: 1.0,
     ));
 
-    print('✅ Media session test completed');
-    print('🎵 Check your lock screen for media controls');
+    if (kDebugMode) {
+      print('✅ Media session test completed');
+      print('🎵 Check your lock screen for media controls');
+    }
   }
 
   /// Broadcast current state to system
@@ -381,14 +443,18 @@ class BackgroundAudioHandler extends BaseAudioHandler
   @override
   Future<void> onTaskRemoved() async {
     // Handle task removal (app swiped away)
-    print('🎵 BackgroundAudioHandler: App task removed');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: App task removed');
+    }
     await stop();
     await super.onTaskRemoved();
   }
 
   @override
   void dispose() {
-    print('🎵 BackgroundAudioHandler: Disposing...');
+    if (kDebugMode) {
+      print('🎵 BackgroundAudioHandler: Disposing...');
+    }
     _player.dispose();
   }
 }

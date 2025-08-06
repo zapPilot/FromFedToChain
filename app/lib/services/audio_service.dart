@@ -64,21 +64,25 @@ class AudioService extends ChangeNotifier {
   String? get currentAudioId => _currentAudioFile?.id;
 
   AudioService(this._audioHandler, [this._contentService]) {
-    print('🎧 AudioService: Initializing...');
-    print(
-        '🎧 Background handler: ${_audioHandler != null ? "PRESENT" : "NULL"}');
-    if (_audioHandler != null) {
-      print('🎧 Handler type: ${_audioHandler.runtimeType}');
-      print('🎧 Will use BACKGROUND AUDIO with media session support');
-    } else {
-      print('🎧 Will fallback to LOCAL PLAYER (no media session)');
+    if (kDebugMode) {
+      print('🎧 AudioService: Initializing...');
+      print(
+          '🎧 Background handler: ${_audioHandler != null ? "PRESENT" : "NULL"}');
+      if (_audioHandler != null) {
+        print('🎧 Handler type: ${_audioHandler.runtimeType}');
+        print('🎧 Will use BACKGROUND AUDIO with media session support');
+      } else {
+        print('🎧 Will fallback to LOCAL PLAYER (no media session)');
+      }
     }
     _initializePlayer();
   }
 
   void _initializePlayer() {
     if (_audioHandler != null) {
-      print('🎧 AudioService: Using background audio handler');
+      if (kDebugMode) {
+        print('🎧 AudioService: Using background audio handler');
+      }
 
       // Set up episode navigation callbacks
       _audioHandler!.setEpisodeNavigationCallbacks(
@@ -88,8 +92,10 @@ class AudioService extends ChangeNotifier {
 
       // Listen to background handler state changes
       _audioHandler!.playbackState.listen((state) {
-        print(
-            '🔄 AudioService: Background state changed - playing: ${state.playing}');
+        if (kDebugMode) {
+          print(
+              '🔄 AudioService: Background state changed - playing: ${state.playing}');
+        }
 
         _currentPosition = state.updatePosition;
         _totalDuration = _audioHandler!.duration;
@@ -129,7 +135,9 @@ class AudioService extends ChangeNotifier {
         }
       });
     } else {
-      print('🎧 AudioService: Falling back to local audio player');
+      if (kDebugMode) {
+        print('🎧 AudioService: Falling back to local audio player');
+      }
 
       // Fallback to local player if background handler not available
       _audioPlayer = AudioPlayer();
@@ -175,12 +183,16 @@ class AudioService extends ChangeNotifier {
 
   /// Play audio file (supports both local files and streaming URLs)
   Future<void> playAudio(AudioFile audioFile) async {
-    print('🎵 AudioService: playAudio() called for ${audioFile.displayTitle}');
-    print('🎵 Audio URL: ${audioFile.sourceUrl}');
+    if (kDebugMode) {
+      print('🎵 AudioService: playAudio() called for ${audioFile.displayTitle}');
+      print('🎵 Audio URL: ${audioFile.sourceUrl}');
+    }
 
     if (_audioHandler != null) {
-      print('🎵 ✅ Using BACKGROUND HANDLER - Media session will be available');
-      print('🎵 Handler type: ${_audioHandler.runtimeType}');
+      if (kDebugMode) {
+        print('🎵 ✅ Using BACKGROUND HANDLER - Media session will be available');
+        print('🎵 Handler type: ${_audioHandler.runtimeType}');
+      }
 
       try {
         _playbackState = PlaybackState.loading;
@@ -196,22 +208,28 @@ class AudioService extends ChangeNotifier {
         );
 
         await _audioHandler!.play();
-        print('✅ AudioService: Background playback started');
+        if (kDebugMode) {
+          print('✅ AudioService: Background playback started');
+        }
       } catch (e) {
         _playbackState = PlaybackState.error;
         _errorMessage = 'Background audio failed: $e';
 
         if (kDebugMode) {
-          print('❌ AudioService: Background playback error: $e');
-          print('AudioFile: ${audioFile.id}');
-          print('sourceUrl: ${audioFile.sourceUrl}');
+          if (kDebugMode) {
+            print('❌ AudioService: Background playback error: $e');
+            print('AudioFile: ${audioFile.id}');
+            print('sourceUrl: ${audioFile.sourceUrl}');
+          }
         }
         notifyListeners();
       }
     } else {
-      print('🎵 ⚠️  Using LOCAL PLAYER - NO media session support');
-      print('🎵 ❌ Lock screen controls will NOT appear');
-      print('🎵 Title: ${audioFile.displayTitle}');
+      if (kDebugMode) {
+        print('🎵 ⚠️  Using LOCAL PLAYER - NO media session support');
+        print('🎵 ❌ Lock screen controls will NOT appear');
+        print('🎵 Title: ${audioFile.displayTitle}');
+      }
 
       // Fallback to original implementation
       try {
@@ -230,9 +248,11 @@ class AudioService extends ChangeNotifier {
 
         // Always use sourceUrl for playback
         if (kDebugMode) {
-          print('AudioService: Playing audio from sourceUrl');
-          print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
-          print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+          if (kDebugMode) {
+            print('AudioService: Playing audio from sourceUrl');
+            print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
+            print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+          }
         }
 
         if (kIsWeb) {
@@ -262,10 +282,12 @@ class AudioService extends ChangeNotifier {
           _errorMessage = 'Failed to play audio: $e';
         }
         if (kDebugMode) {
-          print('AudioService playback error: $e');
-          print('AudioFile: ${audioFile.id}');
-          print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-          print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
+          if (kDebugMode) {
+            print('AudioService playback error: $e');
+            print('AudioFile: ${audioFile.id}');
+            print('AudioService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+            print('AudioService: sourceUrl: ${audioFile.sourceUrl}');
+          }
         }
         notifyListeners();
       }
@@ -437,32 +459,44 @@ class AudioService extends ChangeNotifier {
   /// Episode navigation methods for lock screen controls
   Future<void> _skipToNextEpisode(AudioFile currentEpisode) async {
     if (_contentService == null) {
-      print(
-          '❌ AudioService: ContentService not available for episode navigation');
+      if (kDebugMode) {
+        print(
+            '❌ AudioService: ContentService not available for episode navigation');
+      }
       return;
     }
 
-    print(
-        '⏭️ AudioService: Skipping to next episode from ${currentEpisode.id}');
+    if (kDebugMode) {
+      print(
+          '⏭️ AudioService: Skipping to next episode from ${currentEpisode.id}');
+    }
 
     final nextEpisode = _contentService!.getNextEpisode(currentEpisode);
     if (nextEpisode != null) {
       await playAudio(nextEpisode);
-      print('✅ AudioService: Switched to next episode: ${nextEpisode.id}');
+      if (kDebugMode) {
+        print('✅ AudioService: Switched to next episode: ${nextEpisode.id}');
+      }
     } else {
-      print('📝 AudioService: No next episode available');
+      if (kDebugMode) {
+        print('📝 AudioService: No next episode available');
+      }
     }
   }
 
   Future<void> _skipToPreviousEpisode(AudioFile currentEpisode) async {
     if (_contentService == null) {
-      print(
-          '❌ AudioService: ContentService not available for episode navigation');
+      if (kDebugMode) {
+        print(
+            '❌ AudioService: ContentService not available for episode navigation');
+      }
       return;
     }
 
-    print(
-        '⏮️ AudioService: Skipping to previous episode from ${currentEpisode.id}');
+    if (kDebugMode) {
+      print(
+          '⏮️ AudioService: Skipping to previous episode from ${currentEpisode.id}');
+    }
 
     final previousEpisode = _contentService!.getPreviousEpisode(currentEpisode);
     if (previousEpisode != null) {
@@ -470,7 +504,9 @@ class AudioService extends ChangeNotifier {
       print(
           '✅ AudioService: Switched to previous episode: ${previousEpisode.id}');
     } else {
-      print('📝 AudioService: No previous episode available');
+      if (kDebugMode) {
+        print('📝 AudioService: No previous episode available');
+      }
     }
   }
 
@@ -489,7 +525,9 @@ class AudioService extends ChangeNotifier {
       return;
     }
 
-    print('🔄 AudioService: Switching language for ${newLanguageAudioFile.id}');
+    if (kDebugMode) {
+      print('🔄 AudioService: Switching language for ${newLanguageAudioFile.id}');
+    }
 
     try {
       // Capture current state
@@ -531,15 +569,19 @@ class AudioService extends ChangeNotifier {
       // Update current audio file
       _currentAudioFile = newLanguageAudioFile;
 
-      print('✅ AudioService: Language switched successfully');
+      if (kDebugMode) {
+        print('✅ AudioService: Language switched successfully');
+      }
     } catch (e) {
       _playbackState = PlaybackState.error;
       _errorMessage = 'Failed to switch language: $e';
 
       if (kDebugMode) {
-        print('❌ AudioService: Language switch error: $e');
-        print('New AudioFile: ${newLanguageAudioFile.id}');
-        print('New sourceUrl: ${newLanguageAudioFile.sourceUrl}');
+        if (kDebugMode) {
+          print('❌ AudioService: Language switch error: $e');
+          print('New AudioFile: ${newLanguageAudioFile.id}');
+          print('New sourceUrl: ${newLanguageAudioFile.sourceUrl}');
+        }
       }
       notifyListeners();
     }
@@ -560,18 +602,26 @@ class AudioService extends ChangeNotifier {
 
   /// Handle audio completion - triggers repeat or autoplay if enabled
   Future<void> _handleAudioCompletion() async {
-    print(
-        '🔄 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+    if (kDebugMode) {
+      print(
+          '🔄 AudioService: Audio completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+    }
 
     // Repeat mode takes precedence over autoplay
     if (_repeatEnabled && _currentAudioFile != null) {
-      print('🔁 AudioService: Repeating current episode');
+      if (kDebugMode) {
+        print('🔁 AudioService: Repeating current episode');
+      }
       try {
         await Future.delayed(const Duration(milliseconds: 500));
         await playAudio(_currentAudioFile!);
-        print('✅ AudioService: Repeat completed successfully');
+        if (kDebugMode) {
+          print('✅ AudioService: Repeat completed successfully');
+        }
       } catch (e) {
-        print('❌ AudioService: Repeat failed: $e');
+        if (kDebugMode) {
+          print('❌ AudioService: Repeat failed: $e');
+        }
         _playbackState = PlaybackState.error;
         _errorMessage = 'Repeat failed: $e';
         notifyListeners();
@@ -580,36 +630,50 @@ class AudioService extends ChangeNotifier {
     }
 
     if (!_autoplayEnabled) {
-      print('📝 AudioService: Autoplay disabled, stopping playback');
+      if (kDebugMode) {
+        print('📝 AudioService: Autoplay disabled, stopping playback');
+      }
       return;
     }
 
     if (_contentService == null) {
-      print('❌ AudioService: ContentService not available for autoplay');
+      if (kDebugMode) {
+        print('❌ AudioService: ContentService not available for autoplay');
+      }
       return;
     }
 
     if (_currentAudioFile == null) {
-      print('❌ AudioService: No current audio file for autoplay');
+      if (kDebugMode) {
+        print('❌ AudioService: No current audio file for autoplay');
+      }
       return;
     }
 
     try {
       final nextEpisode = _contentService!.getNextEpisode(_currentAudioFile!);
       if (nextEpisode != null) {
-        print(
-            '⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
+        if (kDebugMode) {
+          print(
+              '⏭️ AudioService: Autoplay starting next episode: ${nextEpisode.id}');
+        }
 
         // Small delay to ensure smooth transition
         await Future.delayed(const Duration(milliseconds: 500));
 
         await playAudio(nextEpisode);
-        print('✅ AudioService: Autoplay completed successfully');
+        if (kDebugMode) {
+          print('✅ AudioService: Autoplay completed successfully');
+        }
       } else {
-        print('📝 AudioService: No next episode available for autoplay');
+        if (kDebugMode) {
+          print('📝 AudioService: No next episode available for autoplay');
+        }
       }
     } catch (e) {
-      print('❌ AudioService: Autoplay failed: $e');
+      if (kDebugMode) {
+        print('❌ AudioService: Autoplay failed: $e');
+      }
       _playbackState = PlaybackState.error;
       _errorMessage = 'Autoplay failed: $e';
       notifyListeners();
@@ -620,7 +684,9 @@ class AudioService extends ChangeNotifier {
   void setAutoplayEnabled(bool enabled) {
     if (_autoplayEnabled != enabled) {
       _autoplayEnabled = enabled;
-      print('🔄 AudioService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
+      if (kDebugMode) {
+        print('🔄 AudioService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
+      }
       notifyListeners();
     }
   }
@@ -629,7 +695,9 @@ class AudioService extends ChangeNotifier {
   void setRepeatEnabled(bool enabled) {
     if (_repeatEnabled != enabled) {
       _repeatEnabled = enabled;
-      print('🔄 AudioService: Repeat ${enabled ? 'enabled' : 'disabled'}');
+      if (kDebugMode) {
+        print('🔄 AudioService: Repeat ${enabled ? 'enabled' : 'disabled'}');
+      }
       notifyListeners();
     }
   }
@@ -651,10 +719,14 @@ class AudioService extends ChangeNotifier {
   /// Test method to verify media session is working
   Future<void> testMediaSession() async {
     if (_audioHandler != null) {
-      print('🧪 Calling test method on background handler...');
+      if (kDebugMode) {
+        print('🧪 Calling test method on background handler...');
+      }
       await _audioHandler!.testMediaSession();
     } else {
-      print('❌ Cannot test media session - no background handler available');
+      if (kDebugMode) {
+        print('❌ Cannot test media session - no background handler available');
+      }
     }
   }
 
