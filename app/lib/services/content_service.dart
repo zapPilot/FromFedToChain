@@ -1,17 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
-import '../models/audio_file.dart';
 import '../models/audio_content.dart';
+import '../models/audio_file.dart';
 import '../models/playlist.dart';
 import '../config/api_config.dart';
+import '../repositories/content_repository.dart';
 import 'streaming_api_service.dart';
 
 /// Service for managing audio content, playlists, and episode navigation
 class ContentService extends ChangeNotifier {
+  final StreamingApiService _streamingApiService;
+  final ContentRepository _contentRepository;
+
   List<AudioFile> _allEpisodes = [];
   List<AudioFile> _filteredEpisodes = [];
   Playlist? _currentPlaylist;
@@ -21,13 +24,8 @@ class ContentService extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Content cache for language learning scripts
-  final Map<String, AudioContent> _contentCache = {};
-
   // Episode completion tracking (episodeId -> completion percentage 0.0-1.0)
   final Map<String, double> _episodeCompletion = {};
-
-  static final _httpClient = http.Client();
 
   // Getters
   List<AudioFile> get allEpisodes => _allEpisodes;
@@ -53,7 +51,7 @@ class ContentService extends ChangeNotifier {
       getEpisodeCompletion(episodeId) > 0.0 &&
       getEpisodeCompletion(episodeId) < 0.9;
 
-  ContentService() {
+  ContentService(this._streamingApiService, this._contentRepository) {
     _loadPreferences();
   }
 
@@ -107,109 +105,25 @@ class ContentService extends ChangeNotifier {
     }
   }
 
-  /// Fetch content/script for a specific episode from Cloudflare API
-  /// This provides the actual content text for language learning
-  Future<AudioContent?> fetchContentById(
-      String id, String language, String category) async {
-    final cacheKey = '$language/$category/$id';
-
-    // Return cached content if available
-    if (_contentCache.containsKey(cacheKey)) {
-      if (kDebugMode) {
-        print('ContentService: Returning cached content for $cacheKey');
-      }
-      return _contentCache[cacheKey];
-    }
-
-    try {
-      if (kDebugMode) {
-        print('ContentService: Fetching content for $cacheKey from API');
-      }
-
-      final url = Uri.parse(ApiConfig.getContentUrl(language, category, id));
-
-      final response = await _httpClient.get(
-        url,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'User-Agent': 'FromFedToChain/1.0.0 (Flutter)',
-        },
-      ).timeout(ApiConfig.apiTimeout);
-
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final content = AudioContent.fromJson(jsonData);
-
-        // Cache the content
-        _contentCache[cacheKey] = content;
-
-        if (kDebugMode) {
-          print(
-              'ContentService: Successfully fetched and cached content for $cacheKey');
-        }
-
-        return content;
-      } else {
-        if (kDebugMode) {
-          print(
-              'ContentService: Failed to fetch content - HTTP ${response.statusCode}');
-          print('ContentService: Response body: ${response.body}');
-        }
-        return null;
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('ContentService: Error fetching content for $cacheKey: $e');
-      }
-      return null;
-    }
-  }
-
   /// Get content for an audio file with lazy loading
-  /// This is the main method for getting content/scripts for language learning
   Future<AudioContent?> getContentForAudioFile(AudioFile audioFile) async {
-    return await fetchContentById(
+    return await _contentRepository.fetchContentById(
         audioFile.id, audioFile.language, audioFile.category);
   }
 
   /// Get cached content without fetching (synchronous)
   AudioContent? getCachedContent(String id, String language, String category) {
-    final cacheKey = '$language/$category/$id';
-    return _contentCache[cacheKey];
+    return _contentRepository.getCachedContent(id, language, category);
   }
 
   /// Pre-fetch content for multiple episodes (useful for preloading)
   Future<void> prefetchContent(List<AudioFile> audioFiles) async {
-    if (audioFiles.isEmpty) return;
-
-    if (kDebugMode) {
-      print(
-          'ContentService: Pre-fetching content for ${audioFiles.length} episodes');
-    }
-
-    final futures = audioFiles.map((audioFile) =>
-        fetchContentById(audioFile.id, audioFile.language, audioFile.category));
-
-    try {
-      await Future.wait(futures);
-      if (kDebugMode) {
-        print(
-            'ContentService: Pre-fetch completed, cached ${_contentCache.length} content items');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('ContentService: Pre-fetch failed: $e');
-      }
-    }
+    await _contentRepository.prefetchContent(audioFiles);
   }
 
   /// Clear content cache
   void clearContentCache() {
-    _contentCache.clear();
-    if (kDebugMode) {
-      print('ContentService: Content cache cleared');
-    }
+    _contentRepository.clearContentCache();
   }
 
   /// Update episode completion percentage (0.0 to 1.0)
@@ -272,7 +186,7 @@ class ContentService extends ChangeNotifier {
       if (kDebugMode) {
         print('ContentService: Loading all episodes...');
       }
-      _allEpisodes = await StreamingApiService.getAllEpisodes();
+      _allEpisodes = await _streamingApiService.getAllEpisodes();
 
       if (_allEpisodes.isEmpty) {
         _setError('No episodes found. Please check your internet connection.');
@@ -286,7 +200,7 @@ class ContentService extends ChangeNotifier {
       if (kDebugMode) {
         print('ContentService: Failed to load episodes: $e');
       }
-      _setError('Failed to load episodes: $e');
+      _setError('Failed to load episodes: ${e.toString()}');
     } finally {
       _setLoading(false);
     }
@@ -309,7 +223,7 @@ class ContentService extends ChangeNotifier {
         print('ContentService: Loading episodes for language: $language');
       }
       final episodes =
-          await StreamingApiService.getAllEpisodesForLanguage(language);
+          await _streamingApiService.getAllEpisodesForLanguage(language);
 
       // Update or merge with existing episodes
       _updateEpisodesForLanguage(language, episodes);
@@ -323,7 +237,7 @@ class ContentService extends ChangeNotifier {
       if (kDebugMode) {
         print('ContentService: Failed to load episodes for $language: $e');
       }
-      _setError('Failed to load episodes for $language: $e');
+      _setError('Failed to load episodes for $language: ${e.toString()}');
     } finally {
       _setLoading(false);
     }
@@ -586,7 +500,7 @@ class ContentService extends ChangeNotifier {
       }
 
       // Otherwise, search via API
-      return await StreamingApiService.searchEpisodes(query);
+      return await _streamingApiService.searchEpisodes(query);
     } catch (e) {
       if (kDebugMode) {
         print('ContentService: Search failed: $e');
@@ -637,13 +551,12 @@ class ContentService extends ChangeNotifier {
 
   void _clearError() {
     _errorMessage = null;
+    notifyListeners();
   }
 
   @override
   void dispose() {
-    StreamingApiService.dispose();
-    _httpClient.close();
-    _contentCache.clear();
+    // No longer responsible for disposing http client
     super.dispose();
   }
 }

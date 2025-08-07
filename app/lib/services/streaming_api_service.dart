@@ -1,18 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/audio_file.dart';
 
 /// Service for interacting with the Cloudflare R2 streaming API
 /// Handles episode discovery and streaming URL generation
 class StreamingApiService {
-  static final _client = http.Client();
+  final Dio _dio;
+
+  StreamingApiService(this._dio);
 
   /// Get list of episodes for a specific language and category
   /// Returns list of AudioFile objects with streaming URLs
-  static Future<List<AudioFile>> getEpisodeList(
+  Future<List<AudioFile>> getEpisodeList(
       String language, String category) async {
     // Validate input parameters
     if (!ApiConfig.isValidLanguage(language)) {
@@ -22,73 +23,32 @@ class StreamingApiService {
       throw ArgumentError('Unsupported category: $category');
     }
 
-    final url = Uri.parse(ApiConfig.getListUrl(language, category));
+    final path = '/';
+    final queryParameters = {'prefix': 'audio/$language/$category/'};
 
     if (kDebugMode) {
       print(
-          'StreamingApiService: Environment: ${ApiConfig.currentEnvironment}');
-      print('StreamingApiService: Base URL: ${ApiConfig.streamingBaseUrl}');
-      print('StreamingApiService: Making request to: $url');
-      print('StreamingApiService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
+          'StreamingApiService: Making request to path: $path with query: $queryParameters');
     }
 
     try {
-      final response = await _client.get(
-        url,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'User-Agent': 'FromFedToChain/1.0.0 (Flutter)',
-        },
-      ).timeout(ApiConfig.apiTimeout);
+      final response =
+          await _dio.get(path, queryParameters: queryParameters);
 
-      if (kDebugMode) {
-        print('StreamingApiService: Response status: ${response.statusCode}');
-        print('StreamingApiService: Response headers: ${response.headers}');
-      }
-
-      if (response.statusCode == 200) {
-        final dynamic responseData = json.decode(response.body);
-
-        if (kDebugMode) {
-          print(
-              'StreamingApiService: API response for $language/$category: $responseData');
-        }
-
-        return _parseEpisodesResponse(responseData, language, category);
-      } else {
-        if (kDebugMode) {
-          print('StreamingApiService: HTTP Error ${response.statusCode}');
-          print('StreamingApiService: Response body: ${response.body}');
-        }
-        throw ApiException(
-            'Failed to load episodes: ${response.statusCode} - ${response.reasonPhrase}');
-      }
-    } on http.ClientException catch (e) {
-      if (kDebugMode) {
-        print('StreamingApiService: ClientException: ${e.message}');
-        print(
-            'StreamingApiService: This usually indicates CORS or network issues');
-      }
-      throw NetworkException('Network connection error: ${e.message}');
-    } on TimeoutException catch (e) {
-      if (kDebugMode) {
-        print(
-            'StreamingApiService: Request timed out after ${ApiConfig.apiTimeout.inSeconds} seconds');
-      }
-      throw TimeoutException('Request timed out: ${e.message}');
+      return _parseEpisodesResponse(response.data, language, category);
+    } on DioException catch (e) {
+      _handleDioException(e);
+      rethrow; // Rethrow to allow caller to handle
     } catch (e) {
       if (kDebugMode) {
         print('StreamingApiService: Unexpected error: $e');
-        print('StreamingApiService: Error type: ${e.runtimeType}');
       }
-      if (e is StreamingApiException) rethrow;
       throw UnknownException('Unexpected error: $e');
     }
   }
 
   /// Parse episodes response from API into AudioFile objects
-  static List<AudioFile> _parseEpisodesResponse(
+  List<AudioFile> _parseEpisodesResponse(
       dynamic responseData, String language, String category) {
     List<Map<String, dynamic>> episodeData;
 
@@ -136,11 +96,6 @@ class StreamingApiService {
         // Create AudioFile object
         final audioFile = AudioFile.fromApiResponse(enhancedEpisodeData);
         audioFiles.add(audioFile);
-
-        if (kDebugMode && audioFiles.length == 1) {
-          print(
-              'StreamingApiService: Sample AudioFile created: ${audioFile.toString()}');
-        }
       } catch (e) {
         if (kDebugMode) {
           print('Warning: Failed to parse episode: $episodeJson, error: $e');
@@ -157,8 +112,7 @@ class StreamingApiService {
   }
 
   /// Get all episodes for a specific language across all categories
-  static Future<List<AudioFile>> getAllEpisodesForLanguage(
-      String language) async {
+  Future<List<AudioFile>> getAllEpisodesForLanguage(String language) async {
     if (!ApiConfig.isValidLanguage(language)) {
       throw ArgumentError('Unsupported language: $language');
     }
@@ -196,12 +150,7 @@ class StreamingApiService {
   }
 
   /// Get all episodes across all languages and categories (parallel loading)
-  static Future<List<AudioFile>> getAllEpisodes() async {
-    if (kDebugMode) {
-      print(
-          'StreamingApiService: Starting parallel loading of all episodes...');
-    }
-
+  Future<List<AudioFile>> getAllEpisodes() async {
     final allEpisodes = <AudioFile>[];
     final errors = <String>[];
 
@@ -216,10 +165,6 @@ class StreamingApiService {
         });
         futures.add(future);
       }
-    }
-
-    if (kDebugMode) {
-      print('StreamingApiService: Created ${futures.length} parallel requests');
     }
 
     // Wait for all requests to complete (parallel execution)
@@ -237,38 +182,30 @@ class StreamingApiService {
     // Sort by date (newest first)
     allEpisodes.sort((a, b) => b.lastModified.compareTo(a.lastModified));
 
-    if (kDebugMode) {
-      print(
-          'StreamingApiService: Parallel loading completed, got ${allEpisodes.length} total episodes');
-    }
     return allEpisodes;
   }
 
   /// Get episodes filtered by search query
-  static Future<List<AudioFile>> searchEpisodes(
+  Future<List<AudioFile>> searchEpisodes(
     String query, {
     String? language,
     String? category,
   }) async {
-    // If language and category specified, search within that subset
+    // This implementation is simplified. A real-world app might have a dedicated search API endpoint.
+    // For now, we fetch all relevant episodes and filter locally.
+    List<AudioFile> episodesToSearch;
     if (language != null && category != null) {
-      final episodes = await getEpisodeList(language, category);
-      return _filterEpisodesByQuery(episodes, query);
+      episodesToSearch = await getEpisodeList(language, category);
+    } else if (language != null) {
+      episodesToSearch = await getAllEpisodesForLanguage(language);
+    } else {
+      episodesToSearch = await getAllEpisodes();
     }
-
-    // If only language specified, search within that language
-    if (language != null) {
-      final episodes = await getAllEpisodesForLanguage(language);
-      return _filterEpisodesByQuery(episodes, query);
-    }
-
-    // Search across all episodes
-    final episodes = await getAllEpisodes();
-    return _filterEpisodesByQuery(episodes, query);
+    return _filterEpisodesByQuery(episodesToSearch, query);
   }
 
   /// Filter episodes by search query
-  static List<AudioFile> _filterEpisodesByQuery(
+  List<AudioFile> _filterEpisodesByQuery(
       List<AudioFile> episodes, String query) {
     if (query.trim().isEmpty) return episodes;
 
@@ -281,9 +218,8 @@ class StreamingApiService {
   }
 
   /// Test connectivity to the streaming API
-  static Future<bool> testConnectivity() async {
+  Future<bool> testConnectivity() async {
     try {
-      // Try to get episodes for a common language/category combination
       final episodes = await getEpisodeList('zh-TW', 'startup');
       return episodes.isNotEmpty;
     } catch (e) {
@@ -308,10 +244,9 @@ class StreamingApiService {
   }
 
   /// Validate streaming URL accessibility
-  static Future<bool> validateStreamingUrl(String url) async {
+  Future<bool> validateStreamingUrl(String url) async {
     try {
-      final response =
-          await _client.head(Uri.parse(url)).timeout(Duration(seconds: 10));
+      final response = await _dio.head(url);
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {
@@ -321,9 +256,33 @@ class StreamingApiService {
     }
   }
 
-  /// Clean up HTTP client resources
-  static void dispose() {
-    _client.close();
+  /// Handles Dio exceptions and throws custom exceptions.
+  Never _handleDioException(DioException e) {
+    if (kDebugMode) {
+      print('StreamingApiService: DioException: ${e.message}');
+      print('StreamingApiService: Type: ${e.type}');
+      if (e.response != null) {
+        print(
+            'StreamingApiService: Response: ${e.response?.statusCode} ${e.response?.statusMessage}');
+      }
+    }
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        throw TimeoutException('Request timed out: ${e.message}');
+      case DioExceptionType.badResponse:
+        throw ApiException(
+            'Failed to load episodes: ${e.response?.statusCode} - ${e.response?.statusMessage}',
+            e.response?.statusCode);
+      case DioExceptionType.cancel:
+        throw NetworkException('Request was cancelled.');
+      case DioExceptionType.connectionError:
+      case DioExceptionType.unknown:
+      default:
+        throw NetworkException('Network connection error: ${e.message}');
+    }
   }
 }
 

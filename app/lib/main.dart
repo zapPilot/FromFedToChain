@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,9 @@ import 'services/background_audio_handler.dart';
 import 'services/audio_service.dart' as local_audio;
 import 'services/content_service.dart';
 import 'screens/home_screen.dart';
+import 'services/api/dio_client.dart';
+import 'services/streaming_api_service.dart';
+import 'repositories/content_repository.dart';
 
 /// Main application entry point
 void main() async {
@@ -100,59 +104,71 @@ class FromFedToChainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Foundational services (no dependencies on other providers)
+        Provider<Dio>(create: (_) => createDioClient()),
+
+        // Services that depend on Dio
+        Provider<StreamingApiService>(
+          create: (context) => StreamingApiService(context.read<Dio>()),
+        ),
+        Provider<ContentRepository>(
+          create: (context) => ContentRepository(context.read<Dio>()),
+        ),
+
         // Content service (manages episodes and playlists)
-        ChangeNotifierProvider(
-          create: (_) => ContentService(),
+        ChangeNotifierProvider<ContentService>(
+          create: (context) => ContentService(
+            context.read<StreamingApiService>(),
+            context.read<ContentRepository>(),
+          ),
         ),
 
         // Audio service (manages playback)
-        ChangeNotifierProvider(
-          create: (context) {
-            final contentService = context.read<ContentService>();
-            return local_audio.AudioService(audioHandler, contentService);
-          },
+        ChangeNotifierProxyProvider<ContentService, local_audio.AudioService>(
+          create: (context) => local_audio.AudioService(
+            audioHandler,
+            context.read<ContentService>(),
+          ),
+          update: (context, contentService, previousAudioService) =>
+              local_audio.AudioService(audioHandler, contentService),
         ),
       ],
-      child: Consumer<ContentService>(
-        builder: (context, contentService, child) {
-          return MaterialApp(
-            // App configuration
-            title: 'From Fed to Chain',
-            debugShowCheckedModeBanner: false,
+      child: MaterialApp(
+        // App configuration
+        title: 'From Fed to Chain',
+        debugShowCheckedModeBanner: false,
 
-            // Theme
-            theme: AppTheme.darkTheme,
-            themeMode: ThemeMode.dark,
+        // Theme
+        theme: AppTheme.darkTheme,
+        themeMode: ThemeMode.dark,
 
-            // Home screen
-            home: const HomeScreen(),
+        // Home screen
+        home: const HomeScreen(),
 
-            // App-wide configuration
-            builder: (context, child) {
-              return MediaQuery(
-                // Ensure text scaling doesn't break layout
-                data: MediaQuery.of(context).copyWith(
-                  textScaleFactor:
-                      MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
-                ),
-                child: child!,
-              );
-            },
-
-            // Route generation (for future navigation)
-            onGenerateRoute: (settings) {
-              switch (settings.name) {
-                case '/':
-                  return MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
-                  );
-                default:
-                  return MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
-                  );
-              }
-            },
+        // App-wide configuration
+        builder: (context, child) {
+          return MediaQuery(
+            // Ensure text scaling doesn't break layout
+            data: MediaQuery.of(context).copyWith(
+              textScaleFactor:
+                  MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
+            ),
+            child: child!,
           );
+        },
+
+        // Route generation (for future navigation)
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/':
+              return MaterialPageRoute(
+                builder: (_) => const HomeScreen(),
+              );
+            default:
+              return MaterialPageRoute(
+                builder: (_) => const HomeScreen(),
+              );
+          }
         },
       ),
     );
