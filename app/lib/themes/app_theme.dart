@@ -143,8 +143,8 @@ class AppTheme {
       ),
 
       // Cards
-      cardTheme: CardThemeData(
-        color: surfaceColor,
+      cardColor: surfaceColor,
+      cardTheme: const CardTheme().copyWith(
         elevation: elevationS,
         shadowColor: Colors.black26,
         shape: RoundedRectangleBorder(

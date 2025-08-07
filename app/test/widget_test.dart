@@ -23,6 +23,7 @@ void main() {
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(const FromFedToChainApp(audioHandler: null));
+    await tester.pumpAndSettle();
 
     // Verify that the app loads without crashing
     expect(find.byType(MaterialApp), findsOneWidget);
