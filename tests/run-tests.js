@@ -38,10 +38,14 @@ async function runTests() {
     console.log(chalk.cyan(`📁 Found ${testFiles.length} test files`));
 
     // Run tests using Node.js built-in test runner
-    const testProcess = spawn("node", ["--test", ...testFiles], {
-      stdio: "inherit",
-      env: { ...process.env, NODE_ENV: "test" },
-    });
+    const testProcess = spawn(
+      "node",
+      ["--test", "--test-concurrency=1", ...testFiles],
+      {
+        stdio: "inherit",
+        env: { ...process.env, NODE_ENV: "test" },
+      },
+    );
 
     testProcess.on("close", (code) => {
       if (code === 0) {
