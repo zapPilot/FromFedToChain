@@ -1,3 +1,8 @@
 {
-  "*.{js,mjs,json,md}": ["prettier --write"]
+  "*.{js,mjs,json,md}": ["prettier --write"],
+  "app/**/*.dart": [
+    "cd app && flutter analyze --no-congratulate",
+    "cd app && flutter test"
+  ],
+  "app/pubspec.yaml": ["cd app && flutter pub get", "cd app && flutter test"]
 }
