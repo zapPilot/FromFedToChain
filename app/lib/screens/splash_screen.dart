@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../themes/app_theme.dart';
 import '../services/content_service.dart';
 import '../services/audio_service.dart';
-import '../services/auth/auth_service.dart';
+import '../services/auth_service.dart';
 import '../services/navigation_service.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 
@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _logoController;
   late AnimationController _textController;
   late AnimationController _progressController;
-  
+
   late Animation<double> _logoScaleAnimation;
   late Animation<double> _logoOpacityAnimation;
   late Animation<double> _textOpacityAnimation;
@@ -118,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen>
       // Initialize content service
       setState(() => _loadingText = 'Loading content...');
       await Future.delayed(const Duration(milliseconds: 800));
-      
+
       if (mounted) {
         await context.read<ContentService>().loadAllEpisodes();
       }
@@ -135,15 +135,14 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         setState(() => _loadingText = 'Ready!');
         await Future.delayed(const Duration(milliseconds: 300));
-        
+
         await _navigateToNextScreen();
       }
-
     } catch (error) {
       if (kDebugMode) {
         print('❌ Splash screen initialization error: $error');
       }
-      
+
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -160,7 +159,7 @@ class _SplashScreenState extends State<SplashScreen>
       final nextScreen = await NavigationService.getInitialScreen(
         authService: authService,
       );
-      
+
       if (mounted) {
         NavigationService.navigateAndClearStack(
           context,
@@ -188,12 +187,12 @@ class _SplashScreenState extends State<SplashScreen>
       _errorMessage = null;
       _loadingText = 'Retrying...';
     });
-    
+
     // Reset animations
     _logoController.reset();
     _textController.reset();
     _progressController.reset();
-    
+
     // Restart initialization
     _logoController.forward();
     _initializeApp();
@@ -232,7 +231,8 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 120,
                         decoration: BoxDecoration(
                           color: AppTheme.primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusXL),
                           border: Border.all(
                             color: AppTheme.primaryColor.withOpacity(0.3),
                             width: 2,
@@ -292,10 +292,7 @@ class _SplashScreenState extends State<SplashScreen>
               const Spacer(flex: 3),
 
               // Loading section
-              if (_hasError)
-                _buildErrorSection()
-              else
-                _buildLoadingSection(),
+              if (_hasError) _buildErrorSection() else _buildLoadingSection(),
 
               const SizedBox(height: AppTheme.spacingXXL),
             ],
@@ -321,7 +318,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: AppTheme.spacingM),
 
               // Progress indicator
@@ -356,9 +353,7 @@ class _SplashScreenState extends State<SplashScreen>
           size: 48,
           color: AppTheme.errorColor,
         ),
-        
         const SizedBox(height: AppTheme.spacingM),
-        
         Text(
           _errorMessage ?? 'Something went wrong',
           style: AppTheme.bodyLarge.copyWith(
@@ -366,9 +361,7 @@ class _SplashScreenState extends State<SplashScreen>
           ),
           textAlign: TextAlign.center,
         ),
-        
         const SizedBox(height: AppTheme.spacingL),
-        
         ElevatedButton(
           onPressed: _retryInitialization,
           style: ElevatedButton.styleFrom(

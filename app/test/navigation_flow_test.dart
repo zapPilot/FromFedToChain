@@ -25,7 +25,8 @@ void main() {
             ChangeNotifierProvider(create: (_) => AuthService()),
             ChangeNotifierProvider(create: (_) => ContentService()),
             ChangeNotifierProvider(
-              create: (context) => local_audio.AudioService(null, context.read<ContentService>()),
+              create: (context) => local_audio.AudioService(
+                  null, context.read<ContentService>()),
             ),
           ],
           child: MaterialApp(
@@ -43,7 +44,8 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('Should show Onboarding Screen for first-time users', (WidgetTester tester) async {
+    testWidgets('Should show Onboarding Screen for first-time users',
+        (WidgetTester tester) async {
       // Clear any existing preferences
       SharedPreferences.setMockInitialValues({});
 
@@ -63,7 +65,8 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('Onboarding navigation should work', (WidgetTester tester) async {
+    testWidgets('Onboarding navigation should work',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: const OnboardingScreen(),
@@ -89,7 +92,8 @@ void main() {
       expect(find.text('Get Started'), findsOneWidget);
     });
 
-    testWidgets('Should navigate back in onboarding', (WidgetTester tester) async {
+    testWidgets('Should navigate back in onboarding',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: const OnboardingScreen(),
@@ -111,14 +115,16 @@ void main() {
       expect(find.text('Stream Web3/Finance Content'), findsOneWidget);
     });
 
-    testWidgets('Home Screen should load correctly', (WidgetTester tester) async {
+    testWidgets('Home Screen should load correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => AuthService()),
             ChangeNotifierProvider(create: (_) => ContentService()),
             ChangeNotifierProvider(
-              create: (context) => local_audio.AudioService(null, context.read<ContentService>()),
+              create: (context) => local_audio.AudioService(
+                  null, context.read<ContentService>()),
             ),
           ],
           child: MaterialApp(
@@ -137,9 +143,10 @@ void main() {
       // Note: Exact elements depend on the HomeScreen implementation
     });
 
-    testWidgets('Auth Service should initialize correctly', (WidgetTester tester) async {
+    testWidgets('Auth Service should initialize correctly',
+        (WidgetTester tester) async {
       final authService = AuthService();
-      
+
       // Initial state should be unauthenticated
       expect(authService.authState, equals(AuthState.initial));
       expect(authService.currentUser, isNull);
@@ -153,32 +160,35 @@ void main() {
       expect(authService.isAuthenticated, isFalse);
     });
 
-    testWidgets('Should handle onboarding completion', (WidgetTester tester) async {
+    testWidgets('Should handle onboarding completion',
+        (WidgetTester tester) async {
       // Start with clean state
       SharedPreferences.setMockInitialValues({});
-      
+
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Initially, onboarding should not be completed
       expect(prefs.getBool('onboarding_completed'), isNull);
-      
+
       // Simulate completing onboarding
       await prefs.setBool('onboarding_completed', true);
-      
+
       // Verify it's marked as completed
       expect(prefs.getBool('onboarding_completed'), isTrue);
     });
   });
 
   group('Theme and Styling Tests', () {
-    testWidgets('Splash screen should use app theme', (WidgetTester tester) async {
+    testWidgets('Splash screen should use app theme',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => AuthService()),
             ChangeNotifierProvider(create: (_) => ContentService()),
             ChangeNotifierProvider(
-              create: (context) => local_audio.AudioService(null, context.read<ContentService>()),
+              create: (context) => local_audio.AudioService(
+                  null, context.read<ContentService>()),
             ),
           ],
           child: MaterialApp(
@@ -192,7 +202,8 @@ void main() {
       expect(scaffold.backgroundColor, isNotNull);
     });
 
-    testWidgets('Onboarding should use proper styling', (WidgetTester tester) async {
+    testWidgets('Onboarding should use proper styling',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: const OnboardingScreen(),
@@ -201,7 +212,7 @@ void main() {
 
       // Verify page indicators are present and styled
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
-      
+
       // Verify buttons are properly styled
       expect(find.byType(ElevatedButton), findsAtLeastNWidgets(1));
       expect(find.byType(TextButton), findsAtLeastNWidgets(1));

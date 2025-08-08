@@ -61,5 +61,26 @@
 	<!-- Required for Control Center and Lock Screen controls -->
 	<key>UIBackgroundTaskIdentifier</key>
 	<string>AudioPlayback</string>
+	
+	<!-- Google Sign In Configuration -->
+	<key>GIDClientID</key>
+	<string>YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com</string>
+	
+	<!-- URL Schemes for Google Sign In -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>GoogleSignIn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>YOUR_REVERSED_CLIENT_ID_HERE</string>
+			</array>
+		</dict>
+	</array>
+	
+	<!-- Apple Sign In Configuration -->
+	<!-- Apple Sign In is automatically enabled for iOS apps with the correct entitlements -->
+	
 </dict>
 </plist>

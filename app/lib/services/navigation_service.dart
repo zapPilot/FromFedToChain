@@ -4,7 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/home_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/auth/auth_screen.dart';
-import '../services/auth/auth_service.dart';
+import '../screens/auth/login_screen.dart';
+import 'auth_service.dart';
 
 /// Service to handle app navigation logic and routing decisions
 class NavigationService {
@@ -15,22 +16,19 @@ class NavigationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final hasSeenOnboarding = prefs.getBool('onboarding_completed') ?? false;
-      
+
       // If user hasn't seen onboarding, show onboarding first
       if (!hasSeenOnboarding) {
         return const OnboardingScreen();
       }
-      
+
       // If user is authenticated, go to home screen
       if (authService?.isAuthenticated == true) {
         return const HomeScreen();
       }
-      
-      // For demo purposes, skip auth and go directly to home
-      // In a real app, you might want to show the auth screen:
-      // return const AuthScreen();
-      return const HomeScreen();
-      
+
+      // Show login screen if user is not authenticated
+      return const LoginScreen();
     } catch (e) {
       // On error, default to onboarding
       return const OnboardingScreen();
@@ -49,9 +47,9 @@ class NavigationService {
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const end = Offset.zero;
 
-        var tween = Tween(begin: begin, end: end)
-            .chain(CurveTween(curve: curve));
-        
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
         var offsetAnimation = animation.drive(tween);
 
         return SlideTransition(
@@ -97,10 +95,9 @@ class NavigationService {
   static Future<void> completeOnboarding(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
-    
-    // For demo purposes, navigate directly to home
-    // In a real app, you might check auth status here
-    navigateAndClearStack(context, const HomeScreen());
+
+    // Navigate to login screen after onboarding
+    navigateAndClearStack(context, const LoginScreen());
   }
 
   /// Handle successful authentication

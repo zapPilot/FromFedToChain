@@ -91,14 +91,15 @@ class AuthService extends ChangeNotifier {
   AuthState get authState => _authState;
   AppUser? get currentUser => _currentUser;
   String? get errorMessage => _errorMessage;
-  bool get isAuthenticated => _authState == AuthState.authenticated && _currentUser != null;
+  bool get isAuthenticated =>
+      _authState == AuthState.authenticated && _currentUser != null;
   bool get isLoading => _authState == AuthState.authenticating;
 
   /// Initialize the auth service and check for existing session
   Future<void> initialize() async {
     try {
       _setAuthState(AuthState.authenticating);
-      
+
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString(_userKey);
       final authToken = prefs.getString(_authTokenKey);
@@ -108,7 +109,7 @@ class AuthService extends ChangeNotifier {
         _currentUser = AppUser.fromJson(userMap);
         _authToken = authToken;
         _setAuthState(AuthState.authenticated);
-        
+
         if (kDebugMode) {
           print('✅ User session restored: ${_currentUser?.email}');
         }
@@ -145,7 +146,7 @@ class AuthService extends ChangeNotifier {
       if (kDebugMode) {
         print('❌ Apple Sign In error: $e');
       }
-      
+
       if (e is PlatformException) {
         if (e.code == 'SignInWithAppleNotSupported') {
           _setError('Apple Sign In is not supported on this device');
@@ -157,7 +158,7 @@ class AuthService extends ChangeNotifier {
       } else {
         _setError('Apple Sign In failed');
       }
-      
+
       _setAuthState(AuthState.unauthenticated);
       return false;
     }
@@ -182,13 +183,13 @@ class AuthService extends ChangeNotifier {
       if (kDebugMode) {
         print('❌ Google Sign In error: $e');
       }
-      
+
       if (e is PlatformException) {
         _setError('Google Sign In failed: ${e.message}');
       } else {
         _setError('Google Sign In failed');
       }
-      
+
       _setAuthState(AuthState.unauthenticated);
       return false;
     }
@@ -274,7 +275,7 @@ class AuthService extends ChangeNotifier {
 
       // Save updated user to local storage
       await _saveUserToStorage(_currentUser!);
-      
+
       notifyListeners();
 
       if (kDebugMode) {

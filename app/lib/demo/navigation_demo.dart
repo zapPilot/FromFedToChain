@@ -5,7 +5,6 @@ import '../services/navigation_service.dart';
 
 /// Demo utility to test and showcase the navigation flow
 class NavigationDemo {
-  
   /// Reset the app to initial state (useful for testing)
   static Future<void> resetToInitialState() async {
     await NavigationService.resetAppState();
@@ -16,14 +15,15 @@ class NavigationDemo {
   static Future<void> markOnboardingCompleted() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
-    print('✅ Onboarding marked as completed - will skip onboarding on next launch');
+    print(
+        '✅ Onboarding marked as completed - will skip onboarding on next launch');
   }
 
   /// Check current app state
   static Future<void> checkAppState() async {
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('onboarding_completed') ?? false;
-    
+
     print('📊 Current App State:');
     print('   - Onboarding completed: $hasSeenOnboarding');
     print('   - Next screen: ${hasSeenOnboarding ? "Home" : "Onboarding"}');
@@ -49,7 +49,7 @@ class NavigationDemo {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Reset app state button
           ElevatedButton(
             onPressed: () async {
@@ -63,25 +63,26 @@ class NavigationDemo {
             },
             child: Text('Reset App State'),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Mark onboarding completed button
           ElevatedButton(
             onPressed: () async {
               await markOnboardingCompleted();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Onboarding marked completed! Restart to skip onboarding.'),
+                  content: Text(
+                      'Onboarding marked completed! Restart to skip onboarding.'),
                   backgroundColor: Colors.blue,
                 ),
               );
             },
             child: Text('Skip Onboarding'),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Check app state button
           ElevatedButton(
             onPressed: () async {

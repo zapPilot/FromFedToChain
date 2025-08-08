@@ -62,7 +62,7 @@ class _AuthScreenState extends State<AuthScreen>
   Future<void> _handleAppleSignIn() async {
     final authService = context.read<AuthService>();
     final success = await authService.signInWithApple();
-    
+
     if (success && mounted) {
       NavigationService.handleAuthSuccess(context);
     }
@@ -71,7 +71,7 @@ class _AuthScreenState extends State<AuthScreen>
   Future<void> _handleGoogleSignIn() async {
     final authService = context.read<AuthService>();
     final success = await authService.signInWithGoogle();
-    
+
     if (success && mounted) {
       NavigationService.handleAuthSuccess(context);
     }
@@ -197,9 +197,7 @@ class _AuthScreenState extends State<AuthScreen>
           ),
           textAlign: TextAlign.center,
         ),
-        
         const SizedBox(height: AppTheme.spacingXS),
-        
         Text(
           'From Fed to Chain',
           style: AppTheme.headlineLarge.copyWith(
@@ -208,9 +206,7 @@ class _AuthScreenState extends State<AuthScreen>
           ),
           textAlign: TextAlign.center,
         ),
-        
         const SizedBox(height: AppTheme.spacingL),
-        
         Text(
           'Sign in to sync your progress across devices and access personalized features.',
           style: AppTheme.bodyLarge.copyWith(
@@ -234,9 +230,9 @@ class _AuthScreenState extends State<AuthScreen>
           textColor: Colors.white,
           isLoading: authService.isLoading,
         ),
-        
+
         const SizedBox(height: AppTheme.spacingM),
-        
+
         // Google Sign In Button
         _buildSignInButton(
           onPressed: authService.isLoading ? null : _handleGoogleSignIn,
@@ -247,9 +243,9 @@ class _AuthScreenState extends State<AuthScreen>
           borderColor: AppTheme.cardColor,
           isLoading: authService.isLoading,
         ),
-        
+
         const SizedBox(height: AppTheme.spacingL),
-        
+
         // Terms and privacy
         _buildTermsText(),
       ],
@@ -277,7 +273,7 @@ class _AuthScreenState extends State<AuthScreen>
           shadowColor: Colors.black26,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusM),
-            side: borderColor != null 
+            side: borderColor != null
                 ? BorderSide(color: borderColor, width: 1)
                 : BorderSide.none,
           ),

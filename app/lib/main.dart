@@ -13,7 +13,8 @@ import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/auth_screen.dart';
-import 'services/auth/auth_service.dart';
+import 'services/auth_service.dart';
+import 'screens/auth/login_screen.dart';
 
 /// Main application entry point
 void main() async {
@@ -133,8 +134,16 @@ class FromFedToChainApp extends StatelessWidget {
             theme: AppTheme.darkTheme,
             themeMode: ThemeMode.dark,
 
-            // Start with splash screen instead of home screen
-            home: const SplashScreen(),
+            // Start with authentication check
+            home: Consumer<AuthService>(
+              builder: (context, authService, child) {
+                if (authService.isAuthenticated) {
+                  return const HomeScreen();
+                } else {
+                  return const LoginScreen();
+                }
+              },
+            ),
 
             // App-wide configuration
             builder: (context, child) {
@@ -162,6 +171,10 @@ class FromFedToChainApp extends StatelessWidget {
                 case '/auth':
                   return MaterialPageRoute(
                     builder: (_) => const AuthScreen(),
+                  );
+                case '/login':
+                  return MaterialPageRoute(
+                    builder: (_) => const LoginScreen(),
                   );
                 case '/home':
                   return MaterialPageRoute(

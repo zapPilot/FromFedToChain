@@ -155,7 +155,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       minHeight: 4,
                     ),
                   ),
-                  
+
                   const SizedBox(width: AppTheme.spacingM),
 
                   // Next/Get Started button
@@ -168,9 +168,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     child: Text(
-                      _currentPage == _totalPages - 1
-                          ? 'Get Started'
-                          : 'Next',
+                      _currentPage == _totalPages - 1 ? 'Get Started' : 'Next',
                     ),
                   ),
                 ],
@@ -414,9 +412,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             size: 20,
           ),
         ),
-        
         const SizedBox(width: AppTheme.spacingM),
-        
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
