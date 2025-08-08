@@ -32,6 +32,10 @@ dependencies:
   # Local storage
   shared_preferences: ^2.2.2
 
+  # Authentication
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.1
+
   # UI enhancements
   flutter_staggered_animations: ^1.1.1
   shimmer: ^3.0.0

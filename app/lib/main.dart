@@ -10,6 +10,10 @@ import 'services/background_audio_handler.dart';
 import 'services/audio_service.dart' as local_audio;
 import 'services/content_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
+import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/auth/auth_screen.dart';
+import 'services/auth/auth_service.dart';
 
 /// Main application entry point
 void main() async {
@@ -100,12 +104,17 @@ class FromFedToChainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Auth service (initialize first)
+        ChangeNotifierProvider(
+          create: (_) => AuthService()..initialize(),
+        ),
+
         // Content service (manages episodes and playlists)
         ChangeNotifierProvider(
           create: (_) => ContentService(),
         ),
 
-        // Audio service (manages playback)
+        // Audio service (manages playbook)
         ChangeNotifierProvider(
           create: (context) {
             final contentService = context.read<ContentService>();
@@ -124,8 +133,8 @@ class FromFedToChainApp extends StatelessWidget {
             theme: AppTheme.darkTheme,
             themeMode: ThemeMode.dark,
 
-            // Home screen
-            home: const HomeScreen(),
+            // Start with splash screen instead of home screen
+            home: const SplashScreen(),
 
             // App-wide configuration
             builder: (context, child) {
@@ -139,16 +148,28 @@ class FromFedToChainApp extends StatelessWidget {
               );
             },
 
-            // Route generation (for future navigation)
+            // Route generation for navigation
             onGenerateRoute: (settings) {
               switch (settings.name) {
                 case '/':
+                  return MaterialPageRoute(
+                    builder: (_) => const SplashScreen(),
+                  );
+                case '/onboarding':
+                  return MaterialPageRoute(
+                    builder: (_) => const OnboardingScreen(),
+                  );
+                case '/auth':
+                  return MaterialPageRoute(
+                    builder: (_) => const AuthScreen(),
+                  );
+                case '/home':
                   return MaterialPageRoute(
                     builder: (_) => const HomeScreen(),
                   );
                 default:
                   return MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
+                    builder: (_) => const SplashScreen(),
                   );
               }
             },

@@ -21,7 +21,13 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "rejected",
+      "score": 2,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-08T03:01:59.857Z",
+      "comments": "技術上說錯了，他們執行攻擊的方式是讓用戶簽署一堆 approve 在事後把錢轉走\u001b[D\u001b[D\u001b[D"
+    }
   },
-  "updated_at": "2025-08-06T12:00:00.000Z"
+  "updated_at": "2025-08-08T03:01:59.857Z"
 }
