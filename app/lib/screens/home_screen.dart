@@ -5,6 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../themes/app_theme.dart';
 import '../services/content_service.dart';
 import '../services/audio_service.dart';
+import '../services/auth_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/filter_bar.dart';
 import '../widgets/audio_list.dart';
@@ -155,6 +156,22 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   )
                 : const Icon(Icons.refresh),
+            style: IconButton.styleFrom(
+              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusM),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: AppTheme.spacingS),
+
+          // Profile button
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed('/profile');
+            },
+            icon: const Icon(Icons.person_outline),
             style: IconButton.styleFrom(
               backgroundColor: AppTheme.cardColor.withOpacity(0.5),
               shape: RoundedRectangleBorder(
@@ -475,6 +492,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build episode options bottom sheet
   Widget _buildEpisodeOptionsSheet(AudioFile episode) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final isFavorite = authService.isFavorite(episode);
+
     return Padding(
       padding: AppTheme.safePadding,
       child: Column(
@@ -523,11 +543,26 @@ class _HomeScreenState extends State<HomeScreen>
           ),
 
           ListTile(
-            leading: const Icon(Icons.favorite_border),
-            title: const Text('Add to Favorites'),
+            leading: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite ? AppTheme.primaryColor : null,
+            ),
+            title: Text(isFavorite ? 'Remove from Favorites' : 'Add to Favorites'),
             onTap: () {
+              if (isFavorite) {
+                authService.removeFromFavorites(episode);
+              } else {
+                authService.addToFavorites(episode);
+              }
               Navigator.pop(context);
-              // TODO: Implement favorites
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(isFavorite
+                      ? 'Removed from Favorites'
+                      : 'Added to Favorites'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
             },
           ),
 
@@ -535,8 +570,8 @@ class _HomeScreenState extends State<HomeScreen>
             leading: const Icon(Icons.playlist_add),
             title: const Text('Add to Playlist'),
             onTap: () {
+              authService.addToPlaylist(episode);
               Navigator.pop(context);
-              context.read<ContentService>().addToCurrentPlaylist(episode);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added "${episode.displayTitle}" to playlist'),

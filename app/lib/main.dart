@@ -9,7 +9,13 @@ import 'themes/app_theme.dart';
 import 'services/background_audio_handler.dart';
 import 'services/audio_service.dart' as local_audio;
 import 'services/content_service.dart';
+import 'services/auth_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/favorites_screen.dart';
+import 'screens/playlists_screen.dart';
 
 /// Main application entry point
 void main() async {
@@ -100,12 +106,10 @@ class FromFedToChainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Content service (manages episodes and playlists)
+        ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(
           create: (_) => ContentService(),
         ),
-
-        // Audio service (manages playback)
         ChangeNotifierProvider(
           create: (context) {
             final contentService = context.read<ContentService>();
@@ -113,48 +117,58 @@ class FromFedToChainApp extends StatelessWidget {
           },
         ),
       ],
-      child: Consumer<ContentService>(
-        builder: (context, contentService, child) {
-          return MaterialApp(
-            // App configuration
-            title: 'From Fed to Chain',
-            debugShowCheckedModeBanner: false,
-
-            // Theme
-            theme: AppTheme.darkTheme,
-            themeMode: ThemeMode.dark,
-
-            // Home screen
-            home: const HomeScreen(),
-
-            // App-wide configuration
-            builder: (context, child) {
-              return MediaQuery(
-                // Ensure text scaling doesn't break layout
-                data: MediaQuery.of(context).copyWith(
-                  textScaleFactor:
-                      MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
-                ),
-                child: child!,
-              );
-            },
-
-            // Route generation (for future navigation)
-            onGenerateRoute: (settings) {
-              switch (settings.name) {
-                case '/':
-                  return MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
-                  );
-                default:
-                  return MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
-                  );
-              }
-            },
+      child: MaterialApp(
+        title: 'From Fed to Chain',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.darkTheme,
+        themeMode: ThemeMode.dark,
+        home: const AuthWrapper(),
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaleFactor:
+                  MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
+            ),
+            child: child!,
           );
         },
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/home':
+              return MaterialPageRoute(builder: (_) => const HomeScreen());
+            case '/login':
+              return MaterialPageRoute(builder: (_) => const LoginScreen());
+            case '/signup':
+              return MaterialPageRoute(builder: (_) => const SignUpScreen());
+            case '/profile':
+              return MaterialPageRoute(builder: (_) => const ProfileScreen());
+            case '/favorites':
+              return MaterialPageRoute(builder: (_) => const FavoritesScreen());
+            case '/playlists':
+              return MaterialPageRoute(builder: (_) => const PlaylistsScreen());
+            default:
+              return MaterialPageRoute(builder: (_) => const AuthWrapper());
+          }
+        },
       ),
+    );
+  }
+}
+
+/// A wrapper to decide which screen to show based on auth state
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        if (authService.isAuthenticated) {
+          return const HomeScreen();
+        } else {
+          return const LoginScreen();
+        }
+      },
     );
   }
 }
