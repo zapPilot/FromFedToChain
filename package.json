@@ -35,6 +35,14 @@
     "husky": "^9.0.11",
     "lint-staged": "^15.2.9"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,yml,yaml}": [
+      "prettier --write --ignore-path .prettierignore"
+    ],
+    "app/**/*.dart": [
+      "dart format"
+    ]
+  },
   "keywords": [
     "tts",
     "content",

@@ -197,6 +197,10 @@ class AudioService extends ChangeNotifier {
       _playbackState = PlaybackState.loading;
       _currentAudioFile = audioFile;
       _errorMessage = null;
+      // Record listen history
+      try {
+        await _contentService?.addToListenHistory(audioFile);
+      } catch (_) {}
       notifyListeners();
 
       if (_audioHandler != null) {

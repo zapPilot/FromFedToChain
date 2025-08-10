@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
 
-# Format all Dart files first
-npm run format:dart
-
-# Run lint-staged to format staged files
+# Run formatters on staged files and re-stage changes
 npx lint-staged

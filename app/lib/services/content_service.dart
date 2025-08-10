@@ -27,6 +27,9 @@ class ContentService extends ChangeNotifier {
   // Episode completion tracking (episodeId -> completion percentage 0.0-1.0)
   final Map<String, double> _episodeCompletion = {};
 
+  // Listen history (episodeId -> last listened timestamp)
+  final Map<String, DateTime> _listenHistory = {};
+
   static final _httpClient = http.Client();
 
   // Getters
@@ -43,6 +46,22 @@ class ContentService extends ChangeNotifier {
   // Sorting and filtering options
   String _sortOrder = 'newest'; // 'newest', 'oldest', 'alphabetical'
   String get sortOrder => _sortOrder;
+
+  // Listen history getters
+  Map<String, DateTime> get listenHistory => Map.unmodifiable(_listenHistory);
+  List<AudioFile> getListenHistoryEpisodes({int limit = 50}) {
+    final entries = _listenHistory.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    // Map ids to episodes; skip missing
+    final byId = {for (final e in _allEpisodes) e.id: e};
+    final episodes = <AudioFile>[];
+    for (final entry in entries) {
+      final ep = byId[entry.key];
+      if (ep != null) episodes.add(ep);
+      if (episodes.length >= limit) break;
+    }
+    return episodes;
+  }
 
   // Episode completion getters
   double getEpisodeCompletion(String episodeId) =>
@@ -76,6 +95,18 @@ class ContentService extends ChangeNotifier {
         });
       }
 
+      // Load listen history
+      final historyJson = prefs.getString('listen_history');
+      if (historyJson != null) {
+        final historyData = json.decode(historyJson) as Map<String, dynamic>;
+        _listenHistory.clear();
+        historyData.forEach((key, value) {
+          try {
+            _listenHistory[key] = DateTime.parse(value as String);
+          } catch (_) {}
+        });
+      }
+
       // Validate loaded language
       if (!ApiConfig.isValidLanguage(_selectedLanguage)) {
         _selectedLanguage = 'zh-TW';
@@ -100,11 +131,48 @@ class ContentService extends ChangeNotifier {
       // Save episode completion data
       final completionJson = json.encode(_episodeCompletion);
       await prefs.setString('episode_completion', completionJson);
+
+      // Save listen history (as id -> ISO8601 string)
+      final historyMap = <String, String>{
+        for (final e in _listenHistory.entries) e.key: e.value.toIso8601String()
+      };
+      await prefs.setString('listen_history', json.encode(historyMap));
     } catch (e) {
       if (kDebugMode) {
         print('ContentService: Failed to save preferences: $e');
       }
     }
+  }
+
+  /// Record an episode in listen history (update timestamp, cap size)
+  Future<void> addToListenHistory(AudioFile episode, {DateTime? at}) async {
+    final ts = at ?? DateTime.now();
+    _listenHistory[episode.id] = ts;
+    // Cap history size to last 100 entries
+    if (_listenHistory.length > 100) {
+      final sorted = _listenHistory.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      final keep = sorted.take(100);
+      _listenHistory
+        ..clear()
+        ..addEntries(keep);
+    }
+    await _savePreferences();
+    notifyListeners();
+  }
+
+  /// Remove an episode from history
+  Future<void> removeFromListenHistory(String episodeId) async {
+    _listenHistory.remove(episodeId);
+    await _savePreferences();
+    notifyListeners();
+  }
+
+  /// Clear all listen history
+  Future<void> clearListenHistory() async {
+    _listenHistory.clear();
+    await _savePreferences();
+    notifyListeners();
   }
 
   /// Fetch content/script for a specific episode from Cloudflare API
