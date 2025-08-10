@@ -714,10 +714,8 @@ class _PlayerScreenState extends State<PlayerScreen>
 
       // Generate deep links
       final deepLink = DeepLinkService.generateContentLink(currentAudio.id);
-      final webLink = DeepLinkService.generateContentLink(
-        currentAudio.id, 
-        useCustomScheme: false
-      );
+      final webLink = DeepLinkService.generateContentLink(currentAudio.id,
+          useCustomScheme: false);
 
       String shareText;
       if (content?.socialHook != null &&

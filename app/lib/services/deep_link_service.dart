@@ -11,23 +11,24 @@ import 'content_service.dart';
 class DeepLinkService {
   static StreamSubscription<String?>? _linkStreamSubscription;
   static GlobalKey<NavigatorState>? _navigatorKey;
-  
+
   /// Initialize deep link handling
   /// [navigatorKey] should be the global navigator key from MaterialApp
   static Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
     _navigatorKey = navigatorKey;
-    
+
     try {
       // Handle initial link when app is launched from closed state
       final initialLink = await getInitialLink();
       if (initialLink != null) {
-        developer.log('Initial deep link received: $initialLink', name: 'DeepLinkService');
+        developer.log('Initial deep link received: $initialLink',
+            name: 'DeepLinkService');
         await _handleDeepLink(initialLink);
       }
     } catch (e) {
       developer.log('Error getting initial link: $e', name: 'DeepLinkService');
     }
-    
+
     // Handle links when app is already running
     _linkStreamSubscription = linkStream.listen(
       (String? link) {
@@ -41,13 +42,13 @@ class DeepLinkService {
       },
     );
   }
-  
+
   /// Handle incoming deep links
   static Future<void> _handleDeepLink(String link) async {
     try {
       final uri = Uri.parse(link);
       developer.log('Parsing deep link URI: $uri', name: 'DeepLinkService');
-      
+
       // Handle our custom scheme: fromfedtochain://
       if (uri.scheme == 'fromfedtochain') {
         await _handleCustomSchemeLink(uri);
@@ -55,15 +56,15 @@ class DeepLinkService {
       // Handle universal links: https://fromfedtochain.com/
       else if (uri.scheme == 'https' && uri.host == 'fromfedtochain.com') {
         await _handleUniversalLink(uri);
-      }
-      else {
-        developer.log('Unhandled deep link scheme: ${uri.scheme}', name: 'DeepLinkService');
+      } else {
+        developer.log('Unhandled deep link scheme: ${uri.scheme}',
+            name: 'DeepLinkService');
       }
     } catch (e) {
       developer.log('Error handling deep link: $e', name: 'DeepLinkService');
     }
   }
-  
+
   /// Handle custom scheme links: fromfedtochain://audio/content-id
   static Future<void> _handleCustomSchemeLink(Uri uri) async {
     if (uri.pathSegments.isEmpty) {
@@ -71,16 +72,17 @@ class DeepLinkService {
       _navigateToHome();
       return;
     }
-    
+
     final firstSegment = uri.pathSegments[0];
-    
+
     switch (firstSegment) {
       case 'audio':
         if (uri.pathSegments.length > 1) {
           final audioId = uri.pathSegments[1];
           await _navigateToAudio(audioId);
         } else {
-          developer.log('Audio deep link missing content ID', name: 'DeepLinkService');
+          developer.log('Audio deep link missing content ID',
+              name: 'DeepLinkService');
           _navigateToHome();
         }
         break;
@@ -88,68 +90,74 @@ class DeepLinkService {
         _navigateToHome();
         break;
       default:
-        developer.log('Unknown deep link path: $firstSegment', name: 'DeepLinkService');
+        developer.log('Unknown deep link path: $firstSegment',
+            name: 'DeepLinkService');
         _navigateToHome();
     }
   }
-  
+
   /// Handle universal links: https://fromfedtochain.com/audio/content-id
   static Future<void> _handleUniversalLink(Uri uri) async {
     // Universal links use the same path structure as custom scheme
     await _handleCustomSchemeLink(uri);
   }
-  
+
   /// Navigate to specific audio content
   static Future<void> _navigateToAudio(String contentId) async {
     if (_navigatorKey?.currentContext == null) {
       developer.log('Navigator context not available', name: 'DeepLinkService');
       return;
     }
-    
+
     try {
       // Load the content to verify it exists
       final content = await ContentService.getContentById(contentId);
       if (content == null) {
-        developer.log('Content not found for ID: $contentId', name: 'DeepLinkService');
+        developer.log('Content not found for ID: $contentId',
+            name: 'DeepLinkService');
         _showContentNotFoundDialog(contentId);
         return;
       }
-      
+
       // Navigate to player screen - the screen will handle loading the content
       _navigatorKey!.currentState!.push(
         MaterialPageRoute(
           builder: (context) => const PlayerScreen(),
         ),
       );
-      
-      developer.log('Navigated to audio content: $contentId', name: 'DeepLinkService');
+
+      developer.log('Navigated to audio content: $contentId',
+          name: 'DeepLinkService');
     } catch (e) {
-      developer.log('Error navigating to audio content: $e', name: 'DeepLinkService');
+      developer.log('Error navigating to audio content: $e',
+          name: 'DeepLinkService');
       _showErrorDialog('Failed to load audio content');
     }
   }
-  
+
   /// Navigate to home screen
   static void _navigateToHome() {
     if (_navigatorKey?.currentContext == null) {
-      developer.log('Navigator context not available for home navigation', name: 'DeepLinkService');
+      developer.log('Navigator context not available for home navigation',
+          name: 'DeepLinkService');
       return;
     }
-    
+
     // Pop all routes and go to home (if not already there)
     _navigatorKey!.currentState!.pushNamedAndRemoveUntil('/', (route) => false);
     developer.log('Navigated to home screen', name: 'DeepLinkService');
   }
-  
+
   /// Show dialog when content is not found
   static void _showContentNotFoundDialog(String contentId) {
     if (_navigatorKey?.currentContext == null) return;
-    
+
     showDialog(
       context: _navigatorKey!.currentContext!,
       builder: (context) => AlertDialog(
         title: const Text('Content Not Found'),
-        content: Text('The audio content "$contentId" could not be found. It may have been removed or renamed.'),
+        content: Text(
+            'The audio content "$contentId" could not be found. It may have been removed or renamed.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -162,11 +170,11 @@ class DeepLinkService {
       ),
     );
   }
-  
+
   /// Show generic error dialog
   static void _showErrorDialog(String message) {
     if (_navigatorKey?.currentContext == null) return;
-    
+
     showDialog(
       context: _navigatorKey!.currentContext!,
       builder: (context) => AlertDialog(
@@ -181,16 +189,17 @@ class DeepLinkService {
       ),
     );
   }
-  
+
   /// Generate deep link for sharing content
-  static String generateContentLink(String contentId, {bool useCustomScheme = true}) {
+  static String generateContentLink(String contentId,
+      {bool useCustomScheme = true}) {
     if (useCustomScheme) {
       return 'fromfedtochain://audio/$contentId';
     } else {
       return 'https://fromfedtochain.com/audio/$contentId';
     }
   }
-  
+
   /// Dispose resources
   static void dispose() {
     _linkStreamSubscription?.cancel();

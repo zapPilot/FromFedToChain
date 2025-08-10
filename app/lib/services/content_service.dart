@@ -185,17 +185,17 @@ class ContentService extends ChangeNotifier {
     // First try to find the audio file in the loaded episodes
     final instance = ContentService();
     await instance.loadAllEpisodes();
-    
+
     final audioFile = instance._allEpisodes.firstWhere(
       (episode) => episode.id == contentId,
       orElse: () => throw StateError('Content not found'),
     );
-    
+
     try {
       // Found the audio file, now fetch its content
       return await instance.fetchContentById(
         audioFile.id,
-        audioFile.language, 
+        audioFile.language,
         audioFile.category,
       );
     } catch (e) {
