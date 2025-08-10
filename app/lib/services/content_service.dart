@@ -179,6 +179,33 @@ class ContentService extends ChangeNotifier {
     return _contentCache[cacheKey];
   }
 
+  /// Get content by ID, searching across all languages and categories
+  /// Used for deep linking when we only have the content ID
+  static Future<AudioContent?> getContentById(String contentId) async {
+    // First try to find the audio file in the loaded episodes
+    final instance = ContentService();
+    await instance.loadAllEpisodes();
+    
+    final audioFile = instance._allEpisodes.firstWhere(
+      (episode) => episode.id == contentId,
+      orElse: () => throw StateError('Content not found'),
+    );
+    
+    try {
+      // Found the audio file, now fetch its content
+      return await instance.fetchContentById(
+        audioFile.id,
+        audioFile.language, 
+        audioFile.category,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('ContentService: Content not found for ID: $contentId');
+      }
+      return null;
+    }
+  }
+
   /// Pre-fetch content for multiple episodes (useful for preloading)
   Future<void> prefetchContent(List<AudioFile> audioFiles) async {
     if (audioFiles.isEmpty) return;

@@ -11,7 +11,7 @@ import '../models/user.dart';
 class AuthService extends ChangeNotifier {
   static const String _userKey = 'authenticated_user';
   static const bool _developmentMode = kDebugMode;
-  
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
   );
@@ -33,7 +33,10 @@ class AuthService extends ChangeNotifier {
   Future<User?> signInWithGoogle() async {
     try {
       // In development mode, provide demo login
-      if (_developmentMode && (_isSimulator || _googleSignIn.clientId?.contains('YOUR_GOOGLE_CLIENT_ID_HERE') == true)) {
+      if (_developmentMode &&
+          (_isSimulator ||
+              _googleSignIn.clientId?.contains('YOUR_GOOGLE_CLIENT_ID_HERE') ==
+                  true)) {
         return _createDemoUser(AuthProvider.google);
       }
 
@@ -94,12 +97,15 @@ class AuthService extends ChangeNotifier {
 
       String fullName = '';
       if (credential.givenName != null || credential.familyName != null) {
-        fullName = '${credential.givenName ?? ''} ${credential.familyName ?? ''}'.trim();
+        fullName =
+            '${credential.givenName ?? ''} ${credential.familyName ?? ''}'
+                .trim();
       }
 
       final user = User.fromApple(
         id: credential.userIdentifier!,
-        email: credential.email ?? '${credential.userIdentifier}@appleid.apple.com',
+        email: credential.email ??
+            '${credential.userIdentifier}@appleid.apple.com',
         fullName: fullName.isEmpty ? null : fullName,
       );
 
@@ -133,7 +139,7 @@ class AuthService extends ChangeNotifier {
       if (_currentUser?.provider == AuthProvider.google) {
         await _googleSignIn.signOut();
       }
-      
+
       await _clearSavedUser();
       _currentUser = null;
       notifyListeners();
@@ -150,7 +156,7 @@ class AuthService extends ChangeNotifier {
   Future<void> _loadSavedUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userString = prefs.getString(_userKey);
-    
+
     if (userString != null) {
       try {
         final userData = jsonDecode(userString);
@@ -185,11 +191,12 @@ class AuthService extends ChangeNotifier {
     await _saveUser(user);
     _currentUser = user;
     notifyListeners();
-    
+
     if (kDebugMode) {
-      print('📱 Demo login: ${provider.toString()} user created for development');
+      print(
+          '📱 Demo login: ${provider.toString()} user created for development');
     }
-    
+
     return user;
   }
 }
@@ -197,7 +204,7 @@ class AuthService extends ChangeNotifier {
 class AuthException implements Exception {
   final String message;
   AuthException(this.message);
-  
+
   @override
   String toString() => 'AuthException: $message';
 }

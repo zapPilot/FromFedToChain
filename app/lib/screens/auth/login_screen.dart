@@ -16,11 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final authService = context.read<AuthService>();
       await authService.signInWithGoogle();
-      
+
       if (mounted && authService.isAuthenticated) {
         Navigator.of(context).pushReplacementNamed('/home');
       }
@@ -43,11 +43,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithApple() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final authService = context.read<AuthService>();
       await authService.signInWithApple();
-      
+
       if (mounted && authService.isAuthenticated) {
         Navigator.of(context).pushReplacementNamed('/home');
       }
@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(),
-                
+
                 // Logo and title
                 Column(
                   children: [
@@ -133,9 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const Spacer(),
-                
+
                 // Login buttons
                 Column(
                   children: [
@@ -157,28 +157,31 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Loading indicator
                 if (_isLoading)
                   const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
                   )
                 else
                   const SizedBox.shrink(),
-                
+
                 const Spacer(),
-                
+
                 // Development mode indicator
                 if (kDebugMode)
                   Container(
                     margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.orange.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+                      border: Border.all(
+                          color: Colors.orange.withValues(alpha: 0.5)),
                     ),
                     child: const Text(
                       '🚧 Development Mode\nDemo login available for simulator testing',
@@ -190,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                
+
                 // Terms and privacy
                 Text(
                   'By continuing, you agree to our Terms of Service\nand Privacy Policy',
@@ -235,9 +238,9 @@ class _LoginScreenState extends State<LoginScreen> {
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: borderColor != null 
-              ? BorderSide(color: borderColor, width: 1)
-              : BorderSide.none,
+            side: borderColor != null
+                ? BorderSide(color: borderColor, width: 1)
+                : BorderSide.none,
           ),
         ),
       ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../themes/app_theme.dart';
 import '../services/audio_service.dart';
 import '../services/content_service.dart';
+import '../services/deep_link_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/audio_controls.dart';
 import '../widgets/playback_speed_selector.dart';
@@ -700,7 +702,7 @@ class _PlayerScreenState extends State<PlayerScreen>
     }
   }
 
-  /// Share current content using social hook if available
+  /// Share current content using social hook and deep linking
   Future<void> _shareCurrentContent(BuildContext context,
       AudioService audioService, ContentService contentService) async {
     final currentAudio = audioService.currentAudioFile;
@@ -710,82 +712,123 @@ class _PlayerScreenState extends State<PlayerScreen>
       // Get content to access social_hook
       final content = await contentService.getContentForAudioFile(currentAudio);
 
+      // Generate deep links
+      final deepLink = DeepLinkService.generateContentLink(currentAudio.id);
+      final webLink = DeepLinkService.generateContentLink(
+        currentAudio.id, 
+        useCustomScheme: false
+      );
+
       String shareText;
       if (content?.socialHook != null &&
           content!.socialHook!.trim().isNotEmpty) {
-        // Use social hook from content
-        shareText = content.socialHook!;
+        // Use social hook from content and append deep links
+        shareText = '${content.socialHook!}\n\n'
+            '🎧 Listen now: $deepLink\n'
+            '🌐 Web: $webLink';
       } else {
-        // Fallback to default sharing message
+        // Fallback to default sharing message with links
         shareText =
             '🎧 Listening to "${currentAudio.displayTitle}" from From Fed to Chain\n\n'
             '${currentAudio.categoryEmoji} ${AppTheme.getCategoryDisplayName(currentAudio.category)} | '
-            '${currentAudio.languageFlag} ${AppTheme.getLanguageDisplayName(currentAudio.language)}';
+            '${currentAudio.languageFlag} ${AppTheme.getLanguageDisplayName(currentAudio.language)}\n\n'
+            '🎧 Listen: $deepLink\n'
+            '🌐 Web: $webLink\n\n'
+            '#FromFedToChain #Crypto #Podcast';
       }
 
-      // Show share dialog with the text
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.share),
-              SizedBox(width: 8),
-              Text('Share Episode'),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Share this episode:'),
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: SelectableText(
-                  shareText,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+      // Use share_plus to share directly with system share sheet
+      final result = await Share.shareWithResult(
+        shareText,
+        subject: 'From Fed to Chain - ${currentAudio.displayTitle}',
+      );
+
+      // Show feedback based on share result
+      if (context.mounted) {
+        if (result.status == ShareResultStatus.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Episode shared successfully! 🚀'),
+              duration: Duration(seconds: 2),
             ),
-            FilledButton.icon(
-              onPressed: () {
-                // Copy to clipboard
-                // TODO: Implement actual sharing (copy to clipboard, share to apps, etc.)
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Share text copied to clipboard!'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.copy),
-              label: const Text('Copy'),
+          );
+        } else if (result.status == ShareResultStatus.dismissed) {
+          // User dismissed - no feedback needed
+        } else {
+          // Fallback: show text in dialog for manual copy
+          await _showShareDialog(context, shareText);
+        }
+      }
+    } catch (e) {
+      // Show error if content loading fails or sharing fails
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to share episode: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Show share dialog as fallback when system share fails
+  Future<void> _showShareDialog(BuildContext context, String shareText) async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.share),
+            SizedBox(width: 8),
+            Text('Share Episode'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Copy this text to share:'),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                shareText,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
           ],
         ),
-      );
-    } catch (e) {
-      // Show error if content loading fails
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to load sharing content: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    }
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              // Copy to clipboard using share_plus
+              await Share.share(shareText);
+              if (context.mounted) {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Share text ready!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.share),
+            label: const Text('Share'),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Show player options bottom sheet

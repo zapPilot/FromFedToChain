@@ -9,12 +9,16 @@ import 'themes/app_theme.dart';
 import 'services/background_audio_handler.dart';
 import 'services/audio_service.dart' as local_audio;
 import 'services/content_service.dart';
+import 'services/deep_link_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/auth_screen.dart';
 import 'services/auth_service.dart';
 import 'screens/auth/login_screen.dart';
+
+/// Global navigator key for deep linking and navigation
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 /// Main application entry point
 void main() async {
@@ -36,6 +40,19 @@ void main() async {
   // Configure system UI
   await _configureSystemUI();
 
+  // Initialize deep linking service
+  try {
+    await DeepLinkService.initialize(navigatorKey);
+    if (kDebugMode) {
+      print('✅ Deep linking service initialized successfully');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('⚠️ Warning: Failed to initialize deep linking: $e');
+      print('📱 App will continue without deep linking support');
+    }
+  }
+
   // Initialize audio service
   BackgroundAudioHandler? audioHandler;
   try {
@@ -45,7 +62,7 @@ void main() async {
         androidNotificationChannelId: 'com.fromfedtochain.audio',
         androidNotificationChannelName: 'From Fed to Chain Audio',
         androidNotificationChannelDescription:
-            'Audio playback controls for From Fed to Chain content',
+            'Audio playbook controls for From Fed to Chain content',
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
         androidNotificationIcon: 'drawable/ic_notification',
@@ -129,6 +146,7 @@ class FromFedToChainApp extends StatelessWidget {
             // App configuration
             title: 'From Fed to Chain',
             debugShowCheckedModeBanner: false,
+            navigatorKey: navigatorKey,
 
             // Theme
             theme: AppTheme.darkTheme,

@@ -46,7 +46,8 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  Future<void> _handleLogout(BuildContext context, AuthService authService) async {
+  Future<void> _handleLogout(
+      BuildContext context, AuthService authService) async {
     try {
       await authService.signOut();
       if (context.mounted) {
@@ -183,7 +184,8 @@ class _HomeScreenState extends State<HomeScreen>
                           children: [
                             Text(
                               authService.currentUser?.name ?? 'User',
-                              style: const TextStyle(fontWeight: FontWeight.w500),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w500),
                             ),
                             if (authService.currentUser?.email != null)
                               Text(

@@ -40,6 +40,7 @@ export class SocialService {
       text,
       language,
       commandExecutor,
+      id,
     );
 
     // Validate hook length
@@ -125,6 +126,7 @@ export class SocialService {
             sourceContent.content,
             sourceLang,
             commandExecutor,
+            id,
           );
 
           // Validate and save Chinese hook
@@ -347,12 +349,13 @@ export class SocialService {
     return results;
   }
 
-  // Generate social hook using Claude
+  // Generate social hook using Claude with deep links
   static async generateHookWithClaude(
     title,
     content,
     language,
     commandExecutor = executeCommandSync,
+    contentId = null,
   ) {
     const languageMap = {
       "zh-TW": "Traditional Chinese",
@@ -365,17 +368,26 @@ export class SocialService {
     // Extract key insight (first meaningful paragraph)
     const keyInsight = content.split("\n\n")[0] || content.substring(0, 200);
 
+    // Generate deep links if contentId is provided
+    let linkText = "";
+    if (contentId) {
+      const deepLink = `fromfedtochain://audio/${contentId}`;
+      const webLink = `https://fromfedtochain.com/audio/${contentId}`;
+      linkText = `\n\n🎧 Listen: ${deepLink}\n🌐 Web: ${webLink}`;
+    }
+
     const prompt = `Create 1 engaging social media hook for "${title}" in ${langName}.
 
 Key content: ${keyInsight}
 
 Requirements:
-- Under 280 characters
+- Under 200 characters for the main hook content (links will be added separately)
 - Compelling and shareable
 - Match ${langName} social media style
-- mention that Eng | 中 | 日 podcasts are available on Apple Podcasts, Spotify
+- Include mention of Eng | 中 | 日 podcasts available on Apple Podcasts, Spotify
+- Focus on the compelling content, deep links will be added automatically
 
-Return only the hook, no explanations.`;
+Return only the hook text, no explanations.`;
 
     try {
       const claudeCommand = `claude -p ${JSON.stringify(prompt)}`;
@@ -386,7 +398,10 @@ Return only the hook, no explanations.`;
         maxBuffer: 1024 * 1024,
       });
 
-      return hookResult.trim();
+      const baseHook = hookResult.trim();
+
+      // Add deep links if contentId provided
+      return baseHook + linkText;
     } catch (error) {
       if (error.code === "ENOENT") {
         throw new Error(
