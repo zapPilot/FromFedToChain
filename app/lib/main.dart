@@ -10,7 +10,7 @@ import 'services/background_audio_handler.dart';
 import 'services/audio_service.dart' as local_audio;
 import 'services/content_service.dart';
 import 'services/deep_link_service.dart';
-import 'screens/home_screen.dart';
+import 'screens/main_navigation_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/auth_screen.dart';
@@ -156,7 +156,7 @@ class FromFedToChainApp extends StatelessWidget {
             home: Consumer<AuthService>(
               builder: (context, authService, child) {
                 if (authService.isAuthenticated) {
-                  return const HomeScreen();
+                  return const MainNavigationScreen();
                 } else {
                   return const LoginScreen();
                 }
@@ -196,7 +196,7 @@ class FromFedToChainApp extends StatelessWidget {
                   );
                 case '/home':
                   return MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
+                    builder: (_) => const MainNavigationScreen(),
                   );
                 default:
                   return MaterialPageRoute(

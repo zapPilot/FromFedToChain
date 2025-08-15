@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     // Load content when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -315,7 +315,6 @@ class _HomeScreenState extends State<HomeScreen>
               Tab(text: 'Recent'),
               Tab(text: 'All'),
               Tab(text: 'Unfinished'),
-              Tab(text: 'History'),
             ],
             labelColor: AppTheme.primaryColor,
             unselectedLabelColor: AppTheme.onSurfaceColor.withOpacity(0.6),
@@ -335,7 +334,6 @@ class _HomeScreenState extends State<HomeScreen>
               _buildRecentTab(contentService, audioService),
               _buildAllTab(contentService, audioService),
               _buildUnfinishedTab(contentService, audioService),
-              _buildHistoryTab(contentService, audioService),
             ],
           ),
         ),
@@ -409,51 +407,6 @@ class _HomeScreenState extends State<HomeScreen>
     return AnimationLimiter(
       child: AudioList(
         episodes: unfinishedEpisodes,
-        onEpisodeTap: (episode) => _playEpisode(episode, audioService),
-        onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
-        scrollController: _scrollController,
-      ),
-    );
-  }
-
-  /// Build listen history tab
-  Widget _buildHistoryTab(
-      ContentService contentService, AudioService audioService) {
-    final historyEpisodes = contentService.getListenHistoryEpisodes();
-
-    if (historyEpisodes.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.history,
-              size: 80,
-              color: AppTheme.onSurfaceColor.withOpacity(0.3),
-            ),
-            const SizedBox(height: AppTheme.spacingL),
-            Text(
-              'No Listening History',
-              style: AppTheme.headlineSmall.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
-              ),
-            ),
-            const SizedBox(height: AppTheme.spacingS),
-            Text(
-              'Episodes you listen to will appear here',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.5),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    }
-
-    return AnimationLimiter(
-      child: AudioList(
-        episodes: historyEpisodes,
         onEpisodeTap: (episode) => _playEpisode(episode, audioService),
         onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
         scrollController: _scrollController,

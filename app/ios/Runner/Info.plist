@@ -64,7 +64,7 @@
 	
 	<!-- Google Sign In Configuration -->
 	<key>GIDClientID</key>
-	<string>YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com</string>
+	<string>242469050085-nvhosf8tdcl6bnuekesp0kaq29mel8i0.apps.googleusercontent.com</string>
 	
 	<!-- URL Schemes for Google Sign In and Deep Linking -->
 	<key>CFBundleURLTypes</key>
@@ -74,7 +74,7 @@
 			<string>GoogleSignIn</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>YOUR_REVERSED_CLIENT_ID_HERE</string>
+				<string>com.example.fromFedToChainApp</string>
 			</array>
 		</dict>
 		<dict>
