@@ -278,95 +278,98 @@ class ContentService extends ChangeNotifier {
   /// Get AudioFile by ID, searching across all languages and categories
   /// Used for deep linking when we only have the content ID
   Future<AudioFile?> getAudioFileById(String contentId) async {
-    if (kDebugMode) {
-      print('ContentService: 🔍 Looking for episode with contentId: "$contentId"');
+    // Check if contentId contains language and split if needed
+    final languageSuffixes = ['zh-TW', 'en-US', 'ja-JP'];
+    String? requestedLanguage;
+    String baseContentId = contentId;
+    
+    for (final suffix in languageSuffixes) {
+      if (contentId.endsWith('-$suffix')) {
+        requestedLanguage = suffix;
+        baseContentId = contentId.substring(0, contentId.length - suffix.length - 1);
+        break;
+      }
     }
+    
+    return await _findEpisodeByIdAndLanguage(contentId, baseContentId, requestedLanguage);
+  }
+  
+  /// Find episode by base ID and language preference
+  Future<AudioFile?> _findEpisodeByIdAndLanguage(String fullContentId, String baseContentId, String? preferredLanguage) async {
     
     // Ensure episodes are loaded
     if (_allEpisodes.isEmpty) {
-      if (kDebugMode) {
-        print('ContentService: 📥 Episodes not loaded, loading all episodes...');
-      }
       await loadAllEpisodes();
-      
-      if (kDebugMode) {
-        print('ContentService: ✅ Loaded ${_allEpisodes.length} episodes');
-        if (_allEpisodes.isNotEmpty) {
-          print('ContentService: 📋 Sample episode IDs:');
-          for (int i = 0; i < math.min(5, _allEpisodes.length); i++) {
-            print('  - "${_allEpisodes[i].id}" (${_allEpisodes[i].language}/${_allEpisodes[i].category})');
-          }
-          if (_allEpisodes.length > 5) {
-            print('  ... and ${_allEpisodes.length - 5} more episodes');
-          }
-        }
-      }
     }
 
     if (_allEpisodes.isEmpty) {
-      if (kDebugMode) {
-        print('ContentService: ❌ No episodes loaded, cannot find contentId');
-      }
       return null;
     }
 
+    // Strategy 1: Try exact match with full content ID (includes language suffix)
     try {
-      // Try exact match first
       final exactMatch = _allEpisodes.firstWhere(
-        (episode) => episode.id == contentId,
+        (episode) => episode.id == fullContentId,
       );
-      
-      if (kDebugMode) {
-        print('ContentService: ✅ Found exact match for "$contentId": ${exactMatch.displayTitle}');
-      }
       return exactMatch;
-      
     } catch (e) {
-      if (kDebugMode) {
-        print('ContentService: ❌ No exact match found for "$contentId"');
-        
-        // Try to find similar IDs for debugging
-        final similarIds = _allEpisodes
-            .where((episode) => 
-                episode.id.toLowerCase().contains(contentId.toLowerCase()) ||
-                contentId.toLowerCase().contains(episode.id.toLowerCase()))
-            .map((episode) => '"${episode.id}" (${episode.language}/${episode.category})')
-            .take(3)
-            .toList();
-            
-        if (similarIds.isNotEmpty) {
-          print('ContentService: 💡 Found similar IDs: ${similarIds.join(', ')}');
-        }
-        
-        // Try fuzzy matching with date extraction
-        final dateMatch = RegExp(r'(\d{4}-\d{2}-\d{2})').firstMatch(contentId);
-        if (dateMatch != null) {
-          final date = dateMatch.group(1)!;
-          final episodesWithDate = _allEpisodes
-              .where((episode) => episode.id.contains(date))
+      // Continue to next strategy
+    }
+
+    // Strategy 2: If preferred language is specified, look for baseContentId with that language
+    if (preferredLanguage != null) {
+      final languageSpecificId = '$baseContentId-$preferredLanguage';
+      try {
+        final languageMatch = _allEpisodes.firstWhere(
+          (episode) => episode.id == languageSpecificId,
+        );
+        return languageMatch;
+      } catch (e) {
+        // Continue to next approach
+      }
+      
+      // Also try finding episodes with base ID and matching language
+      final episodesWithBaseId = _allEpisodes.where((episode) {
+        // Check if episode ID starts with baseContentId and has the preferred language
+        return episode.id.startsWith(baseContentId) && episode.language == preferredLanguage;
+      }).toList();
+      
+      if (episodesWithBaseId.isNotEmpty) {
+        return episodesWithBaseId.first;
+      }
+    }
+
+    // Strategy 3: Fuzzy matching with date extraction from baseContentId
+    final dateMatch = RegExp(r'(\d{4}-\d{2}-\d{2})').firstMatch(baseContentId);
+    if (dateMatch != null) {
+      final date = dateMatch.group(1)!;
+      final episodesWithDate = _allEpisodes
+          .where((episode) => episode.id.contains(date))
+          .toList();
+          
+      if (episodesWithDate.isNotEmpty) {
+        // If preferred language specified, prioritize episodes with that language
+        if (preferredLanguage != null) {
+          final languageMatches = episodesWithDate
+              .where((episode) => episode.language == preferredLanguage)
               .toList();
               
-          if (episodesWithDate.isNotEmpty) {
-            print('ContentService: 📅 Found ${episodesWithDate.length} episodes with date "$date":');
-            for (final episode in episodesWithDate.take(3)) {
-              print('  - "${episode.id}" (${episode.language}/${episode.category})');
-            }
-            
-            // Try to find the best match
-            final bestMatch = episodesWithDate.firstWhere(
-              (episode) => episode.id.toLowerCase().contains(contentId.toLowerCase().replaceAll(date + '-', '')),
-              orElse: () => episodesWithDate.first,
-            );
-            
-            print('ContentService: 🎯 Using best fuzzy match: "${bestMatch.id}"');
-            return bestMatch;
+          if (languageMatches.isNotEmpty) {
+            return languageMatches.first;
           }
         }
         
-        print('ContentService: ❌ No fuzzy matches found either');
+        // Fallback: use any episode with the date, prioritizing those that match more of the baseContentId
+        final bestMatch = episodesWithDate.firstWhere(
+          (episode) => episode.id.toLowerCase().contains(baseContentId.toLowerCase().replaceAll(date + '-', '')),
+          orElse: () => episodesWithDate.first,
+        );
+        
+        return bestMatch;
       }
-      return null;
     }
+    
+    return null;
   }
 
   /// Pre-fetch content for multiple episodes (useful for preloading)

@@ -46,8 +46,7 @@ class DeepLinkService {
   static Future<void> _handleDeepLink(String link) async {
     try {
       final uri = Uri.parse(link);
-      developer.log('🔗 DeepLinkService: Parsing deep link URI: $uri', name: 'DeepLinkService');
-      print('🔗 DeepLinkService: Received link: $link');
+      developer.log('DeepLinkService: Parsing deep link URI: $uri', name: 'DeepLinkService');
 
       // Handle our custom scheme: fromfedtochain://
       if (uri.scheme == 'fromfedtochain') {
@@ -67,26 +66,26 @@ class DeepLinkService {
 
   /// Handle custom scheme links: fromfedtochain://audio/content-id
   static Future<void> _handleCustomSchemeLink(Uri uri) async {
-    print('🎯 DeepLinkService: Handling custom scheme link: ${uri.toString()}');
-    print('🎯 DeepLinkService: Host: ${uri.host}');
-    print('🎯 DeepLinkService: Path segments: ${uri.pathSegments}');
-    
     // For custom scheme URLs like fromfedtochain://audio/content-id:
     // - uri.host contains "audio" (the route type)
     // - uri.pathSegments contains ["content-id"] (the parameters)
     final routeType = uri.host;
-    print('🎯 DeepLinkService: Route type: $routeType');
 
     switch (routeType) {
       case 'audio':
         if (uri.pathSegments.isNotEmpty) {
-          final audioId = uri.pathSegments[0]; // Content ID is now first path segment
-          print('🎯 DeepLinkService: Extracted audioId: "$audioId"');
-          await _navigateToAudio(audioId);
+          final episodeId = uri.pathSegments[0]; // Base episode ID
+          final language = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+          
+          // Construct full content ID with language if provided
+          final fullContentId = language != null 
+              ? '$episodeId-$language'
+              : episodeId;
+              
+          await _navigateToAudio(fullContentId);
         } else {
           developer.log('Audio deep link missing content ID',
               name: 'DeepLinkService');
-          print('❌ DeepLinkService: Audio deep link missing content ID');
           _navigateToHome();
         }
         break;
@@ -97,7 +96,6 @@ class DeepLinkService {
       default:
         developer.log('Unknown deep link route type: $routeType',
             name: 'DeepLinkService');
-        print('❌ DeepLinkService: Unknown route type: $routeType');
         _navigateToHome();
     }
   }
@@ -116,18 +114,14 @@ class DeepLinkService {
     }
 
     try {
-      developer.log('🔍 DeepLinkService: Attempting to navigate to contentId: "$contentId"',
-          name: 'DeepLinkService');
-
       // Navigate directly to player screen - let PlayerScreen handle content verification and loading
-      // with enhanced fuzzy matching logic
       _navigatorKey!.currentState!.push(
         MaterialPageRoute(
           builder: (context) => PlayerScreen(contentId: contentId),
         ),
       );
 
-      developer.log('✅ DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
+      developer.log('DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
           name: 'DeepLinkService');
     } catch (e) {
       developer.log('Error navigating to audio content: $e',
@@ -191,22 +185,44 @@ class DeepLinkService {
     );
   }
 
-  /// Generate deep link for sharing content
+  /// Generate deep link for sharing content with language support
+  /// [contentId] can be either full ID (episode-id-language) or base episode ID
+  /// [language] optional explicit language parameter
   static String generateContentLink(String contentId,
-      {bool useCustomScheme = true}) {
-    if (useCustomScheme) {
-      return 'fromfedtochain://audio/$contentId';
+      {String? language, bool useCustomScheme = true}) {
+    
+    String episodeId;
+    String? linkLanguage;
+    
+    // Check if contentId already contains language suffix
+    final languageSuffixes = ['zh-TW', 'en-US', 'ja-JP'];
+    final matchedSuffix = languageSuffixes.firstWhere(
+      (suffix) => contentId.endsWith('-$suffix'),
+      orElse: () => '',
+    );
+    
+    if (matchedSuffix.isNotEmpty) {
+      // Split existing contentId with language
+      episodeId = contentId.substring(0, contentId.length - matchedSuffix.length - 1);
+      linkLanguage = matchedSuffix;
     } else {
-      return 'https://fromfedtochain.com/audio/$contentId';
+      // Use contentId as-is and explicit language parameter
+      episodeId = contentId;
+      linkLanguage = language;
+    }
+    
+    // Construct URL
+    final basePath = linkLanguage != null 
+        ? 'audio/$episodeId/$linkLanguage'
+        : 'audio/$episodeId';
+    
+    if (useCustomScheme) {
+      return 'fromfedtochain://$basePath';
+    } else {
+      return 'https://fromfedtochain.com/$basePath';
     }
   }
 
-  /// Test method to manually trigger deep link processing
-  static Future<void> testDeepLink(String link) async {
-    print('🧪 DeepLinkService: Testing deep link manually: $link');
-    developer.log('Testing deep link manually: $link', name: 'DeepLinkService');
-    await _handleDeepLink(link);
-  }
 
   /// Dispose resources
   static void dispose() {

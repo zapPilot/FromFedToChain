@@ -32,10 +32,6 @@ class _PlayerScreenState extends State<PlayerScreen>
   void initState() {
     super.initState();
     
-    print('🎬 PlayerScreen: initState called with contentId: "${widget.contentId}"');
-    print('🎬 PlayerScreen: Current time: ${DateTime.now()}');
-    print('🎬 PlayerScreen: Widget instance: ${widget.toString()}');
-
     _animationController = AnimationController(
       duration: const Duration(seconds: 20),
       vsync: this,
@@ -54,13 +50,9 @@ class _PlayerScreenState extends State<PlayerScreen>
 
     // Auto-load and play content if contentId is provided (for deep linking)
     if (widget.contentId != null) {
-      print('🎬 PlayerScreen: ContentId provided, will auto-load: "${widget.contentId}"');
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        print('🎬 PlayerScreen: Post-frame callback executing for contentId: "${widget.contentId}"');
         _loadAndPlayContent(widget.contentId!);
       });
-    } else {
-      print('🎬 PlayerScreen: No contentId provided - this appears to be normal navigation');
     }
   }
 
@@ -72,15 +64,12 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Load and automatically play content by ID (for deep linking)
   Future<void> _loadAndPlayContent(String contentId) async {
-    print('🎬 PlayerScreen: _loadAndPlayContent called with: "$contentId"');
     try {
       final contentService = context.read<ContentService>();
       final audioService = context.read<AudioService>();
 
-      print('🎬 PlayerScreen: Getting AudioFile by contentId: "$contentId"');
       // Get the AudioFile by contentId
       final audioFile = await contentService.getAudioFileById(contentId);
-      print('🎬 PlayerScreen: AudioFile result: ${audioFile?.id ?? 'null'}');
       
       if (audioFile != null) {
         // Add to listen history
@@ -780,9 +769,9 @@ class _PlayerScreenState extends State<PlayerScreen>
       // Get content to access social_hook
       final content = await contentService.getContentForAudioFile(currentAudio);
 
-      // Generate deep links
-      final deepLink = DeepLinkService.generateContentLink(currentAudio.id);
-      final webLink = DeepLinkService.generateContentLink(currentAudio.id,
+      // Generate deep links with language parameter
+      final deepLink = DeepLinkService.generateContentLink(currentAudio.id, language: currentAudio.language);
+      final webLink = DeepLinkService.generateContentLink(currentAudio.id, language: currentAudio.language,
           useCustomScheme: false);
 
       String shareText;
@@ -790,8 +779,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           content!.socialHook!.trim().isNotEmpty) {
         // Use social hook from content and append deep links
         shareText = '${content.socialHook!}\n\n'
-            '🎧 Listen now: $deepLink\n'
-            '🌐 Web: $webLink';
+            '🎧 Listen now: $deepLink';
       } else {
         // Fallback to default sharing message with links
         shareText =
