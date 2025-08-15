@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../screens/player_screen.dart';
-import '../models/audio_content.dart';
 import 'content_service.dart';
 
 /// Service to handle deep links and app navigation from external sources
@@ -47,7 +46,8 @@ class DeepLinkService {
   static Future<void> _handleDeepLink(String link) async {
     try {
       final uri = Uri.parse(link);
-      developer.log('Parsing deep link URI: $uri', name: 'DeepLinkService');
+      developer.log('🔗 DeepLinkService: Parsing deep link URI: $uri', name: 'DeepLinkService');
+      print('🔗 DeepLinkService: Received link: $link');
 
       // Handle our custom scheme: fromfedtochain://
       if (uri.scheme == 'fromfedtochain') {
@@ -67,31 +67,37 @@ class DeepLinkService {
 
   /// Handle custom scheme links: fromfedtochain://audio/content-id
   static Future<void> _handleCustomSchemeLink(Uri uri) async {
-    if (uri.pathSegments.isEmpty) {
-      // Navigate to home screen if no specific path
-      _navigateToHome();
-      return;
-    }
+    print('🎯 DeepLinkService: Handling custom scheme link: ${uri.toString()}');
+    print('🎯 DeepLinkService: Host: ${uri.host}');
+    print('🎯 DeepLinkService: Path segments: ${uri.pathSegments}');
+    
+    // For custom scheme URLs like fromfedtochain://audio/content-id:
+    // - uri.host contains "audio" (the route type)
+    // - uri.pathSegments contains ["content-id"] (the parameters)
+    final routeType = uri.host;
+    print('🎯 DeepLinkService: Route type: $routeType');
 
-    final firstSegment = uri.pathSegments[0];
-
-    switch (firstSegment) {
+    switch (routeType) {
       case 'audio':
-        if (uri.pathSegments.length > 1) {
-          final audioId = uri.pathSegments[1];
+        if (uri.pathSegments.isNotEmpty) {
+          final audioId = uri.pathSegments[0]; // Content ID is now first path segment
+          print('🎯 DeepLinkService: Extracted audioId: "$audioId"');
           await _navigateToAudio(audioId);
         } else {
           developer.log('Audio deep link missing content ID',
               name: 'DeepLinkService');
+          print('❌ DeepLinkService: Audio deep link missing content ID');
           _navigateToHome();
         }
         break;
       case 'home':
+      case '': // Handle empty host case
         _navigateToHome();
         break;
       default:
-        developer.log('Unknown deep link path: $firstSegment',
+        developer.log('Unknown deep link route type: $routeType',
             name: 'DeepLinkService');
+        print('❌ DeepLinkService: Unknown route type: $routeType');
         _navigateToHome();
     }
   }
@@ -110,23 +116,18 @@ class DeepLinkService {
     }
 
     try {
-      // Load the content to verify it exists
-      final content = await ContentService.getContentById(contentId);
-      if (content == null) {
-        developer.log('Content not found for ID: $contentId',
-            name: 'DeepLinkService');
-        _showContentNotFoundDialog(contentId);
-        return;
-      }
+      developer.log('🔍 DeepLinkService: Attempting to navigate to contentId: "$contentId"',
+          name: 'DeepLinkService');
 
-      // Navigate to player screen - the screen will handle loading the content
+      // Navigate directly to player screen - let PlayerScreen handle content verification and loading
+      // with enhanced fuzzy matching logic
       _navigatorKey!.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => const PlayerScreen(),
+          builder: (context) => PlayerScreen(contentId: contentId),
         ),
       );
 
-      developer.log('Navigated to audio content: $contentId',
+      developer.log('✅ DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
           name: 'DeepLinkService');
     } catch (e) {
       developer.log('Error navigating to audio content: $e',
@@ -198,6 +199,13 @@ class DeepLinkService {
     } else {
       return 'https://fromfedtochain.com/audio/$contentId';
     }
+  }
+
+  /// Test method to manually trigger deep link processing
+  static Future<void> testDeepLink(String link) async {
+    print('🧪 DeepLinkService: Testing deep link manually: $link');
+    developer.log('Testing deep link manually: $link', name: 'DeepLinkService');
+    await _handleDeepLink(link);
   }
 
   /// Dispose resources

@@ -6,6 +6,7 @@ import '../themes/app_theme.dart';
 import '../services/content_service.dart';
 import '../services/audio_service.dart';
 import '../services/auth_service.dart';
+import '../services/deep_link_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/filter_bar.dart';
 import '../widgets/audio_list.dart';
@@ -65,6 +66,112 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+  /// Test deep link functionality from menu
+  Future<void> _testDeepLinkFromMenu(BuildContext context) async {
+    // Show dialog with multiple test options
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.bug_report, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Test Deep Links'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Select a deep link to test:'),
+            const SizedBox(height: 16),
+            _buildDeepLinkTestButton(
+              context,
+              'Test with Language Param',
+              'fromfedtochain://audio/2025-08-05-usde-synthetic-stablecoin-delta-neutral-risks-zh-TW',
+            ),
+            const SizedBox(height: 8),
+            _buildDeepLinkTestButton(
+              context,
+              'Test without Language',
+              'fromfedtochain://audio/2025-08-08-agentfi-intelligent-defi-evolution',
+            ),
+            const SizedBox(height: 8),
+            _buildDeepLinkTestButton(
+              context,
+              'Test Different Episode',
+              'fromfedtochain://audio/2025-07-15-blockchain-private-equity-tokenization',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build deep link test button
+  Widget _buildDeepLinkTestButton(BuildContext context, String label, String deepLink) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () async {
+          Navigator.of(context).pop(); // Close dialog
+          print('🧪 Testing deep link from menu: $deepLink');
+          
+          // Show loading indicator
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  SizedBox(width: 12),
+                  Text('Testing deep link...'),
+                ],
+              ),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          
+          try {
+            await DeepLinkService.testDeepLink(deepLink);
+            
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('✅ Deep link test completed - check console logs'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('❌ Deep link test failed: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange.withOpacity(0.1),
+          foregroundColor: Colors.orange,
+        ),
+        child: Text(label),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,6 +206,18 @@ class _HomeScreenState extends State<HomeScreen>
           );
         },
       ),
+      // Debug: Test deep link button - positioned to avoid UI overlap
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          print('🧪 Testing deep link manually...');
+          await DeepLinkService.testDeepLink(
+            'fromfedtochain://audio/2025-08-05-usde-synthetic-stablecoin-delta-neutral-risks-zh-TW'
+          );
+        },
+        backgroundColor: Colors.orange,
+        child: const Icon(Icons.bug_report),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
@@ -169,6 +288,9 @@ class _HomeScreenState extends State<HomeScreen>
                     case 'logout':
                       await _handleLogout(context, authService);
                       break;
+                    case 'test_deeplink':
+                      await _testDeepLinkFromMenu(context);
+                      break;
                   }
                 },
                 itemBuilder: (context) => [
@@ -197,6 +319,17 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                           ],
                         ),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'test_deeplink',
+                    child: Row(
+                      children: [
+                        Icon(Icons.bug_report, color: Colors.orange),
+                        SizedBox(width: 8),
+                        Text('Test Deep Link', style: TextStyle(color: Colors.orange)),
                       ],
                     ),
                   ),

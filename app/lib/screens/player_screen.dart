@@ -13,7 +13,9 @@ import '../widgets/content_display.dart';
 
 /// Full-screen audio player with enhanced controls
 class PlayerScreen extends StatefulWidget {
-  const PlayerScreen({super.key});
+  final String? contentId;
+  
+  const PlayerScreen({super.key, this.contentId});
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -29,6 +31,10 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void initState() {
     super.initState();
+    
+    print('🎬 PlayerScreen: initState called with contentId: "${widget.contentId}"');
+    print('🎬 PlayerScreen: Current time: ${DateTime.now()}');
+    print('🎬 PlayerScreen: Widget instance: ${widget.toString()}');
 
     _animationController = AnimationController(
       duration: const Duration(seconds: 20),
@@ -45,12 +51,74 @@ class _PlayerScreenState extends State<PlayerScreen>
 
     // Start rotation animation
     _animationController.repeat();
+
+    // Auto-load and play content if contentId is provided (for deep linking)
+    if (widget.contentId != null) {
+      print('🎬 PlayerScreen: ContentId provided, will auto-load: "${widget.contentId}"');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        print('🎬 PlayerScreen: Post-frame callback executing for contentId: "${widget.contentId}"');
+        _loadAndPlayContent(widget.contentId!);
+      });
+    } else {
+      print('🎬 PlayerScreen: No contentId provided - this appears to be normal navigation');
+    }
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  /// Load and automatically play content by ID (for deep linking)
+  Future<void> _loadAndPlayContent(String contentId) async {
+    print('🎬 PlayerScreen: _loadAndPlayContent called with: "$contentId"');
+    try {
+      final contentService = context.read<ContentService>();
+      final audioService = context.read<AudioService>();
+
+      print('🎬 PlayerScreen: Getting AudioFile by contentId: "$contentId"');
+      // Get the AudioFile by contentId
+      final audioFile = await contentService.getAudioFileById(contentId);
+      print('🎬 PlayerScreen: AudioFile result: ${audioFile?.id ?? 'null'}');
+      
+      if (audioFile != null) {
+        // Add to listen history
+        await contentService.addToListenHistory(audioFile);
+        
+        // Start playing the audio
+        await audioService.playAudio(audioFile);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Now playing: ${audioFile.displayTitle}'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Episode not found: $contentId'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load episode: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   @override

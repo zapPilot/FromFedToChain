@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -269,6 +270,100 @@ class ContentService extends ChangeNotifier {
     } catch (e) {
       if (kDebugMode) {
         print('ContentService: Content not found for ID: $contentId');
+      }
+      return null;
+    }
+  }
+
+  /// Get AudioFile by ID, searching across all languages and categories
+  /// Used for deep linking when we only have the content ID
+  Future<AudioFile?> getAudioFileById(String contentId) async {
+    if (kDebugMode) {
+      print('ContentService: 🔍 Looking for episode with contentId: "$contentId"');
+    }
+    
+    // Ensure episodes are loaded
+    if (_allEpisodes.isEmpty) {
+      if (kDebugMode) {
+        print('ContentService: 📥 Episodes not loaded, loading all episodes...');
+      }
+      await loadAllEpisodes();
+      
+      if (kDebugMode) {
+        print('ContentService: ✅ Loaded ${_allEpisodes.length} episodes');
+        if (_allEpisodes.isNotEmpty) {
+          print('ContentService: 📋 Sample episode IDs:');
+          for (int i = 0; i < math.min(5, _allEpisodes.length); i++) {
+            print('  - "${_allEpisodes[i].id}" (${_allEpisodes[i].language}/${_allEpisodes[i].category})');
+          }
+          if (_allEpisodes.length > 5) {
+            print('  ... and ${_allEpisodes.length - 5} more episodes');
+          }
+        }
+      }
+    }
+
+    if (_allEpisodes.isEmpty) {
+      if (kDebugMode) {
+        print('ContentService: ❌ No episodes loaded, cannot find contentId');
+      }
+      return null;
+    }
+
+    try {
+      // Try exact match first
+      final exactMatch = _allEpisodes.firstWhere(
+        (episode) => episode.id == contentId,
+      );
+      
+      if (kDebugMode) {
+        print('ContentService: ✅ Found exact match for "$contentId": ${exactMatch.displayTitle}');
+      }
+      return exactMatch;
+      
+    } catch (e) {
+      if (kDebugMode) {
+        print('ContentService: ❌ No exact match found for "$contentId"');
+        
+        // Try to find similar IDs for debugging
+        final similarIds = _allEpisodes
+            .where((episode) => 
+                episode.id.toLowerCase().contains(contentId.toLowerCase()) ||
+                contentId.toLowerCase().contains(episode.id.toLowerCase()))
+            .map((episode) => '"${episode.id}" (${episode.language}/${episode.category})')
+            .take(3)
+            .toList();
+            
+        if (similarIds.isNotEmpty) {
+          print('ContentService: 💡 Found similar IDs: ${similarIds.join(', ')}');
+        }
+        
+        // Try fuzzy matching with date extraction
+        final dateMatch = RegExp(r'(\d{4}-\d{2}-\d{2})').firstMatch(contentId);
+        if (dateMatch != null) {
+          final date = dateMatch.group(1)!;
+          final episodesWithDate = _allEpisodes
+              .where((episode) => episode.id.contains(date))
+              .toList();
+              
+          if (episodesWithDate.isNotEmpty) {
+            print('ContentService: 📅 Found ${episodesWithDate.length} episodes with date "$date":');
+            for (final episode in episodesWithDate.take(3)) {
+              print('  - "${episode.id}" (${episode.language}/${episode.category})');
+            }
+            
+            // Try to find the best match
+            final bestMatch = episodesWithDate.firstWhere(
+              (episode) => episode.id.toLowerCase().contains(contentId.toLowerCase().replaceAll(date + '-', '')),
+              orElse: () => episodesWithDate.first,
+            );
+            
+            print('ContentService: 🎯 Using best fuzzy match: "${bestMatch.id}"');
+            return bestMatch;
+          }
+        }
+        
+        print('ContentService: ❌ No fuzzy matches found either');
       }
       return null;
     }

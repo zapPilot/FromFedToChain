@@ -24,14 +24,6 @@ class StreamingApiService {
 
     final url = Uri.parse(ApiConfig.getListUrl(language, category));
 
-    if (kDebugMode) {
-      print(
-          'StreamingApiService: Environment: ${ApiConfig.currentEnvironment}');
-      print('StreamingApiService: Base URL: ${ApiConfig.streamingBaseUrl}');
-      print('StreamingApiService: Making request to: $url');
-      print('StreamingApiService: Platform: ${kIsWeb ? 'Web' : 'Mobile'}');
-    }
-
     try {
       final response = await _client.get(
         url,
@@ -49,18 +41,8 @@ class StreamingApiService {
 
       if (response.statusCode == 200) {
         final dynamic responseData = json.decode(response.body);
-
-        if (kDebugMode) {
-          print(
-              'StreamingApiService: API response for $language/$category: $responseData');
-        }
-
         return _parseEpisodesResponse(responseData, language, category);
       } else {
-        if (kDebugMode) {
-          print('StreamingApiService: HTTP Error ${response.statusCode}');
-          print('StreamingApiService: Response body: ${response.body}');
-        }
         throw ApiException(
             'Failed to load episodes: ${response.statusCode} - ${response.reasonPhrase}');
       }
