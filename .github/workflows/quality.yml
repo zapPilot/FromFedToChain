@@ -23,8 +23,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
+          flutter-version: "3.32.6"
+          channel: "stable"
           cache: true
 
       - name: Install Node.js dependencies
@@ -45,7 +45,9 @@ jobs:
         run: cp service-account.json.example service-account.json
 
       - name: Run comprehensive Flutter quality checks
-        run: npm run precommit:test
+        run: |
+          npm run test:flutter
+          npm run precommit:test
 
       - name: Run Node.js tests
         run: npm run test:node

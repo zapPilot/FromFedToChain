@@ -18,7 +18,7 @@
     "build:flutter": "cd app && flutter build web",
     "install:flutter": "cd app && flutter pub get",
     "prepare": "husky install",
-    "precommit:test": "cd app && dart format --set-exit-if-changed lib/ test/ && (flutter analyze --no-congratulate || exit_code=$?; if [ ${exit_code:-0} -le 1 ]; then exit 0; else exit $exit_code; fi) && flutter test",
+    "precommit:test": "cd app && dart format --set-exit-if-changed lib/ test/ && (flutter analyze --no-congratulate || exit_code=$?; if [ ${exit_code:-0} -le 1 ]; then exit 0; else exit $exit_code; fi)",
     "verify:precommit-ci-alignment": "echo '✅ Verifying pre-commit and CI alignment...' && npm run precommit:test && echo '✅ Pre-commit checks match CI quality gates'"
   },
   "dependencies": {
@@ -39,7 +39,7 @@
       "prettier --write --ignore-path .prettierignore"
     ],
     "app/**/*.dart": [
-      "cd app && dart format"
+      "dart format"
     ]
   },
   "keywords": [

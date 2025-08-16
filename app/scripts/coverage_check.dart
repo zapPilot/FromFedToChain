@@ -1,7 +1,6 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
-import 'dart:convert';
 import 'package:yaml/yaml.dart';
 
 void main(List<String> args) async {
@@ -76,7 +75,7 @@ void main(List<String> args) async {
 
     final status = coverage >= threshold ? '✅' : '❌';
     print(
-        '   $metric: $status ${coverage.toStringAsFixed(2)}% (threshold: ${threshold}%)');
+        '   $metric: $status ${coverage.toStringAsFixed(2)}% (threshold: $threshold%)');
 
     if (coverage < threshold) {
       allThresholdsMet = false;

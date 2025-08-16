@@ -168,8 +168,10 @@ class FromFedToChainApp extends StatelessWidget {
               return MediaQuery(
                 // Ensure text scaling doesn't break layout
                 data: MediaQuery.of(context).copyWith(
-                  textScaleFactor:
-                      MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
+                  textScaler: TextScaler.linear(MediaQuery.of(context)
+                      .textScaler
+                      .scale(1.0)
+                      .clamp(0.8, 1.2)),
                 ),
                 child: child!,
               );

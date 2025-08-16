@@ -6,10 +6,6 @@ import '../services/content_service.dart';
 import '../services/audio_service.dart';
 import '../models/audio_file.dart';
 
-
-
-
-
 import '../widgets/audio_list.dart';
 import '../widgets/mini_player.dart';
 import 'player_screen.dart';
