@@ -38,8 +38,8 @@
     "*.{js,jsx,ts,tsx,json,md,yml,yaml}": [
       "prettier --write --ignore-path .prettierignore"
     ],
-    "./app/**/*.dart": [
-      "dart format"
+    "app/**/*.dart": [
+      "cd app && dart format"
     ]
   },
   "keywords": [
