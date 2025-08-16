@@ -7,7 +7,7 @@ void main() {
   group('App Theme Tests', () {
     testWidgets('Dark theme has correct properties', (tester) async {
       final theme = AppTheme.darkTheme;
-      
+
       expect(theme.brightness, equals(Brightness.dark));
       expect(theme.useMaterial3, isTrue);
       expect(theme.scaffoldBackgroundColor, equals(AppTheme.backgroundColor));
@@ -16,7 +16,7 @@ void main() {
     testWidgets('Color scheme is properly configured', (tester) async {
       final theme = AppTheme.darkTheme;
       final colorScheme = theme.colorScheme;
-      
+
       expect(colorScheme.brightness, equals(Brightness.dark));
       expect(colorScheme.primary, equals(AppTheme.primaryColor));
       expect(colorScheme.secondary, equals(AppTheme.secondaryColor));
@@ -27,7 +27,7 @@ void main() {
     testWidgets('AppBar theme is correctly configured', (tester) async {
       final theme = AppTheme.darkTheme;
       final appBarTheme = theme.appBarTheme;
-      
+
       expect(appBarTheme.backgroundColor, equals(Colors.transparent));
       expect(appBarTheme.elevation, equals(0));
       expect(appBarTheme.centerTitle, isTrue);
@@ -36,25 +36,26 @@ void main() {
     testWidgets('Card theme is correctly configured', (tester) async {
       final theme = AppTheme.darkTheme;
       final cardTheme = theme.cardTheme;
-      
+
       expect(cardTheme.color, equals(AppTheme.surfaceColor));
       expect(cardTheme.elevation, equals(AppTheme.elevationS));
     });
 
     testWidgets('Button themes are correctly configured', (tester) async {
       final theme = AppTheme.darkTheme;
-      
-      expect(theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}), 
-             equals(AppTheme.primaryColor));
-      expect(theme.textButtonTheme.style?.foregroundColor?.resolve({}), 
-             equals(AppTheme.primaryColor));
+
+      expect(theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}),
+          equals(AppTheme.primaryColor));
+      expect(theme.textButtonTheme.style?.foregroundColor?.resolve({}),
+          equals(AppTheme.primaryColor));
     });
 
     test('Language colors are properly defined', () {
       expect(AppTheme.getLanguageColor('zh-TW'), isA<Color>());
       expect(AppTheme.getLanguageColor('en-US'), isA<Color>());
       expect(AppTheme.getLanguageColor('ja-JP'), isA<Color>());
-      expect(AppTheme.getLanguageColor('unknown'), equals(AppTheme.primaryColor));
+      expect(
+          AppTheme.getLanguageColor('unknown'), equals(AppTheme.primaryColor));
     });
 
     test('Category colors are properly defined', () {
@@ -63,11 +64,13 @@ void main() {
       expect(AppTheme.getCategoryColor('macro'), isA<Color>());
       expect(AppTheme.getCategoryColor('startup'), isA<Color>());
       expect(AppTheme.getCategoryColor('ai'), isA<Color>());
-      expect(AppTheme.getCategoryColor('unknown'), equals(AppTheme.secondaryColor));
+      expect(AppTheme.getCategoryColor('unknown'),
+          equals(AppTheme.secondaryColor));
     });
 
     test('Category display names are correct', () {
-      expect(AppTheme.getCategoryDisplayName('daily-news'), equals('Daily News'));
+      expect(
+          AppTheme.getCategoryDisplayName('daily-news'), equals('Daily News'));
       expect(AppTheme.getCategoryDisplayName('ethereum'), equals('Ethereum'));
       expect(AppTheme.getCategoryDisplayName('macro'), equals('Macro'));
       expect(AppTheme.getCategoryDisplayName('startup'), equals('Startup'));
@@ -85,7 +88,7 @@ void main() {
 
     test('Glass morphism decoration is properly configured', () {
       final decoration = AppTheme.glassMorphismDecoration;
-      
+
       expect(decoration.color, isA<Color>());
       expect(decoration.borderRadius, isA<BorderRadius>());
       expect(decoration.border, isA<Border>());
@@ -94,7 +97,7 @@ void main() {
 
     test('Card decoration is properly configured', () {
       final decoration = AppTheme.cardDecoration;
-      
+
       expect(decoration.color, equals(AppTheme.surfaceColor));
       expect(decoration.borderRadius, isA<BorderRadius>());
       expect(decoration.boxShadow, isNotEmpty);
@@ -102,7 +105,7 @@ void main() {
 
     test('Gradient card decoration is properly configured', () {
       final decoration = AppTheme.gradientCardDecoration;
-      
+
       expect(decoration.gradient, isA<Gradient>());
       expect(decoration.borderRadius, isA<BorderRadius>());
       expect(decoration.boxShadow, isNotEmpty);
@@ -133,7 +136,8 @@ void main() {
 
     test('Animation durations are defined', () {
       expect(AppTheme.animationFast, equals(const Duration(milliseconds: 150)));
-      expect(AppTheme.animationMedium, equals(const Duration(milliseconds: 300)));
+      expect(
+          AppTheme.animationMedium, equals(const Duration(milliseconds: 300)));
       expect(AppTheme.animationSlow, equals(const Duration(milliseconds: 500)));
     });
 
@@ -163,7 +167,7 @@ void main() {
       );
 
       expect(find.text('Test App'), findsOneWidget);
-      
+
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(materialApp.theme?.brightness, equals(Brightness.dark));
     });
@@ -189,7 +193,7 @@ void main() {
       expect(find.text('Card'), findsOneWidget);
       expect(find.text('Button'), findsOneWidget);
       expect(find.text('Text Button'), findsOneWidget);
-      
+
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.byType(Card), findsOneWidget);
       expect(find.byType(ElevatedButton), findsOneWidget);

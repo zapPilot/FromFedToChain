@@ -46,7 +46,8 @@ class DeepLinkService {
   static Future<void> _handleDeepLink(String link) async {
     try {
       final uri = Uri.parse(link);
-      developer.log('DeepLinkService: Parsing deep link URI: $uri', name: 'DeepLinkService');
+      developer.log('DeepLinkService: Parsing deep link URI: $uri',
+          name: 'DeepLinkService');
 
       // Handle our custom scheme: fromfedtochain://
       if (uri.scheme == 'fromfedtochain') {
@@ -75,13 +76,13 @@ class DeepLinkService {
       case 'audio':
         if (uri.pathSegments.isNotEmpty) {
           final episodeId = uri.pathSegments[0]; // Base episode ID
-          final language = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-          
+          final language =
+              uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+
           // Construct full content ID with language if provided
-          final fullContentId = language != null 
-              ? '$episodeId-$language'
-              : episodeId;
-              
+          final fullContentId =
+              language != null ? '$episodeId-$language' : episodeId;
+
           await _navigateToAudio(fullContentId);
         } else {
           developer.log('Audio deep link missing content ID',
@@ -121,7 +122,8 @@ class DeepLinkService {
         ),
       );
 
-      developer.log('DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
+      developer.log(
+          'DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
           name: 'DeepLinkService');
     } catch (e) {
       developer.log('Error navigating to audio content: $e',
@@ -190,39 +192,38 @@ class DeepLinkService {
   /// [language] optional explicit language parameter
   static String generateContentLink(String contentId,
       {String? language, bool useCustomScheme = true}) {
-    
     String episodeId;
     String? linkLanguage;
-    
+
     // Check if contentId already contains language suffix
     final languageSuffixes = ['zh-TW', 'en-US', 'ja-JP'];
     final matchedSuffix = languageSuffixes.firstWhere(
       (suffix) => contentId.endsWith('-$suffix'),
       orElse: () => '',
     );
-    
+
     if (matchedSuffix.isNotEmpty) {
       // Split existing contentId with language
-      episodeId = contentId.substring(0, contentId.length - matchedSuffix.length - 1);
+      episodeId =
+          contentId.substring(0, contentId.length - matchedSuffix.length - 1);
       linkLanguage = matchedSuffix;
     } else {
       // Use contentId as-is and explicit language parameter
       episodeId = contentId;
       linkLanguage = language;
     }
-    
+
     // Construct URL
-    final basePath = linkLanguage != null 
+    final basePath = linkLanguage != null
         ? 'audio/$episodeId/$linkLanguage'
         : 'audio/$episodeId';
-    
+
     if (useCustomScheme) {
       return 'fromfedtochain://$basePath';
     } else {
       return 'https://fromfedtochain.com/$basePath';
     }
   }
-
 
   /// Dispose resources
   static void dispose() {

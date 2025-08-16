@@ -17,7 +17,7 @@ void main() {
 
     testWidgets('Button tap test', (tester) async {
       int counter = 0;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -127,7 +127,7 @@ void main() {
 
     testWidgets('Form validation test', (tester) async {
       final formKey = GlobalKey<FormState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -156,13 +156,13 @@ void main() {
 
       await tester.tap(find.text('Submit'));
       await tester.pump();
-      
+
       expect(find.text('Required'), findsOneWidget);
     });
 
     testWidgets('Checkbox test', (tester) async {
       bool isChecked = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -200,7 +200,7 @@ void main() {
       );
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      
+
       // Test animation frames
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 100));

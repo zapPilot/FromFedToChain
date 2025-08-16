@@ -37,7 +37,8 @@ class TestUtils {
   }
 
   /// Delay for testing async operations
-  static Future<void> delay([Duration duration = const Duration(milliseconds: 100)]) {
+  static Future<void> delay(
+      [Duration duration = const Duration(milliseconds: 100)]) {
     return Future.delayed(duration);
   }
 
