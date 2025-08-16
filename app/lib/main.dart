@@ -14,7 +14,7 @@ import 'screens/main_navigation_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/auth_screen.dart';
-import 'services/auth_service.dart';
+import 'services/auth/auth_service.dart';
 import 'screens/auth/login_screen.dart';
 
 /// Global navigator key for deep linking and navigation

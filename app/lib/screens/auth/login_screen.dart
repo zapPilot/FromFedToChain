@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../services/auth_service.dart';
+import '../../services/auth/auth_service.dart';
 import '../../themes/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,16 +19,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final authService = context.read<AuthService>();
-      await authService.signInWithGoogle();
+      final success = await authService.signInWithGoogle();
 
-      if (mounted && authService.isAuthenticated) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
-    } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        if (success && authService.isAuthenticated) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Google sign-in failed')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -46,16 +46,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final authService = context.read<AuthService>();
-      await authService.signInWithApple();
+      final success = await authService.signInWithApple();
 
-      if (mounted && authService.isAuthenticated) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
-    } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        if (success && authService.isAuthenticated) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Apple sign-in failed')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
