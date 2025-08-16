@@ -57,13 +57,13 @@ class AudioContent extends Equatable {
       'title': title,
       'language': language,
       'category': category,
-      'date': date.toIso8601String(),
+      'date': date.toUtc().toIso8601String(),
       'status': status,
       'content': description,
       'references': references,
       'social_hook': socialHook,
       'duration': duration?.inSeconds,
-      'updated_at': updatedAt.toIso8601String(),
+      'updated_at': updatedAt.toUtc().toIso8601String(),
     };
   }
 
