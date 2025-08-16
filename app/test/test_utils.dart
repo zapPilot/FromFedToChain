@@ -1,6 +1,8 @@
 import 'package:from_fed_to_chain_app/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/models/playlist.dart';
+import 'package:from_fed_to_chain_app/models/user.dart';
+import 'package:from_fed_to_chain_app/services/auth/auth_service.dart';
 
 /// Test utilities for consistent test data across all test files
 class TestUtils {
@@ -86,6 +88,43 @@ class TestUtils {
       repeatMode: repeatMode,
       createdAt: now,
       updatedAt: now,
+    );
+  }
+
+  /// Create sample User for testing
+  static User createSampleUser({
+    String id = 'test-user-123',
+    String email = 'test@example.com',
+    String name = 'Test User',
+    String? photoUrl,
+    AuthProvider provider = AuthProvider.google,
+  }) {
+    return User(
+      id: id,
+      email: email,
+      name: name,
+      photoUrl: photoUrl,
+      provider: provider,
+    );
+  }
+
+  /// Create sample AppUser for auth testing
+  static AppUser createSampleAppUser({
+    String id = 'test-user-123',
+    String email = 'test@example.com',
+    String name = 'Test User',
+    String? photoUrl,
+    String provider = 'google',
+  }) {
+    final now = DateTime.now();
+    return AppUser(
+      id: id,
+      email: email,
+      name: name,
+      photoUrl: photoUrl,
+      provider: provider,
+      createdAt: now,
+      lastLoginAt: now,
     );
   }
 
