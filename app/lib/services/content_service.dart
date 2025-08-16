@@ -364,7 +364,7 @@ class ContentService extends ChangeNotifier {
         final bestMatch = episodesWithDate.firstWhere(
           (episode) => episode.id
               .toLowerCase()
-              .contains(baseContentId.toLowerCase().replaceAll(date + '-', '')),
+              .contains(baseContentId.toLowerCase().replaceAll('$date-', '')),
           orElse: () => episodesWithDate.first,
         );
 
