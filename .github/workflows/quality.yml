@@ -34,6 +34,9 @@ jobs:
         run: flutter pub get
         working-directory: app
 
+      - name: Install lcov for coverage reporting
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
       - name: Check Node.js code formatting
         run: npx prettier --check "src/**/*.{js,mjs,json}" "tests/**/*.{js,mjs}" "*.{js,mjs,json,md}"
 
