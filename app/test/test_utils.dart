@@ -1,267 +1,137 @@
-import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/models/playlist.dart';
-import 'package:from_fed_to_chain_app/models/user.dart';
-import 'package:from_fed_to_chain_app/services/auth/auth_service.dart';
+import 'package:flutter/material.dart';
 
-/// Test utilities for consistent test data across all test files
+/// Simple test utilities without complex dependencies
 class TestUtils {
-  /// Create sample AudioContent for testing
-  static AudioContent createSampleAudioContent({
-    String id = '2025-01-15-bitcoin-analysis',
-    String title = 'Bitcoin Analysis',
+  /// Create sample data for testing
+  static Map<String, dynamic> createSampleData({
+    String id = 'test-id',
+    String title = 'Test Title',
+    String category = 'test-category',
     String language = 'en-US',
-    String category = 'daily-news',
-    String status = 'published',
-    String? description = 'Sample content description',
-    List<String> references = const ['Source 1', 'Source 2'],
-    String? socialHook = '🚀 Bitcoin breaking news!',
-    Duration? duration = const Duration(minutes: 5),
-  }) {
-    final date = DateTime.parse('2025-01-15');
-    final updatedAt = DateTime.parse('2025-01-15T10:00:00Z');
-
-    return AudioContent(
-      id: id,
-      title: title,
-      language: language,
-      category: category,
-      date: date,
-      status: status,
-      description: description,
-      references: references,
-      socialHook: socialHook,
-      duration: duration,
-      updatedAt: updatedAt,
-    );
-  }
-
-  /// Create sample AudioFile for testing
-  static AudioFile createSampleAudioFile({
-    String id = '2025-01-15-bitcoin-analysis',
-    String title = 'Bitcoin Analysis',
-    String language = 'en-US',
-    String category = 'daily-news',
-    String streamingUrl = 'https://example.com/audio.m3u8',
-    String path = 'audio/en-US/2025-01-15-bitcoin-analysis.m3u8',
-    Duration? duration = const Duration(minutes: 5),
-    int? fileSizeBytes = 1024000,
-  }) {
-    final lastModified = DateTime.parse('2025-01-15T10:00:00Z');
-
-    return AudioFile(
-      id: id,
-      title: title,
-      language: language,
-      category: category,
-      streamingUrl: streamingUrl,
-      path: path,
-      duration: duration,
-      fileSizeBytes: fileSizeBytes,
-      lastModified: lastModified,
-    );
-  }
-
-  /// Create sample Playlist for testing
-  static Playlist createSamplePlaylist({
-    String id = 'playlist_test',
-    String name = 'Test Playlist',
-    List<AudioFile>? episodes,
-    int currentIndex = 0,
-    bool shuffleEnabled = false,
-    PlaylistRepeatMode repeatMode = PlaylistRepeatMode.none,
-  }) {
-    final now = DateTime.now();
-    final testEpisodes = episodes ??
-        [
-          createSampleAudioFile(id: 'episode-1', title: 'Episode 1'),
-          createSampleAudioFile(id: 'episode-2', title: 'Episode 2'),
-          createSampleAudioFile(id: 'episode-3', title: 'Episode 3'),
-        ];
-
-    return Playlist(
-      id: id,
-      name: name,
-      episodes: testEpisodes,
-      currentIndex: currentIndex,
-      shuffleEnabled: shuffleEnabled,
-      repeatMode: repeatMode,
-      createdAt: now,
-      updatedAt: now,
-    );
-  }
-
-  /// Create sample User for testing
-  static User createSampleUser({
-    String id = 'test-user-123',
-    String email = 'test@example.com',
-    String name = 'Test User',
-    String? photoUrl,
-    AuthProvider provider = AuthProvider.google,
-  }) {
-    return User(
-      id: id,
-      email: email,
-      name: name,
-      photoUrl: photoUrl,
-      provider: provider,
-    );
-  }
-
-  /// Create sample AppUser for auth testing
-  static AppUser createSampleAppUser({
-    String id = 'test-user-123',
-    String email = 'test@example.com',
-    String name = 'Test User',
-    String? photoUrl,
-    String provider = 'google',
-  }) {
-    final now = DateTime.now();
-    return AppUser(
-      id: id,
-      email: email,
-      name: name,
-      photoUrl: photoUrl,
-      provider: provider,
-      createdAt: now,
-      lastLoginAt: now,
-    );
-  }
-
-  /// Create API response JSON for AudioContent
-  static Map<String, dynamic> createAudioContentJson({
-    String id = '2025-01-15-bitcoin-analysis',
-    String title = 'Bitcoin Analysis',
-    String language = 'en-US',
-    String category = 'daily-news',
-    String status = 'published',
-    String? content = 'Sample content description',
-    List<String> references = const ['Source 1', 'Source 2'],
-    String? socialHook = '🚀 Bitcoin breaking news!',
-    int? duration = 300, // 5 minutes in seconds
   }) {
     return {
       'id': id,
       'title': title,
-      'language': language,
       'category': category,
-      'date': '2025-01-15',
-      'status': status,
-      'content': content,
-      'references': references,
-      'social_hook': socialHook,
-      'duration': duration,
-      'updated_at': '2025-01-15T10:00:00Z',
+      'language': language,
+      'date': '2025-01-01',
+      'status': 'published',
+      'content': 'Test content for $title',
+      'streamingUrls': {
+        'hls': 'https://example.com/test.m3u8',
+        'mp3': 'https://example.com/test.mp3',
+      },
     };
   }
 
-  /// Create API response JSON for AudioFile
-  static Map<String, dynamic> createAudioFileJson({
-    String id = '2025-01-15-bitcoin-analysis',
-    String? title = 'Bitcoin Analysis',
-    String language = 'en-US',
-    String category = 'daily-news',
-    String streamingUrl = 'https://example.com/audio.m3u8',
-    String path = 'audio/en-US/2025-01-15-bitcoin-analysis.m3u8',
-    int? duration = 300, // 5 minutes in seconds
-    int? size = 1024000,
+  /// Create a list of sample data
+  static List<Map<String, dynamic>> createSampleDataList(int count) {
+    return List.generate(count, (index) {
+      return createSampleData(
+        id: 'test-$index',
+        title: 'Test Title $index',
+        category: index % 2 == 0 ? 'daily-news' : 'ethereum',
+        language: index % 3 == 0 ? 'en-US' : 'ja-JP',
+      );
+    });
+  }
+
+  /// Delay for testing async operations
+  static Future<void> delay([Duration duration = const Duration(milliseconds: 100)]) {
+    return Future.delayed(duration);
+  }
+
+  /// Create a simple test widget
+  static Widget createTestWidget({
+    String text = 'Test Widget',
+    VoidCallback? onTap,
   }) {
-    return {
-      'id': id,
-      'title': title,
-      'language': language,
-      'category': category,
-      'streaming_url': streamingUrl,
-      'path': path,
-      'duration': duration,
-      'size': size,
-      'last_modified': '2025-01-15T10:00:00Z',
-    };
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(text),
+      ),
+    );
   }
 
-  /// Create invalid JSON for negative testing
-  static Map<String, dynamic> createInvalidAudioContentJson() {
-    return {
-      'id': null, // Invalid - required field
-      'title': '',
-      'language': 'invalid-lang',
-      'category': '',
-      'date': 'invalid-date',
-      'status': '',
-      'updated_at': 'invalid-date',
-    };
+  /// Create a test list widget
+  static Widget createTestList(List<String> items) {
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(items[index]),
+          leading: const Icon(Icons.list),
+        );
+      },
+    );
   }
 
-  /// Test categories for validation
-  static const List<String> validCategories = [
+  /// Test categories
+  static const List<String> testCategories = [
     'daily-news',
     'ethereum',
     'macro',
     'startup',
     'ai',
-    'defi',
   ];
 
-  /// Test languages for validation
-  static const List<String> validLanguages = [
-    'zh-TW',
+  /// Test languages
+  static const List<String> testLanguages = [
     'en-US',
     'ja-JP',
+    'zh-TW',
   ];
 
-  /// Test statuses for validation
-  static const List<String> validStatuses = [
-    'draft',
-    'reviewed',
-    'published',
+  /// Test sort orders
+  static const List<String> testSortOrders = [
+    'newest',
+    'oldest',
+    'alphabetical',
   ];
 
-  /// Expected emojis for categories
-  static const Map<String, String> categoryEmojis = {
-    'daily-news': '📰',
-    'ethereum': '⚡',
-    'macro': '📊',
-    'startup': '🚀',
-    'ai': '🤖',
-    'defi': '💎',
-  };
-
-  /// Expected emojis for languages
-  static const Map<String, String> languageEmojis = {
-    'zh-TW': '🇹🇼',
-    'en-US': '🇺🇸',
-    'ja-JP': '🇯🇵',
-  };
-
-  /// Helper to create edge case data
-  static AudioContent createEdgeCaseAudioContent() {
-    return AudioContent(
-      id: '',
-      title: '',
-      language: 'unknown',
-      category: 'unknown',
-      date: DateTime.now(),
-      status: 'unknown',
-      description: null,
-      references: [],
-      socialHook: null,
-      duration: null,
-      updatedAt: DateTime.now(),
-    );
+  /// Generate test statistics
+  static Map<String, int> generateTestStatistics() {
+    return {
+      'totalEpisodes': 100,
+      'filteredEpisodes': 50,
+      'recentEpisodes': 20,
+      'unfinishedEpisodes': 5,
+    };
   }
 
-  /// Helper to create edge case AudioFile
-  static AudioFile createEdgeCaseAudioFile() {
-    return AudioFile(
-      id: '',
-      title: '',
-      language: 'unknown',
-      category: 'unknown',
-      streamingUrl: '',
-      path: '',
-      duration: null,
-      fileSizeBytes: null,
-      lastModified: DateTime.now(),
+  /// Validate test data structure
+  static bool isValidTestData(Map<String, dynamic> data) {
+    final requiredFields = ['id', 'title', 'category', 'language'];
+    return requiredFields.every((field) => data.containsKey(field));
+  }
+
+  /// Create formatted time string for testing
+  static String formatTestDuration(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  /// Test error messages
+  static const Map<String, String> testErrorMessages = {
+    'network': 'Network connection failed',
+    'loading': 'Failed to load content',
+    'audio': 'Audio playback error',
+    'auth': 'Authentication failed',
+  };
+
+  /// Create test theme
+  static ThemeData createTestTheme() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primarySwatch: Colors.blue,
+      scaffoldBackgroundColor: Colors.black,
     );
   }
 }
