@@ -3,9 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/home_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
-import '../screens/auth/auth_screen.dart';
 import '../screens/auth/login_screen.dart';
-import 'auth_service.dart';
+import 'auth/auth_service.dart';
 
 /// Service to handle app navigation logic and routing decisions
 class NavigationService {

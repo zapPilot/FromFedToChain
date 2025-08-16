@@ -14,7 +14,7 @@ import 'screens/main_navigation_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/auth_screen.dart';
-import 'services/auth_service.dart';
+import 'services/auth/auth_service.dart';
 import 'screens/auth/login_screen.dart';
 
 /// Global navigator key for deep linking and navigation
@@ -168,8 +168,10 @@ class FromFedToChainApp extends StatelessWidget {
               return MediaQuery(
                 // Ensure text scaling doesn't break layout
                 data: MediaQuery.of(context).copyWith(
-                  textScaleFactor:
-                      MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
+                  textScaler: TextScaler.linear(MediaQuery.of(context)
+                      .textScaler
+                      .scale(1.0)
+                      .clamp(0.8, 1.2)),
                 ),
                 child: child!,
               );

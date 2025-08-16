@@ -14,7 +14,7 @@ import '../widgets/content_display.dart';
 /// Full-screen audio player with enhanced controls
 class PlayerScreen extends StatefulWidget {
   final String? contentId;
-  
+
   const PlayerScreen({super.key, this.contentId});
 
   @override
@@ -31,7 +31,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       duration: const Duration(seconds: 20),
       vsync: this,
@@ -70,14 +70,14 @@ class _PlayerScreenState extends State<PlayerScreen>
 
       // Get the AudioFile by contentId
       final audioFile = await contentService.getAudioFileById(contentId);
-      
+
       if (audioFile != null) {
         // Add to listen history
         await contentService.addToListenHistory(audioFile);
-        
+
         // Start playing the audio
         await audioService.playAudio(audioFile);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -770,9 +770,10 @@ class _PlayerScreenState extends State<PlayerScreen>
       final content = await contentService.getContentForAudioFile(currentAudio);
 
       // Generate deep links with language parameter
-      final deepLink = DeepLinkService.generateContentLink(currentAudio.id, language: currentAudio.language);
-      final webLink = DeepLinkService.generateContentLink(currentAudio.id, language: currentAudio.language,
-          useCustomScheme: false);
+      final deepLink = DeepLinkService.generateContentLink(currentAudio.id,
+          language: currentAudio.language);
+      final webLink = DeepLinkService.generateContentLink(currentAudio.id,
+          language: currentAudio.language, useCustomScheme: false);
 
       String shareText;
       if (content?.socialHook != null &&

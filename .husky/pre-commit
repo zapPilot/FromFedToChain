@@ -1,5 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
-
-# Run formatters on staged files and re-stage changes
 npx lint-staged
+flutter analyze
+npm run test:flutter

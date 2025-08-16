@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../screens/player_screen.dart';
-import 'content_service.dart';
 
 /// Service to handle deep links and app navigation from external sources
 class DeepLinkService {
@@ -46,7 +45,8 @@ class DeepLinkService {
   static Future<void> _handleDeepLink(String link) async {
     try {
       final uri = Uri.parse(link);
-      developer.log('DeepLinkService: Parsing deep link URI: $uri', name: 'DeepLinkService');
+      developer.log('DeepLinkService: Parsing deep link URI: $uri',
+          name: 'DeepLinkService');
 
       // Handle our custom scheme: fromfedtochain://
       if (uri.scheme == 'fromfedtochain') {
@@ -75,13 +75,13 @@ class DeepLinkService {
       case 'audio':
         if (uri.pathSegments.isNotEmpty) {
           final episodeId = uri.pathSegments[0]; // Base episode ID
-          final language = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-          
+          final language =
+              uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+
           // Construct full content ID with language if provided
-          final fullContentId = language != null 
-              ? '$episodeId-$language'
-              : episodeId;
-              
+          final fullContentId =
+              language != null ? '$episodeId-$language' : episodeId;
+
           await _navigateToAudio(fullContentId);
         } else {
           developer.log('Audio deep link missing content ID',
@@ -121,7 +121,8 @@ class DeepLinkService {
         ),
       );
 
-      developer.log('DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
+      developer.log(
+          'DeepLinkService: Navigated to PlayerScreen with contentId: "$contentId"',
           name: 'DeepLinkService');
     } catch (e) {
       developer.log('Error navigating to audio content: $e',
@@ -141,29 +142,6 @@ class DeepLinkService {
     // Pop all routes and go to home (if not already there)
     _navigatorKey!.currentState!.pushNamedAndRemoveUntil('/', (route) => false);
     developer.log('Navigated to home screen', name: 'DeepLinkService');
-  }
-
-  /// Show dialog when content is not found
-  static void _showContentNotFoundDialog(String contentId) {
-    if (_navigatorKey?.currentContext == null) return;
-
-    showDialog(
-      context: _navigatorKey!.currentContext!,
-      builder: (context) => AlertDialog(
-        title: const Text('Content Not Found'),
-        content: Text(
-            'The audio content "$contentId" could not be found. It may have been removed or renamed.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _navigateToHome();
-            },
-            child: const Text('Go to Home'),
-          ),
-        ],
-      ),
-    );
   }
 
   /// Show generic error dialog
@@ -190,39 +168,38 @@ class DeepLinkService {
   /// [language] optional explicit language parameter
   static String generateContentLink(String contentId,
       {String? language, bool useCustomScheme = true}) {
-    
     String episodeId;
     String? linkLanguage;
-    
+
     // Check if contentId already contains language suffix
     final languageSuffixes = ['zh-TW', 'en-US', 'ja-JP'];
     final matchedSuffix = languageSuffixes.firstWhere(
       (suffix) => contentId.endsWith('-$suffix'),
       orElse: () => '',
     );
-    
+
     if (matchedSuffix.isNotEmpty) {
       // Split existing contentId with language
-      episodeId = contentId.substring(0, contentId.length - matchedSuffix.length - 1);
+      episodeId =
+          contentId.substring(0, contentId.length - matchedSuffix.length - 1);
       linkLanguage = matchedSuffix;
     } else {
       // Use contentId as-is and explicit language parameter
       episodeId = contentId;
       linkLanguage = language;
     }
-    
+
     // Construct URL
-    final basePath = linkLanguage != null 
+    final basePath = linkLanguage != null
         ? 'audio/$episodeId/$linkLanguage'
         : 'audio/$episodeId';
-    
+
     if (useCustomScheme) {
       return 'fromfedtochain://$basePath';
     } else {
       return 'https://fromfedtochain.com/$basePath';
     }
   }
-
 
   /// Dispose resources
   static void dispose() {

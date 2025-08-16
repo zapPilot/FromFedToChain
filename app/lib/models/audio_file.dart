@@ -148,7 +148,7 @@ class AudioFile extends Equatable {
 
   /// Formatted file size
   String get formattedFileSize {
-    if (fileSizeBytes == null) return 'Unknown size';
+    if (fileSizeBytes == null) return 'Unknown';
 
     const suffixes = ['B', 'KB', 'MB', 'GB'];
     double size = fileSizeBytes!.toDouble();
@@ -159,12 +159,16 @@ class AudioFile extends Equatable {
       suffixIndex++;
     }
 
-    return '${size.toStringAsFixed(1)} ${suffixes[suffixIndex]}';
+    // Don't show decimal for bytes, show decimal for KB and above
+    String formattedSize = suffixIndex == 0 && size % 1 == 0
+        ? size.toStringAsFixed(0)
+        : size.toStringAsFixed(1);
+    return '$formattedSize ${suffixes[suffixIndex]}';
   }
 
   /// Formatted duration
   String get formattedDuration {
-    if (duration == null) return '';
+    if (duration == null) return '--:--';
 
     final hours = duration!.inHours;
     final minutes = duration!.inMinutes.remainder(60);
@@ -173,7 +177,7 @@ class AudioFile extends Equatable {
     if (hours > 0) {
       return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     } else {
-      return '${minutes}:${seconds.toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     }
   }
 

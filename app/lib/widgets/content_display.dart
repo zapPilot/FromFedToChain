@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/audio_file.dart';
 import '../models/audio_content.dart';
@@ -28,7 +27,6 @@ class _ContentDisplayState extends State<ContentDisplay> {
   AudioContent? _currentContent;
   bool _isLoading = false;
   String? _error;
-  String? _rawJson; // Debug: Store raw JSON response
 
   @override
   void initState() {
@@ -61,7 +59,6 @@ class _ContentDisplayState extends State<ContentDisplay> {
     setState(() {
       _isLoading = true;
       _error = null;
-      _rawJson = null;
     });
 
     try {
@@ -72,18 +69,6 @@ class _ContentDisplayState extends State<ContentDisplay> {
         setState(() {
           _currentContent = rawResult;
           _isLoading = false;
-          // DEBUG: Store raw JSON for debugging
-          _rawJson = const JsonEncoder.withIndent('  ').convert({
-            'result': rawResult?.toJson(),
-            'resultType': rawResult.runtimeType.toString(),
-            'isNull': rawResult == null,
-            'audioFile': {
-              'id': widget.currentAudioFile!.id,
-              'title': widget.currentAudioFile!.title,
-              'language': widget.currentAudioFile!.language,
-              'category': widget.currentAudioFile!.category,
-            }
-          });
           _error = rawResult == null ? 'Content not available' : null;
         });
       }
@@ -92,16 +77,6 @@ class _ContentDisplayState extends State<ContentDisplay> {
         setState(() {
           _currentContent = null;
           _isLoading = false;
-          _rawJson = const JsonEncoder.withIndent('  ').convert({
-            'error': e.toString(),
-            'errorType': e.runtimeType.toString(),
-            'audioFile': {
-              'id': widget.currentAudioFile?.id,
-              'title': widget.currentAudioFile?.title,
-              'language': widget.currentAudioFile?.language,
-              'category': widget.currentAudioFile?.category,
-            }
-          });
           _error = 'Failed to load content: $e';
         });
       }

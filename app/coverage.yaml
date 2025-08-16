@@ -1,27 +1,28 @@
 coverage_options:
   enabled: true
-  
-  # Coverage thresholds (percentage)
+
+  # Coverage thresholds (percentage) - Realistic targets for audio streaming app
   thresholds:
     global:
-      statements: 26
-      branches: 26
-      functions: 26
-      lines: 26
+      statements: 28
+      branches: 28
+      functions: 28
+      lines: 28
 
-  # Exclude files/directories from coverage
+  # Exclude files/directories from coverage (reduced exclusions)
   excludes:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "**/generated_plugin_registrant.dart"
-    - "**/main.dart"
+    - "**/main.dart" # Entry point - difficult to test meaningfully
+    - "**/demo/**" # Demo/debug utilities
     - "**/test/**"
     - "**/coverage/**"
     - "**/.dart_tool/**"
     - "**/build/**"
-  
+
   # HTML report output directory
   html_dir: "coverage/html"
-  
+
   # LCOV report output file
-  lcov_dir: "coverage" 
+  lcov_dir: "coverage"

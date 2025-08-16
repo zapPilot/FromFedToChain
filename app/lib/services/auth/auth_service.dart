@@ -85,7 +85,6 @@ class AuthService extends ChangeNotifier {
   AuthState _authState = AuthState.initial;
   AppUser? _currentUser;
   String? _errorMessage;
-  String? _authToken;
 
   // Getters
   AuthState get authState => _authState;
@@ -107,7 +106,6 @@ class AuthService extends ChangeNotifier {
       if (userJson != null && authToken != null) {
         final userMap = jsonDecode(userJson) as Map<String, dynamic>;
         _currentUser = AppUser.fromJson(userMap);
-        _authToken = authToken;
         _setAuthState(AuthState.authenticated);
 
         if (kDebugMode) {
@@ -209,7 +207,6 @@ class AuthService extends ChangeNotifier {
 
       // Clear in-memory data
       _currentUser = null;
-      _authToken = null;
       _clearError();
       _setAuthState(AuthState.unauthenticated);
 
@@ -333,7 +330,6 @@ class AuthService extends ChangeNotifier {
   /// Complete the sign-in process
   Future<void> _completeSignIn(AppUser user, String token) async {
     _currentUser = user;
-    _authToken = token;
 
     // Save to local storage
     await _saveUserToStorage(user);

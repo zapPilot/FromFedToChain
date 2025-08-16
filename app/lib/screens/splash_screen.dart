@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../themes/app_theme.dart';
 import '../services/content_service.dart';
-import '../services/audio_service.dart';
-import '../services/auth_service.dart';
+import '../services/auth/auth_service.dart';
 import '../services/navigation_service.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 

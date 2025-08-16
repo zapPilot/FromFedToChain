@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -282,21 +281,23 @@ class ContentService extends ChangeNotifier {
     final languageSuffixes = ['zh-TW', 'en-US', 'ja-JP'];
     String? requestedLanguage;
     String baseContentId = contentId;
-    
+
     for (final suffix in languageSuffixes) {
       if (contentId.endsWith('-$suffix')) {
         requestedLanguage = suffix;
-        baseContentId = contentId.substring(0, contentId.length - suffix.length - 1);
+        baseContentId =
+            contentId.substring(0, contentId.length - suffix.length - 1);
         break;
       }
     }
-    
-    return await _findEpisodeByIdAndLanguage(contentId, baseContentId, requestedLanguage);
+
+    return await _findEpisodeByIdAndLanguage(
+        contentId, baseContentId, requestedLanguage);
   }
-  
+
   /// Find episode by base ID and language preference
-  Future<AudioFile?> _findEpisodeByIdAndLanguage(String fullContentId, String baseContentId, String? preferredLanguage) async {
-    
+  Future<AudioFile?> _findEpisodeByIdAndLanguage(String fullContentId,
+      String baseContentId, String? preferredLanguage) async {
     // Ensure episodes are loaded
     if (_allEpisodes.isEmpty) {
       await loadAllEpisodes();
@@ -327,13 +328,14 @@ class ContentService extends ChangeNotifier {
       } catch (e) {
         // Continue to next approach
       }
-      
+
       // Also try finding episodes with base ID and matching language
       final episodesWithBaseId = _allEpisodes.where((episode) {
         // Check if episode ID starts with baseContentId and has the preferred language
-        return episode.id.startsWith(baseContentId) && episode.language == preferredLanguage;
+        return episode.id.startsWith(baseContentId) &&
+            episode.language == preferredLanguage;
       }).toList();
-      
+
       if (episodesWithBaseId.isNotEmpty) {
         return episodesWithBaseId.first;
       }
@@ -343,32 +345,33 @@ class ContentService extends ChangeNotifier {
     final dateMatch = RegExp(r'(\d{4}-\d{2}-\d{2})').firstMatch(baseContentId);
     if (dateMatch != null) {
       final date = dateMatch.group(1)!;
-      final episodesWithDate = _allEpisodes
-          .where((episode) => episode.id.contains(date))
-          .toList();
-          
+      final episodesWithDate =
+          _allEpisodes.where((episode) => episode.id.contains(date)).toList();
+
       if (episodesWithDate.isNotEmpty) {
         // If preferred language specified, prioritize episodes with that language
         if (preferredLanguage != null) {
           final languageMatches = episodesWithDate
               .where((episode) => episode.language == preferredLanguage)
               .toList();
-              
+
           if (languageMatches.isNotEmpty) {
             return languageMatches.first;
           }
         }
-        
+
         // Fallback: use any episode with the date, prioritizing those that match more of the baseContentId
         final bestMatch = episodesWithDate.firstWhere(
-          (episode) => episode.id.toLowerCase().contains(baseContentId.toLowerCase().replaceAll(date + '-', '')),
+          (episode) => episode.id
+              .toLowerCase()
+              .contains(baseContentId.toLowerCase().replaceAll('$date-', '')),
           orElse: () => episodesWithDate.first,
         );
-        
+
         return bestMatch;
       }
     }
-    
+
     return null;
   }
 

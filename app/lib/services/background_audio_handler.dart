@@ -450,7 +450,6 @@ class BackgroundAudioHandler extends BaseAudioHandler
     await super.onTaskRemoved();
   }
 
-  @override
   void dispose() {
     if (kDebugMode) {
       print('🎵 BackgroundAudioHandler: Disposing...');

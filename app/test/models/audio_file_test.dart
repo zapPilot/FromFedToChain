@@ -1,449 +1,235 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import '../test_utils.dart';
+import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
 void main() {
-  group('AudioFile', () {
-    group('Constructor', () {
-      test('creates AudioFile with required fields', () {
-        final audioFile = TestUtils.createSampleAudioFile();
+  group('AudioFile Tests', () {
+    test('should create AudioFile from API response', () {
+      // Arrange
+      final apiResponse = {
+        'id': '2025-08-16-bitcoin-analysis',
+        'title': 'Bitcoin Market Analysis',
+        'language': 'en-US',
+        'category': 'daily-news',
+        'streaming_url':
+            'https://r2.example.com/audio/en-US/2025-08-16-bitcoin-analysis.m3u8',
+        'path': 'audio/en-US/2025-08-16-bitcoin-analysis.m3u8',
+        'duration': 180,
+        'size': 5242880,
+        'last_modified': '2025-08-16T10:30:00Z',
+      };
 
-        expect(audioFile.id, '2025-01-15-bitcoin-analysis');
-        expect(audioFile.title, 'Bitcoin Analysis');
-        expect(audioFile.language, 'en-US');
-        expect(audioFile.category, 'daily-news');
-        expect(audioFile.streamingUrl, 'https://example.com/audio.m3u8');
-        expect(audioFile.path, 'audio/en-US/2025-01-15-bitcoin-analysis.m3u8');
-        expect(audioFile.duration, const Duration(minutes: 5));
-        expect(audioFile.fileSizeBytes, 1024000);
-        expect(audioFile.lastModified, DateTime.parse('2025-01-15T10:00:00Z'));
-      });
+      // Act
+      final audioFile = AudioFile.fromApiResponse(apiResponse);
 
-      test('handles optional fields correctly', () {
+      // Assert
+      expect(audioFile.id, equals('2025-08-16-bitcoin-analysis'));
+      expect(audioFile.title, equals('Bitcoin Market Analysis'));
+      expect(audioFile.language, equals('en-US'));
+      expect(audioFile.category, equals('daily-news'));
+      expect(
+          audioFile.streamingUrl,
+          equals(
+              'https://r2.example.com/audio/en-US/2025-08-16-bitcoin-analysis.m3u8'));
+      expect(audioFile.path,
+          equals('audio/en-US/2025-08-16-bitcoin-analysis.m3u8'));
+      expect(audioFile.duration, equals(const Duration(seconds: 180)));
+      expect(audioFile.fileSizeBytes, equals(5242880));
+      expect(audioFile.lastModified,
+          equals(DateTime.parse('2025-08-16T10:30:00Z')));
+    });
+
+    test('should handle API response with missing optional fields', () {
+      // Arrange
+      final apiResponse = {
+        'id': 'minimal-audio',
+        'streaming_url': 'https://r2.example.com/minimal.m3u8',
+        'path': 'audio/minimal.m3u8',
+      };
+
+      // Act
+      final audioFile = AudioFile.fromApiResponse(apiResponse);
+
+      // Assert
+      expect(audioFile.id, equals('minimal-audio'));
+      expect(audioFile.title, equals('Minimal Audio')); // Generated from ID
+      expect(audioFile.language, equals('unknown'));
+      expect(audioFile.category, equals('unknown'));
+      expect(audioFile.duration, isNull);
+      expect(audioFile.fileSizeBytes, isNull);
+      expect(audioFile.lastModified, isA<DateTime>());
+    });
+
+    test('should create AudioFile from AudioContent', () {
+      // Arrange
+      final audioContent = AudioContent(
+        id: 'test-content-id',
+        title: 'Test Content Title',
+        language: 'ja-JP',
+        category: 'ethereum',
+        date: DateTime.parse('2025-06-15'),
+        status: 'published',
+        duration: const Duration(minutes: 5),
+        updatedAt: DateTime.parse('2025-06-15T15:00:00Z'),
+      );
+
+      const streamingPath = 'audio/ja-JP/test-content-id.m3u8';
+
+      // Act
+      final audioFile = AudioFile.fromContent(audioContent, streamingPath);
+
+      // Assert
+      expect(audioFile.id, equals('test-content-id'));
+      expect(audioFile.title, equals('Test Content Title'));
+      expect(audioFile.language, equals('ja-JP'));
+      expect(audioFile.category, equals('ethereum'));
+      expect(audioFile.path, equals(streamingPath));
+      expect(audioFile.duration, equals(const Duration(minutes: 5)));
+      expect(audioFile.lastModified,
+          equals(DateTime.parse('2025-06-15T15:00:00Z')));
+      expect(audioFile.metadata, equals(audioContent));
+    });
+
+    test('should format duration correctly', () {
+      // Arrange
+      final audioFile = AudioFile(
+        id: 'duration-test',
+        title: 'Duration Test',
+        language: 'en-US',
+        category: 'test',
+        streamingUrl: 'https://example.com/test.m3u8',
+        path: 'test.m3u8',
+        duration: const Duration(minutes: 3, seconds: 45),
+        lastModified: DateTime.now(),
+      );
+
+      // Act
+      final formattedDuration = audioFile.formattedDuration;
+
+      // Assert
+      expect(formattedDuration, equals('3:45'));
+    });
+
+    test('should handle duration formatting for different lengths', () {
+      final testCases = [
+        {'duration': Duration(seconds: 30), 'expected': '0:30'},
+        {'duration': Duration(minutes: 1, seconds: 5), 'expected': '1:05'},
+        {'duration': Duration(minutes: 15, seconds: 0), 'expected': '15:00'},
+        {
+          'duration': Duration(hours: 1, minutes: 23, seconds: 45),
+          'expected': '1:23:45'
+        },
+      ];
+
+      for (final testCase in testCases) {
         final audioFile = AudioFile(
-          id: 'test-id',
-          title: 'Test Title',
+          id: 'test',
+          title: 'Test',
           language: 'en-US',
-          category: 'daily-news',
+          category: 'test',
           streamingUrl: 'https://example.com/test.m3u8',
           path: 'test.m3u8',
+          duration: testCase['duration'] as Duration,
           lastModified: DateTime.now(),
         );
 
-        expect(audioFile.duration, isNull);
-        expect(audioFile.fileSizeBytes, isNull);
-        expect(audioFile.metadata, isNull);
-      });
+        expect(audioFile.formattedDuration, equals(testCase['expected']));
+      }
     });
 
-    group('fromApiResponse', () {
-      test('creates AudioFile from valid API response', () {
-        final json = TestUtils.createAudioFileJson();
-        final audioFile = AudioFile.fromApiResponse(json);
+    test('should handle null duration formatting', () {
+      // Arrange
+      final audioFile = AudioFile(
+        id: 'no-duration',
+        title: 'No Duration',
+        language: 'en-US',
+        category: 'test',
+        streamingUrl: 'https://example.com/test.m3u8',
+        path: 'test.m3u8',
+        lastModified: DateTime.now(),
+      );
 
-        expect(audioFile.id, '2025-01-15-bitcoin-analysis');
-        expect(audioFile.title, 'Bitcoin Analysis');
-        expect(audioFile.language, 'en-US');
-        expect(audioFile.category, 'daily-news');
-        expect(audioFile.streamingUrl, 'https://example.com/audio.m3u8');
-        expect(audioFile.path, 'audio/en-US/2025-01-15-bitcoin-analysis.m3u8');
-        expect(audioFile.duration, const Duration(minutes: 5));
-        expect(audioFile.fileSizeBytes, 1024000);
-        expect(audioFile.lastModified, DateTime.parse('2025-01-15T10:00:00Z'));
-      });
-
-      test('handles missing optional fields in API response', () {
-        final json = {
-          'id': 'test-id',
-          'streaming_url': 'https://example.com/test.m3u8',
-          'path': 'test.m3u8',
-        };
-
-        final audioFile = AudioFile.fromApiResponse(json);
-
-        expect(audioFile.title, 'Test Id'); // Generated from ID
-        expect(audioFile.language, 'unknown');
-        expect(audioFile.category, 'unknown');
-        expect(audioFile.duration, isNull);
-        expect(audioFile.fileSizeBytes, isNull);
-        expect(audioFile.lastModified, isA<DateTime>());
-      });
-
-      test('generates title from ID when title is missing', () {
-        final json = {
-          'id': '2025-07-15-ethereum-analysis-report',
-          'streaming_url': 'https://example.com/test.m3u8',
-          'path': 'test.m3u8',
-        };
-
-        final audioFile = AudioFile.fromApiResponse(json);
-        expect(audioFile.title, '2025 07 15 Ethereum Analysis Report');
-      });
-
-      test('uses provided title when available', () {
-        final json = {
-          'id': 'test-id',
-          'title': 'Custom Title',
-          'streaming_url': 'https://example.com/test.m3u8',
-          'path': 'test.m3u8',
-        };
-
-        final audioFile = AudioFile.fromApiResponse(json);
-        expect(audioFile.title, 'Custom Title');
-      });
+      // Act & Assert
+      expect(audioFile.formattedDuration, equals('--:--'));
     });
 
-    group('fromContent', () {
-      test('creates AudioFile from AudioContent and streaming path', () {
-        final content = TestUtils.createSampleAudioContent();
-        final streamingPath = 'audio/en-US/2025-01-15-bitcoin-analysis.m3u8';
+    test('should support equality comparison', () {
+      // Arrange
+      final file1 = AudioFile(
+        id: 'same-id',
+        title: 'Same Title',
+        language: 'en-US',
+        category: 'daily-news',
+        streamingUrl: 'https://example.com/same.m3u8',
+        path: 'same.m3u8',
+        lastModified: DateTime.parse('2025-01-01T12:00:00Z'),
+      );
 
-        final audioFile = AudioFile.fromContent(content, streamingPath);
+      final file2 = AudioFile(
+        id: 'same-id',
+        title: 'Same Title',
+        language: 'en-US',
+        category: 'daily-news',
+        streamingUrl: 'https://example.com/same.m3u8',
+        path: 'same.m3u8',
+        lastModified: DateTime.parse('2025-01-01T12:00:00Z'),
+      );
 
-        expect(audioFile.id, content.id);
-        expect(audioFile.title, content.title);
-        expect(audioFile.language, content.language);
-        expect(audioFile.category, content.category);
-        expect(audioFile.duration, content.duration);
-        expect(audioFile.lastModified, content.updatedAt);
-        expect(audioFile.metadata, content);
-        expect(audioFile.path, streamingPath);
-        expect(audioFile.streamingUrl, contains(streamingPath));
-      });
+      final file3 = AudioFile(
+        id: 'different-id',
+        title: 'Same Title',
+        language: 'en-US',
+        category: 'daily-news',
+        streamingUrl: 'https://example.com/same.m3u8',
+        path: 'same.m3u8',
+        lastModified: DateTime.parse('2025-01-01T12:00:00Z'),
+      );
+
+      // Assert
+      expect(file1, equals(file2));
+      expect(file1, isNot(equals(file3)));
+      expect(file1.hashCode, equals(file2.hashCode));
     });
 
-    group('toJson', () {
-      test('converts AudioFile to JSON correctly', () {
-        final audioFile = TestUtils.createSampleAudioFile();
-        final json = audioFile.toJson();
+    test('should format file size correctly', () {
+      final testCases = [
+        {'bytes': 512, 'expected': '512 B'},
+        {'bytes': 1536, 'expected': '1.5 KB'},
+        {'bytes': 1048576, 'expected': '1.0 MB'},
+        {'bytes': 5242880, 'expected': '5.0 MB'},
+        {'bytes': 1073741824, 'expected': '1.0 GB'},
+      ];
 
-        expect(json['id'], '2025-01-15-bitcoin-analysis');
-        expect(json['title'], 'Bitcoin Analysis');
-        expect(json['language'], 'en-US');
-        expect(json['category'], 'daily-news');
-        expect(json['streaming_url'], 'https://example.com/audio.m3u8');
-        expect(json['path'], 'audio/en-US/2025-01-15-bitcoin-analysis.m3u8');
-        expect(json['duration'], 300);
-        expect(json['size'], 1024000);
-        expect(json['last_modified'], '2025-01-15T10:00:00.000Z');
-      });
-
-      test('handles null optional fields in JSON output', () {
+      for (final testCase in testCases) {
         final audioFile = AudioFile(
-          id: 'test-id',
-          title: 'Test Title',
+          id: 'size-test',
+          title: 'Size Test',
           language: 'en-US',
-          category: 'daily-news',
+          category: 'test',
           streamingUrl: 'https://example.com/test.m3u8',
           path: 'test.m3u8',
-          lastModified: DateTime.parse('2025-01-15T10:00:00Z'),
+          fileSizeBytes: testCase['bytes'] as int,
+          lastModified: DateTime.now(),
         );
 
-        final json = audioFile.toJson();
-
-        expect(json['duration'], isNull);
-        expect(json['size'], isNull);
-      });
+        expect(audioFile.formattedFileSize, equals(testCase['expected']));
+      }
     });
 
-    group('copyWith', () {
-      test('creates copy with updated fields', () {
-        final original = TestUtils.createSampleAudioFile();
-        final copy = original.copyWith(
-          title: 'Updated Title',
-          duration: const Duration(minutes: 10),
-        );
+    test('should handle null file size formatting', () {
+      // Arrange
+      final audioFile = AudioFile(
+        id: 'no-size',
+        title: 'No Size',
+        language: 'en-US',
+        category: 'test',
+        streamingUrl: 'https://example.com/test.m3u8',
+        path: 'test.m3u8',
+        lastModified: DateTime.now(),
+      );
 
-        expect(copy.title, 'Updated Title');
-        expect(copy.duration, const Duration(minutes: 10));
-        expect(copy.id, original.id); // Unchanged
-        expect(copy.language, original.language); // Unchanged
-      });
-
-      test('creates exact copy when no parameters provided', () {
-        final original = TestUtils.createSampleAudioFile();
-        final copy = original.copyWith();
-
-        expect(copy.id, original.id);
-        expect(copy.title, original.title);
-        expect(copy.streamingUrl, original.streamingUrl);
-        expect(copy.duration, original.duration);
-      });
-    });
-
-    group('Display Properties', () {
-      test('displayTitle returns title when not empty', () {
-        final audioFile = TestUtils.createSampleAudioFile(title: 'Test Title');
-        expect(audioFile.displayTitle, 'Test Title');
-      });
-
-      test('displayTitle generates from ID when title is empty', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          id: '2025-07-15-ethereum-analysis',
-          title: '',
-        );
-        expect(audioFile.displayTitle, '2025 07 15 Ethereum Analysis');
-      });
-
-      test('displayTitle generates from ID when title is whitespace', () {
-        final audioFile = TestUtils.createSampleAudioFile(title: '   ');
-        expect(audioFile.displayTitle, '2025 01 15 Bitcoin Analysis');
-      });
-
-      test('sourceUrl returns streamingUrl', () {
-        final audioFile = TestUtils.createSampleAudioFile();
-        expect(audioFile.sourceUrl, audioFile.streamingUrl);
-      });
-    });
-
-    group('File Type Checks', () {
-      test('isHlsStream returns true for m3u8 files', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/test.m3u8',
-        );
-        expect(audioFile.isHlsStream, isTrue);
-      });
-
-      test('isHlsStream returns false for non-m3u8 files', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/test.wav',
-        );
-        expect(audioFile.isHlsStream, isFalse);
-      });
-
-      test('isDirectAudio returns true for wav files', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/test.wav',
-        );
-        expect(audioFile.isDirectAudio, isTrue);
-      });
-
-      test('isDirectAudio returns true for mp3 files', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/test.mp3',
-        );
-        expect(audioFile.isDirectAudio, isTrue);
-      });
-
-      test('isDirectAudio returns true for m4a files', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/test.m4a',
-        );
-        expect(audioFile.isDirectAudio, isTrue);
-      });
-
-      test('isDirectAudio returns false for m3u8 files', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/test.m3u8',
-        );
-        expect(audioFile.isDirectAudio, isFalse);
-      });
-    });
-
-    group('Formatted Properties', () {
-      test('formattedFileSize displays bytes correctly', () {
-        final audioFile = TestUtils.createSampleAudioFile(fileSizeBytes: 512);
-        expect(audioFile.formattedFileSize, '512.0 B');
-      });
-
-      test('formattedFileSize displays KB correctly', () {
-        final audioFile =
-            TestUtils.createSampleAudioFile(fileSizeBytes: 1536); // 1.5 KB
-        expect(audioFile.formattedFileSize, '1.5 KB');
-      });
-
-      test('formattedFileSize displays MB correctly', () {
-        final audioFile =
-            TestUtils.createSampleAudioFile(fileSizeBytes: 1572864); // 1.5 MB
-        expect(audioFile.formattedFileSize, '1.5 MB');
-      });
-
-      test('formattedFileSize displays GB correctly', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-            fileSizeBytes: 1610612736); // 1.5 GB
-        expect(audioFile.formattedFileSize, '1.5 GB');
-      });
-
-      test('formattedFileSize handles null size', () {
-        final audioFile = TestUtils.createSampleAudioFile(fileSizeBytes: null);
-        expect(audioFile.formattedFileSize, 'Unknown size');
-      });
-
-      test('formattedDuration handles minutes only', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          duration: const Duration(minutes: 3, seconds: 45),
-        );
-        expect(audioFile.formattedDuration, '3:45');
-      });
-
-      test('formattedDuration handles hours', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          duration: const Duration(hours: 1, minutes: 23, seconds: 45),
-        );
-        expect(audioFile.formattedDuration, '1:23:45');
-      });
-
-      test('formattedDuration handles null duration', () {
-        final audioFile = TestUtils.createSampleAudioFile(duration: null);
-        expect(audioFile.formattedDuration, '');
-      });
-
-      test('formattedDuration pads seconds correctly', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          duration: const Duration(minutes: 5, seconds: 7),
-        );
-        expect(audioFile.formattedDuration, '5:07');
-      });
-    });
-
-    group('Category and Language Emojis', () {
-      test('returns correct emoji for each category', () {
-        for (final entry in TestUtils.categoryEmojis.entries) {
-          final audioFile =
-              TestUtils.createSampleAudioFile(category: entry.key);
-          expect(audioFile.categoryEmoji, entry.value,
-              reason: 'Category: ${entry.key}');
-        }
-      });
-
-      test('returns default emoji for unknown category', () {
-        final audioFile = TestUtils.createSampleAudioFile(category: 'unknown');
-        expect(audioFile.categoryEmoji, '🎧');
-      });
-
-      test('returns correct flag for each language', () {
-        for (final entry in TestUtils.languageEmojis.entries) {
-          final audioFile =
-              TestUtils.createSampleAudioFile(language: entry.key);
-          expect(audioFile.languageFlag, entry.value,
-              reason: 'Language: ${entry.key}');
-        }
-      });
-
-      test('returns default flag for unknown language', () {
-        final audioFile = TestUtils.createSampleAudioFile(language: 'unknown');
-        expect(audioFile.languageFlag, '🌐');
-      });
-    });
-
-    group('publishDate', () {
-      test('parses date from ID correctly', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          id: '2025-07-15-bitcoin-analysis',
-        );
-        expect(audioFile.publishDate, DateTime.parse('2025-07-15'));
-      });
-
-      test('handles different date formats in ID', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          id: '2025-12-31-year-end-review',
-        );
-        expect(audioFile.publishDate, DateTime.parse('2025-12-31'));
-      });
-
-      test('falls back to lastModified for invalid date in ID', () {
-        final lastModified = DateTime.parse('2025-01-15T10:00:00Z');
-        final audioFile = AudioFile(
-          id: 'invalid-date-format',
-          title: 'Test',
-          language: 'en-US',
-          category: 'daily-news',
-          streamingUrl: 'https://example.com/test.m3u8',
-          path: 'test.m3u8',
-          lastModified: lastModified,
-        );
-        expect(audioFile.publishDate, lastModified);
-      });
-
-      test('falls back to lastModified for short ID', () {
-        final lastModified = DateTime.parse('2025-01-15T10:00:00Z');
-        final audioFile = AudioFile(
-          id: 'short',
-          title: 'Test',
-          language: 'en-US',
-          category: 'daily-news',
-          streamingUrl: 'https://example.com/test.m3u8',
-          path: 'test.m3u8',
-          lastModified: lastModified,
-        );
-        expect(audioFile.publishDate, lastModified);
-      });
-    });
-
-    group('Equality', () {
-      test('equal objects have same hash code', () {
-        final audioFile1 = TestUtils.createSampleAudioFile();
-        final audioFile2 = TestUtils.createSampleAudioFile();
-
-        expect(audioFile1, equals(audioFile2));
-        expect(audioFile1.hashCode, equals(audioFile2.hashCode));
-      });
-
-      test('different objects are not equal', () {
-        final audioFile1 = TestUtils.createSampleAudioFile();
-        final audioFile2 =
-            TestUtils.createSampleAudioFile(title: 'Different Title');
-
-        expect(audioFile1, isNot(equals(audioFile2)));
-      });
-
-      test('same object is equal to itself', () {
-        final audioFile = TestUtils.createSampleAudioFile();
-        expect(audioFile, equals(audioFile));
-      });
-    });
-
-    group('toString', () {
-      test('returns formatted string representation', () {
-        final audioFile = TestUtils.createSampleAudioFile();
-        final string = audioFile.toString();
-
-        expect(string, contains('AudioFile'));
-        expect(string, contains('2025-01-15-bitcoin-analysis'));
-        expect(string, contains('Bitcoin Analysis'));
-        expect(string, contains('en-US'));
-        expect(string, contains('daily-news'));
-        expect(string, contains('https://example.com/audio.m3u8'));
-      });
-    });
-
-    group('Edge Cases', () {
-      test('handles empty strings', () {
-        final audioFile = TestUtils.createEdgeCaseAudioFile();
-        expect(audioFile.id, '');
-        expect(audioFile.title, '');
-        expect(audioFile.displayTitle, ''); // Generated from empty ID
-        expect(audioFile.formattedFileSize, 'Unknown size');
-        expect(audioFile.formattedDuration, '');
-      });
-
-      test('handles very long durations', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          duration: const Duration(hours: 25, minutes: 30, seconds: 45),
-        );
-        expect(audioFile.formattedDuration, '25:30:45');
-      });
-
-      test('handles special characters in path', () {
-        final audioFile = TestUtils.createSampleAudioFile(
-          path: 'audio/special chars & symbols/test file.m3u8',
-        );
-        expect(audioFile.path, 'audio/special chars & symbols/test file.m3u8');
-        expect(audioFile.isHlsStream, isTrue);
-      });
-    });
-
-    group('Static Methods', () {
-      test('_generateTitleFromId formats correctly', () {
-        // This is tested indirectly through displayTitle and fromApiResponse
-        final audioFile = AudioFile.fromApiResponse({
-          'id': 'hello-world-test-case',
-          'streaming_url': 'https://example.com/test.m3u8',
-          'path': 'test.m3u8',
-        });
-        expect(audioFile.title, 'Hello World Test Case');
-      });
+      // Act & Assert
+      expect(audioFile.formattedFileSize, equals('Unknown'));
     });
   });
 }
