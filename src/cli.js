@@ -149,24 +149,39 @@ async function handleReview() {
 // Helper function to get user input
 function getUserInput() {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
+    let timeout;
+    let readableListener;
+    let errorListener;
+
+    const cleanup = () => {
+      if (timeout) clearTimeout(timeout);
+      if (readableListener)
+        process.stdin.removeListener("readable", readableListener);
+      if (errorListener) process.stdin.removeListener("error", errorListener);
+    };
+
+    timeout = setTimeout(() => {
+      cleanup();
       reject(new Error("Input timeout"));
     }, 300000); // 5 minute timeout
 
-    process.stdin.once("readable", () => {
-      clearTimeout(timeout);
+    readableListener = () => {
+      cleanup();
       const chunk = process.stdin.read();
       if (chunk !== null) {
         resolve(chunk.toString().trim());
       } else {
         reject(new Error("No input received"));
       }
-    });
+    };
 
-    process.stdin.once("error", (error) => {
-      clearTimeout(timeout);
+    errorListener = (error) => {
+      cleanup();
       reject(error);
-    });
+    };
+
+    process.stdin.once("readable", readableListener);
+    process.stdin.once("error", errorListener);
   });
 }
 
