@@ -423,7 +423,7 @@ class ContentService extends ChangeNotifier {
 
   /// Get unfinished episodes (started but not completed)
   List<AudioFile> getUnfinishedEpisodes() {
-    return _allEpisodes
+    return _filteredEpisodes
         .where((episode) => isEpisodeUnfinished(episode.id))
         .toList();
   }
