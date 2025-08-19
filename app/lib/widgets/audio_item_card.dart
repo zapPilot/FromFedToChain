@@ -120,8 +120,10 @@ class AudioItemCard extends StatelessWidget {
 
         const SizedBox(height: AppTheme.spacingXS),
 
-        // Category and language info
-        Row(
+        // Category and language info - wrapped to prevent overflow
+        Wrap(
+          spacing: AppTheme.spacingS,
+          runSpacing: AppTheme.spacingXS,
           children: [
             // Category chip
             _buildInfoChip(
@@ -129,8 +131,6 @@ class AudioItemCard extends StatelessWidget {
                   '${audioFile.categoryEmoji} ${ApiConfig.getCategoryDisplayName(audioFile.category)}',
               color: AppTheme.getCategoryColor(audioFile.category),
             ),
-
-            const SizedBox(width: AppTheme.spacingS),
 
             // Language chip
             _buildInfoChip(
@@ -143,47 +143,50 @@ class AudioItemCard extends StatelessWidget {
 
         const SizedBox(height: AppTheme.spacingXS),
 
-        // Additional metadata
-        Row(
-          children: [
-            // Date
-            Text(
-              _formatDate(audioFile.publishDate),
-              style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
-              ),
-            ),
-
-            if (audioFile.duration != null) ...[
+        // Additional metadata - scrollable to prevent overflow
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              // Date
               Text(
-                ' • ',
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.4),
-                ),
-              ),
-              Text(
-                audioFile.formattedDuration,
+                _formatDate(audioFile.publishDate),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.onSurfaceColor.withOpacity(0.6),
                 ),
               ),
-            ],
 
-            if (audioFile.fileSizeBytes != null) ...[
-              Text(
-                ' • ',
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.4),
+              if (audioFile.duration != null) ...[
+                Text(
+                  ' • ',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.onSurfaceColor.withOpacity(0.4),
+                  ),
                 ),
-              ),
-              Text(
-                audioFile.formattedFileSize,
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                Text(
+                  audioFile.formattedDuration,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                  ),
                 ),
-              ),
+              ],
+
+              if (audioFile.fileSizeBytes != null) ...[
+                Text(
+                  ' • ',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.onSurfaceColor.withOpacity(0.4),
+                  ),
+                ),
+                Text(
+                  audioFile.formattedFileSize,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
 
         // Currently playing indicator

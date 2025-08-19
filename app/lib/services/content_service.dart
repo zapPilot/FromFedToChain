@@ -107,8 +107,9 @@ class ContentService extends ChangeNotifier {
         });
       }
 
-      // Validate loaded language
-      if (!ApiConfig.isValidLanguage(_selectedLanguage)) {
+      // Validate loaded language (reset 'all' to default language)
+      if (!ApiConfig.isValidLanguage(_selectedLanguage) ||
+          _selectedLanguage == 'all') {
         _selectedLanguage = 'zh-TW';
       }
 
@@ -590,11 +591,9 @@ class ContentService extends ChangeNotifier {
     var filtered = List<AudioFile>.from(_allEpisodes);
 
     // Filter by language
-    if (_selectedLanguage != 'all') {
-      filtered = filtered
-          .where((episode) => episode.language == _selectedLanguage)
-          .toList();
-    }
+    filtered = filtered
+        .where((episode) => episode.language == _selectedLanguage)
+        .toList();
 
     // Filter by category
     if (_selectedCategory != 'all') {

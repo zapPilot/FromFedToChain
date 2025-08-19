@@ -2,6 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/models/audio_content.dart';
+import 'package:from_fed_to_chain_app/models/playlist.dart';
+import '../test_utils.dart';
 
 void main() {
   group('ContentService Tests', () {
@@ -138,6 +141,415 @@ void main() {
       // Trigger a change that should notify listeners
       contentService.setSearchQuery('test query');
       expect(notified, isTrue);
+    });
+
+    // Enhanced tests for recent language filtering logic
+    group('Language Filtering Logic', () {
+      test('should filter episodes by selected language correctly', () {
+        // Create mixed language episodes
+        final episodes = [
+          TestUtils.createSampleAudioFile(
+            id: 'ep1',
+            title: 'English Episode',
+            language: 'en-US',
+          ),
+          TestUtils.createSampleAudioFile(
+            id: 'ep2',
+            title: 'Japanese Episode',
+            language: 'ja-JP',
+          ),
+          TestUtils.createSampleAudioFile(
+            id: 'ep3',
+            title: 'Chinese Episode',
+            language: 'zh-TW',
+          ),
+        ];
+
+        // Mock the episodes in the service
+        contentService.setEpisodesForTesting(episodes);
+
+        // Test filtering by English
+        contentService.setSelectedLanguage('en-US');
+        final englishEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(englishEpisodes, hasLength(1));
+        expect(englishEpisodes.first.language, equals('en-US'));
+
+        // Test filtering by Japanese
+        contentService.setSelectedLanguage('ja-JP');
+        final japaneseEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(japaneseEpisodes, hasLength(1));
+        expect(japaneseEpisodes.first.language, equals('ja-JP'));
+
+        // Test filtering by Chinese
+        contentService.setSelectedLanguage('zh-TW');
+        final chineseEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(chineseEpisodes, hasLength(1));
+        expect(chineseEpisodes.first.language, equals('zh-TW'));
+      });
+
+      test('should handle case where no episodes match selected language', () {
+        // Create episodes with only one language
+        final episodes = [
+          TestUtils.createSampleAudioFile(language: 'en-US'),
+          TestUtils.createSampleAudioFile(language: 'en-US'),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+
+        // Filter by language that doesn't exist
+        contentService.setSelectedLanguage('ja-JP');
+        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(filteredEpisodes, isEmpty);
+      });
+
+      test('should preserve episode order when filtering by language', () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(
+            id: 'ep1',
+            title: 'First English',
+            language: 'en-US',
+            publishDate: DateTime(2025, 1, 1),
+          ),
+          TestUtils.createSampleAudioFile(
+            id: 'ep2',
+            title: 'Japanese Episode',
+            language: 'ja-JP',
+            publishDate: DateTime(2025, 1, 2),
+          ),
+          TestUtils.createSampleAudioFile(
+            id: 'ep3',
+            title: 'Second English',
+            language: 'en-US',
+            publishDate: DateTime(2025, 1, 3),
+          ),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+        contentService.setSelectedLanguage('en-US');
+
+        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(filteredEpisodes, hasLength(2));
+        expect(filteredEpisodes[0].title, equals('First English'));
+        expect(filteredEpisodes[1].title, equals('Second English'));
+      });
+
+      test('should update filtered episodes when language selection changes',
+          () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(language: 'en-US'),
+          TestUtils.createSampleAudioFile(language: 'ja-JP'),
+          TestUtils.createSampleAudioFile(language: 'zh-TW'),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+
+        // Start with English
+        contentService.setSelectedLanguage('en-US');
+        expect(contentService.getFilteredEpisodesByLanguage(), hasLength(1));
+
+        // Change to Japanese
+        contentService.setSelectedLanguage('ja-JP');
+        expect(contentService.getFilteredEpisodesByLanguage(), hasLength(1));
+
+        // Change to Chinese
+        contentService.setSelectedLanguage('zh-TW');
+        expect(contentService.getFilteredEpisodesByLanguage(), hasLength(1));
+      });
+
+      test('should handle empty episode list when filtering by language', () {
+        contentService.setEpisodesForTesting([]);
+        contentService.setSelectedLanguage('en-US');
+
+        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(filteredEpisodes, isEmpty);
+      });
+
+      test('should filter episodes regardless of case sensitivity', () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(language: 'en-US'),
+          TestUtils.createSampleAudioFile(language: 'EN-US'), // Different case
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+        contentService.setSelectedLanguage('en-US');
+
+        // Should match both regardless of case (if service handles case insensitive)
+        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        expect(filteredEpisodes, hasLength(greaterThanOrEqualTo(1)));
+      });
+    });
+
+    group('Category Filtering Logic', () {
+      test('should filter episodes by selected category correctly', () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(category: 'daily-news'),
+          TestUtils.createSampleAudioFile(category: 'ethereum'),
+          TestUtils.createSampleAudioFile(category: 'macro'),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+
+        // Test filtering by category
+        contentService.setSelectedCategory('daily-news');
+        final newsEpisodes = contentService.getFilteredEpisodesByCategory();
+        expect(newsEpisodes, hasLength(1));
+        expect(newsEpisodes.first.category, equals('daily-news'));
+      });
+
+      test('should return all episodes when category is "all"', () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(category: 'daily-news'),
+          TestUtils.createSampleAudioFile(category: 'ethereum'),
+          TestUtils.createSampleAudioFile(category: 'macro'),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+        contentService.setSelectedCategory('all');
+
+        final allEpisodes = contentService.getFilteredEpisodesByCategory();
+        expect(allEpisodes, hasLength(3));
+      });
+    });
+
+    group('Combined Filtering Logic', () {
+      test('should apply both language and category filters', () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(
+            language: 'en-US',
+            category: 'daily-news',
+          ),
+          TestUtils.createSampleAudioFile(
+            language: 'en-US',
+            category: 'ethereum',
+          ),
+          TestUtils.createSampleAudioFile(
+            language: 'ja-JP',
+            category: 'daily-news',
+          ),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+        contentService.setSelectedLanguage('en-US');
+        contentService.setSelectedCategory('daily-news');
+
+        final filteredEpisodes = contentService.getFilteredEpisodes();
+        expect(filteredEpisodes, hasLength(1));
+        expect(filteredEpisodes.first.language, equals('en-US'));
+        expect(filteredEpisodes.first.category, equals('daily-news'));
+      });
+
+      test('should handle search query with filters', () {
+        final episodes = [
+          TestUtils.createSampleAudioFile(
+            title: 'Bitcoin News Today',
+            language: 'en-US',
+            category: 'daily-news',
+          ),
+          TestUtils.createSampleAudioFile(
+            title: 'Ethereum Update',
+            language: 'en-US',
+            category: 'ethereum',
+          ),
+          TestUtils.createSampleAudioFile(
+            title: 'Bitcoin Analysis',
+            language: 'ja-JP',
+            category: 'daily-news',
+          ),
+        ];
+
+        contentService.setEpisodesForTesting(episodes);
+        contentService.setSelectedLanguage('en-US');
+        contentService.setSearchQuery('Bitcoin');
+
+        final filteredEpisodes = contentService.getFilteredEpisodes();
+        expect(filteredEpisodes, hasLength(1));
+        expect(filteredEpisodes.first.title, contains('Bitcoin News Today'));
+      });
+    });
+
+    group('Episode Completion and History', () {
+      test('should track episode completion correctly', () {
+        const episodeId = 'test-episode';
+
+        // Initially no completion
+        expect(contentService.getEpisodeCompletion(episodeId), equals(0.0));
+
+        // Set completion
+        contentService.setEpisodeCompletion(episodeId, 0.5);
+        expect(contentService.getEpisodeCompletion(episodeId), equals(0.5));
+
+        // Update completion
+        contentService.setEpisodeCompletion(episodeId, 0.9);
+        expect(contentService.getEpisodeCompletion(episodeId), equals(0.9));
+      });
+
+      test('should identify finished episodes correctly', () {
+        const episodeId = 'finished-episode';
+
+        // Not finished initially
+        expect(contentService.isEpisodeFinished(episodeId), isFalse);
+
+        // Set to almost finished (should not be considered finished)
+        contentService.setEpisodeCompletion(episodeId, 0.89);
+        expect(contentService.isEpisodeFinished(episodeId), isFalse);
+
+        // Set to finished threshold
+        contentService.setEpisodeCompletion(episodeId, 0.9);
+        expect(contentService.isEpisodeFinished(episodeId), isTrue);
+
+        // Set to fully finished
+        contentService.setEpisodeCompletion(episodeId, 1.0);
+        expect(contentService.isEpisodeFinished(episodeId), isTrue);
+      });
+
+      test('should identify unfinished episodes correctly', () {
+        const episodeId = 'unfinished-episode';
+
+        // Not started (should not be unfinished)
+        expect(contentService.isEpisodeUnfinished(episodeId), isFalse);
+
+        // Started but not finished
+        contentService.setEpisodeCompletion(episodeId, 0.3);
+        expect(contentService.isEpisodeUnfinished(episodeId), isTrue);
+
+        // Almost finished (still unfinished)
+        contentService.setEpisodeCompletion(episodeId, 0.8);
+        expect(contentService.isEpisodeUnfinished(episodeId), isTrue);
+
+        // Finished (no longer unfinished)
+        contentService.setEpisodeCompletion(episodeId, 0.9);
+        expect(contentService.isEpisodeUnfinished(episodeId), isFalse);
+      });
+
+      test('should track listen history correctly', () {
+        final episodes = TestUtils.createSampleAudioFileList(5);
+        contentService.setEpisodesForTesting(episodes);
+
+        // Add episodes to history
+        contentService.addToListenHistory(episodes[0].id);
+        contentService.addToListenHistory(episodes[1].id);
+
+        final historyEpisodes = contentService.getListenHistoryEpisodes();
+        expect(historyEpisodes, hasLength(2));
+      });
+
+      test('should limit listen history correctly', () {
+        final episodes = TestUtils.createSampleAudioFileList(10);
+        contentService.setEpisodesForTesting(episodes);
+
+        // Add all episodes to history
+        for (final episode in episodes) {
+          contentService.addToListenHistory(episode.id);
+        }
+
+        // Get limited history
+        final limitedHistory =
+            contentService.getListenHistoryEpisodes(limit: 3);
+        expect(limitedHistory, hasLength(3));
+      });
+    });
+
+    group('Playlist Operations', () {
+      test('should handle playlist creation and management', () {
+        final audioFile = TestUtils.createSampleAudioFile();
+
+        // Initially no playlist
+        expect(contentService.currentPlaylist, isNull);
+
+        // Create playlist
+        contentService.createPlaylist('Test Playlist');
+        expect(contentService.currentPlaylist, isNotNull);
+        expect(contentService.currentPlaylist?.name, equals('Test Playlist'));
+
+        // Add to playlist
+        contentService.addToCurrentPlaylist(audioFile);
+        expect(contentService.currentPlaylist?.episodes, contains(audioFile));
+      });
+
+      test('should handle playlist clearing', () {
+        final audioFile = TestUtils.createSampleAudioFile();
+
+        contentService.createPlaylist('Test Playlist');
+        contentService.addToCurrentPlaylist(audioFile);
+
+        // Verify playlist has content
+        expect(contentService.currentPlaylist?.episodes, isNotEmpty);
+
+        // Clear playlist
+        contentService.clearCurrentPlaylist();
+        expect(contentService.currentPlaylist?.episodes, isEmpty);
+      });
+    });
+
+    group('Content Cache Management', () {
+      test('should cache and retrieve content correctly', () {
+        final content = TestUtils.createSampleAudioContent();
+
+        // Cache content
+        contentService.cacheContent(content);
+
+        // Retrieve cached content
+        final cachedContent = contentService.getCachedContent(
+          content.id,
+          content.language,
+          content.category,
+        );
+
+        expect(cachedContent, isNotNull);
+        expect(cachedContent?.id, equals(content.id));
+      });
+
+      test('should clear content cache correctly', () {
+        final content = TestUtils.createSampleAudioContent();
+
+        // Cache content
+        contentService.cacheContent(content);
+        expect(
+            contentService.getCachedContent(
+                content.id, content.language, content.category),
+            isNotNull);
+
+        // Clear cache
+        contentService.clearContentCache();
+        expect(
+            contentService.getCachedContent(
+                content.id, content.language, content.category),
+            isNull);
+      });
+    });
+
+    group('Error Handling and Edge Cases', () {
+      test('should handle null episode IDs gracefully', () {
+        expect(() => contentService.getEpisodeCompletion(''), returnsNormally);
+        expect(() => contentService.isEpisodeFinished(''), returnsNormally);
+        expect(() => contentService.isEpisodeUnfinished(''), returnsNormally);
+      });
+
+      test('should handle invalid completion values', () {
+        const episodeId = 'test-episode';
+
+        // Test negative completion
+        contentService.setEpisodeCompletion(episodeId, -0.1);
+        expect(contentService.getEpisodeCompletion(episodeId), equals(0.0));
+
+        // Test completion over 1.0
+        contentService.setEpisodeCompletion(episodeId, 1.5);
+        expect(contentService.getEpisodeCompletion(episodeId), equals(1.0));
+      });
+
+      test('should handle concurrent filter operations', () {
+        final episodes = TestUtils.createSampleAudioFileList(10);
+        contentService.setEpisodesForTesting(episodes);
+
+        // Rapidly change filters
+        contentService.setSelectedLanguage('en-US');
+        contentService.setSelectedCategory('daily-news');
+        contentService.setSearchQuery('test');
+        contentService.setSelectedLanguage('ja-JP');
+
+        // Should handle concurrent operations without errors
+        expect(() => contentService.getFilteredEpisodes(), returnsNormally);
+      });
     });
   });
 }

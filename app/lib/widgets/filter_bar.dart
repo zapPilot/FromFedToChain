@@ -50,17 +50,6 @@ class FilterBar extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              // All languages option
-              _buildFilterChip(
-                label: 'All',
-                value: 'all',
-                isSelected: selectedLanguage == 'all',
-                onTap: () => onLanguageChanged('all'),
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
-              ),
-
-              const SizedBox(width: AppTheme.spacingS),
-
               // Individual language options
               ...ApiConfig.supportedLanguages.map((language) {
                 return Padding(
