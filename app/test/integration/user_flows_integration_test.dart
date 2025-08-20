@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:from_fed_to_chain_app/screens/home_screen.dart';
 import 'package:from_fed_to_chain_app/screens/player_screen.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/services/audio_service.dart';
+import 'package:from_fed_to_chain_app/services/auth/auth_service.dart';
 import 'package:from_fed_to_chain_app/widgets/mini_player.dart';
 
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
@@ -15,11 +17,21 @@ void main() {
   group('User Flows Integration Tests', () {
     late ContentService contentService;
     late AudioService audioService;
+    late AuthService authService;
+
+    setUpAll(() async {
+      // Initialize dotenv with test environment variables
+      dotenv.testLoad(fileInput: '''
+AUDIO_API_BASE_URL=https://test-api.example.com
+ENVIRONMENT=test
+''');
+    });
 
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       contentService = ContentService();
       audioService = AudioService(null, contentService);
+      authService = AuthService();
 
       // Setup test data
       final testEpisodes = TestUtils.createSampleAudioFileList(15);
@@ -29,6 +41,7 @@ void main() {
     tearDown(() {
       contentService.dispose();
       audioService.dispose();
+      authService.dispose();
     });
 
     /// Helper to create the main app with providers
@@ -37,6 +50,7 @@ void main() {
         providers: [
           ChangeNotifierProvider<ContentService>.value(value: contentService),
           ChangeNotifierProvider<AudioService>.value(value: audioService),
+          ChangeNotifierProvider<AuthService>.value(value: authService),
         ],
         child: MaterialApp(
           theme: AppTheme.darkTheme,

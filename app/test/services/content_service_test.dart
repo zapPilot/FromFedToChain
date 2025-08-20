@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
@@ -8,6 +9,14 @@ import '../test_utils.dart';
 void main() {
   group('ContentService Tests', () {
     late ContentService contentService;
+
+    setUpAll(() async {
+      // Initialize dotenv with test environment variables
+      dotenv.testLoad(fileInput: '''
+AUDIO_API_BASE_URL=https://test-api.example.com
+ENVIRONMENT=test
+''');
+    });
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});
@@ -280,7 +289,7 @@ void main() {
     });
 
     group('Category Filtering Logic', () {
-      test('should filter episodes by selected category correctly', () {
+      test('should filter episodes by selected category correctly', () async {
         final episodes = [
           TestUtils.createSampleAudioFile(category: 'daily-news'),
           TestUtils.createSampleAudioFile(category: 'ethereum'),
@@ -289,14 +298,19 @@ void main() {
 
         contentService.setEpisodesForTesting(episodes);
 
+        // Set language to same as episode language to ensure episodes are not filtered out by language
+        contentService.setSelectedLanguage(episodes.first.language);
+
         // Test filtering by category
         contentService.setSelectedCategory('daily-news');
+        await Future.delayed(Duration.zero); // Allow time for filtering
+
         final newsEpisodes = contentService.getFilteredEpisodes();
         expect(newsEpisodes, hasLength(1));
         expect(newsEpisodes.first.category, equals('daily-news'));
       });
 
-      test('should return all episodes when category is "all"', () {
+      test('should return all episodes when category is "all"', () async {
         final episodes = [
           TestUtils.createSampleAudioFile(category: 'daily-news'),
           TestUtils.createSampleAudioFile(category: 'ethereum'),
@@ -304,7 +318,11 @@ void main() {
         ];
 
         contentService.setEpisodesForTesting(episodes);
+
+        // Set language to same as episode language to ensure episodes are not filtered out by language
+        contentService.setSelectedLanguage(episodes.first.language);
         contentService.setSelectedCategory('all');
+        await Future.delayed(Duration.zero); // Allow time for filtering
 
         final allEpisodes = contentService.getFilteredEpisodes();
         expect(allEpisodes, hasLength(3));

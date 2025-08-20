@@ -445,7 +445,7 @@ void main() {
       loadMoreCalled = false;
 
       // Find loading indicator and verify onLoadMore can be triggered
-      TestUtils.expectWidgetExists(find.byType(CircularProgressIndicator));
+      expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
 
       // The onLoadMore callback would typically be triggered by scroll events
       // For this test, we just verify it can be called

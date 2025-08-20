@@ -1,11 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
 void main() {
   group('ContentService Basic Tests', () {
     late ContentService contentService;
+
+    setUpAll(() async {
+      // Initialize dotenv with test environment variables
+      dotenv.testLoad(fileInput: '''
+AUDIO_API_BASE_URL=https://test-api.example.com
+ENVIRONMENT=test
+''');
+    });
 
     setUp(() async {
       // Initialize test binding and mock SharedPreferences
