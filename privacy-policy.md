@@ -8,8 +8,6 @@ From Fed to Chain ("we", "our", or "us") is committed to protecting your privacy
 
 We do not collect, store, or share any personal information through the From Fed to Chain app.
 
-- No user accounts or login is required.
-- No personal data such as name, email, or device ID is collected.
 - No analytics or tracking is implemented.
 - No third-party advertising services are used.
 
