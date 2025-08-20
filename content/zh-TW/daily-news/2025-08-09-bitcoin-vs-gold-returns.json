@@ -15,7 +15,13 @@
   "audio_file": null,
   "social_hook": null,
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "rejected",
+      "score": 2,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-17T00:01:29.683Z",
+      "comments": "沒有知識點"
+    }
   },
-  "updated_at": "2025-08-10T03:05:00.000Z"
+  "updated_at": "2025-08-17T00:01:29.683Z"
 }

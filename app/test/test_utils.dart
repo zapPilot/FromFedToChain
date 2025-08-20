@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/models/audio_content.dart';
+import 'package:from_fed_to_chain_app/models/playlist.dart';
+import 'package:from_fed_to_chain_app/themes/app_theme.dart';
 
-/// Simple test utilities without complex dependencies
+/// Comprehensive test utilities for Flutter testing
 class TestUtils {
   /// Create sample data for testing
   static Map<String, dynamic> createSampleData({
@@ -135,4 +140,372 @@ class TestUtils {
       scaffoldBackgroundColor: Colors.black,
     );
   }
+
+  /// Create sample AudioFile for testing
+  static AudioFile createSampleAudioFile({
+    String id = 'test-audio-file',
+    String title = 'Test Audio File',
+    String language = 'en-US',
+    String category = 'daily-news',
+    String streamingUrl = 'https://example.com/test.m3u8',
+    Duration? duration,
+    int? fileSizeBytes,
+    DateTime? lastModified,
+    DateTime? publishDate,
+  }) {
+    return AudioFile(
+      id: id,
+      title: title,
+      language: language,
+      category: category,
+      streamingUrl: streamingUrl,
+      path: '$id.m3u8',
+      duration: duration ?? const Duration(minutes: 5),
+      fileSizeBytes: fileSizeBytes ?? 1024 * 1024,
+      lastModified: lastModified ?? DateTime.now(),
+    );
+  }
+
+  /// Create sample AudioContent for testing
+  static AudioContent createSampleAudioContent({
+    String id = 'test-content',
+    String title = 'Test Content',
+    String language = 'en-US',
+    String category = 'daily-news',
+    String status = 'published',
+    String? description,
+    List<String>? references,
+    String? socialHook,
+    Duration? duration,
+    DateTime? date,
+    DateTime? updatedAt,
+  }) {
+    return AudioContent(
+      id: id,
+      title: title,
+      language: language,
+      category: category,
+      status: status,
+      description: description ?? 'Test description for $title',
+      references: references ?? ['Test Reference 1', 'Test Reference 2'],
+      socialHook: socialHook ?? 'Test social hook',
+      duration: duration ?? const Duration(minutes: 5),
+      date: date ?? DateTime.now(),
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
+  }
+
+  /// Create sample Playlist for testing
+  static Playlist createSamplePlaylist({
+    String id = 'test-playlist',
+    String name = 'Test Playlist',
+    List<AudioFile>? episodes,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Playlist(
+      id: id,
+      name: name,
+      episodes: episodes ?? [createSampleAudioFile()],
+      createdAt: createdAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
+  }
+
+  /// Create a list of sample AudioFiles
+  static List<AudioFile> createSampleAudioFileList(int count) {
+    return List.generate(count, (index) {
+      return createSampleAudioFile(
+        id: 'test-audio-$index',
+        title: 'Test Audio Title $index',
+        category: testCategories[index % testCategories.length],
+        language: testLanguages[index % testLanguages.length],
+        duration: Duration(minutes: 5 + index),
+      );
+    });
+  }
+
+  /// Create test widget wrapper with MaterialApp and theme
+  static Widget wrapWithMaterialApp(
+    Widget child, {
+    ThemeData? theme,
+    Locale? locale,
+    List<NavigatorObserver>? navigatorObservers,
+  }) {
+    return MaterialApp(
+      theme: theme ?? createTestTheme(),
+      locale: locale,
+      navigatorObservers: navigatorObservers ?? [],
+      home: Scaffold(body: child),
+    );
+  }
+
+  /// Create test widget wrapper with full app structure
+  static Widget wrapWithFullApp(
+    Widget child, {
+    ThemeData? theme,
+    Locale? locale,
+  }) {
+    return MaterialApp(
+      theme: theme ?? AppTheme.darkTheme,
+      locale: locale,
+      home: Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        body: child,
+      ),
+    );
+  }
+
+  /// Pump widget with common setup
+  static Future<void> pumpWidgetWithMaterialApp(
+    WidgetTester tester,
+    Widget child, {
+    ThemeData? theme,
+    Locale? locale,
+  }) async {
+    await tester
+        .pumpWidget(wrapWithMaterialApp(child, theme: theme, locale: locale));
+  }
+
+  /// Find widget by type and optional key
+  static Finder findWidgetByType<T extends Widget>([Key? key]) {
+    return key != null ? find.byKey(key) : find.byType(T);
+  }
+
+  /// Find text widget with specific text
+  static Finder findTextWidget(String text) {
+    return find.text(text);
+  }
+
+  /// Find icon widget with specific icon
+  static Finder findIconWidget(IconData icon) {
+    return find.byIcon(icon);
+  }
+
+  /// Assert widget exists
+  static void expectWidgetExists(Finder finder) {
+    expect(finder, findsOneWidget);
+  }
+
+  /// Assert widget doesn't exist
+  static void expectWidgetNotExists(Finder finder) {
+    expect(finder, findsNothing);
+  }
+
+  /// Assert text exists
+  static void expectTextExists(String text) {
+    expectWidgetExists(findTextWidget(text));
+  }
+
+  /// Assert icon exists
+  static void expectIconExists(IconData icon) {
+    expectWidgetExists(findIconWidget(icon));
+  }
+
+  /// Simulate scroll
+  static Future<void> scrollWidget(
+    WidgetTester tester,
+    Finder scrollable,
+    Offset offset,
+  ) async {
+    await tester.drag(scrollable, offset);
+    await tester.pumpAndSettle();
+  }
+
+  /// Simulate tap with settling
+  static Future<void> tapWidget(
+    WidgetTester tester,
+    Finder widget,
+  ) async {
+    await tester.tap(widget);
+    await tester.pumpAndSettle();
+  }
+
+  /// Simulate long press with settling
+  static Future<void> longPressWidget(
+    WidgetTester tester,
+    Finder widget,
+  ) async {
+    await tester.longPress(widget);
+    await tester.pumpAndSettle();
+  }
+
+  /// Enter text with settling
+  static Future<void> enterTextInWidget(
+    WidgetTester tester,
+    Finder widget,
+    String text,
+  ) async {
+    await tester.enterText(widget, text);
+    await tester.pumpAndSettle();
+  }
+
+  /// Wait for animation completion
+  static Future<void> waitForAnimation(
+    WidgetTester tester, [
+    Duration duration = const Duration(milliseconds: 500),
+  ]) async {
+    await tester.pump(duration);
+    await tester.pumpAndSettle();
+  }
+
+  /// Generate test error scenarios
+  static List<Map<String, dynamic>> generateErrorScenarios() {
+    return [
+      {
+        'type': 'network',
+        'message': 'Network connection failed',
+        'code': 'NETWORK_ERROR',
+      },
+      {
+        'type': 'loading',
+        'message': 'Failed to load content',
+        'code': 'LOADING_ERROR',
+      },
+      {
+        'type': 'audio',
+        'message': 'Audio playback error',
+        'code': 'AUDIO_ERROR',
+      },
+      {
+        'type': 'auth',
+        'message': 'Authentication failed',
+        'code': 'AUTH_ERROR',
+      },
+    ];
+  }
+
+  /// Create test statistics with various scenarios
+  static Map<String, int> generateVariedTestStatistics({
+    int totalEpisodes = 100,
+    int filteredEpisodes = 50,
+    int recentEpisodes = 20,
+    int unfinishedEpisodes = 5,
+  }) {
+    return {
+      'totalEpisodes': totalEpisodes,
+      'filteredEpisodes': filteredEpisodes,
+      'recentEpisodes': recentEpisodes,
+      'unfinishedEpisodes': unfinishedEpisodes,
+    };
+  }
+
+  /// Create realistic audio file sizes for different durations
+  static int calculateAudioFileSize(Duration duration) {
+    // Approximate HLS stream size calculation (320kbps)
+    const int bitrateKbps = 320;
+    final int durationSeconds = duration.inSeconds;
+    return (bitrateKbps * 1024 * durationSeconds) ~/ 8;
+  }
+
+  /// Generate test streaming URLs
+  static Map<String, String> generateTestStreamingUrls(String id) {
+    return {
+      'hls': 'https://example.com/streams/$id.m3u8',
+      'mp3': 'https://example.com/audio/$id.mp3',
+      'opus': 'https://example.com/audio/$id.opus',
+    };
+  }
+
+  /// Generate test timestamps for different scenarios
+  static List<DateTime> generateTestTimestamps({
+    int count = 10,
+    Duration? spacing,
+    DateTime? startDate,
+  }) {
+    final start =
+        startDate ?? DateTime.now().subtract(const Duration(days: 30));
+    final interval = spacing ?? const Duration(days: 3);
+
+    return List.generate(count, (index) {
+      return start.add(Duration(milliseconds: interval.inMilliseconds * index));
+    });
+  }
+
+  /// Create test completion percentages
+  static Map<String, double> generateTestCompletions(List<String> episodeIds) {
+    return Map.fromEntries(
+      episodeIds.asMap().entries.map((entry) {
+        final index = entry.key;
+        final id = entry.value;
+        // Create varied completion percentages
+        return MapEntry(id, (index * 0.1) % 1.0);
+      }),
+    );
+  }
+
+  /// Test data validation helpers
+  static void validateAudioFile(AudioFile audioFile) {
+    expect(audioFile.id, isNotEmpty);
+    expect(audioFile.title, isNotEmpty);
+    expect(audioFile.language, isIn(testLanguages));
+    expect(audioFile.category, isIn(testCategories));
+    expect(audioFile.streamingUrl, isNotEmpty);
+    expect(audioFile.path, isNotEmpty);
+  }
+
+  static void validateAudioContent(AudioContent content) {
+    expect(content.id, isNotEmpty);
+    expect(content.title, isNotEmpty);
+    expect(content.language, isIn(testLanguages));
+    expect(content.category, isIn(testCategories));
+    expect(content.status, isNotEmpty);
+  }
+
+  /// Mock async operation results
+  static Future<T> mockAsyncSuccess<T>(T result, {Duration? delay}) async {
+    await Future.delayed(delay ?? const Duration(milliseconds: 100));
+    return result;
+  }
+
+  static Future<T> mockAsyncError<T>(String message, {Duration? delay}) async {
+    await Future.delayed(delay ?? const Duration(milliseconds: 100));
+    throw Exception(message);
+  }
 }
+
+// Extension to add testing methods to ContentService for integration tests
+// Note: These methods would need to be implemented in the actual ContentService class
+// extension ContentServiceTesting on ContentService {
+//   void setEpisodesForTesting(List<AudioFile> episodes) {
+//     // This would be implemented in the actual ContentService class
+//     // to allow setting test data for integration tests
+//   }
+//
+//   void setLoadingForTesting(bool isLoading) {
+//     // This would be implemented in the actual ContentService class
+//     // to simulate loading states in tests
+//   }
+//
+//   void setErrorForTesting(String error) {
+//     // This would be implemented in the actual ContentService class
+//     // to simulate error states in tests
+//   }
+//
+//   List<AudioFile> getFilteredEpisodesByLanguage() {
+//     // This would be implemented in the actual ContentService class
+//     // to return episodes filtered by selected language
+//     return [];
+//   }
+//
+//   List<AudioFile> getFilteredEpisodesByCategory() {
+//     // This would be implemented in the actual ContentService class
+//     // to return episodes filtered by selected category
+//     return [];
+//   }
+//
+//   void setLanguage(String language) {
+//     // This would be implemented in the actual ContentService class
+//     // to set the selected language
+//   }
+//
+//   void setCategory(String category) {
+//     // This would be implemented in the actual ContentService class
+//     // to set the selected category
+//   }
+//
+//   void setSortOrder(String sortOrder) {
+//     // This would be implemented in the actual ContentService class
+//     // to set the sort order
+//   }
+// }

@@ -443,6 +443,18 @@ class AudioService extends ChangeNotifier {
     }
   }
 
+  /// Skip to next episode (public method for testing compatibility)
+  Future<void> skipToNext() => skipToNextEpisode();
+
+  /// Skip to previous episode (public method for testing compatibility)
+  Future<void> skipToPrevious() => skipToPreviousEpisode();
+
+  /// Skip forward by 30 seconds (alias for seekForward)
+  Future<void> seekForward() async => skipForward();
+
+  /// Skip backward by 10 seconds (alias for seekBackward)
+  Future<void> seekBackward() async => skipBackward();
+
   /// Skip to next episode
   Future<void> _skipToNextEpisode() async {
     if (_contentService == null || _currentAudioFile == null) {
@@ -541,6 +553,110 @@ class AudioService extends ChangeNotifier {
     }
   }
 
+  /// Play audio file (alias for playAudio for test compatibility)
+  Future<void> play(AudioFile audioFile) => playAudio(audioFile);
+
+  /// Pause playback
+  Future<void> pause() async {
+    if (_audioHandler != null) {
+      await _audioHandler!.pause();
+    } else {
+      await _audioPlayer.pause();
+    }
+  }
+
+  /// Resume playback
+  Future<void> resume() async {
+    if (_audioHandler != null) {
+      await _audioHandler!.play();
+    } else {
+      await _audioPlayer.play();
+    }
+  }
+
+  /// Stop playback
+  Future<void> stop() async {
+    if (_audioHandler != null) {
+      await _audioHandler!.stop();
+    } else {
+      await _audioPlayer.stop();
+    }
+    _playbackState = PlaybackState.stopped;
+    _currentPosition = Duration.zero;
+    notifyListeners();
+  }
+
+  /// Toggle autoplay
+  void toggleAutoplay() {
+    setAutoplayEnabled(!_autoplayEnabled);
+  }
+
+  /// Toggle repeat
+  void toggleRepeat() {
+    setRepeatEnabled(!_repeatEnabled);
+  }
+
+  /// Enable autoplay (alias for setAutoplayEnabled)
+  void enableAutoplay(bool enabled) {
+    setAutoplayEnabled(enabled);
+  }
+
+  /// Handle episode completion (public method)
+  Future<void> onEpisodeCompleted() => _handleAudioCompletion();
+
+  /// Update progress manually
+  void updateProgress(Duration position) {
+    _currentPosition = position;
+    _updateEpisodeProgress();
+    notifyListeners();
+  }
+
+  /// Handle playback error
+  void handlePlaybackError(String message) {
+    _playbackState = PlaybackState.error;
+    _errorMessage = message;
+    notifyListeners();
+  }
+
+  /// Handle network timeout
+  void handleNetworkTimeout() {
+    handlePlaybackError('Network timeout occurred');
+  }
+
+  /// Handle invalid URL
+  void handleInvalidUrl(AudioFile audioFile) {
+    handlePlaybackError('Invalid audio URL: ${audioFile.streamingUrl}');
+  }
+
+  /// Validate audio file
+  bool isValidAudioFile(AudioFile? audioFile) {
+    if (audioFile == null) return false;
+    return audioFile.streamingUrl.isNotEmpty;
+  }
+
+  /// Save playback state
+  void savePlaybackState() {
+    if (_contentService != null && _currentAudioFile != null) {
+      final progress = _totalDuration.inMilliseconds > 0
+          ? _currentPosition.inMilliseconds / _totalDuration.inMilliseconds
+          : 0.0;
+      _contentService!.updateEpisodeCompletion(_currentAudioFile!.id, progress);
+    }
+  }
+
+  /// Restore playback position
+  Future<void> restorePlaybackPosition(AudioFile audioFile) async {
+    if (_contentService != null) {
+      final completion = _contentService!.getEpisodeCompletion(audioFile.id);
+      if (completion > 0.0 && _totalDuration.inMilliseconds > 0) {
+        final position = Duration(
+            milliseconds: (_totalDuration.inMilliseconds * completion).round());
+        _currentPosition = position;
+        notifyListeners();
+      }
+    }
+  }
+
   @override
   void dispose() {
     // Only dispose local audio player if not using background handler
@@ -548,5 +664,37 @@ class AudioService extends ChangeNotifier {
       _audioPlayer.dispose();
     }
     super.dispose();
+  }
+
+  // Testing methods - only available in debug builds
+  @visibleForTesting
+  void setPlaybackStateForTesting(PlaybackState state) {
+    _playbackState = state;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setCurrentAudioFileForTesting(AudioFile? audioFile) {
+    _currentAudioFile = audioFile;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setDurationForTesting(Duration duration) {
+    _totalDuration = duration;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setPositionForTesting(Duration position) {
+    _currentPosition = position;
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setErrorForTesting(String error) {
+    _playbackState = PlaybackState.error;
+    _errorMessage = error;
+    notifyListeners();
   }
 }

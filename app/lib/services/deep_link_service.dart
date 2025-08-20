@@ -1,39 +1,39 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 
 import '../screens/player_screen.dart';
 
 /// Service to handle deep links and app navigation from external sources
 class DeepLinkService {
-  static StreamSubscription<String?>? _linkStreamSubscription;
+  static StreamSubscription<Uri>? _linkStreamSubscription;
   static GlobalKey<NavigatorState>? _navigatorKey;
+  static AppLinks? _appLinks;
 
   /// Initialize deep link handling
   /// [navigatorKey] should be the global navigator key from MaterialApp
   static Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
     _navigatorKey = navigatorKey;
+    _appLinks = AppLinks();
 
     try {
       // Handle initial link when app is launched from closed state
-      final initialLink = await getInitialLink();
+      final initialLink = await _appLinks!.getInitialLink();
       if (initialLink != null) {
         developer.log('Initial deep link received: $initialLink',
             name: 'DeepLinkService');
-        await _handleDeepLink(initialLink);
+        await _handleDeepLink(initialLink.toString());
       }
     } catch (e) {
       developer.log('Error getting initial link: $e', name: 'DeepLinkService');
     }
 
     // Handle links when app is already running
-    _linkStreamSubscription = linkStream.listen(
-      (String? link) {
-        if (link != null) {
-          developer.log('Deep link received: $link', name: 'DeepLinkService');
-          _handleDeepLink(link);
-        }
+    _linkStreamSubscription = _appLinks!.uriLinkStream.listen(
+      (Uri uri) {
+        developer.log('Deep link received: $uri', name: 'DeepLinkService');
+        _handleDeepLink(uri.toString());
       },
       onError: (err) {
         developer.log('Deep link stream error: $err', name: 'DeepLinkService');
@@ -206,6 +206,7 @@ class DeepLinkService {
     _linkStreamSubscription?.cancel();
     _linkStreamSubscription = null;
     _navigatorKey = null;
+    _appLinks = null;
     developer.log('DeepLinkService disposed', name: 'DeepLinkService');
   }
 }

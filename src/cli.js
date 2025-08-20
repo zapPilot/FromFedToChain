@@ -58,11 +58,55 @@ async function handleReview() {
     console.log(content.content);
     console.log("");
 
+    // Check category
+    let currentCategory = content.category;
+    console.log(
+      chalk.blue("Check category: [c]hange category, [k]eep current"),
+    );
+    process.stdout.write("▷ ");
+
+    try {
+      const categoryInput = await getUserInput();
+      const categoryDecision = categoryInput.trim().toLowerCase();
+
+      if (categoryDecision === "c" || categoryDecision === "change") {
+        const availableCategories = ContentSchema.getCategories();
+        console.log(chalk.cyan("Available categories:"));
+        availableCategories.forEach((cat, index) => {
+          console.log(chalk.cyan(`  ${index + 1}. ${cat}`));
+        });
+
+        process.stdout.write("Enter new category: ");
+        const newCategoryInput = await getUserInput();
+        const newCategory = newCategoryInput.trim();
+
+        if (availableCategories.includes(newCategory)) {
+          currentCategory = newCategory;
+          console.log(chalk.green(`✅ Category changed to: ${newCategory}`));
+        } else {
+          console.log(
+            chalk.red(
+              `❌ Invalid category. Keeping current: ${currentCategory}`,
+            ),
+          );
+        }
+      } else {
+        console.log(chalk.gray(`📂 Keeping category: ${currentCategory}`));
+      }
+    } catch (error) {
+      console.log(
+        chalk.red(`\n❌ Error getting category input: ${error.message}`),
+      );
+      console.log(chalk.gray(`📂 Keeping category: ${currentCategory}`));
+    }
+
+    console.log("");
+
     // Get user decision
     let action, feedback;
     while (true) {
       console.log(chalk.blue("Decision: [a]ccept, [r]eject, [s]kip, [q]uit"));
-      process.stdout.write("❯ ");
+      process.stdout.write("▷ ");
 
       try {
         const input = await getUserInput();
@@ -108,6 +152,15 @@ async function handleReview() {
     // Process decision
     if (action === "accept") {
       try {
+        // Update category if changed
+        if (currentCategory !== content.category) {
+          await ContentManager.updateSourceCategory(
+            content.id,
+            currentCategory,
+          );
+          console.log(chalk.blue(`📂 Category updated to: ${currentCategory}`));
+        }
+
         await ContentManager.addContentFeedback(
           content.id,
           "accepted",
@@ -125,6 +178,15 @@ async function handleReview() {
       }
     } else if (action === "reject") {
       try {
+        // Update category if changed (even for rejected content)
+        if (currentCategory !== content.category) {
+          await ContentManager.updateSourceCategory(
+            content.id,
+            currentCategory,
+          );
+          console.log(chalk.blue(`📂 Category updated to: ${currentCategory}`));
+        }
+
         await ContentManager.addContentFeedback(
           content.id,
           "rejected",
@@ -149,24 +211,39 @@ async function handleReview() {
 // Helper function to get user input
 function getUserInput() {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
+    let timeout;
+    let readableListener;
+    let errorListener;
+
+    const cleanup = () => {
+      if (timeout) clearTimeout(timeout);
+      if (readableListener)
+        process.stdin.removeListener("readable", readableListener);
+      if (errorListener) process.stdin.removeListener("error", errorListener);
+    };
+
+    timeout = setTimeout(() => {
+      cleanup();
       reject(new Error("Input timeout"));
     }, 300000); // 5 minute timeout
 
-    process.stdin.once("readable", () => {
-      clearTimeout(timeout);
+    readableListener = () => {
+      cleanup();
       const chunk = process.stdin.read();
       if (chunk !== null) {
         resolve(chunk.toString().trim());
       } else {
         reject(new Error("No input received"));
       }
-    });
+    };
 
-    process.stdin.once("error", (error) => {
-      clearTimeout(timeout);
+    errorListener = (error) => {
+      cleanup();
       reject(error);
-    });
+    };
+
+    process.stdin.once("readable", readableListener);
+    process.stdin.once("error", errorListener);
   });
 }
 

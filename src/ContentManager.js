@@ -336,6 +336,16 @@ export class ContentManager {
     return this.update(id, { status }, "zh-TW");
   }
 
+  /**
+   * Update category for source content
+   * @param {string} id - Content ID
+   * @param {string} category - New category
+   * @returns {Promise<Object>} Updated content
+   */
+  static async updateSourceCategory(id, category) {
+    return this.update(id, { category }, "zh-TW");
+  }
+
   // Get all content by ID across all languages (for pipeline processing)
   static async getAllLanguagesForId(id) {
     const allContent = [];
