@@ -77,7 +77,7 @@ void main() {
       test('should transition to loading state when starting playback',
           () async {
         // Mock the play method to simulate loading
-        when(mockAudioHandler.play(any)).thenAnswer((_) async {
+        when(mockAudioHandler.play()).thenAnswer((_) async {
           // Simulate async loading
           await Future.delayed(const Duration(milliseconds: 10));
         });
@@ -350,7 +350,7 @@ void main() {
       test('should delegate play calls to background handler', () {
         audioService.play(sampleAudioFile);
 
-        verify(mockAudioHandler.play(sampleAudioFile)).called(1);
+        verify(mockAudioHandler.play()).called(1);
       });
 
       test('should delegate pause calls to background handler', () {
@@ -370,7 +370,7 @@ void main() {
 
         audioService.seekTo(position);
 
-        verify(mockAudioHandler.seekTo(position)).called(1);
+        verify(mockAudioHandler.seek(position)).called(1);
       });
 
       test('should set episode navigation callbacks on handler', () {
@@ -459,7 +459,7 @@ void main() {
 
         // Mock content service to track completion
         when(mockContentService.setEpisodeCompletion(any, any))
-            .thenReturn(null);
+            .thenAnswer((_) async {});
 
         audioService.updateProgress(const Duration(minutes: 5));
 

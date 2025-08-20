@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:from_fed_to_chain_app/widgets/filter_bar.dart';
 import 'package:from_fed_to_chain_app/config/api_config.dart';
-import 'package:from_fed_to_chain_app/themes/app_theme.dart';
+
 import '../test_utils.dart';
 
 void main() {
@@ -41,7 +41,10 @@ void main() {
 
       // Verify main structure
       TestUtils.expectWidgetExists(find.byType(FilterBar));
-      TestUtils.expectWidgetExists(find.byType(Column));
+      expect(
+          find.byType(Column),
+          findsAtLeastNWidgets(
+              1)); // There are multiple Column widgets in the hierarchy
 
       // Verify language and category sections
       TestUtils.expectTextExists('Language');
@@ -55,16 +58,14 @@ void main() {
         (tester) async {
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
-      // Verify all supported languages are displayed
-      for (final language in ApiConfig.supportedLanguages) {
-        final displayName = ApiConfig.getLanguageDisplayName(language);
-        TestUtils.expectTextExists(displayName);
-      }
+      // Verify all supported languages are displayed with flags
+      TestUtils.expectTextExists('🇹🇼 繁體中文');
+      TestUtils.expectTextExists('🇺🇸 English');
+      TestUtils.expectTextExists('🇯🇵 日本語');
 
       // Verify 'all' option is NOT present in language section
       // Look for text that contains "All" but exclude category "All"
       final allLanguageElements = find.text('All');
-      final categoryAllElement = find.text('All');
 
       // Should only find "All" in category section, not language section
       expect(allLanguageElements, findsOneWidget); // Only category "All"
@@ -77,11 +78,13 @@ void main() {
       // Verify "All" category option exists
       TestUtils.expectTextExists('All');
 
-      // Verify all supported categories are displayed
-      for (final category in ApiConfig.supportedCategories) {
-        final displayName = ApiConfig.getCategoryDisplayName(category);
-        TestUtils.expectTextExists(displayName);
-      }
+      // Verify all supported categories are displayed with emojis
+      TestUtils.expectTextExists('📰 Daily News');
+      TestUtils.expectTextExists('⚡ Ethereum');
+      TestUtils.expectTextExists('📊 Macro Economics');
+      TestUtils.expectTextExists('🚀 Startup');
+      TestUtils.expectTextExists('🤖 AI & Technology');
+      TestUtils.expectTextExists('💎 DeFi');
     });
 
     testWidgets('should show language flags with display names',
@@ -89,7 +92,7 @@ void main() {
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Check for specific language flag combinations
-      TestUtils.expectTextExists('🇹🇼 中文'); // Traditional Chinese
+      TestUtils.expectTextExists('🇹🇼 繁體中文'); // Traditional Chinese
       TestUtils.expectTextExists('🇺🇸 English'); // English
       TestUtils.expectTextExists('🇯🇵 日本語'); // Japanese
     });
@@ -101,12 +104,14 @@ void main() {
       // Check for specific category emoji combinations
       TestUtils.expectTextExists('📰 Daily News');
       TestUtils.expectTextExists('⚡ Ethereum');
-      TestUtils.expectTextExists('📊 Macro');
+      TestUtils.expectTextExists('📊 Macro Economics');
       TestUtils.expectTextExists('🚀 Startup');
-      TestUtils.expectTextExists('🤖 AI');
+      TestUtils.expectTextExists('🤖 AI & Technology');
     });
 
     testWidgets('should handle language selection correctly', (tester) async {
+      // Set a larger screen width to ensure all language chips are visible
+      await tester.binding.setSurfaceSize(const Size(800, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Test selecting English
@@ -116,6 +121,8 @@ void main() {
     });
 
     testWidgets('should handle category selection correctly', (tester) async {
+      // Set a larger screen width to ensure all category chips are visible
+      await tester.binding.setSurfaceSize(const Size(800, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Test selecting Ethereum category
@@ -125,6 +132,8 @@ void main() {
     });
 
     testWidgets('should highlight selected language correctly', (tester) async {
+      // Set a larger screen width to ensure all language chips are visible
+      await tester.binding.setSurfaceSize(const Size(800, 600));
       selectedLanguage = 'en-US';
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
@@ -190,6 +199,8 @@ void main() {
     });
 
     testWidgets('should handle multiple rapid selections', (tester) async {
+      // Set a larger screen width to ensure all chips are visible
+      await tester.binding.setSurfaceSize(const Size(1000, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Rapidly select different languages
@@ -203,11 +214,13 @@ void main() {
       await TestUtils.tapWidget(tester, find.text('⚡ Ethereum'));
       expect(changedCategory, equals('ethereum'));
 
-      await TestUtils.tapWidget(tester, find.text('📊 Macro'));
+      await TestUtils.tapWidget(tester, find.text('📊 Macro Economics'));
       expect(changedCategory, equals('macro'));
     });
 
     testWidgets('should handle edge case language selections', (tester) async {
+      // Set a larger screen width to ensure all language chips are visible
+      await tester.binding.setSurfaceSize(const Size(1000, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Test all supported languages
@@ -227,19 +240,28 @@ void main() {
     });
 
     testWidgets('should handle edge case category selections', (tester) async {
+      // Set a larger screen width to ensure all category chips are visible
+      await tester.binding.setSurfaceSize(const Size(1200, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Test "All" category first
       await TestUtils.tapWidget(tester, find.text('All'));
       expect(changedCategory, equals('all'));
 
-      // Test all supported categories
-      for (final category in ApiConfig.supportedCategories) {
-        final displayName = ApiConfig.getCategoryDisplayName(category);
-        final finder = find.textContaining(displayName);
+      // Test all supported categories with proper display names
+      final categoryTexts = {
+        'daily-news': '📰 Daily News',
+        'ethereum': '⚡ Ethereum',
+        'macro': '📊 Macro Economics',
+        'startup': '🚀 Startup',
+        'ai': '🤖 AI & Technology',
+        'defi': '💎 DeFi',
+      };
 
-        if (finder.evaluate().isNotEmpty) {
-          await TestUtils.tapWidget(tester, finder.first);
+      for (final category in ApiConfig.supportedCategories) {
+        final expectedText = categoryTexts[category];
+        if (expectedText != null) {
+          await TestUtils.tapWidget(tester, find.text(expectedText));
           expect(changedCategory, equals(category));
         }
       }
@@ -247,6 +269,8 @@ void main() {
 
     testWidgets('should maintain state correctly across rebuilds',
         (tester) async {
+      // Set a larger screen width to ensure all language chips are visible
+      await tester.binding.setSurfaceSize(const Size(800, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Select a language
@@ -262,6 +286,8 @@ void main() {
     });
 
     testWidgets('should handle animation timing correctly', (tester) async {
+      // Set a larger screen width to ensure all language chips are visible
+      await tester.binding.setSurfaceSize(const Size(800, 600));
       await TestUtils.pumpWidgetWithMaterialApp(tester, createFilterBar());
 
       // Find an AnimatedContainer (used for selected state animation)
@@ -303,6 +329,9 @@ void main() {
 
     testWidgets('should handle empty or null callbacks gracefully',
         (tester) async {
+      // Set a larger screen width to ensure all chips are visible
+      await tester.binding.setSurfaceSize(const Size(1000, 600));
+
       // Test with null callbacks (should not crash)
       final filterBarWithNullCallbacks = FilterBar(
         selectedLanguage: 'zh-TW',

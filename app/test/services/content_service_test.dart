@@ -2,8 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import 'package:from_fed_to_chain_app/models/playlist.dart';
+
 import '../test_utils.dart';
 
 void main() {
@@ -170,19 +169,19 @@ void main() {
 
         // Test filtering by English
         contentService.setSelectedLanguage('en-US');
-        final englishEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final englishEpisodes = contentService.getFilteredEpisodes();
         expect(englishEpisodes, hasLength(1));
         expect(englishEpisodes.first.language, equals('en-US'));
 
         // Test filtering by Japanese
         contentService.setSelectedLanguage('ja-JP');
-        final japaneseEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final japaneseEpisodes = contentService.getFilteredEpisodes();
         expect(japaneseEpisodes, hasLength(1));
         expect(japaneseEpisodes.first.language, equals('ja-JP'));
 
         // Test filtering by Chinese
         contentService.setSelectedLanguage('zh-TW');
-        final chineseEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final chineseEpisodes = contentService.getFilteredEpisodes();
         expect(chineseEpisodes, hasLength(1));
         expect(chineseEpisodes.first.language, equals('zh-TW'));
       });
@@ -198,7 +197,7 @@ void main() {
 
         // Filter by language that doesn't exist
         contentService.setSelectedLanguage('ja-JP');
-        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final filteredEpisodes = contentService.getFilteredEpisodes();
         expect(filteredEpisodes, isEmpty);
       });
 
@@ -227,10 +226,11 @@ void main() {
         contentService.setEpisodesForTesting(episodes);
         contentService.setSelectedLanguage('en-US');
 
-        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final filteredEpisodes = contentService.getFilteredEpisodes();
         expect(filteredEpisodes, hasLength(2));
-        expect(filteredEpisodes[0].title, equals('First English'));
-        expect(filteredEpisodes[1].title, equals('Second English'));
+        expect(filteredEpisodes[0].title,
+            equals('Second English')); // Newest first
+        expect(filteredEpisodes[1].title, equals('First English'));
       });
 
       test('should update filtered episodes when language selection changes',
@@ -245,22 +245,22 @@ void main() {
 
         // Start with English
         contentService.setSelectedLanguage('en-US');
-        expect(contentService.getFilteredEpisodesByLanguage(), hasLength(1));
+        expect(contentService.getFilteredEpisodes(), hasLength(1));
 
         // Change to Japanese
         contentService.setSelectedLanguage('ja-JP');
-        expect(contentService.getFilteredEpisodesByLanguage(), hasLength(1));
+        expect(contentService.getFilteredEpisodes(), hasLength(1));
 
         // Change to Chinese
         contentService.setSelectedLanguage('zh-TW');
-        expect(contentService.getFilteredEpisodesByLanguage(), hasLength(1));
+        expect(contentService.getFilteredEpisodes(), hasLength(1));
       });
 
       test('should handle empty episode list when filtering by language', () {
         contentService.setEpisodesForTesting([]);
         contentService.setSelectedLanguage('en-US');
 
-        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final filteredEpisodes = contentService.getFilteredEpisodes();
         expect(filteredEpisodes, isEmpty);
       });
 
@@ -274,7 +274,7 @@ void main() {
         contentService.setSelectedLanguage('en-US');
 
         // Should match both regardless of case (if service handles case insensitive)
-        final filteredEpisodes = contentService.getFilteredEpisodesByLanguage();
+        final filteredEpisodes = contentService.getFilteredEpisodes();
         expect(filteredEpisodes, hasLength(greaterThanOrEqualTo(1)));
       });
     });
@@ -291,7 +291,7 @@ void main() {
 
         // Test filtering by category
         contentService.setSelectedCategory('daily-news');
-        final newsEpisodes = contentService.getFilteredEpisodesByCategory();
+        final newsEpisodes = contentService.getFilteredEpisodes();
         expect(newsEpisodes, hasLength(1));
         expect(newsEpisodes.first.category, equals('daily-news'));
       });
@@ -306,7 +306,7 @@ void main() {
         contentService.setEpisodesForTesting(episodes);
         contentService.setSelectedCategory('all');
 
-        final allEpisodes = contentService.getFilteredEpisodesByCategory();
+        final allEpisodes = contentService.getFilteredEpisodes();
         expect(allEpisodes, hasLength(3));
       });
     });
@@ -368,78 +368,78 @@ void main() {
     });
 
     group('Episode Completion and History', () {
-      test('should track episode completion correctly', () {
+      test('should track episode completion correctly', () async {
         const episodeId = 'test-episode';
 
         // Initially no completion
         expect(contentService.getEpisodeCompletion(episodeId), equals(0.0));
 
         // Set completion
-        contentService.setEpisodeCompletion(episodeId, 0.5);
+        await contentService.setEpisodeCompletion(episodeId, 0.5);
         expect(contentService.getEpisodeCompletion(episodeId), equals(0.5));
 
         // Update completion
-        contentService.setEpisodeCompletion(episodeId, 0.9);
+        await contentService.setEpisodeCompletion(episodeId, 0.9);
         expect(contentService.getEpisodeCompletion(episodeId), equals(0.9));
       });
 
-      test('should identify finished episodes correctly', () {
+      test('should identify finished episodes correctly', () async {
         const episodeId = 'finished-episode';
 
         // Not finished initially
         expect(contentService.isEpisodeFinished(episodeId), isFalse);
 
         // Set to almost finished (should not be considered finished)
-        contentService.setEpisodeCompletion(episodeId, 0.89);
+        await contentService.setEpisodeCompletion(episodeId, 0.89);
         expect(contentService.isEpisodeFinished(episodeId), isFalse);
 
         // Set to finished threshold
-        contentService.setEpisodeCompletion(episodeId, 0.9);
+        await contentService.setEpisodeCompletion(episodeId, 0.9);
         expect(contentService.isEpisodeFinished(episodeId), isTrue);
 
         // Set to fully finished
-        contentService.setEpisodeCompletion(episodeId, 1.0);
+        await contentService.setEpisodeCompletion(episodeId, 1.0);
         expect(contentService.isEpisodeFinished(episodeId), isTrue);
       });
 
-      test('should identify unfinished episodes correctly', () {
+      test('should identify unfinished episodes correctly', () async {
         const episodeId = 'unfinished-episode';
 
         // Not started (should not be unfinished)
         expect(contentService.isEpisodeUnfinished(episodeId), isFalse);
 
         // Started but not finished
-        contentService.setEpisodeCompletion(episodeId, 0.3);
+        await contentService.setEpisodeCompletion(episodeId, 0.3);
         expect(contentService.isEpisodeUnfinished(episodeId), isTrue);
 
         // Almost finished (still unfinished)
-        contentService.setEpisodeCompletion(episodeId, 0.8);
+        await contentService.setEpisodeCompletion(episodeId, 0.8);
         expect(contentService.isEpisodeUnfinished(episodeId), isTrue);
 
         // Finished (no longer unfinished)
-        contentService.setEpisodeCompletion(episodeId, 0.9);
+        await contentService.setEpisodeCompletion(episodeId, 0.9);
         expect(contentService.isEpisodeUnfinished(episodeId), isFalse);
       });
 
-      test('should track listen history correctly', () {
+      test('should track listen history correctly', () async {
         final episodes = TestUtils.createSampleAudioFileList(5);
         contentService.setEpisodesForTesting(episodes);
 
         // Add episodes to history
-        contentService.addToListenHistory(episodes[0].id);
-        contentService.addToListenHistory(episodes[1].id);
+        await contentService.addToListenHistory(episodes[0]);
+        await contentService.addToListenHistory(episodes[1]);
 
         final historyEpisodes = contentService.getListenHistoryEpisodes();
         expect(historyEpisodes, hasLength(2));
       });
 
-      test('should limit listen history correctly', () {
+      test('should limit listen history correctly', () async {
         final episodes = TestUtils.createSampleAudioFileList(10);
         contentService.setEpisodesForTesting(episodes);
 
         // Add all episodes to history
         for (final episode in episodes) {
-          contentService.addToListenHistory(episode.id);
+          await contentService.addToListenHistory(episode);
         }
 
         // Get limited history
@@ -457,7 +457,8 @@ void main() {
         expect(contentService.currentPlaylist, isNull);
 
         // Create playlist
-        contentService.createPlaylist('Test Playlist');
+        final episodes = [TestUtils.createSampleAudioFile()];
+        contentService.createPlaylist('Test Playlist', episodes);
         expect(contentService.currentPlaylist, isNotNull);
         expect(contentService.currentPlaylist?.name, equals('Test Playlist'));
 
@@ -469,15 +470,14 @@ void main() {
       test('should handle playlist clearing', () {
         final audioFile = TestUtils.createSampleAudioFile();
 
-        contentService.createPlaylist('Test Playlist');
-        contentService.addToCurrentPlaylist(audioFile);
+        contentService.createPlaylist('Test Playlist', [audioFile]);
 
         // Verify playlist has content
         expect(contentService.currentPlaylist?.episodes, isNotEmpty);
 
         // Clear playlist
         contentService.clearCurrentPlaylist();
-        expect(contentService.currentPlaylist?.episodes, isEmpty);
+        expect(contentService.currentPlaylist, isNull);
       });
     });
 
@@ -486,7 +486,8 @@ void main() {
         final content = TestUtils.createSampleAudioContent();
 
         // Cache content
-        contentService.cacheContent(content);
+        contentService.cacheContent(
+            content.id, content.language, content.category, content);
 
         // Retrieve cached content
         final cachedContent = contentService.getCachedContent(
@@ -503,7 +504,8 @@ void main() {
         final content = TestUtils.createSampleAudioContent();
 
         // Cache content
-        contentService.cacheContent(content);
+        contentService.cacheContent(
+            content.id, content.language, content.category, content);
         expect(
             contentService.getCachedContent(
                 content.id, content.language, content.category),
@@ -525,15 +527,15 @@ void main() {
         expect(() => contentService.isEpisodeUnfinished(''), returnsNormally);
       });
 
-      test('should handle invalid completion values', () {
+      test('should handle invalid completion values', () async {
         const episodeId = 'test-episode';
 
         // Test negative completion
-        contentService.setEpisodeCompletion(episodeId, -0.1);
+        await contentService.setEpisodeCompletion(episodeId, -0.1);
         expect(contentService.getEpisodeCompletion(episodeId), equals(0.0));
 
         // Test completion over 1.0
-        contentService.setEpisodeCompletion(episodeId, 1.5);
+        await contentService.setEpisodeCompletion(episodeId, 1.5);
         expect(contentService.getEpisodeCompletion(episodeId), equals(1.0));
       });
 

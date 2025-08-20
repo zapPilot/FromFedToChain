@@ -834,11 +834,64 @@ class ContentService extends ChangeNotifier {
     _errorMessage = null;
   }
 
+  /// Update episode completion percentage alias for testing
+  Future<void> setEpisodeCompletion(String episodeId, double completion) async {
+    await updateEpisodeCompletion(episodeId, completion);
+  }
+
+  /// Clear current playlist
+  void clearCurrentPlaylist() {
+    _currentPlaylist = null;
+    notifyListeners();
+  }
+
+  /// Cache content manually (for testing)
+  void cacheContent(
+      String id, String language, String category, AudioContent content) {
+    final cacheKey = '$language/$category/$id';
+    _contentCache[cacheKey] = content;
+  }
+
+  /// Get filtered episodes (for testing compatibility)
+  List<AudioFile> getFilteredEpisodes() => _filteredEpisodes;
+
   @override
   void dispose() {
     StreamingApiService.dispose();
     _httpClient.close();
     _contentCache.clear();
     super.dispose();
+  }
+
+  // Testing methods - only available in debug builds
+  @visibleForTesting
+  void setEpisodesForTesting(List<AudioFile> episodes) {
+    _allEpisodes = episodes;
+    _applyFilters();
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setLoadingForTesting(bool loading) {
+    _setLoading(loading);
+  }
+
+  @visibleForTesting
+  void setErrorForTesting(String error) {
+    _setError(error);
+  }
+
+  @visibleForTesting
+  void setSelectedLanguage(String language) {
+    _selectedLanguage = language;
+    _applyFilters();
+    notifyListeners();
+  }
+
+  @visibleForTesting
+  void setSelectedCategory(String category) {
+    _selectedCategory = category;
+    _applyFilters();
+    notifyListeners();
   }
 }

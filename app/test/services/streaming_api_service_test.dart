@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -88,9 +87,8 @@ void main() {
       });
 
       test('should handle network timeouts', () async {
-        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenThrow(
-            TimeoutException(
-                'Connection timeout', const Duration(seconds: 30)));
+        when(mockHttpClient.get(any, headers: anyNamed('headers')))
+            .thenThrow(const TimeoutException('Connection timeout'));
 
         expect(
           () => StreamingApiService.getEpisodeList('en-US', 'daily-news'),
@@ -100,7 +98,7 @@ void main() {
 
       test('should handle network connectivity issues', () async {
         when(mockHttpClient.get(any, headers: anyNamed('headers')))
-            .thenThrow(const http.ClientException('Network unreachable'));
+            .thenThrow(http.ClientException('Network unreachable'));
 
         expect(
           () => StreamingApiService.getEpisodeList('en-US', 'daily-news'),
@@ -148,7 +146,8 @@ void main() {
 
         // Test parsing logic
         expect(responseData['episodes'], hasLength(1));
-        expect(responseData['episodes'][0]['title'], equals('Episode 1'));
+        final episodes = responseData['episodes'] as List<dynamic>;
+        expect(episodes[0]['title'], equals('Episode 1'));
       });
 
       test('should handle single episode object response', () {
@@ -258,7 +257,7 @@ void main() {
             futures.add(Future.value([TestUtils.createSampleAudioFile()]));
           } else {
             // Failed request
-            futures.add(Future.error('Network error')
+            futures.add(Future<List<AudioFile>>.error('Network error')
                 .catchError((error) => <AudioFile>[]));
           }
         }
@@ -381,7 +380,7 @@ void main() {
 
         // Empty query should return all episodes
         final filteredEpisodes = episodes.where((episode) {
-          final query = '';
+          const query = '';
           if (query.trim().isEmpty) return true;
           return episode.title.toLowerCase().contains(query.toLowerCase());
         }).toList();
@@ -426,7 +425,7 @@ void main() {
             .thenAnswer((_) async => mockResponse);
 
         // Since we can't easily mock the static method, we simulate the logic
-        final hasEpisodes = true; // Would be result of getEpisodeList
+        const hasEpisodes = true; // Would be result of getEpisodeList
         expect(hasEpisodes, isTrue);
       });
 
@@ -454,7 +453,6 @@ void main() {
         when(mockHttpClient.head(any)).thenAnswer((_) async => mockResponse);
 
         // Simulate URL validation logic
-        final url = 'https://example.com/test.m3u8';
         bool isValid = false;
 
         try {
@@ -471,7 +469,6 @@ void main() {
         when(mockHttpClient.head(any)).thenThrow(Exception('URL not found'));
 
         // Simulate URL validation logic
-        final url = 'https://invalid.com/test.m3u8';
         bool isValid = false;
 
         try {
@@ -591,7 +588,7 @@ void main() {
       });
 
       test('should handle malformed JSON response', () {
-        final malformedJsonString =
+        const malformedJsonString =
             '{"episodes": [{"path": "test.m3u8", "title": "Test", "invalid": }]}';
 
         expect(() => jsonDecode(malformedJsonString), throwsFormatException);
