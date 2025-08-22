@@ -877,8 +877,12 @@ class ContentService extends ChangeNotifier {
   }
 
   @visibleForTesting
-  void setErrorForTesting(String error) {
-    _setError(error);
+  void setErrorForTesting(String? error) {
+    if (error == null) {
+      _clearError();
+    } else {
+      _setError(error);
+    }
   }
 
   @visibleForTesting
