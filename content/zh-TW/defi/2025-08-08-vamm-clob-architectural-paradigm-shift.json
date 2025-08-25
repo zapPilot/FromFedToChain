@@ -1,6 +1,6 @@
 {
   "id": "2025-08-08-vamm-clob-architectural-paradigm-shift",
-  "status": "draft",
+  "status": "social",
   "category": "defi",
   "date": "2025-08-08",
   "language": "zh-TW",
@@ -19,10 +19,70 @@
     "https://arxiv.org/html/2311.18164"
   ],
   "framework": "萬維鋼風格.md",
-  "audio_file": null,
-  "social_hook": null,
+  "audio_file": "audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift.wav",
+  "social_hook": "🔥 當 DeFi 理想主義撞上現實牆：連 Solana 明星項目都要拋棄複雜數學模型了！\n\nDrift Protocol 正式告別 vAMM，全面轉向傳統訂單薄 — 這背後隱藏著什麼殘酷真相？\n\n凱恩斯說市場非理性持續時間超乎想像，但在 DeFi 世界，理想化協議燒錢速度更驚人 💸\n\n🎧 深度解析 Eng | 中 | 日 播客已上線 Apple...",
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-24T00:08:35.007Z",
+      "comments": "know more about order book"
+    }
   },
-  "updated_at": "2025-08-08T10:30:00.000Z"
+  "updated_at": "2025-08-24T03:02:06.228Z",
+  "streaming_urls": {
+    "m3u8": "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/playlist.m3u8",
+    "segments": [
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment000.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment001.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment002.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment003.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment004.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment005.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment006.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment007.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment008.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment009.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment010.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment011.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment012.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment013.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment014.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment015.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment016.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment017.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment018.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment019.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment020.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment021.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment022.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment023.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment024.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment025.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment026.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment027.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment028.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment029.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment030.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment031.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment032.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment033.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment034.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment035.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment036.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment037.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment038.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment039.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment040.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment041.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment042.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment043.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment044.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment045.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment046.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment047.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-08-vamm-clob-architectural-paradigm-shift/segment048.ts"
+    ]
+  }
 }
