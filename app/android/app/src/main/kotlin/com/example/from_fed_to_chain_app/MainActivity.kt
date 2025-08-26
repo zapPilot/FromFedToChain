@@ -1,4 +1,4 @@
-package com.example.from_fed_to_chain_app
+package com.fromfedtochain.app
 
 import io.flutter.embedding.android.FlutterActivity
 

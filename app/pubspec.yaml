@@ -3,7 +3,7 @@ description: Modern Flutter audio streaming app for From Fed to Chain crypto/mac
 
 publish_to: "none"
 
-version: 1.0.4
+version: 1.0.5
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
