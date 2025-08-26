@@ -5,6 +5,36 @@ import 'package:from_fed_to_chain_app/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/models/playlist.dart';
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
 
+/// Custom matchers for testing
+/// Matches at least N widgets
+Matcher findsAtLeastNWidget(int count) => _FindsAtLeastNWidget(count);
+
+class _FindsAtLeastNWidget extends Matcher {
+  const _FindsAtLeastNWidget(this.count);
+  final int count;
+
+  @override
+  bool matches(covariant Finder finder, Map<dynamic, dynamic> matchState) {
+    matchState['count'] = finder.evaluate().length;
+    return finder.evaluate().length >= count;
+  }
+
+  @override
+  Description describe(Description description) {
+    return description.add('finds at least $count widgets');
+  }
+
+  @override
+  Description describeMismatch(
+    covariant Finder finder,
+    Description mismatchDescription,
+    Map<dynamic, dynamic> matchState,
+    bool verbose,
+  ) {
+    return mismatchDescription.add('found ${matchState['count']} widgets');
+  }
+}
+
 /// Comprehensive test utilities for Flutter testing
 class TestUtils {
   /// Create sample data for testing

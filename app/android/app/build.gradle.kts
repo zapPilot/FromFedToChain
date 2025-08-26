@@ -8,7 +8,8 @@ plugins {
 android {
     namespace = "com.example.from_fed_to_chain_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    // Use NDK 25.2.9519653 which has complete cmake toolchain files
+    ndkVersion = "25.2.9519653"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

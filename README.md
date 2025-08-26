@@ -241,7 +241,7 @@ npm run build:flutter
 
 ```bash
 cd app
-flutter build apk    # Android
+flutter build appbundle --release
 flutter build ios    # iOS (requires Xcode)
 ```
 

@@ -1,6 +1,6 @@
 {
   "id": "2025-08-17-vietnamese-phone-farms-airdrop-manipulation",
-  "status": "draft",
+  "status": "social",
   "category": "defi",
   "date": "2025-08-17",
   "language": "zh-TW",
@@ -21,10 +21,70 @@
     "https://whitepaper.world.org/"
   ],
   "framework": "萬維鋼風格.md",
-  "audio_file": null,
-  "social_hook": null,
+  "audio_file": "audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation.wav",
+  "social_hook": "🏭💰 越南3萬台手機農場24/7掃空投，Vitalik的「公平夢」被工業化羊毛黨重新定義！當去中心化遇上規模化作弊，加密世界的遊戲規則正在被改寫... \n\n📻 Eng | 中 | 日 播客 Apple Podcasts、Spotify 同步上線\n\n🎧 Listen: fromfedtochain://audio/2025-08-17-vietn...",
   "feedback": {
-    "content_review": null
+    "content_review": {
+      "status": "accepted",
+      "score": 4,
+      "reviewer": "reviewer_cli",
+      "timestamp": "2025-08-24T00:08:12.987Z",
+      "comments": "good to know"
+    }
   },
-  "updated_at": "2025-08-17T08:00:00Z"
+  "updated_at": "2025-08-24T02:22:52.286Z",
+  "streaming_urls": {
+    "m3u8": "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/playlist.m3u8",
+    "segments": [
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment000.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment001.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment002.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment003.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment004.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment005.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment006.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment007.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment008.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment009.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment010.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment011.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment012.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment013.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment014.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment015.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment016.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment017.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment018.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment019.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment020.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment021.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment022.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment023.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment024.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment025.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment026.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment027.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment028.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment029.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment030.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment031.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment032.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment033.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment034.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment035.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment036.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment037.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment038.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment039.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment040.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment041.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment042.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment043.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment044.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment045.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment046.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment047.ts",
+      "https://fromfedtochain.1352ed9cb1e236fe232f67ff3a8e9850.r2.cloudflarestorage.com/audio/zh-TW/defi/2025-08-17-vietnamese-phone-farms-airdrop-manipulation/segment048.ts"
+    ]
+  }
 }

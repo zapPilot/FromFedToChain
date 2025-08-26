@@ -697,4 +697,11 @@ class AudioService extends ChangeNotifier {
     _errorMessage = error;
     notifyListeners();
   }
+
+  @visibleForTesting
+  void clearErrorForTesting() {
+    _errorMessage = null;
+    _playbackState = PlaybackState.stopped;
+    notifyListeners();
+  }
 }
