@@ -255,6 +255,11 @@ class TestUtils {
     });
   }
 
+  /// Create a list of sample AudioFiles (alias for createSampleAudioFileList)
+  static List<AudioFile> createSampleAudioFiles(int count) {
+    return createSampleAudioFileList(count);
+  }
+
   /// Create test widget wrapper with MaterialApp and theme
   static Widget wrapWithMaterialApp(
     Widget child, {

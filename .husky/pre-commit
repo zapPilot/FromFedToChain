@@ -1,3 +1,2 @@
-npx lint-staged
-flutter analyze
+npx --no-install lint-staged && npm run precommit:test
 npm run test:flutter
