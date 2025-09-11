@@ -52,8 +52,10 @@ class AudioService extends ChangeNotifier {
   bool get isIdle => _playbackState == PlaybackState.stopped;
 
   double get progress {
-    if (_totalDuration.inMilliseconds == 0) return 0.0;
-    return _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
+    if (_totalDuration.inMilliseconds <= 0) return 0.0;
+    final result =
+        _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
+    return result.clamp(0.0, 1.0);
   }
 
   String get formattedCurrentPosition {
@@ -317,10 +319,17 @@ class AudioService extends ChangeNotifier {
 
   /// Set playback speed
   Future<void> setPlaybackSpeed(double speed) async {
-    if (_audioHandler != null) {
-      await _audioHandler!.customAction('setSpeed', {'speed': speed});
-    } else {
-      await _audioPlayer.setSpeed(speed);
+    try {
+      if (_audioHandler != null) {
+        await _audioHandler!.customAction('setSpeed', {'speed': speed});
+      } else {
+        await _audioPlayer.setSpeed(speed);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ AudioService: Failed to set speed on handler: $e');
+      }
+      // Continue to update internal speed even if handler fails
     }
     _playbackSpeed = speed;
     notifyListeners();
@@ -631,7 +640,7 @@ class AudioService extends ChangeNotifier {
   /// Validate audio file
   bool isValidAudioFile(AudioFile? audioFile) {
     if (audioFile == null) return false;
-    return audioFile.streamingUrl.isNotEmpty;
+    return audioFile.streamingUrl.trim().isNotEmpty;
   }
 
   /// Save playback state
