@@ -21,17 +21,24 @@ class SearchBarWidget extends StatefulWidget {
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  String _lastText = '';
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.initialValue);
     _focusNode = FocusNode();
+    _lastText = widget.initialValue ?? '';
 
     // Listen to text changes
     _controller.addListener(() {
-      widget.onSearchChanged(_controller.text);
-      setState(() {}); // Trigger rebuild to show/hide suffix icon
+      final currentText = _controller.text;
+      // Only call callback if text actually changed (avoid duplicate calls)
+      if (currentText != _lastText) {
+        _lastText = currentText;
+        widget.onSearchChanged(currentText);
+        setState(() {}); // Trigger rebuild to show/hide suffix icon
+      }
     });
   }
 
@@ -68,7 +75,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     child: InkWell(
                       onTap: () {
                         _controller.clear();
-                        widget.onSearchChanged('');
+                        // onSearchChanged('') is automatically called by _controller.addListener
                       },
                       borderRadius: BorderRadius.circular(24),
                       child: Container(
@@ -78,6 +85,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                         child: Icon(
                           Icons.clear,
                           color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                          size:
+                              32.0, // Increased size for accessibility compliance
                         ),
                       ),
                     ),
@@ -104,7 +113,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         ),
         textInputAction: TextInputAction.search,
         onSubmitted: (value) {
-          widget.onSearchChanged(value);
+          // onSearchChanged is already handled by _controller.addListener
+          // onSubmitted should only handle submission-specific actions
           _focusNode.unfocus();
         },
       ),

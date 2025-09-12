@@ -21,6 +21,10 @@ class AudioItemCard extends StatelessWidget {
     this.isCurrentlyPlaying = false,
   });
 
+  // Add unique keys for testing
+  static const Key cardKey = Key('audio_item_card_inkwell');
+  static const Key playButtonKey = Key('audio_item_card_play_button');
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -31,6 +35,7 @@ class AudioItemCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          key: cardKey,
           onTap: onTap,
           onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(AppTheme.radiusM),
@@ -248,6 +253,7 @@ class AudioItemCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
+        key: playButtonKey,
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
         child: Semantics(

@@ -100,7 +100,9 @@ class AudioControls extends StatelessWidget {
           onTap: hasError ? onPlayPause : (isLoading ? null : onPlayPause),
           borderRadius: BorderRadius.circular(buttonSize / 2),
           child: Semantics(
-            label: hasError ? 'Retry playback' : (isLoading ? 'Loading' : (isPlaying ? 'Pause' : 'Play')),
+            label: hasError
+                ? 'Retry playback'
+                : (isLoading ? 'Loading' : (isPlaying ? 'Pause' : 'Play')),
             button: true,
             child: Center(
               child: _buildMainButtonContent(buttonSize),
@@ -153,13 +155,16 @@ class AudioControls extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: Tooltip(
-        message: tooltip,
+      child: Semantics(
+        label: tooltip, // Add semantic label for accessibility
+        button: true,
         child: IconButton(
           onPressed: onPressed,
+          tooltip: tooltip, // IconButton's built-in tooltip
           icon: Icon(
             icon,
             size: size * 0.5,
+            semanticLabel: tooltip, // Add semantic label to icon
           ),
           style: IconButton.styleFrom(
             backgroundColor: AppTheme.cardColor.withOpacity(0.6),
@@ -177,7 +182,8 @@ class AudioControls extends StatelessWidget {
   _ButtonSizes _getButtonSizes() {
     switch (size) {
       case AudioControlsSize.small:
-        return _ButtonSizes(primary: 48, secondary: 48); // Increased to meet accessibility
+        return _ButtonSizes(
+            primary: 48, secondary: 48); // Increased to meet accessibility
       case AudioControlsSize.medium:
         return _ButtonSizes(primary: 64, secondary: 48);
       case AudioControlsSize.large:

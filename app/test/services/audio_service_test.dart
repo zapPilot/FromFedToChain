@@ -27,7 +27,8 @@ void main() {
       mockContentService = MockContentService();
 
       // Simple stream setup
-      final playbackStateStream = BehaviorSubject<audio_service_pkg.PlaybackState>.seeded(
+      final playbackStateStream =
+          BehaviorSubject<audio_service_pkg.PlaybackState>.seeded(
         audio_service_pkg.PlaybackState(
           controls: [],
           systemActions: const {},
@@ -39,13 +40,18 @@ void main() {
         ),
       );
 
-      when(mockAudioHandler.playbackState).thenAnswer((_) => playbackStateStream);
-      when(mockAudioHandler.mediaItem).thenAnswer((_) => BehaviorSubject<audio_service_pkg.MediaItem?>.seeded(null));
+      when(mockAudioHandler.playbackState)
+          .thenAnswer((_) => playbackStateStream);
+      when(mockAudioHandler.mediaItem).thenAnswer(
+          (_) => BehaviorSubject<audio_service_pkg.MediaItem?>.seeded(null));
       when(mockAudioHandler.duration).thenReturn(Duration.zero);
 
       // Basic method stubs
-      when(mockAudioHandler.setAudioSource(any, title: anyNamed('title'), artist: anyNamed('artist'), 
-           initialPosition: anyNamed('initialPosition'), audioFile: anyNamed('audioFile')))
+      when(mockAudioHandler.setAudioSource(any,
+              title: anyNamed('title'),
+              artist: anyNamed('artist'),
+              initialPosition: anyNamed('initialPosition'),
+              audioFile: anyNamed('audioFile')))
           .thenAnswer((_) async => {});
       when(mockAudioHandler.play()).thenAnswer((_) async => {});
       when(mockAudioHandler.pause()).thenAnswer((_) async => {});
@@ -107,6 +113,8 @@ void main() {
       });
 
       test('should call handler pause method', () async {
+        // Set up state to be playing so togglePlayPause calls pause
+        audioService.setPlaybackStateForTesting(PlaybackState.playing);
         await audioService.togglePlayPause();
         verify(mockAudioHandler.pause()).called(1);
       });
@@ -141,11 +149,13 @@ void main() {
       });
 
       test('should set playback speed', () async {
-        when(mockAudioHandler.customAction('setSpeed', any)).thenAnswer((_) async => {});
-        
+        when(mockAudioHandler.customAction('setSpeed', any))
+            .thenAnswer((_) async => {});
+
         await audioService.setPlaybackSpeed(1.5);
         expect(audioService.playbackSpeed, 1.5);
-        verify(mockAudioHandler.customAction('setSpeed', {'speed': 1.5})).called(1);
+        verify(mockAudioHandler.customAction('setSpeed', {'speed': 1.5}))
+            .called(1);
       });
     });
 
@@ -153,33 +163,33 @@ void main() {
       test('should attempt to skip to next episode', () async {
         when(mockContentService.getNextEpisode(any)).thenReturn(testAudioFile);
         when(mockAudioHandler.setEpisodeNavigationCallbacks(
-          onNext: anyNamed('onNext'), 
-          onPrevious: anyNamed('onPrevious')
-        )).thenReturn(null);
+                onNext: anyNamed('onNext'), onPrevious: anyNamed('onPrevious')))
+            .thenReturn(null);
 
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         await audioService.skipToNext();
-        
+
         // Verify that we attempted to get next episode
         verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
       });
 
       test('should attempt to skip to previous episode', () async {
-        when(mockContentService.getPreviousEpisode(any)).thenReturn(testAudioFile);
-        
+        when(mockContentService.getPreviousEpisode(any))
+            .thenReturn(testAudioFile);
+
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         await audioService.skipToPrevious();
-        
+
         // Verify that we attempted to get previous episode
         verify(mockContentService.getPreviousEpisode(testAudioFile)).called(1);
       });
 
       test('should handle no next episode available', () async {
         when(mockContentService.getNextEpisode(any)).thenReturn(null);
-        
+
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         await audioService.skipToNext();
-        
+
         verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
         // Should not crash when no next episode available
       });
@@ -187,17 +197,25 @@ void main() {
 
     group('Error Handling', () {
       test('should handle playback errors gracefully', () async {
-        when(mockAudioHandler.setAudioSource(any, 
-          title: anyNamed('title'),
-          artist: anyNamed('artist'),
-          initialPosition: anyNamed('initialPosition'),
-          audioFile: anyNamed('audioFile')
-        )).thenThrow(Exception('Network error'));
+        when(mockAudioHandler.setAudioSource(any,
+                title: anyNamed('title'),
+                artist: anyNamed('artist'),
+                initialPosition: anyNamed('initialPosition'),
+                audioFile: anyNamed('audioFile')))
+            .thenThrow(Exception('Network error'));
 
-        await audioService.playAudio(testAudioFile);
-        
-        expect(audioService.hasError, isTrue);
-        expect(audioService.errorMessage, contains('Network error'));
+        // Expect the exception to be rethrown
+        expect(() => audioService.playAudio(testAudioFile),
+            throwsA(isA<Exception>()));
+
+        // Wait for the future to complete and check error state
+        try {
+          await audioService.playAudio(testAudioFile);
+        } catch (e) {
+          // Exception is expected, check that error state was set
+          expect(audioService.hasError, isTrue);
+          expect(audioService.errorMessage, contains('Network error'));
+        }
       });
 
       test('should clear error on successful play', () async {
@@ -207,7 +225,7 @@ void main() {
 
         // Then play successfully
         await audioService.playAudio(testAudioFile);
-        
+
         expect(audioService.hasError, isFalse);
         expect(audioService.errorMessage, isNull);
       });

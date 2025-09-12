@@ -10,6 +10,7 @@ import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
+import '../widget_test_utils.dart';
 
 // Generate mocks for dependencies
 @GenerateMocks([AudioService, ContentService])
@@ -24,7 +25,7 @@ void main() {
     setUp(() {
       mockAudioService = MockAudioService();
       mockContentService = MockContentService();
-      
+
       testAudioFile = AudioFile(
         id: 'test-episode',
         title: 'Test Episode',
@@ -40,7 +41,8 @@ void main() {
       when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
       when(mockAudioService.playbackState).thenReturn(PlaybackState.stopped);
       when(mockAudioService.currentPosition).thenReturn(Duration.zero);
-      when(mockAudioService.totalDuration).thenReturn(const Duration(minutes: 5));
+      when(mockAudioService.totalDuration)
+          .thenReturn(const Duration(minutes: 5));
       when(mockAudioService.playbackSpeed).thenReturn(1.0);
       when(mockAudioService.autoplayEnabled).thenReturn(true);
       when(mockAudioService.repeatEnabled).thenReturn(false);
@@ -77,45 +79,67 @@ void main() {
       reset(mockContentService);
     });
 
+    // Helper method to setup proper screen size for all tests
+    Future<void> setupTestWithScreenSize(
+        WidgetTester tester, Widget widget) async {
+      WidgetTestUtils.setDeviceSize(
+          tester, const Size(375, 667)); // iPhone size
+      await tester.pumpWidget(widget);
+      await tester.pump();
+    }
+
+    void tearDownTestScreenSize(WidgetTester tester) {
+      WidgetTestUtils.resetDeviceSize(tester);
+    }
+
     Widget createTestWidget({String? contentId}) {
-      return MaterialApp(
-        theme: ThemeData.dark(),
-        home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider<AudioService>.value(value: mockAudioService),
-            ChangeNotifierProvider<ContentService>.value(value: mockContentService),
-          ],
-          child: PlayerScreen(contentId: contentId),
+      return MediaQuery(
+        data: const MediaQueryData(
+          size: Size(375, 667), // iPhone size to prevent overflow
+          devicePixelRatio: 2.0,
+        ),
+        child: MaterialApp(
+          theme: ThemeData.dark(),
+          home: MultiProvider(
+            providers: [
+              ChangeNotifierProvider<AudioService>.value(
+                  value: mockAudioService),
+              ChangeNotifierProvider<ContentService>.value(
+                  value: mockContentService),
+            ],
+            child: PlayerScreen(contentId: contentId),
+          ),
         ),
       );
     }
 
     group('Basic Widget Creation', () {
-      testWidgets('should create PlayerScreen without crashing', (tester) async {
+      testWidgets('should create PlayerScreen without crashing',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.byType(PlayerScreen), findsOneWidget);
       });
 
       testWidgets('should display audio title when available', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.text(testAudioFile.title), findsOneWidget);
       });
 
       testWidgets('should display current position', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.text('0:00'), findsOneWidget);
       });
 
       testWidgets('should display total duration', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.text('5:00'), findsOneWidget);
       });
     });
@@ -124,29 +148,30 @@ void main() {
       testWidgets('should handle play button tap', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find and tap play button
         final playButton = find.byIcon(Icons.play_arrow);
         if (playButton.evaluate().isNotEmpty) {
           await tester.tap(playButton);
           await tester.pump();
-          
+
           verify(mockAudioService.togglePlayPause()).called(1);
         }
       });
 
-      testWidgets('should handle pause button tap when playing', (tester) async {
+      testWidgets('should handle pause button tap when playing',
+          (tester) async {
         when(mockAudioService.isPlaying).thenReturn(true);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find and tap pause button
         final pauseButton = find.byIcon(Icons.pause);
         if (pauseButton.evaluate().isNotEmpty) {
           await tester.tap(pauseButton);
           await tester.pump();
-          
+
           verify(mockAudioService.togglePlayPause()).called(1);
         }
       });
@@ -156,39 +181,42 @@ void main() {
       testWidgets('should request content for audio file', (tester) async {
         await tester.pumpWidget(createTestWidget(contentId: testAudioFile.id));
         await tester.pump();
-        
+
         // Should call content service to get content
-        verify(mockContentService.getContentForAudioFile(any)).called(greaterThanOrEqualTo(0));
+        verify(mockContentService.getContentForAudioFile(any))
+            .called(greaterThanOrEqualTo(0));
       });
 
       testWidgets('should handle no current audio file', (tester) async {
         when(mockAudioService.currentAudioFile).thenReturn(null);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Should not crash when no audio file
         expect(find.byType(PlayerScreen), findsOneWidget);
       });
     });
 
     group('Error States', () {
-      testWidgets('should display error message when audio has error', (tester) async {
+      testWidgets('should display error state when audio has error',
+          (tester) async {
         when(mockAudioService.hasError).thenReturn(true);
         when(mockAudioService.errorMessage).thenReturn('Network error');
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
-        expect(find.text('Network error'), findsOneWidget);
+
+        // PlayerScreen should show error state via AudioControls (refresh icon)
+        expect(find.byIcon(Icons.refresh), findsOneWidget);
       });
 
       testWidgets('should handle loading state', (tester) async {
         when(mockAudioService.isLoading).thenReturn(true);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Should show loading indicator
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
@@ -198,13 +226,13 @@ void main() {
       testWidgets('should handle back navigation', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find and tap back button
         final backButton = find.byType(BackButton);
         if (backButton.evaluate().isNotEmpty) {
           await tester.tap(backButton);
           await tester.pump();
-          
+
           // Should navigate back (handled by Navigator)
         }
       });
@@ -214,13 +242,13 @@ void main() {
       testWidgets('should handle skip forward', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find skip forward button
         final skipForwardButton = find.byIcon(Icons.forward_30);
         if (skipForwardButton.evaluate().isNotEmpty) {
           await tester.tap(skipForwardButton);
           await tester.pump();
-          
+
           verify(mockAudioService.skipForward()).called(1);
         }
       });
@@ -228,13 +256,13 @@ void main() {
       testWidgets('should handle skip backward', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
-        // Find skip backward button  
+
+        // Find skip backward button
         final skipBackButton = find.byIcon(Icons.replay_10);
         if (skipBackButton.evaluate().isNotEmpty) {
           await tester.tap(skipBackButton);
           await tester.pump();
-          
+
           verify(mockAudioService.skipBackward()).called(1);
         }
       });

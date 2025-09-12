@@ -36,14 +36,14 @@ void main() {
 
       testWidgets('should show language and category sections', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        
+
         expect(find.text('Language'), findsOneWidget);
         expect(find.text('Category'), findsOneWidget);
       });
 
       testWidgets('should show basic language options', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        
+
         // Should show some language options
         expect(find.textContaining('English'), findsOneWidget);
         expect(find.textContaining('日本語'), findsOneWidget);
@@ -52,7 +52,7 @@ void main() {
 
       testWidgets('should show basic category options', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        
+
         // Should show "All" and some categories
         expect(find.text('All'), findsOneWidget);
         expect(find.textContaining('Daily News'), findsOneWidget);
@@ -62,37 +62,37 @@ void main() {
     group('Basic Interactions', () {
       testWidgets('should handle language selection', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        
+
         // Find and tap a language option
         final japaneseButton = find.textContaining('日本語');
         if (japaneseButton.evaluate().isNotEmpty) {
           await tester.tap(japaneseButton);
           await tester.pump();
-          
+
           expect(languageChanges, contains('ja-JP'));
         }
       });
 
       testWidgets('should handle category selection', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        
+
         // Find and tap "All" category
         final allButton = find.text('All');
         await tester.tap(allButton);
         await tester.pump();
-        
+
         expect(categoryChanges, contains('all'));
       });
 
       testWidgets('should handle English language selection', (tester) async {
         await tester.pumpWidget(createTestWidget(selectedLanguage: 'zh-TW'));
-        
+
         // Find and tap English option
         final englishButton = find.textContaining('English');
         if (englishButton.evaluate().isNotEmpty) {
           await tester.tap(englishButton);
           await tester.pump();
-          
+
           expect(languageChanges, contains('en-US'));
         }
       });
@@ -101,14 +101,15 @@ void main() {
     group('State Management', () {
       testWidgets('should handle different selected language', (tester) async {
         await tester.pumpWidget(createTestWidget(selectedLanguage: 'ja-JP'));
-        
+
         // Should render without issues when Japanese is selected
         expect(find.byType(FilterBar), findsOneWidget);
       });
 
       testWidgets('should handle different selected category', (tester) async {
-        await tester.pumpWidget(createTestWidget(selectedCategory: 'daily-news'));
-        
+        await tester
+            .pumpWidget(createTestWidget(selectedCategory: 'daily-news'));
+
         // Should render without issues when specific category is selected
         expect(find.byType(FilterBar), findsOneWidget);
       });
@@ -124,7 +125,7 @@ void main() {
             ),
           ),
         );
-        
+
         await tester.pumpWidget(widget);
         expect(find.byType(FilterBar), findsOneWidget);
       });
@@ -133,14 +134,14 @@ void main() {
     group('Edge Cases', () {
       testWidgets('should handle unknown language selection', (tester) async {
         await tester.pumpWidget(createTestWidget(selectedLanguage: 'unknown'));
-        
+
         // Should not crash with unknown language
         expect(find.byType(FilterBar), findsOneWidget);
       });
 
       testWidgets('should handle unknown category selection', (tester) async {
         await tester.pumpWidget(createTestWidget(selectedCategory: 'unknown'));
-        
+
         // Should not crash with unknown category
         expect(find.byType(FilterBar), findsOneWidget);
       });

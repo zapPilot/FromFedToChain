@@ -63,7 +63,8 @@ void main() {
       when(mockAudioService.currentAudioFile).thenReturn(null);
       when(mockAudioService.playbackState).thenReturn(PlaybackState.stopped);
       when(mockAudioService.currentPosition).thenReturn(Duration.zero);
-      when(mockAudioService.totalDuration).thenReturn(const Duration(minutes: 10));
+      when(mockAudioService.totalDuration)
+          .thenReturn(const Duration(minutes: 10));
       when(mockAudioService.isPlaying).thenReturn(false);
       when(mockAudioService.isPaused).thenReturn(false);
       when(mockAudioService.isLoading).thenReturn(false);
@@ -79,7 +80,8 @@ void main() {
         theme: ThemeData.dark(),
         home: MultiProvider(
           providers: [
-            ChangeNotifierProvider<ContentService>.value(value: mockContentService),
+            ChangeNotifierProvider<ContentService>.value(
+                value: mockContentService),
             ChangeNotifierProvider<AudioService>.value(value: mockAudioService),
           ],
           child: const HomeScreen(),
@@ -91,21 +93,21 @@ void main() {
       testWidgets('should render HomeScreen without crashing', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.byType(HomeScreen), findsOneWidget);
       });
 
       testWidgets('should display app title', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.text('From Fed to Chain'), findsOneWidget);
       });
 
       testWidgets('should display episode when available', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.text(testAudioFile.title), findsOneWidget);
       });
     });
@@ -114,7 +116,7 @@ void main() {
       testWidgets('should handle language filter tap', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find language filter buttons
         final zhButton = find.text('中文');
         if (zhButton.evaluate().isNotEmpty) {
@@ -127,7 +129,7 @@ void main() {
       testWidgets('should handle category filter tap', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find category filter buttons
         final categoryButton = find.text('Daily News');
         if (categoryButton.evaluate().isNotEmpty) {
@@ -142,7 +144,7 @@ void main() {
       testWidgets('should handle episode tap for playback', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find episode card and tap it
         final episodeCard = find.text(testAudioFile.title);
         if (episodeCard.evaluate().isNotEmpty) {
@@ -152,13 +154,14 @@ void main() {
         }
       });
 
-      testWidgets('should show mini player when audio is playing', (tester) async {
+      testWidgets('should show mini player when audio is playing',
+          (tester) async {
         when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
         when(mockAudioService.isPlaying).thenReturn(true);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Should show mini player
         expect(find.text(testAudioFile.title), findsAtLeastNWidgets(1));
       });
@@ -168,7 +171,7 @@ void main() {
       testWidgets('should handle search input', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Find search field
         final searchField = find.byType(TextField);
         if (searchField.evaluate().isNotEmpty) {
@@ -182,30 +185,31 @@ void main() {
     group('Loading and Error States', () {
       testWidgets('should show loading indicator when loading', (tester) async {
         when(mockContentService.isLoading).thenReturn(true);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('should show error message when error occurs', (tester) async {
+      testWidgets('should show error message when error occurs',
+          (tester) async {
         when(mockContentService.hasError).thenReturn(true);
         when(mockContentService.errorMessage).thenReturn('Network error');
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         expect(find.text('Network error'), findsOneWidget);
       });
 
       testWidgets('should show empty state when no episodes', (tester) async {
         when(mockContentService.hasEpisodes).thenReturn(false);
         when(mockContentService.filteredEpisodes).thenReturn([]);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Should show some kind of empty state message
         expect(find.byType(HomeScreen), findsOneWidget);
       });
@@ -215,19 +219,21 @@ void main() {
       testWidgets('should show episode statistics', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Check if statistics are displayed somewhere
         expect(find.byType(HomeScreen), findsOneWidget);
         // Statistics should be accessible through ContentService
-        verify(mockContentService.getStatistics()).called(greaterThanOrEqualTo(0));
+        verify(mockContentService.getStatistics())
+            .called(greaterThanOrEqualTo(0));
       });
     });
 
     group('Navigation', () {
-      testWidgets('should navigate to player on episode selection', (tester) async {
+      testWidgets('should navigate to player on episode selection',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
-        
+
         // Tap on episode should trigger navigation
         final episodeTile = find.text(testAudioFile.title);
         if (episodeTile.evaluate().isNotEmpty) {

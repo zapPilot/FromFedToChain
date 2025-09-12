@@ -68,11 +68,11 @@ STREAM_TIMEOUT_SECONDS=10
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
-      
+
       // Create and set up mock HTTP client
       mockHttpClient = MockClient();
       ContentService.setHttpClientForTesting(mockHttpClient);
-      
+
       // Set up default mock responses to prevent network calls
       when(mockHttpClient.get(any, headers: anyNamed('headers')))
           .thenAnswer((_) async => http.Response('[]', 200));
@@ -179,7 +179,8 @@ STREAM_TIMEOUT_SECONDS=10
 
       test('searches episodes by query', () {
         contentService.setSearchQuery('bitcoin');
-        expect(contentService.filteredEpisodes.first.title.toLowerCase(), contains('bitcoin'));
+        expect(contentService.filteredEpisodes.first.title.toLowerCase(),
+            contains('bitcoin'));
       });
     });
 
@@ -223,7 +224,6 @@ STREAM_TIMEOUT_SECONDS=10
       });
     });
 
-
     group('Episode Progress', () {
       test('marks episode as finished', () async {
         await contentService.markEpisodeAsFinished('episode-1');
@@ -234,7 +234,9 @@ STREAM_TIMEOUT_SECONDS=10
     group('Listen History', () {
       test('adds episode to listen history', () async {
         await contentService.addToListenHistory(sampleEpisodes.first);
-        expect(contentService.listenHistory.containsKey(sampleEpisodes.first.id), true);
+        expect(
+            contentService.listenHistory.containsKey(sampleEpisodes.first.id),
+            true);
       });
     });
 
@@ -277,20 +279,5 @@ STREAM_TIMEOUT_SECONDS=10
         expect(nextEpisode?.id, contentService.filteredEpisodes[1].id);
       });
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   });
 }

@@ -30,7 +30,7 @@ class MiniPlayer extends StatelessWidget {
     final margin = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
     final padding = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
     final spacing = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
-    
+
     return Container(
       margin: EdgeInsets.all(margin),
       decoration: AppTheme.glassMorphismDecoration,
@@ -215,12 +215,12 @@ class MiniPlayer extends StatelessWidget {
         final screenWidth = MediaQuery.of(context).size.width;
         final isVerySmall = screenWidth < 360;
         final isSmall = screenWidth < 480;
-        
+
         // Adjust sizes based on available space while maintaining minimum accessibility size
         final secondarySize = 48.0; // Minimum accessibility size
         final primarySize = isVerySmall ? 48.0 : (isSmall ? 50.0 : 52.0);
         final spacing = isVerySmall ? 2.0 : AppTheme.spacingXS;
-        
+
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -267,10 +267,10 @@ class MiniPlayer extends StatelessWidget {
     bool isPrimary = false,
   }) {
     // Calculate icon size - smaller proportion for 48px+ buttons to maintain balance
-    final iconSize = isPrimary 
-        ? size * 0.5  // Larger primary button gets proportionally smaller icon
+    final iconSize = isPrimary
+        ? size * 0.5 // Larger primary button gets proportionally smaller icon
         : size * 0.45; // Secondary buttons get slightly smaller icons
-    
+
     return SizedBox(
       width: size,
       height: size,

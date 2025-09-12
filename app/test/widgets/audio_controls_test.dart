@@ -251,7 +251,7 @@ void main() {
         // Verify the play button exists and the widget renders without errors
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
         expect(tester.takeException(), isNull);
-        
+
         // Verify the play button exists and the widget renders without errors
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
         expect(tester.takeException(), isNull);
@@ -375,10 +375,10 @@ void main() {
           expect(size.height, greaterThanOrEqualTo(48));
         }
 
-        // Main play button should be larger - verify the play icon exists 
+        // Main play button should be larger - verify the play icon exists
         // and check for accessibility compliance
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-        
+
         // Verify accessibility guidelines are met
         final handle = tester.ensureSemantics();
         // Basic check that tappable elements exist and are accessible
@@ -405,18 +405,13 @@ void main() {
         );
 
         // Find the main play button container (within AudioControls)
-        final audioControlsInkWell = find.descendant(
+        // Structure is: Container > Material > InkWell
+        final containerFinder = find.descendant(
           of: find.byType(AudioControls),
-          matching: find.byType(InkWell),
+          matching: find.byType(Container),
         );
-        final containerFinder = find
-            .descendant(
-              of: audioControlsInkWell,
-              matching: find.byType(Container),
-            )
-            .first;
 
-        final container = tester.widget<Container>(containerFinder);
+        final container = tester.widget<Container>(containerFinder.first);
         final decoration = container.decoration as BoxDecoration;
 
         // Verify gradient is applied
@@ -441,18 +436,14 @@ void main() {
           ),
         );
 
-        final audioControlsInkWell = find.descendant(
+        // Find the main play button container (within AudioControls)
+        // Structure is: Container > Material > InkWell
+        final containerFinder = find.descendant(
           of: find.byType(AudioControls),
-          matching: find.byType(InkWell),
+          matching: find.byType(Container),
         );
-        final containerFinder = find
-            .descendant(
-              of: audioControlsInkWell,
-              matching: find.byType(Container),
-            )
-            .first;
 
-        final container = tester.widget<Container>(containerFinder);
+        final container = tester.widget<Container>(containerFinder.first);
         final decoration = container.decoration as BoxDecoration;
 
         // Verify shadow is applied
@@ -568,7 +559,8 @@ void main() {
         await WidgetTestUtils.tapAndSettle(
             tester, find.byIcon(Icons.skip_previous));
         // Tap the play icon directly rather than InkWell
-        await WidgetTestUtils.tapAndSettle(tester, find.byIcon(Icons.play_arrow));
+        await WidgetTestUtils.tapAndSettle(
+            tester, find.byIcon(Icons.play_arrow));
       });
 
       testWidgets('should maintain aspect ratio across sizes',
@@ -605,7 +597,5 @@ void main() {
         }
       });
     });
-
-
   });
 }

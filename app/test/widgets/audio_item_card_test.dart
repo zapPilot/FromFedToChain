@@ -45,8 +45,10 @@ void main() {
         // Verify episode information
         expect(find.text(testAudioFile.displayTitle), findsOneWidget);
         // Use display names instead of raw codes
-        expect(find.textContaining('Daily News'), findsOneWidget); // daily-news -> Daily News
-        expect(find.textContaining('English'), findsOneWidget); // en-US -> English
+        expect(find.textContaining('Daily News'),
+            findsOneWidget); // daily-news -> Daily News
+        expect(
+            find.textContaining('English'), findsOneWidget); // en-US -> English
 
         // Verify play button is shown
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
@@ -224,7 +226,7 @@ void main() {
 
         // Verify play button is shown
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-        expect(find.byType(IconButton), findsOneWidget);
+        expect(find.byKey(AudioItemCard.playButtonKey), findsOneWidget);
       });
 
       testWidgets('should show pause icon when currently playing',
@@ -351,7 +353,8 @@ void main() {
         );
 
         // Tap the card
-        await WidgetTestUtils.tapAndSettle(tester, find.byType(InkWell));
+        await WidgetTestUtils.tapAndSettle(
+            tester, find.byKey(AudioItemCard.cardKey));
 
         // Verify callback was triggered
         expect(WidgetTestUtils.tapCount, equals(1));
@@ -371,7 +374,8 @@ void main() {
         );
 
         // Long press the card
-        await WidgetTestUtils.longPressAndSettle(tester, find.byType(InkWell));
+        await WidgetTestUtils.longPressAndSettle(
+            tester, find.byKey(AudioItemCard.cardKey));
 
         // Verify long press callback was triggered
         expect(WidgetTestUtils.longPressCount, equals(1));
@@ -413,7 +417,8 @@ void main() {
         expect(find.byType(AudioItemCard), findsOneWidget);
 
         // Tap should still work
-        await WidgetTestUtils.tapAndSettle(tester, find.byType(InkWell));
+        await WidgetTestUtils.tapAndSettle(
+            tester, find.byKey(AudioItemCard.cardKey));
         expect(WidgetTestUtils.tapCount, equals(1));
       });
     });
@@ -600,8 +605,6 @@ void main() {
       });
     });
 
-
-
     group('Accessibility Tests', () {
       testWidgets('should meet accessibility guidelines',
           (WidgetTester tester) async {
@@ -633,15 +636,17 @@ void main() {
         // Verify basic accessibility requirements - the card exists and has content
         final audioItemCardFinder = find.byType(AudioItemCard);
         expect(audioItemCardFinder, findsOneWidget);
-        
-        final cardRenderObject = tester.renderObject<RenderBox>(audioItemCardFinder);
+
+        final cardRenderObject =
+            tester.renderObject<RenderBox>(audioItemCardFinder);
         // Card should be reasonably sized for accessibility
         expect(cardRenderObject.size.width, greaterThanOrEqualTo(200));
         expect(cardRenderObject.size.height, greaterThanOrEqualTo(60));
 
         // Verify interactive elements exist
         expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-        expect(find.text('Test Audio: Bitcoin Market Analysis'), findsOneWidget);
+        expect(
+            find.text('Test Audio: Bitcoin Market Analysis'), findsOneWidget);
       });
 
       testWidgets('should provide semantic information for screen readers',
@@ -658,12 +663,15 @@ void main() {
 
         // Verify important text content is available for screen readers
         expect(find.text(testAudioFile.displayTitle), findsOneWidget);
-        expect(find.textContaining(testAudioFile.category), findsOneWidget);
-        expect(find.textContaining(testAudioFile.language), findsOneWidget);
+        // Use display names instead of raw codes
+        expect(find.textContaining('Daily News'),
+            findsOneWidget); // daily-news -> Daily News
+        expect(
+            find.textContaining('English'), findsOneWidget); // en-US -> English
 
         // Interactive elements should be discoverable
-        expect(find.byType(InkWell), findsOneWidget);
-        expect(find.byType(IconButton), findsOneWidget);
+        expect(find.byKey(AudioItemCard.cardKey), findsOneWidget);
+        expect(find.byKey(AudioItemCard.playButtonKey), findsOneWidget);
       });
     });
 
@@ -685,7 +693,8 @@ void main() {
         expect(find.byType(AudioItemCard), findsOneWidget);
 
         // Main tap should still work
-        await WidgetTestUtils.tapAndSettle(tester, find.byType(InkWell));
+        await WidgetTestUtils.tapAndSettle(
+            tester, find.byKey(AudioItemCard.cardKey));
         expect(WidgetTestUtils.tapCount, equals(1));
       });
 
@@ -706,8 +715,10 @@ void main() {
         expect(find.byType(AudioItemCard), findsOneWidget);
 
         // Should handle interactions without crashes
-        await WidgetTestUtils.tapAndSettle(tester, find.byType(InkWell));
-        await WidgetTestUtils.longPressAndSettle(tester, find.byType(InkWell));
+        await WidgetTestUtils.tapAndSettle(
+            tester, find.byKey(AudioItemCard.cardKey));
+        await WidgetTestUtils.longPressAndSettle(
+            tester, find.byKey(AudioItemCard.cardKey));
       });
 
       testWidgets('should handle extreme duration values',
@@ -826,8 +837,6 @@ void main() {
         WidgetTestUtils.resetDeviceSize(tester);
       });
     });
-
-
 
     group('Content Validation Tests', () {
       testWidgets('should use WidgetTestUtils helper methods correctly',

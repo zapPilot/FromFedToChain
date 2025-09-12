@@ -190,43 +190,58 @@ class _PlayerScreenState extends State<PlayerScreen>
   /// Build album art section with animation
   Widget _buildAlbumArtSection(
       AudioFile currentAudio, AudioService audioService) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Animated album art
-          RotationTransition(
-            turns: audioService.isPlaying
-                ? _albumArtAnimation
-                : const AlwaysStoppedAnimation(0.0),
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: AppTheme.primaryGradient,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryColor.withOpacity(0.3),
-                    blurRadius: 30,
-                    offset: const Offset(0, 10),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Make album art responsive to available space
+        final maxSize = constraints.maxHeight > 0
+            ? (constraints.maxHeight * 0.6).clamp(120.0,
+                280.0) // 60% of available height, clamped between 120-280px
+            : 200.0; // Fallback size
+        final iconSize = maxSize * 0.43; // Scale icon proportionally
+
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Animated album art
+              RotationTransition(
+                turns: audioService.isPlaying
+                    ? _albumArtAnimation
+                    : const AlwaysStoppedAnimation(0.0),
+                child: Container(
+                  width: maxSize,
+                  height: maxSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppTheme.primaryGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryColor.withOpacity(0.3),
+                        blurRadius: maxSize * 0.1, // Scale shadow with size
+                        offset: Offset(
+                            0, maxSize * 0.035), // Scale offset with size
+                      ),
+                    ],
                   ),
-                ],
+                  child: Icon(
+                    _getAudioIcon(currentAudio),
+                    size: iconSize,
+                    color: AppTheme.onPrimaryColor,
+                  ),
+                ),
               ),
-              child: Icon(
-                _getAudioIcon(currentAudio),
-                size: 120,
-                color: AppTheme.onPrimaryColor,
-              ),
-            ),
+
+              SizedBox(
+                  height: (maxSize * 0.06)
+                      .clamp(8.0, AppTheme.spacingL)), // Scale spacing
+
+              // Playback state indicator
+              _buildPlaybackStateIndicator(audioService),
+            ],
           ),
-
-          const SizedBox(height: AppTheme.spacingL),
-
-          // Playback state indicator
-          _buildPlaybackStateIndicator(audioService),
-        ],
-      ),
+        );
+      },
     );
   }
 

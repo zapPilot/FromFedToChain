@@ -100,6 +100,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
             ),
             child: Text(
               '${speed}x',
+              key: Key('speed_chip_${speed}x'),
               style: AppTheme.bodyMedium.copyWith(
                 color: isSelected
                     ? AppTheme.onPrimaryColor
@@ -133,6 +134,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
             children: [
               Text(
                 '0.5x',
+                key: const Key('slider_min_label'),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.onSurfaceColor.withOpacity(0.6),
                 ),
@@ -153,7 +155,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
                     overlayColor: AppTheme.primaryColor.withOpacity(0.2),
                   ),
                   child: Slider(
-                    value: currentSpeed,
+                    value: currentSpeed.clamp(0.5, 2.0),
                     min: 0.5,
                     max: 2.0,
                     divisions: 30, // 0.05 increments
@@ -163,6 +165,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
               ),
               Text(
                 '2.0x',
+                key: const Key('slider_max_label'),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.onSurfaceColor.withOpacity(0.6),
                 ),
@@ -187,6 +190,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
               ),
               child: Text(
                 '${currentSpeed.toStringAsFixed(2)}x',
+                key: const Key('custom_speed_display'),
                 style: AppTheme.bodyMedium.copyWith(
                   color: AppTheme.primaryColor,
                   fontWeight: FontWeight.w600,

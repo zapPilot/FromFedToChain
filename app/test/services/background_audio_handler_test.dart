@@ -21,7 +21,7 @@ void main() {
 
     setUp(() {
       mockAudioHandler = MockBackgroundAudioHandler();
-      
+
       testAudioFile = AudioFile(
         id: 'test-episode',
         title: 'Test Episode',
@@ -34,7 +34,8 @@ void main() {
       );
 
       // Basic stream setup
-      final playbackStateStream = BehaviorSubject<audio_service_pkg.PlaybackState>.seeded(
+      final playbackStateStream =
+          BehaviorSubject<audio_service_pkg.PlaybackState>.seeded(
         audio_service_pkg.PlaybackState(
           controls: [audio_service_pkg.MediaControl.play],
           systemActions: const {audio_service_pkg.MediaAction.seek},
@@ -46,9 +47,10 @@ void main() {
         ),
       );
 
-      when(mockAudioHandler.playbackState).thenAnswer((_) => playbackStateStream);
-      when(mockAudioHandler.mediaItem).thenAnswer((_) => 
-          BehaviorSubject<audio_service_pkg.MediaItem?>.seeded(null));
+      when(mockAudioHandler.playbackState)
+          .thenAnswer((_) => playbackStateStream);
+      when(mockAudioHandler.mediaItem).thenAnswer(
+          (_) => BehaviorSubject<audio_service_pkg.MediaItem?>.seeded(null));
       when(mockAudioHandler.duration).thenReturn(Duration.zero);
     });
 
@@ -58,11 +60,13 @@ void main() {
 
     group('Basic Interface Tests', () {
       test('should provide playback state stream', () {
-        expect(mockAudioHandler.playbackState, isA<Stream<audio_service_pkg.PlaybackState>>());
+        expect(mockAudioHandler.playbackState,
+            isA<Stream<audio_service_pkg.PlaybackState>>());
       });
 
       test('should provide media item stream', () {
-        expect(mockAudioHandler.mediaItem, isA<Stream<audio_service_pkg.MediaItem?>>());
+        expect(mockAudioHandler.mediaItem,
+            isA<Stream<audio_service_pkg.MediaItem?>>());
       });
 
       test('should provide duration property', () {
@@ -140,18 +144,21 @@ void main() {
 
     group('Custom Actions', () {
       test('should handle setSpeed custom action', () async {
-        when(mockAudioHandler.customAction('setSpeed', any)).thenAnswer((_) async => {});
-        
+        when(mockAudioHandler.customAction('setSpeed', any))
+            .thenAnswer((_) async => {});
+
         await mockAudioHandler.customAction('setSpeed', {'speed': 1.5});
-        
-        verify(mockAudioHandler.customAction('setSpeed', {'speed': 1.5})).called(1);
+
+        verify(mockAudioHandler.customAction('setSpeed', {'speed': 1.5}))
+            .called(1);
       });
 
       test('should handle getPosition custom action', () async {
-        when(mockAudioHandler.customAction('getPosition')).thenAnswer((_) async => Duration.zero);
-        
+        when(mockAudioHandler.customAction('getPosition'))
+            .thenAnswer((_) async => Duration.zero);
+
         final position = await mockAudioHandler.customAction('getPosition');
-        
+
         verify(mockAudioHandler.customAction('getPosition')).called(1);
         expect(position, isA<Duration>());
       });

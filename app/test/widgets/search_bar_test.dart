@@ -851,8 +851,6 @@ void main() {
       });
     });
 
-
-
     group('Responsive Design Tests', () {
       testWidgets('should adapt to different screen sizes',
           (WidgetTester tester) async {
@@ -876,8 +874,6 @@ void main() {
 
         WidgetTestUtils.resetDeviceSize(tester);
       });
-
-
     });
   });
 }
