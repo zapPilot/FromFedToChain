@@ -302,14 +302,14 @@ class WidgetTestUtils {
 
   /// Set device size for testing
   static void setDeviceSize(WidgetTester tester, Size size) {
-    tester.binding.window.physicalSizeTestValue = size;
-    tester.binding.window.devicePixelRatioTestValue = 1.0;
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
   }
 
   /// Reset device size
   static void resetDeviceSize(WidgetTester tester) {
-    tester.binding.window.clearPhysicalSizeTestValue();
-    tester.binding.window.clearDevicePixelRatioTestValue();
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
   }
 
   /// Custom matchers for audio widget testing
@@ -378,11 +378,13 @@ class WidgetTestUtils {
     // Verify title
     expect(find.text(audioFile.displayTitle), findsOneWidget);
 
-    // Verify category display
-    expect(find.textContaining(audioFile.category), findsOneWidget);
+    // Verify category display (using display name, not raw category)
+    final categoryDisplayName = _getCategoryDisplayName(audioFile.category);
+    expect(find.textContaining(categoryDisplayName), findsOneWidget);
 
-    // Verify language display
-    expect(find.textContaining(audioFile.language), findsOneWidget);
+    // Verify language display (using display name, not language code)
+    final languageDisplayName = _getLanguageDisplayName(audioFile.language);
+    expect(find.textContaining(languageDisplayName), findsOneWidget);
 
     // Verify play button or duration
     if (shouldShowPlayButton) {
@@ -611,6 +613,29 @@ class WidgetTestUtils {
 
     // Should handle stress without errors
     expect(tester.takeException(), isNull);
+  }
+
+  /// Helper method to get category display name (matches ApiConfig)
+  static String _getCategoryDisplayName(String category) {
+    const categoryNames = {
+      'daily-news': 'Daily News',
+      'ethereum': 'Ethereum',
+      'macro': 'Macro Economics',
+      'startup': 'Startup',
+      'ai': 'AI & Technology',
+      'defi': 'DeFi',
+    };
+    return categoryNames[category] ?? category;
+  }
+
+  /// Helper method to get language display name (matches ApiConfig)
+  static String _getLanguageDisplayName(String language) {
+    const languageNames = {
+      'zh-TW': '中文',
+      'en-US': 'English',
+      'ja-JP': '日本語',
+    };
+    return languageNames[language] ?? language;
   }
 }
 

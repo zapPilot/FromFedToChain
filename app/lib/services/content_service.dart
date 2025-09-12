@@ -898,4 +898,9 @@ class ContentService extends ChangeNotifier {
     _applyFilters();
     notifyListeners();
   }
+
+  @visibleForTesting
+  static void setHttpClientForTesting(http.Client? client) {
+    StreamingApiService.setHttpClient(client);
+  }
 }

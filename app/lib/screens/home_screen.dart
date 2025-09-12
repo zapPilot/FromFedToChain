@@ -5,13 +5,11 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../themes/app_theme.dart';
 import '../services/content_service.dart';
 import '../services/audio_service.dart';
-import '../services/auth/auth_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/filter_bar.dart';
 import '../widgets/audio_list.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/search_bar.dart';
-import '../screens/auth/login_screen.dart';
 import 'player_screen.dart';
 
 /// Main home screen displaying episodes with filtering and search
@@ -46,24 +44,6 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  Future<void> _handleLogout(
-      BuildContext context, AuthService authService) async {
-    try {
-      await authService.signOut();
-      if (context.mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign out failed: ${e.toString()}')),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,65 +135,6 @@ class _HomeScreenState extends State<HomeScreen>
                 borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
             ),
-          ),
-
-          const SizedBox(width: AppTheme.spacingS),
-
-          // Profile/Settings menu
-          Consumer<AuthService>(
-            builder: (context, authService, child) {
-              return PopupMenuButton<String>(
-                icon: const Icon(Icons.account_circle),
-                onSelected: (value) async {
-                  switch (value) {
-                    case 'logout':
-                      await _handleLogout(context, authService);
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'profile',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person_outline),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              authService.currentUser?.name ?? 'User',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                            if (authService.currentUser?.email != null)
-                              Text(
-                                authService.currentUser!.email,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Sign Out', style: TextStyle(color: Colors.red)),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
           ),
 
           const SizedBox(width: AppTheme.spacingS),

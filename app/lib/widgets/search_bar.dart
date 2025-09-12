@@ -31,6 +31,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     // Listen to text changes
     _controller.addListener(() {
       widget.onSearchChanged(_controller.text);
+      setState(() {}); // Trigger rebuild to show/hide suffix icon
     });
   }
 
@@ -59,14 +60,27 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             color: AppTheme.onSurfaceColor.withOpacity(0.6),
           ),
           suffixIcon: _controller.text.isNotEmpty
-              ? IconButton(
-                  onPressed: () {
-                    _controller.clear();
-                    widget.onSearchChanged('');
-                  },
-                  icon: Icon(
-                    Icons.clear,
-                    color: AppTheme.onSurfaceColor.withOpacity(0.6),
+              ? Semantics(
+                  label: 'Clear search',
+                  button: true,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        _controller.clear();
+                        widget.onSearchChanged('');
+                      },
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.clear,
+                          color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                        ),
+                      ),
+                    ),
                   ),
                 )
               : null,

@@ -245,25 +245,34 @@ class AudioItemCard extends StatelessWidget {
 
   /// Build action button (play/options)
   Widget _buildActionButton() {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.1),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
-        border: Border.all(
-          color: AppTheme.primaryColor.withOpacity(0.3),
-          width: 1,
+        child: Semantics(
+          label: isCurrentlyPlaying ? 'Pause' : 'Play',
+          button: true,
+          child: Container(
+            width: 48, // Minimum accessibility tap target size
+            height: 48, // Minimum accessibility tap target size
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusS),
+              border: Border.all(
+                color: AppTheme.primaryColor.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Center(
+              child: Icon(
+                isCurrentlyPlaying ? Icons.pause : Icons.play_arrow,
+                color: AppTheme.primaryColor,
+                size: 22, // Slightly larger icon for better proportion
+              ),
+            ),
+          ),
         ),
-      ),
-      child: IconButton(
-        onPressed: onTap,
-        icon: Icon(
-          isCurrentlyPlaying ? Icons.pause : Icons.play_arrow,
-          color: AppTheme.primaryColor,
-          size: 20,
-        ),
-        padding: EdgeInsets.zero,
       ),
     );
   }

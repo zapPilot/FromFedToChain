@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart' as audio_service_pkg;
@@ -20,6 +21,16 @@ class AudioService extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   final BackgroundAudioHandler? _audioHandler;
   final ContentService? _contentService;
+
+  // Stream subscriptions for proper disposal
+  StreamSubscription? _playbackStateSubscription;
+  StreamSubscription? _mediaItemSubscription;
+  StreamSubscription? _positionSubscription;
+  StreamSubscription? _durationSubscription;
+  StreamSubscription? _playerStateSubscription;
+
+  // Disposal guard to prevent multiple dispose calls
+  bool _disposed = false;
 
   // Current playback state
   PlaybackState _playbackState = PlaybackState.stopped;
@@ -96,7 +107,7 @@ class AudioService extends ChangeNotifier {
       );
 
       // Listen to background handler state changes
-      _audioHandler!.playbackState.listen((state) {
+      _playbackStateSubscription = _audioHandler!.playbackState.listen((state) {
         if (kDebugMode) {
           print(
               '🔄 AudioService: Background state changed - playing: ${state.playing}');
@@ -134,7 +145,7 @@ class AudioService extends ChangeNotifier {
       });
 
       // Listen to media item changes
-      _audioHandler!.mediaItem.listen((mediaItem) {
+      _mediaItemSubscription = _audioHandler!.mediaItem.listen((mediaItem) {
         if (mediaItem != null) {
           _totalDuration = mediaItem.duration ?? Duration.zero;
           notifyListeners();
@@ -149,20 +160,20 @@ class AudioService extends ChangeNotifier {
       _audioPlayer = AudioPlayer();
 
       // Listen to position changes
-      _audioPlayer.positionStream.listen((position) {
+      _positionSubscription = _audioPlayer.positionStream.listen((position) {
         _currentPosition = position;
         _updateEpisodeProgress();
         notifyListeners();
       });
 
       // Listen to duration changes
-      _audioPlayer.durationStream.listen((duration) {
+      _durationSubscription = _audioPlayer.durationStream.listen((duration) {
         _totalDuration = duration ?? Duration.zero;
         notifyListeners();
       });
 
       // Listen to player state changes
-      _audioPlayer.playerStateStream.listen((state) {
+      _playerStateSubscription = _audioPlayer.playerStateStream.listen((state) {
         switch (state.processingState) {
           case ProcessingState.idle:
             _playbackState = PlaybackState.stopped;
@@ -344,10 +355,17 @@ class AudioService extends ChangeNotifier {
 
     // Mark episode as finished in ContentService
     if (_contentService != null && _currentAudioFile != null) {
-      await _contentService!.markEpisodeAsFinished(_currentAudioFile!.id);
-      if (kDebugMode) {
-        print(
-            '✅ AudioService: Episode marked as finished: ${_currentAudioFile!.id}');
+      try {
+        await _contentService!.markEpisodeAsFinished(_currentAudioFile!.id);
+        if (kDebugMode) {
+          print(
+              '✅ AudioService: Episode marked as finished: ${_currentAudioFile!.id}');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ AudioService: Failed to mark episode as finished: $e');
+        }
+        // Continue with repeat/autoplay even if marking fails
       }
     }
 
@@ -444,7 +462,14 @@ class AudioService extends ChangeNotifier {
       if (kDebugMode) {
         print('🧪 Calling test method on background handler...');
       }
-      await _audioHandler!.testMediaSession();
+      try {
+        await _audioHandler!.testMediaSession();
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ AudioService: Media session test failed: $e');
+        }
+        // Continue gracefully - media session errors shouldn't crash the app
+      }
     } else {
       if (kDebugMode) {
         print('❌ Cannot test media session - no background handler available');
@@ -668,6 +693,19 @@ class AudioService extends ChangeNotifier {
 
   @override
   void dispose() {
+    if (_disposed) {
+      return; // Already disposed, nothing to do
+    }
+
+    _disposed = true;
+
+    // Cancel all stream subscriptions
+    _playbackStateSubscription?.cancel();
+    _mediaItemSubscription?.cancel();
+    _positionSubscription?.cancel();
+    _durationSubscription?.cancel();
+    _playerStateSubscription?.cancel();
+
     // Only dispose local audio player if not using background handler
     if (_audioHandler == null) {
       _audioPlayer.dispose();

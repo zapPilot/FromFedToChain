@@ -24,8 +24,15 @@ class MiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Responsive spacing and sizing based on screen width
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isVerySmall = screenWidth < 360;
+    final margin = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
+    final padding = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
+    final spacing = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
+    
     return Container(
-      margin: const EdgeInsets.all(AppTheme.spacingM),
+      margin: EdgeInsets.all(margin),
       decoration: AppTheme.glassMorphismDecoration,
       child: Material(
         color: Colors.transparent,
@@ -33,13 +40,13 @@ class MiniPlayer extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusM),
           child: Padding(
-            padding: const EdgeInsets.all(AppTheme.spacingM),
+            padding: EdgeInsets.all(padding),
             child: Row(
               children: [
                 // Album art / Icon
-                _buildAlbumArt(),
+                _buildAlbumArt(size: isVerySmall ? 36 : 44),
 
-                const SizedBox(width: AppTheme.spacingM),
+                SizedBox(width: spacing),
 
                 // Track info
                 Expanded(
@@ -57,10 +64,10 @@ class MiniPlayer extends StatelessWidget {
   }
 
   /// Build album art or category icon
-  Widget _buildAlbumArt() {
+  Widget _buildAlbumArt({double size = 48}) {
     return Container(
-      width: 48,
-      height: 48,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         gradient: AppTheme.primaryGradient,
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
@@ -75,7 +82,7 @@ class MiniPlayer extends StatelessWidget {
       child: Icon(
         _getCategoryIcon(audioFile.category),
         color: AppTheme.onPrimaryColor,
-        size: 24,
+        size: size * 0.5, // Scale icon with container size
       ),
     );
   }
@@ -101,33 +108,48 @@ class MiniPlayer extends StatelessWidget {
         // Track details with playback state
         Row(
           children: [
-            // Category and language
-            Text(
-              '${audioFile.categoryEmoji} ${audioFile.category}',
-              style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.getCategoryColor(audioFile.category),
+            // Category and language in flexible container
+            Expanded(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Category
+                  Flexible(
+                    child: Text(
+                      '${audioFile.categoryEmoji} ${audioFile.category}',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.getCategoryColor(audioFile.category),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                  const SizedBox(width: AppTheme.spacingS),
+
+                  Text(
+                    '•',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.onSurfaceColor.withOpacity(0.5),
+                    ),
+                  ),
+
+                  const SizedBox(width: AppTheme.spacingS),
+
+                  // Language
+                  Flexible(
+                    child: Text(
+                      '${audioFile.languageFlag} ${audioFile.language}',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.getLanguageColor(audioFile.language),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(width: AppTheme.spacingS),
-
-            Text(
-              '•',
-              style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.5),
-              ),
-            ),
-
-            const SizedBox(width: AppTheme.spacingS),
-
-            Text(
-              '${audioFile.languageFlag} ${audioFile.language}',
-              style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.getLanguageColor(audioFile.language),
-              ),
-            ),
-
-            const Spacer(),
 
             // Playback state indicator
             _buildPlaybackStateIndicator(),
@@ -186,35 +208,53 @@ class MiniPlayer extends StatelessWidget {
 
   /// Build control buttons
   Widget _buildControls() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Previous button
-        _buildControlButton(
-          icon: Icons.skip_previous,
-          onPressed: onPrevious,
-          size: 32,
-        ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Ensure minimum 48px tap targets for accessibility compliance
+        // while adapting to screen space and preventing overflow
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isVerySmall = screenWidth < 360;
+        final isSmall = screenWidth < 480;
+        
+        // Adjust sizes based on available space while maintaining minimum accessibility size
+        final secondarySize = 48.0; // Minimum accessibility size
+        final primarySize = isVerySmall ? 48.0 : (isSmall ? 50.0 : 52.0);
+        final spacing = isVerySmall ? 2.0 : AppTheme.spacingXS;
+        
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Previous button
+            _buildControlButton(
+              icon: Icons.skip_previous,
+              onPressed: onPrevious,
+              size: secondarySize,
+              semanticLabel: 'Previous track',
+            ),
 
-        const SizedBox(width: AppTheme.spacingS),
+            SizedBox(width: spacing),
 
-        // Play/Pause button
-        _buildControlButton(
-          icon: _getPlayPauseIcon(),
-          onPressed: onPlayPause,
-          size: 40,
-          isPrimary: true,
-        ),
+            // Play/Pause button
+            _buildControlButton(
+              icon: _getPlayPauseIcon(),
+              onPressed: onPlayPause,
+              size: primarySize,
+              isPrimary: true,
+              semanticLabel: _getPlayPauseSemanticLabel(),
+            ),
 
-        const SizedBox(width: AppTheme.spacingS),
+            SizedBox(width: spacing),
 
-        // Next button
-        _buildControlButton(
-          icon: Icons.skip_next,
-          onPressed: onNext,
-          size: 32,
-        ),
-      ],
+            // Next button
+            _buildControlButton(
+              icon: Icons.skip_next,
+              onPressed: onNext,
+              size: secondarySize,
+              semanticLabel: 'Next track',
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -223,8 +263,14 @@ class MiniPlayer extends StatelessWidget {
     required IconData icon,
     required VoidCallback onPressed,
     required double size,
+    required String semanticLabel,
     bool isPrimary = false,
   }) {
+    // Calculate icon size - smaller proportion for 48px+ buttons to maintain balance
+    final iconSize = isPrimary 
+        ? size * 0.5  // Larger primary button gets proportionally smaller icon
+        : size * 0.45; // Secondary buttons get slightly smaller icons
+    
     return SizedBox(
       width: size,
       height: size,
@@ -232,10 +278,11 @@ class MiniPlayer extends StatelessWidget {
         onPressed: playbackState == PlaybackState.loading && isPrimary
             ? null
             : onPressed,
+        tooltip: semanticLabel,
         icon: playbackState == PlaybackState.loading && isPrimary
             ? SizedBox(
-                width: size * 0.6,
-                height: size * 0.6,
+                width: iconSize,
+                height: iconSize,
                 child: const CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -245,7 +292,8 @@ class MiniPlayer extends StatelessWidget {
               )
             : Icon(
                 icon,
-                size: size * 0.6,
+                size: iconSize,
+                semanticLabel: semanticLabel,
               ),
         style: IconButton.styleFrom(
           backgroundColor: isPrimary
@@ -310,6 +358,21 @@ class MiniPlayer extends StatelessWidget {
         return 'Error';
       case PlaybackState.stopped:
         return 'Stopped';
+    }
+  }
+
+  /// Get semantic label for play/pause button based on current state
+  String _getPlayPauseSemanticLabel() {
+    switch (playbackState) {
+      case PlaybackState.playing:
+        return 'Pause';
+      case PlaybackState.paused:
+      case PlaybackState.stopped:
+        return 'Play';
+      case PlaybackState.loading:
+        return 'Loading, please wait';
+      case PlaybackState.error:
+        return 'Retry playback';
     }
   }
 }

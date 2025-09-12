@@ -8,7 +8,17 @@ import '../models/audio_file.dart';
 /// Service for interacting with the Cloudflare R2 streaming API
 /// Handles episode discovery and streaming URL generation
 class StreamingApiService {
-  static final _client = http.Client();
+  static http.Client? _staticClient;
+  static http.Client get _client => _staticClient ??= http.Client();
+  
+  /// Set HTTP client for dependency injection (mainly for testing)
+  static void setHttpClient(http.Client? client) {
+    _staticClient?.close();
+    _staticClient = client;
+  }
+  
+  /// Get current HTTP client instance (mainly for testing)
+  static http.Client get httpClient => _client;
 
   /// Get list of episodes for a specific language and category
   /// Returns list of AudioFile objects with streaming URLs
@@ -305,7 +315,8 @@ class StreamingApiService {
 
   /// Clean up HTTP client resources
   static void dispose() {
-    _client.close();
+    _staticClient?.close();
+    _staticClient = null;
   }
 }
 

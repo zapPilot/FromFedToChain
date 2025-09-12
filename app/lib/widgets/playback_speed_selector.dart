@@ -75,30 +75,37 @@ class PlaybackSpeedSelector extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusM),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingM,
-            vertical: AppTheme.spacingS,
-          ),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AppTheme.primaryColor
-                : AppTheme.cardColor.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(AppTheme.radiusM),
-            border: isSelected
-                ? null
-                : Border.all(
-                    color: AppTheme.onSurfaceColor.withOpacity(0.2),
-                    width: 1,
-                  ),
-          ),
-          child: Text(
-            '${speed}x',
-            style: AppTheme.bodyMedium.copyWith(
+        child: Semantics(
+          label: 'Playback speed ${speed}x${isSelected ? ', selected' : ''}',
+          button: true,
+          selected: isSelected,
+          child: Container(
+            // Ensure minimum 48px height for accessibility compliance
+            constraints: const BoxConstraints(minHeight: 48.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingM,
+              vertical: AppTheme.spacingM, // Increased from spacingS
+            ),
+            decoration: BoxDecoration(
               color: isSelected
-                  ? AppTheme.onPrimaryColor
-                  : AppTheme.onSurfaceColor,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ? AppTheme.primaryColor
+                  : AppTheme.cardColor.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(AppTheme.radiusM),
+              border: isSelected
+                  ? null
+                  : Border.all(
+                      color: AppTheme.onSurfaceColor.withOpacity(0.2),
+                      width: 1,
+                    ),
+            ),
+            child: Text(
+              '${speed}x',
+              style: AppTheme.bodyMedium.copyWith(
+                color: isSelected
+                    ? AppTheme.onPrimaryColor
+                    : AppTheme.onSurfaceColor,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
           ),
         ),
