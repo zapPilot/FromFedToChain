@@ -217,7 +217,7 @@ class MiniPlayer extends StatelessWidget {
         final isSmall = screenWidth < 480;
 
         // Adjust sizes based on available space while maintaining minimum accessibility size
-        final secondarySize = 48.0; // Minimum accessibility size
+        const secondarySize = 48.0; // Minimum accessibility size
         final primarySize = isVerySmall ? 48.0 : (isSmall ? 50.0 : 52.0);
         final spacing = isVerySmall ? 2.0 : AppTheme.spacingXS;
 

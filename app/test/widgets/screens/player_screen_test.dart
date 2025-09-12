@@ -8,9 +8,6 @@ import 'package:from_fed_to_chain_app/screens/player_screen.dart';
 import 'package:from_fed_to_chain_app/services/audio_service.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import 'package:from_fed_to_chain_app/themes/app_theme.dart';
-import '../widget_test_utils.dart';
 
 // Generate mocks for dependencies
 @GenerateMocks([AudioService, ContentService])
@@ -78,19 +75,6 @@ void main() {
       reset(mockAudioService);
       reset(mockContentService);
     });
-
-    // Helper method to setup proper screen size for all tests
-    Future<void> setupTestWithScreenSize(
-        WidgetTester tester, Widget widget) async {
-      WidgetTestUtils.setDeviceSize(
-          tester, const Size(375, 667)); // iPhone size
-      await tester.pumpWidget(widget);
-      await tester.pump();
-    }
-
-    void tearDownTestScreenSize(WidgetTester tester) {
-      WidgetTestUtils.resetDeviceSize(tester);
-    }
 
     Widget createTestWidget({String? contentId}) {
       return MediaQuery(

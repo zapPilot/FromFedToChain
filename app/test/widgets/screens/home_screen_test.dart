@@ -8,7 +8,6 @@ import 'package:from_fed_to_chain_app/screens/home_screen.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/services/audio_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/themes/app_theme.dart';
 
 // Generate mocks for dependencies
 @GenerateMocks([ContentService, AudioService])
