@@ -297,10 +297,17 @@ class AudioService extends ChangeNotifier {
 
   /// Seek to specific position
   Future<void> seekTo(Duration position) async {
-    if (_audioHandler != null) {
-      await _audioHandler!.seek(position);
-    } else {
-      await _audioPlayer.seek(position);
+    try {
+      if (_audioHandler != null) {
+        await _audioHandler!.seek(position);
+      } else {
+        await _audioPlayer.seek(position);
+      }
+    } catch (e) {
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Seek failed: $e';
+      notifyListeners();
+      rethrow;
     }
   }
 
@@ -610,14 +617,21 @@ class AudioService extends ChangeNotifier {
 
   /// Stop playback
   Future<void> stop() async {
-    if (_audioHandler != null) {
-      await _audioHandler!.stop();
-    } else {
-      await _audioPlayer.stop();
+    try {
+      if (_audioHandler != null) {
+        await _audioHandler!.stop();
+      } else {
+        await _audioPlayer.stop();
+      }
+      _playbackState = PlaybackState.stopped;
+      _currentPosition = Duration.zero;
+      notifyListeners();
+    } catch (e) {
+      _playbackState = PlaybackState.error;
+      _errorMessage = 'Stop failed: $e';
+      notifyListeners();
+      rethrow;
     }
-    _playbackState = PlaybackState.stopped;
-    _currentPosition = Duration.zero;
-    notifyListeners();
   }
 
   /// Toggle autoplay
