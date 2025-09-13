@@ -1,0 +1,912 @@
+{"protocolVersion":"0.1.1","runnerVersion":null,"pid":6871,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"/Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading /Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":0}
+{"suite":{"id":2,"platform":"vm","path":"/Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"suite","time":2}
+{"test":{"id":3,"name":"loading /Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart","suiteID":2,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":2}
+{"suite":{"id":4,"platform":"vm","path":"/Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"suite","time":2}
+{"test":{"id":5,"name":"loading /Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart","suiteID":4,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":2}
+{"suite":{"id":6,"platform":"vm","path":"/Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"suite","time":2}
+{"test":{"id":7,"name":"loading /Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart","suiteID":6,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":2}
+{"count":4,"time":3,"type":"allSuites"}
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":1599}
+{"group":{"id":8,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":54,"line":null,"column":null,"url":null},"type":"group","time":1600}
+{"group":{"id":9,"suiteID":0,"parentID":8,"name":"ContentService Comprehensive Tests","metadata":{"skip":false,"skipReason":null},"testCount":54,"line":37,"column":3,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1601}
+{"test":{"id":10,"name":"ContentService Comprehensive Tests (setUpAll)","suiteID":0,"groupIDs":[8,9],"metadata":{"skip":false,"skipReason":null},"line":57,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1601}
+{"testID":10,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":1614}
+{"group":{"id":11,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Initialization","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":129,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1614}
+{"test":{"id":12,"name":"ContentService Comprehensive Tests Initialization loads preferences from SharedPreferences","suiteID":0,"groupIDs":[8,9,11],"metadata":{"skip":false,"skipReason":null},"line":130,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1614}
+{"testID":12,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1717}
+{"group":{"id":13,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Episode Loading","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":146,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1717}
+{"test":{"id":14,"name":"ContentService Comprehensive Tests Episode Loading loads episodes successfully","suiteID":0,"groupIDs":[8,9,13],"metadata":{"skip":false,"skipReason":null},"line":147,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1717}
+{"testID":14,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1720}
+{"test":{"id":15,"name":"ContentService Comprehensive Tests Episode Loading filters episodes by language","suiteID":0,"groupIDs":[8,9,13],"metadata":{"skip":false,"skipReason":null},"line":154,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1720}
+{"testID":15,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1722}
+{"group":{"id":16,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval","metadata":{"skip":false,"skipReason":null},"testCount":8,"line":163,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1722}
+{"test":{"id":17,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getStatistics returns accurate counts","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":164,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1722}
+{"testID":17,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1724}
+{"test":{"id":18,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getEpisodesByLanguage filters correctly","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":187,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1724}
+{"testID":18,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1725}
+{"test":{"id":19,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getEpisodesByCategory filters correctly","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":199,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1725}
+{"testID":19,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1727}
+{"test":{"id":20,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getEpisodesByLanguageAndCategory filters by both criteria","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":211,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1727}
+{"testID":20,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1728}
+{"test":{"id":21,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getDebugInfo provides comprehensive debug information","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":226,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1728}
+{"testID":21,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1729}
+{"test":{"id":22,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getDebugInfo handles null audio file","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":242,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1730}
+{"testID":22,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1731}
+{"test":{"id":23,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getCachedContent returns cached content synchronously","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":247,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1731}
+{"testID":23,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1732}
+{"test":{"id":24,"name":"ContentService Comprehensive Tests Statistics and Content Retrieval getCachedContent returns null for non-existent cache","suiteID":0,"groupIDs":[8,9,16],"metadata":{"skip":false,"skipReason":null},"line":257,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1732}
+{"testID":24,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1733}
+{"group":{"id":25,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Filtering and Search","metadata":{"skip":false,"skipReason":null},"testCount":11,"line":264,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1733}
+{"test":{"id":26,"name":"ContentService Comprehensive Tests Filtering and Search filters episodes by language","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":269,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1733}
+{"testID":26,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1734}
+{"test":{"id":27,"name":"ContentService Comprehensive Tests Filtering and Search filters episodes by category","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":274,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1734}
+{"testID":27,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1736}
+{"test":{"id":28,"name":"ContentService Comprehensive Tests Filtering and Search searches episodes by query","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":280,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1736}
+{"testID":28,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1737}
+{"test":{"id":29,"name":"ContentService Comprehensive Tests Filtering and Search filters by \"all\" category shows all episodes","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":286,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1737}
+{"testID":29,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1739}
+{"test":{"id":30,"name":"ContentService Comprehensive Tests Filtering and Search search query filters by title","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":292,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1739}
+{"testID":30,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1740}
+{"test":{"id":31,"name":"ContentService Comprehensive Tests Filtering and Search search query filters by id","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":299,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1740}
+{"testID":31,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1741}
+{"test":{"id":32,"name":"ContentService Comprehensive Tests Filtering and Search search query filters by category","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":305,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1741}
+{"testID":32,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1742}
+{"test":{"id":33,"name":"ContentService Comprehensive Tests Filtering and Search empty search query shows all filtered episodes","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":312,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1742}
+{"testID":33,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1744}
+{"test":{"id":34,"name":"ContentService Comprehensive Tests Filtering and Search case insensitive search","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":324,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1744}
+{"testID":34,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1745}
+{"test":{"id":35,"name":"ContentService Comprehensive Tests Filtering and Search combined filters work together","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":334,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1745}
+{"testID":35,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1746}
+{"test":{"id":36,"name":"ContentService Comprehensive Tests Filtering and Search _applyFilters method processes all filters correctly","suiteID":0,"groupIDs":[8,9,25],"metadata":{"skip":false,"skipReason":null},"line":345,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1746}
+{"testID":36,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1748}
+{"group":{"id":37,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Sorting","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":353,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1748}
+{"test":{"id":38,"name":"ContentService Comprehensive Tests Sorting sorts episodes alphabetically","suiteID":0,"groupIDs":[8,9,37],"metadata":{"skip":false,"skipReason":null},"line":354,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1748}
+{"testID":38,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1749}
+{"test":{"id":39,"name":"ContentService Comprehensive Tests Sorting sorts episodes by newest first (default)","suiteID":0,"groupIDs":[8,9,37],"metadata":{"skip":false,"skipReason":null},"line":380,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1750}
+{"testID":39,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1751}
+{"test":{"id":40,"name":"ContentService Comprehensive Tests Sorting sorts episodes by oldest first","suiteID":0,"groupIDs":[8,9,37],"metadata":{"skip":false,"skipReason":null},"line":406,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1751}
+{"testID":40,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1752}
+{"test":{"id":41,"name":"ContentService Comprehensive Tests Sorting does not change sort order if same value is set","suiteID":0,"groupIDs":[8,9,37],"metadata":{"skip":false,"skipReason":null},"line":432,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1752}
+{"testID":41,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1753}
+{"test":{"id":42,"name":"ContentService Comprehensive Tests Sorting _applySorting method works correctly","suiteID":0,"groupIDs":[8,9,37],"metadata":{"skip":false,"skipReason":null},"line":438,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1753}
+{"testID":42,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1755}
+{"group":{"id":43,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Content Caching","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":466,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1755}
+{"test":{"id":44,"name":"ContentService Comprehensive Tests Content Caching caches and retrieves content","suiteID":0,"groupIDs":[8,9,43],"metadata":{"skip":false,"skipReason":null},"line":467,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1755}
+{"testID":44,"messageType":"print","message":"ContentService: Returning cached content for en-US/daily-news/test-content-1","type":"print","time":1757}
+{"testID":44,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1757}
+{"group":{"id":45,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Episode Progress","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":478,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1757}
+{"test":{"id":46,"name":"ContentService Comprehensive Tests Episode Progress marks episode as finished","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":479,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1757}
+{"testID":46,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1759}
+{"test":{"id":47,"name":"ContentService Comprehensive Tests Episode Progress updates episode completion percentage","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":484,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1759}
+{"testID":47,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1760}
+{"test":{"id":48,"name":"ContentService Comprehensive Tests Episode Progress clamps completion percentage to valid range","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":489,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1760}
+{"testID":48,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1761}
+{"test":{"id":49,"name":"ContentService Comprehensive Tests Episode Progress identifies finished episodes","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":499,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1761}
+{"testID":49,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1763}
+{"test":{"id":50,"name":"ContentService Comprehensive Tests Episode Progress identifies unfinished episodes","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":507,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1763}
+{"testID":50,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1764}
+{"test":{"id":51,"name":"ContentService Comprehensive Tests Episode Progress gets unfinished episodes from filtered list","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":518,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1764}
+{"testID":51,"error":"Expected: <2>\n  Actual: <1>\n","stackTrace":"package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 474:18  expect\ntest/services/content_service_test.dart 527:9       main.<fn>.<fn>.<fn>\n","isFailure":true,"type":"error","time":1780}
+{"testID":51,"result":"failure","skipped":false,"hidden":false,"type":"testDone","time":1780}
+{"test":{"id":52,"name":"ContentService Comprehensive Tests Episode Progress setEpisodeCompletion alias works correctly","suiteID":0,"groupIDs":[8,9,45],"metadata":{"skip":false,"skipReason":null},"line":533,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1781}
+{"testID":52,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1784}
+{"group":{"id":53,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Advanced Listen History","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":539,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1784}
+{"test":{"id":54,"name":"ContentService Comprehensive Tests Advanced Listen History getListenHistoryEpisodes sorts by timestamp correctly","suiteID":0,"groupIDs":[8,9,53],"metadata":{"skip":false,"skipReason":null},"line":540,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1784}
+{"testID":54,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1789}
+{"test":{"id":55,"name":"ContentService Comprehensive Tests Advanced Listen History getListenHistoryEpisodes respects limit parameter","suiteID":0,"groupIDs":[8,9,53],"metadata":{"skip":false,"skipReason":null},"line":561,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1789}
+{"testID":55,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1792}
+{"test":{"id":56,"name":"ContentService Comprehensive Tests Advanced Listen History getListenHistoryEpisodes handles missing episodes gracefully","suiteID":0,"groupIDs":[8,9,53],"metadata":{"skip":false,"skipReason":null},"line":579,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1793}
+{"testID":56,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1795}
+{"test":{"id":57,"name":"ContentService Comprehensive Tests Advanced Listen History getListenHistoryEpisodes returns empty list when no episodes loaded","suiteID":0,"groupIDs":[8,9,53],"metadata":{"skip":false,"skipReason":null},"line":600,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1796}
+{"testID":57,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1797}
+{"group":{"id":58,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Listen History","metadata":{"skip":false,"skipReason":null},"testCount":8,"line":611,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1798}
+{"test":{"id":59,"name":"ContentService Comprehensive Tests Listen History adds episode to listen history","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":612,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1798}
+{"testID":59,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1799}
+{"test":{"id":60,"name":"ContentService Comprehensive Tests Listen History adds episode with custom timestamp","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":619,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1799}
+{"testID":60,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1801}
+{"test":{"id":61,"name":"ContentService Comprehensive Tests Listen History caps listen history to 100 entries","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":627,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1801}
+{"testID":61,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1824}
+{"test":{"id":62,"name":"ContentService Comprehensive Tests Listen History removes episode from listen history","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":645,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1824}
+{"testID":62,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1826}
+{"test":{"id":63,"name":"ContentService Comprehensive Tests Listen History clears all listen history","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":653,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1827}
+{"testID":63,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1828}
+{"test":{"id":64,"name":"ContentService Comprehensive Tests Listen History gets listen history episodes sorted by timestamp","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":660,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1828}
+{"testID":64,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1830}
+{"test":{"id":65,"name":"ContentService Comprehensive Tests Listen History respects limit parameter in getListenHistoryEpisodes","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":678,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1830}
+{"testID":65,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1831}
+{"test":{"id":66,"name":"ContentService Comprehensive Tests Listen History handles missing episodes in getListenHistoryEpisodes","suiteID":0,"groupIDs":[8,9,58],"metadata":{"skip":false,"skipReason":null},"line":690,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1831}
+{"testID":66,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1833}
+{"group":{"id":67,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Playlist Management","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":705,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1833}
+{"test":{"id":68,"name":"ContentService Comprehensive Tests Playlist Management creates playlist with episodes","suiteID":0,"groupIDs":[8,9,67],"metadata":{"skip":false,"skipReason":null},"line":710,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1833}
+{"testID":68,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1834}
+{"group":{"id":69,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Episode Navigation","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":716,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1834}
+{"test":{"id":70,"name":"ContentService Comprehensive Tests Episode Navigation gets next episode","suiteID":0,"groupIDs":[8,9,69],"metadata":{"skip":false,"skipReason":null},"line":717,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1834}
+{"testID":70,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1837}
+{"group":{"id":71,"suiteID":0,"parentID":9,"name":"ContentService Comprehensive Tests Additional Coverage Tests","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":745,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"group","time":1837}
+{"test":{"id":72,"name":"ContentService Comprehensive Tests Additional Coverage Tests hasEpisodes returns correct boolean","suiteID":0,"groupIDs":[8,9,71],"metadata":{"skip":false,"skipReason":null},"line":746,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1837}
+{"testID":72,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1838}
+{"test":{"id":73,"name":"ContentService Comprehensive Tests Additional Coverage Tests hasFilteredResults returns correct boolean","suiteID":0,"groupIDs":[8,9,71],"metadata":{"skip":false,"skipReason":null},"line":753,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1838}
+{"testID":73,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1840}
+{"test":{"id":74,"name":"ContentService Comprehensive Tests Additional Coverage Tests error handling methods work correctly","suiteID":0,"groupIDs":[8,9,71],"metadata":{"skip":false,"skipReason":null},"line":761,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1840}
+{"testID":74,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1842}
+{"test":{"id":75,"name":"ContentService Comprehensive Tests Additional Coverage Tests clearContentCache clears the content cache","suiteID":0,"groupIDs":[8,9,71],"metadata":{"skip":false,"skipReason":null},"line":770,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1842}
+{"testID":75,"messageType":"print","message":"ContentService: Content cache cleared","type":"print","time":1842}
+{"testID":75,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1843}
+{"test":{"id":76,"name":"ContentService Comprehensive Tests Additional Coverage Tests clear removes all content and resets state","suiteID":0,"groupIDs":[8,9,71],"metadata":{"skip":false,"skipReason":null},"line":789,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/content_service_test.dart"},"type":"testStart","time":1843}
+{"testID":76,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1844}
+{"test":{"id":77,"name":"ContentService Comprehensive Tests (tearDownAll)","suiteID":0,"groupIDs":[8,9],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1844}
+{"testID":77,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":1845}
+{"testID":3,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":1967}
+{"group":{"id":78,"suiteID":2,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":63,"line":null,"column":null,"url":null},"type":"group","time":1967}
+{"group":{"id":79,"suiteID":2,"parentID":78,"name":"AudioService - Simplified Unit Tests","metadata":{"skip":false,"skipReason":null},"testCount":63,"line":19,"column":3,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":1967}
+{"group":{"id":80,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Basic State Management","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":80,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":1967}
+{"test":{"id":81,"name":"AudioService - Simplified Unit Tests Basic State Management should initialize with default state","suiteID":2,"groupIDs":[78,79,80],"metadata":{"skip":false,"skipReason":null},"line":81,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":1967}
+{"testID":81,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":1983}
+{"testID":81,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":1984}
+{"testID":81,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":1984}
+{"testID":81,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":1984}
+{"testID":81,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":1985}
+{"testID":81,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":1989}
+{"testID":81,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1993}
+{"test":{"id":82,"name":"AudioService - Simplified Unit Tests Basic State Management should calculate computed properties correctly","suiteID":2,"groupIDs":[78,79,80],"metadata":{"skip":false,"skipReason":null},"line":88,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":1994}
+{"testID":82,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":1995}
+{"testID":82,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":1995}
+{"testID":82,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":1995}
+{"testID":82,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":1995}
+{"testID":82,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":1995}
+{"testID":82,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":1996}
+{"testID":82,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":1996}
+{"group":{"id":83,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Basic Playback Control","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":102,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":1996}
+{"test":{"id":84,"name":"AudioService - Simplified Unit Tests Basic Playback Control should call handler play method","suiteID":2,"groupIDs":[78,79,83],"metadata":{"skip":false,"skipReason":null},"line":103,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":1996}
+{"testID":84,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":1997}
+{"testID":84,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":1997}
+{"testID":84,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":1997}
+{"testID":84,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":1998}
+{"testID":84,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":1998}
+{"testID":84,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":1998}
+{"testID":84,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":1998}
+{"testID":84,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":1999}
+{"testID":84,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":1999}
+{"testID":84,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2002}
+{"test":{"id":85,"name":"AudioService - Simplified Unit Tests Basic Playback Control should call handler pause method","suiteID":2,"groupIDs":[78,79,83],"metadata":{"skip":false,"skipReason":null},"line":115,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2002}
+{"testID":85,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2003}
+{"testID":85,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2004}
+{"testID":85,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2004}
+{"testID":85,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2004}
+{"testID":85,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2004}
+{"testID":85,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2004}
+{"testID":85,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2006}
+{"test":{"id":86,"name":"AudioService - Simplified Unit Tests Basic Playback Control should call handler stop method","suiteID":2,"groupIDs":[78,79,83],"metadata":{"skip":false,"skipReason":null},"line":122,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2006}
+{"testID":86,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2007}
+{"testID":86,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2007}
+{"testID":86,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2007}
+{"testID":86,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2007}
+{"testID":86,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2007}
+{"testID":86,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2007}
+{"testID":86,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2008}
+{"test":{"id":87,"name":"AudioService - Simplified Unit Tests Basic Playback Control should call handler seek method","suiteID":2,"groupIDs":[78,79,83],"metadata":{"skip":false,"skipReason":null},"line":127,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2008}
+{"testID":87,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2009}
+{"testID":87,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2009}
+{"testID":87,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2009}
+{"testID":87,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2009}
+{"testID":87,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2009}
+{"testID":87,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2010}
+{"testID":87,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2010}
+{"group":{"id":88,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests User Preferences","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":134,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2011}
+{"test":{"id":89,"name":"AudioService - Simplified Unit Tests User Preferences should toggle autoplay setting","suiteID":2,"groupIDs":[78,79,88],"metadata":{"skip":false,"skipReason":null},"line":135,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2011}
+{"testID":89,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2012}
+{"testID":89,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2012}
+{"testID":89,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2012}
+{"testID":89,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2012}
+{"testID":89,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2012}
+{"testID":89,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2013}
+{"testID":89,"messageType":"print","message":"🔄 AudioService: Autoplay disabled","type":"print","time":2013}
+{"testID":89,"messageType":"print","message":"🔄 AudioService: Autoplay enabled","type":"print","time":2013}
+{"testID":89,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2013}
+{"test":{"id":90,"name":"AudioService - Simplified Unit Tests User Preferences should toggle repeat setting","suiteID":2,"groupIDs":[78,79,88],"metadata":{"skip":false,"skipReason":null},"line":143,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2013}
+{"testID":90,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2014}
+{"testID":90,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2014}
+{"testID":90,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2014}
+{"testID":90,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2014}
+{"testID":90,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2014}
+{"testID":90,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2015}
+{"testID":90,"messageType":"print","message":"🔄 AudioService: Repeat enabled","type":"print","time":2015}
+{"testID":90,"messageType":"print","message":"🔄 AudioService: Repeat disabled","type":"print","time":2015}
+{"testID":90,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2016}
+{"test":{"id":91,"name":"AudioService - Simplified Unit Tests User Preferences should set playback speed","suiteID":2,"groupIDs":[78,79,88],"metadata":{"skip":false,"skipReason":null},"line":151,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2016}
+{"testID":91,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2016}
+{"testID":91,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2016}
+{"testID":91,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2017}
+{"testID":91,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2017}
+{"testID":91,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2017}
+{"testID":91,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2017}
+{"testID":91,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2019}
+{"group":{"id":92,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Navigation - Basic Tests","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":162,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2019}
+{"test":{"id":93,"name":"AudioService - Simplified Unit Tests Navigation - Basic Tests should attempt to skip to next episode","suiteID":2,"groupIDs":[78,79,92],"metadata":{"skip":false,"skipReason":null},"line":163,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2019}
+{"testID":93,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2020}
+{"testID":93,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2020}
+{"testID":93,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2020}
+{"testID":93,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2020}
+{"testID":93,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2020}
+{"testID":93,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2020}
+{"testID":93,"messageType":"print","message":"⏭️ AudioService: Skipping to next episode: test-episode","type":"print","time":2021}
+{"testID":93,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2021}
+{"testID":93,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2021}
+{"testID":93,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2021}
+{"testID":93,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2022}
+{"test":{"id":94,"name":"AudioService - Simplified Unit Tests Navigation - Basic Tests should attempt to skip to previous episode","suiteID":2,"groupIDs":[78,79,92],"metadata":{"skip":false,"skipReason":null},"line":176,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2022}
+{"testID":94,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2023}
+{"testID":94,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2023}
+{"testID":94,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2023}
+{"testID":94,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2023}
+{"testID":94,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2023}
+{"testID":94,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2023}
+{"testID":94,"messageType":"print","message":"⏮️ AudioService: Skipping to previous episode: test-episode","type":"print","time":2024}
+{"testID":94,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2024}
+{"testID":94,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2024}
+{"testID":94,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2024}
+{"testID":94,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2025}
+{"test":{"id":95,"name":"AudioService - Simplified Unit Tests Navigation - Basic Tests should handle no next episode available","suiteID":2,"groupIDs":[78,79,92],"metadata":{"skip":false,"skipReason":null},"line":187,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2025}
+{"testID":95,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2026}
+{"testID":95,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2026}
+{"testID":95,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2026}
+{"testID":95,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2026}
+{"testID":95,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2026}
+{"testID":95,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2026}
+{"testID":95,"messageType":"print","message":"📝 AudioService: No next episode available","type":"print","time":2027}
+{"testID":95,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2027}
+{"group":{"id":96,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Error Handling","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":198,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2027}
+{"test":{"id":97,"name":"AudioService - Simplified Unit Tests Error Handling should handle playback errors gracefully","suiteID":2,"groupIDs":[78,79,96],"metadata":{"skip":false,"skipReason":null},"line":199,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2027}
+{"testID":97,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2028}
+{"testID":97,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2028}
+{"testID":97,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2028}
+{"testID":97,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2028}
+{"testID":97,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2028}
+{"testID":97,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2029}
+{"testID":97,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2029}
+{"testID":97,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2030}
+{"testID":97,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2030}
+{"testID":97,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2030}
+{"testID":97,"messageType":"print","message":"❌ AudioService: Failed to play audio: Exception: Network error","type":"print","time":2031}
+{"testID":97,"messageType":"print","message":"❌ AudioService: Failed to play audio: Exception: Network error","type":"print","time":2032}
+{"testID":97,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2033}
+{"test":{"id":98,"name":"AudioService - Simplified Unit Tests Error Handling should clear error on successful play","suiteID":2,"groupIDs":[78,79,96],"metadata":{"skip":false,"skipReason":null},"line":221,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2033}
+{"testID":98,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2034}
+{"testID":98,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2034}
+{"testID":98,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2034}
+{"testID":98,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2034}
+{"testID":98,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2034}
+{"testID":98,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2034}
+{"testID":98,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2035}
+{"testID":98,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2035}
+{"testID":98,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2035}
+{"testID":98,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2036}
+{"test":{"id":99,"name":"AudioService - Simplified Unit Tests Error Handling should handle seek errors gracefully","suiteID":2,"groupIDs":[78,79,96],"metadata":{"skip":false,"skipReason":null},"line":233,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2036}
+{"testID":99,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2038}
+{"testID":99,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2038}
+{"testID":99,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2038}
+{"testID":99,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2038}
+{"testID":99,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2038}
+{"testID":99,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2038}
+{"testID":99,"error":"Expected: true\n  Actual: <false>\n","stackTrace":"package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 474:18  expect\ntest/services/audio_service_test.dart 239:11        main.<fn>.<fn>.<fn>\n","isFailure":true,"type":"error","time":2044}
+{"testID":99,"result":"failure","skipped":false,"hidden":false,"type":"testDone","time":2044}
+{"test":{"id":100,"name":"AudioService - Simplified Unit Tests Error Handling should handle stop errors gracefully","suiteID":2,"groupIDs":[78,79,96],"metadata":{"skip":false,"skipReason":null},"line":244,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2044}
+{"testID":100,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2045}
+{"testID":100,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2045}
+{"testID":100,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2045}
+{"testID":100,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2045}
+{"testID":100,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2045}
+{"testID":100,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2045}
+{"testID":100,"error":"Expected: true\n  Actual: <false>\n","stackTrace":"package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 474:18  expect\ntest/services/audio_service_test.dart 250:11        main.<fn>.<fn>.<fn>\n","isFailure":true,"type":"error","time":2047}
+{"testID":100,"result":"failure","skipped":false,"hidden":false,"type":"testDone","time":2047}
+{"group":{"id":101,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests State Transitions","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":256,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2047}
+{"test":{"id":102,"name":"AudioService - Simplified Unit Tests State Transitions should transition from stopped to loading when playing audio","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":257,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2047}
+{"testID":102,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2048}
+{"testID":102,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2048}
+{"testID":102,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2048}
+{"testID":102,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2048}
+{"testID":102,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2048}
+{"testID":102,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2049}
+{"testID":102,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2049}
+{"test":{"id":103,"name":"AudioService - Simplified Unit Tests State Transitions should transition between playing and paused states","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":272,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2049}
+{"testID":103,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2050}
+{"testID":103,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2050}
+{"testID":103,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2050}
+{"testID":103,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2050}
+{"testID":103,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2050}
+{"testID":103,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2050}
+{"testID":103,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2052}
+{"test":{"id":104,"name":"AudioService - Simplified Unit Tests State Transitions should handle loading state properly","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":286,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2052}
+{"testID":104,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2053}
+{"testID":104,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2053}
+{"testID":104,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2053}
+{"testID":104,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2053}
+{"testID":104,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2053}
+{"testID":104,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2053}
+{"testID":104,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2054}
+{"test":{"id":105,"name":"AudioService - Simplified Unit Tests State Transitions should handle error state","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":294,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2054}
+{"testID":105,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2054}
+{"testID":105,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2054}
+{"testID":105,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2054}
+{"testID":105,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2054}
+{"testID":105,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2055}
+{"testID":105,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2055}
+{"testID":105,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2055}
+{"test":{"id":106,"name":"AudioService - Simplified Unit Tests State Transitions should check idle state correctly","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":302,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2055}
+{"testID":106,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2056}
+{"testID":106,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2056}
+{"testID":106,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2056}
+{"testID":106,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2056}
+{"testID":106,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2056}
+{"testID":106,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2056}
+{"testID":106,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2057}
+{"test":{"id":107,"name":"AudioService - Simplified Unit Tests State Transitions should return to stopped state after stop","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":310,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2057}
+{"testID":107,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2058}
+{"testID":107,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2058}
+{"testID":107,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2058}
+{"testID":107,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2058}
+{"testID":107,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2058}
+{"testID":107,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2058}
+{"testID":107,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2059}
+{"test":{"id":108,"name":"AudioService - Simplified Unit Tests State Transitions should handle complex state transition sequence","suiteID":2,"groupIDs":[78,79,101],"metadata":{"skip":false,"skipReason":null},"line":321,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2059}
+{"testID":108,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2059}
+{"testID":108,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2059}
+{"testID":108,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2060}
+{"testID":108,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2060}
+{"testID":108,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2060}
+{"testID":108,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2060}
+{"testID":108,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2060}
+{"group":{"id":109,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Audio Completion Logic","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":352,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2060}
+{"test":{"id":110,"name":"AudioService - Simplified Unit Tests Audio Completion Logic should handle completion with repeat enabled","suiteID":2,"groupIDs":[78,79,109],"metadata":{"skip":false,"skipReason":null},"line":353,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2060}
+{"testID":110,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2061}
+{"testID":110,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2061}
+{"testID":110,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2061}
+{"testID":110,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2061}
+{"testID":110,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2062}
+{"testID":110,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2062}
+{"testID":110,"messageType":"print","message":"🔄 AudioService: Repeat enabled","type":"print","time":2062}
+{"testID":110,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2062}
+{"testID":110,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2062}
+{"testID":110,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2062}
+{"testID":110,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2063}
+{"test":{"id":111,"name":"AudioService - Simplified Unit Tests Audio Completion Logic should handle completion with autoplay enabled","suiteID":2,"groupIDs":[78,79,109],"metadata":{"skip":false,"skipReason":null},"line":372,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2063}
+{"testID":111,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2063}
+{"testID":111,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2063}
+{"testID":111,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2063}
+{"testID":111,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2064}
+{"testID":111,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2064}
+{"testID":111,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2064}
+{"testID":111,"messageType":"print","message":"⏭️ AudioService: Skipping to next episode: next-episode","type":"print","time":2064}
+{"testID":111,"messageType":"print","message":"▶️ AudioService: Playing audio: Next Episode","type":"print","time":2064}
+{"testID":111,"messageType":"print","message":"🎵 Audio URL: https://example.com/next.m3u8","type":"print","time":2064}
+{"testID":111,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Next Episode","type":"print","time":2064}
+{"testID":111,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2065}
+{"test":{"id":112,"name":"AudioService - Simplified Unit Tests Audio Completion Logic should handle completion with no next episode and autoplay enabled","suiteID":2,"groupIDs":[78,79,109],"metadata":{"skip":false,"skipReason":null},"line":397,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2065}
+{"testID":112,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2065}
+{"testID":112,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2066}
+{"testID":112,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2066}
+{"testID":112,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2066}
+{"testID":112,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2066}
+{"testID":112,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2066}
+{"testID":112,"messageType":"print","message":"📝 AudioService: No next episode available","type":"print","time":2066}
+{"testID":112,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2066}
+{"test":{"id":113,"name":"AudioService - Simplified Unit Tests Audio Completion Logic should handle completion with autoplay disabled","suiteID":2,"groupIDs":[78,79,109],"metadata":{"skip":false,"skipReason":null},"line":412,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2067}
+{"testID":113,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2067}
+{"testID":113,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2067}
+{"testID":113,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2067}
+{"testID":113,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2068}
+{"testID":113,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2068}
+{"testID":113,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2068}
+{"testID":113,"messageType":"print","message":"🔄 AudioService: Autoplay disabled","type":"print","time":2068}
+{"testID":113,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2068}
+{"group":{"id":114,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Playback Speed Control","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":425,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2068}
+{"test":{"id":115,"name":"AudioService - Simplified Unit Tests Playback Speed Control should handle different playback speeds","suiteID":2,"groupIDs":[78,79,114],"metadata":{"skip":false,"skipReason":null},"line":426,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2068}
+{"testID":115,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2069}
+{"testID":115,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2070}
+{"testID":115,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2070}
+{"testID":115,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2070}
+{"testID":115,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2070}
+{"testID":115,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2070}
+{"testID":115,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2071}
+{"test":{"id":116,"name":"AudioService - Simplified Unit Tests Playback Speed Control should handle invalid playback speeds","suiteID":2,"groupIDs":[78,79,114],"metadata":{"skip":false,"skipReason":null},"line":440,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2071}
+{"testID":116,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2073}
+{"testID":116,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2073}
+{"testID":116,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2073}
+{"testID":116,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2073}
+{"testID":116,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2073}
+{"testID":116,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2074}
+{"testID":116,"messageType":"print","message":"❌ AudioService: Failed to set speed on handler: Exception: Invalid speed","type":"print","time":2074}
+{"testID":116,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2075}
+{"group":{"id":117,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Episode Progress Tracking","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":452,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2075}
+{"test":{"id":118,"name":"AudioService - Simplified Unit Tests Episode Progress Tracking should update progress when episode completes","suiteID":2,"groupIDs":[78,79,117],"metadata":{"skip":false,"skipReason":null},"line":453,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2075}
+{"testID":118,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2077}
+{"testID":118,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2077}
+{"testID":118,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2077}
+{"testID":118,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2077}
+{"testID":118,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2077}
+{"testID":118,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2077}
+{"testID":118,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2078}
+{"test":{"id":119,"name":"AudioService - Simplified Unit Tests Episode Progress Tracking should update progress during playback","suiteID":2,"groupIDs":[78,79,117],"metadata":{"skip":false,"skipReason":null},"line":469,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2078}
+{"testID":119,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2079}
+{"testID":119,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2079}
+{"testID":119,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2079}
+{"testID":119,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2079}
+{"testID":119,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2079}
+{"testID":119,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2079}
+{"testID":119,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2080}
+{"group":{"id":120,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Audio File Management","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":482,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2080}
+{"test":{"id":121,"name":"AudioService - Simplified Unit Tests Audio File Management should set current audio file when playing","suiteID":2,"groupIDs":[78,79,120],"metadata":{"skip":false,"skipReason":null},"line":483,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2080}
+{"testID":121,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2080}
+{"testID":121,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2081}
+{"testID":121,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2081}
+{"testID":121,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2082}
+{"test":{"id":122,"name":"AudioService - Simplified Unit Tests Audio File Management should clear current audio file when stopping","suiteID":2,"groupIDs":[78,79,120],"metadata":{"skip":false,"skipReason":null},"line":493,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2082}
+{"testID":122,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2083}
+{"testID":122,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2083}
+{"testID":122,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2083}
+{"testID":122,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2083}
+{"testID":122,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2083}
+{"testID":122,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2083}
+{"testID":122,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2083}
+{"test":{"id":123,"name":"AudioService - Simplified Unit Tests Audio File Management should handle playing different audio files","suiteID":2,"groupIDs":[78,79,120],"metadata":{"skip":false,"skipReason":null},"line":504,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2084}
+{"testID":123,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2084}
+{"testID":123,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2084}
+{"testID":123,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2084}
+{"testID":123,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"▶️ AudioService: Playing audio: Second Episode","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"🎵 Audio URL: https://example.com/second.m3u8","type":"print","time":2085}
+{"testID":123,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Second Episode","type":"print","time":2086}
+{"testID":123,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2086}
+{"group":{"id":124,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Progress and Duration Management","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":536,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2086}
+{"test":{"id":125,"name":"AudioService - Simplified Unit Tests Progress and Duration Management should calculate progress correctly","suiteID":2,"groupIDs":[78,79,124],"metadata":{"skip":false,"skipReason":null},"line":537,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2086}
+{"testID":125,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2087}
+{"testID":125,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2087}
+{"testID":125,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2087}
+{"testID":125,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2087}
+{"testID":125,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2087}
+{"testID":125,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2087}
+{"testID":125,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2088}
+{"test":{"id":126,"name":"AudioService - Simplified Unit Tests Progress and Duration Management should handle zero duration gracefully","suiteID":2,"groupIDs":[78,79,124],"metadata":{"skip":false,"skipReason":null},"line":546,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2088}
+{"testID":126,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2089}
+{"testID":126,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2089}
+{"testID":126,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2089}
+{"testID":126,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2089}
+{"testID":126,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2089}
+{"testID":126,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2090}
+{"testID":126,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2090}
+{"test":{"id":127,"name":"AudioService - Simplified Unit Tests Progress and Duration Management should clamp progress between 0 and 1","suiteID":2,"groupIDs":[78,79,124],"metadata":{"skip":false,"skipReason":null},"line":553,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2090}
+{"testID":127,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2091}
+{"testID":127,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2091}
+{"testID":127,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2091}
+{"testID":127,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2091}
+{"testID":127,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2091}
+{"testID":127,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2091}
+{"testID":127,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2092}
+{"test":{"id":128,"name":"AudioService - Simplified Unit Tests Progress and Duration Management should format duration correctly","suiteID":2,"groupIDs":[78,79,124],"metadata":{"skip":false,"skipReason":null},"line":561,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2092}
+{"testID":128,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2093}
+{"testID":128,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2093}
+{"testID":128,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2093}
+{"testID":128,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2093}
+{"testID":128,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2093}
+{"testID":128,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2093}
+{"testID":128,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2094}
+{"test":{"id":129,"name":"AudioService - Simplified Unit Tests Progress and Duration Management should format hours correctly","suiteID":2,"groupIDs":[78,79,124],"metadata":{"skip":false,"skipReason":null},"line":571,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2094}
+{"testID":129,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2095}
+{"testID":129,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2095}
+{"testID":129,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2095}
+{"testID":129,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2095}
+{"testID":129,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2095}
+{"testID":129,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2095}
+{"testID":129,"error":"Expected: '0:45:20'\n  Actual: '45:20'\n   Which: is different.\n          Expected: 0:45:20\n            Actual: 45:20\n                    ^\n           Differ at offset 0\n","stackTrace":"package:matcher                                     expect\npackage:flutter_test/src/widget_tester.dart 474:18  expect\ntest/services/audio_service_test.dart 578:9         main.<fn>.<fn>.<fn>\n","isFailure":true,"type":"error","time":2099}
+{"testID":129,"result":"failure","skipped":false,"hidden":false,"type":"testDone","time":2099}
+{"test":{"id":130,"name":"AudioService - Simplified Unit Tests Progress and Duration Management should provide current audio ID","suiteID":2,"groupIDs":[78,79,124],"metadata":{"skip":false,"skipReason":null},"line":581,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2099}
+{"testID":130,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2101}
+{"testID":130,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2101}
+{"testID":130,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2101}
+{"testID":130,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2101}
+{"testID":130,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2101}
+{"testID":130,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2101}
+{"testID":130,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2101}
+{"group":{"id":131,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls","metadata":{"skip":false,"skipReason":null},"testCount":7,"line":589,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2102}
+{"test":{"id":132,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle pause method","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":590,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2102}
+{"testID":132,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2102}
+{"testID":132,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2102}
+{"testID":132,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2102}
+{"testID":132,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2103}
+{"testID":132,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2103}
+{"testID":132,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2103}
+{"testID":132,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2103}
+{"test":{"id":133,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle resume method","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":595,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2103}
+{"testID":133,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2104}
+{"testID":133,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2104}
+{"testID":133,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2104}
+{"testID":133,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2104}
+{"testID":133,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2104}
+{"testID":133,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2105}
+{"testID":133,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2105}
+{"test":{"id":134,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle play alias method","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":600,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2105}
+{"testID":134,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2106}
+{"testID":134,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2106}
+{"testID":134,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2106}
+{"testID":134,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2106}
+{"testID":134,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2106}
+{"testID":134,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2106}
+{"testID":134,"messageType":"print","message":"▶️ AudioService: Playing audio: Test Episode","type":"print","time":2107}
+{"testID":134,"messageType":"print","message":"🎵 Audio URL: https://example.com/audio.m3u8","type":"print","time":2107}
+{"testID":134,"messageType":"print","message":"✅ AudioService: Successfully started playback for: Test Episode","type":"print","time":2107}
+{"testID":134,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2107}
+{"test":{"id":135,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle skip forward","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":611,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2107}
+{"testID":135,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2108}
+{"testID":135,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2108}
+{"testID":135,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2108}
+{"testID":135,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2108}
+{"testID":135,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2108}
+{"testID":135,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2108}
+{"testID":135,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2109}
+{"test":{"id":136,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle skip backward","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":618,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2109}
+{"testID":136,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2110}
+{"testID":136,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2110}
+{"testID":136,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2110}
+{"testID":136,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2110}
+{"testID":136,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2110}
+{"testID":136,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2110}
+{"testID":136,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2111}
+{"test":{"id":137,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle seek forward alias","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":625,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2111}
+{"testID":137,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2112}
+{"testID":137,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2112}
+{"testID":137,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2112}
+{"testID":137,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2112}
+{"testID":137,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2112}
+{"testID":137,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2112}
+{"testID":137,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2112}
+{"test":{"id":138,"name":"AudioService - Simplified Unit Tests Advanced Playback Controls should handle seek backward alias","suiteID":2,"groupIDs":[78,79,131],"metadata":{"skip":false,"skipReason":null},"line":632,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2113}
+{"testID":138,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2113}
+{"testID":138,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2113}
+{"testID":138,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2113}
+{"testID":138,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2114}
+{"testID":138,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2114}
+{"testID":138,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2114}
+{"testID":138,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2114}
+{"group":{"id":139,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Episode Management and Validation","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":640,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2115}
+{"test":{"id":140,"name":"AudioService - Simplified Unit Tests Episode Management and Validation should validate audio files correctly","suiteID":2,"groupIDs":[78,79,139],"metadata":{"skip":false,"skipReason":null},"line":641,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2115}
+{"testID":140,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2118}
+{"testID":140,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2118}
+{"testID":140,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2118}
+{"testID":140,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2118}
+{"testID":140,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2118}
+{"testID":140,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2118}
+{"testID":140,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2119}
+{"test":{"id":141,"name":"AudioService - Simplified Unit Tests Episode Management and Validation should handle network timeout","suiteID":2,"groupIDs":[78,79,139],"metadata":{"skip":false,"skipReason":null},"line":658,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2119}
+{"testID":141,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2120}
+{"testID":141,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2120}
+{"testID":141,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2120}
+{"testID":141,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2120}
+{"testID":141,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2120}
+{"testID":141,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2120}
+{"testID":141,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2120}
+{"test":{"id":142,"name":"AudioService - Simplified Unit Tests Episode Management and Validation should handle invalid URL","suiteID":2,"groupIDs":[78,79,139],"metadata":{"skip":false,"skipReason":null},"line":664,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2120}
+{"testID":142,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2121}
+{"testID":142,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2121}
+{"testID":142,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2121}
+{"testID":142,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2121}
+{"testID":142,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2121}
+{"testID":142,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2122}
+{"testID":142,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2122}
+{"test":{"id":143,"name":"AudioService - Simplified Unit Tests Episode Management and Validation should handle playback error","suiteID":2,"groupIDs":[78,79,139],"metadata":{"skip":false,"skipReason":null},"line":670,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2122}
+{"testID":143,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2123}
+{"testID":143,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2123}
+{"testID":143,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2123}
+{"testID":143,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2123}
+{"testID":143,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2123}
+{"testID":143,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2123}
+{"testID":143,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2124}
+{"test":{"id":144,"name":"AudioService - Simplified Unit Tests Episode Management and Validation should update progress manually","suiteID":2,"groupIDs":[78,79,139],"metadata":{"skip":false,"skipReason":null},"line":677,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2124}
+{"testID":144,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2124}
+{"testID":144,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2124}
+{"testID":144,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2124}
+{"testID":144,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2125}
+{"testID":144,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2125}
+{"testID":144,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2125}
+{"testID":144,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2125}
+{"test":{"id":145,"name":"AudioService - Simplified Unit Tests Episode Management and Validation should handle episode completion callback","suiteID":2,"groupIDs":[78,79,139],"metadata":{"skip":false,"skipReason":null},"line":683,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2125}
+{"testID":145,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2126}
+{"testID":145,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2126}
+{"testID":145,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2126}
+{"testID":145,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2126}
+{"testID":145,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2126}
+{"testID":145,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2126}
+{"testID":145,"messageType":"print","message":"🎵 AudioService: Audio completed. Repeat: false, Autoplay: true","type":"print","time":2127}
+{"testID":145,"messageType":"print","message":"✅ AudioService: Episode marked as finished: test-episode","type":"print","time":2127}
+{"testID":145,"messageType":"print","message":"❌ AudioService: Autoplay failed: MissingStubError: 'getNextEpisode'\nNo stub was found which matches the arguments of this method call:\ngetNextEpisode(AudioFile(id: test-episode, title: Test Episode, language: en-US, category: daily-news, url: https://example.com/audio.m3u8))\n\nAdd a stub for this method using Mockito's 'when' API, or generate the MockContentService mock with the @GenerateNiceMocks annotation (see https://pub.dev/documentation/mockito/latest/annotations/MockSpec-class.html).","type":"print","time":2128}
+{"testID":145,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2128}
+{"group":{"id":146,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests State Management Methods","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":694,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2128}
+{"test":{"id":147,"name":"AudioService - Simplified Unit Tests State Management Methods should save playback state","suiteID":2,"groupIDs":[78,79,146],"metadata":{"skip":false,"skipReason":null},"line":695,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2128}
+{"testID":147,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2129}
+{"testID":147,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2129}
+{"testID":147,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2129}
+{"testID":147,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2129}
+{"testID":147,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2129}
+{"testID":147,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2130}
+{"testID":147,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2130}
+{"test":{"id":148,"name":"AudioService - Simplified Unit Tests State Management Methods should restore playback position","suiteID":2,"groupIDs":[78,79,146],"metadata":{"skip":false,"skipReason":null},"line":709,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2130}
+{"testID":148,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2131}
+{"testID":148,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2131}
+{"testID":148,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2131}
+{"testID":148,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2131}
+{"testID":148,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2131}
+{"testID":148,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2132}
+{"testID":148,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2132}
+{"test":{"id":149,"name":"AudioService - Simplified Unit Tests State Management Methods should handle restore position with zero completion","suiteID":2,"groupIDs":[78,79,146],"metadata":{"skip":false,"skipReason":null},"line":719,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2132}
+{"testID":149,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2133}
+{"testID":149,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2133}
+{"testID":149,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2133}
+{"testID":149,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2133}
+{"testID":149,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2133}
+{"testID":149,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2134}
+{"testID":149,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2134}
+{"test":{"id":150,"name":"AudioService - Simplified Unit Tests State Management Methods should clear error state","suiteID":2,"groupIDs":[78,79,146],"metadata":{"skip":false,"skipReason":null},"line":732,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2134}
+{"testID":150,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2135}
+{"testID":150,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2135}
+{"testID":150,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2135}
+{"testID":150,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2135}
+{"testID":150,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2135}
+{"testID":150,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2135}
+{"testID":150,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2135}
+{"group":{"id":151,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Preference Management","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":742,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2136}
+{"test":{"id":152,"name":"AudioService - Simplified Unit Tests Preference Management should use setAutoplayEnabled method","suiteID":2,"groupIDs":[78,79,151],"metadata":{"skip":false,"skipReason":null},"line":743,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2136}
+{"testID":152,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2136}
+{"testID":152,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2136}
+{"testID":152,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2136}
+{"testID":152,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2136}
+{"testID":152,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2137}
+{"testID":152,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2137}
+{"testID":152,"messageType":"print","message":"🔄 AudioService: Autoplay disabled","type":"print","time":2137}
+{"testID":152,"messageType":"print","message":"🔄 AudioService: Autoplay enabled","type":"print","time":2137}
+{"testID":152,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2137}
+{"test":{"id":153,"name":"AudioService - Simplified Unit Tests Preference Management should use setRepeatEnabled method","suiteID":2,"groupIDs":[78,79,151],"metadata":{"skip":false,"skipReason":null},"line":753,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2137}
+{"testID":153,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2138}
+{"testID":153,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2138}
+{"testID":153,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2138}
+{"testID":153,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2138}
+{"testID":153,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2138}
+{"testID":153,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2139}
+{"testID":153,"messageType":"print","message":"🔄 AudioService: Repeat enabled","type":"print","time":2139}
+{"testID":153,"messageType":"print","message":"🔄 AudioService: Repeat disabled","type":"print","time":2139}
+{"testID":153,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2139}
+{"test":{"id":154,"name":"AudioService - Simplified Unit Tests Preference Management should use enableAutoplay alias","suiteID":2,"groupIDs":[78,79,151],"metadata":{"skip":false,"skipReason":null},"line":763,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2139}
+{"testID":154,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2140}
+{"testID":154,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2140}
+{"testID":154,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2140}
+{"testID":154,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2140}
+{"testID":154,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2141}
+{"testID":154,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2141}
+{"testID":154,"messageType":"print","message":"🔄 AudioService: Autoplay disabled","type":"print","time":2141}
+{"testID":154,"messageType":"print","message":"🔄 AudioService: Autoplay enabled","type":"print","time":2141}
+{"testID":154,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2142}
+{"test":{"id":155,"name":"AudioService - Simplified Unit Tests Preference Management should not notify listeners if state unchanged","suiteID":2,"groupIDs":[78,79,151],"metadata":{"skip":false,"skipReason":null},"line":771,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2142}
+{"testID":155,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2142}
+{"testID":155,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2142}
+{"testID":155,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2143}
+{"testID":155,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2143}
+{"testID":155,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2143}
+{"testID":155,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2143}
+{"testID":155,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2143}
+{"group":{"id":156,"suiteID":2,"parentID":79,"name":"AudioService - Simplified Unit Tests Media Session Integration","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":782,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"group","time":2143}
+{"test":{"id":157,"name":"AudioService - Simplified Unit Tests Media Session Integration should test media session when handler available","suiteID":2,"groupIDs":[78,79,156],"metadata":{"skip":false,"skipReason":null},"line":783,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2143}
+{"testID":157,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2144}
+{"testID":157,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2144}
+{"testID":157,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2144}
+{"testID":157,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2144}
+{"testID":157,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2144}
+{"testID":157,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2145}
+{"testID":157,"messageType":"print","message":"🧪 Calling test method on background handler...","type":"print","time":2145}
+{"testID":157,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2145}
+{"test":{"id":158,"name":"AudioService - Simplified Unit Tests Media Session Integration should handle media session test errors gracefully","suiteID":2,"groupIDs":[78,79,156],"metadata":{"skip":false,"skipReason":null},"line":790,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/audio_service_test.dart"},"type":"testStart","time":2145}
+{"testID":158,"messageType":"print","message":"🎧 AudioService: Initializing...","type":"print","time":2146}
+{"testID":158,"messageType":"print","message":"🎧 Background handler: PRESENT","type":"print","time":2146}
+{"testID":158,"messageType":"print","message":"🎧 Handler type: MockBackgroundAudioHandler","type":"print","time":2146}
+{"testID":158,"messageType":"print","message":"🎧 Will use BACKGROUND AUDIO with media session support","type":"print","time":2146}
+{"testID":158,"messageType":"print","message":"🎧 AudioService: Using background audio handler","type":"print","time":2146}
+{"testID":158,"messageType":"print","message":"🔄 AudioService: Background state changed - playing: false","type":"print","time":2147}
+{"testID":158,"messageType":"print","message":"🧪 Calling test method on background handler...","type":"print","time":2147}
+{"testID":158,"messageType":"print","message":"⚠️ AudioService: Media session test failed: Exception: Media session error","type":"print","time":2147}
+{"testID":158,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2147}
+{"testID":5,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":2214}
+{"group":{"id":159,"suiteID":4,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":35,"line":null,"column":null,"url":null},"type":"group","time":2214}
+{"group":{"id":160,"suiteID":4,"parentID":159,"name":"AuthService Comprehensive Tests","metadata":{"skip":false,"skipReason":null},"testCount":35,"line":11,"column":3,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":2214}
+{"group":{"id":161,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests Initialization","metadata":{"skip":false,"skipReason":null},"testCount":5,"line":36,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":2214}
+{"test":{"id":162,"name":"AuthService Comprehensive Tests Initialization should start with initial state","suiteID":4,"groupIDs":[159,160,161],"metadata":{"skip":false,"skipReason":null},"line":37,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":2214}
+{"testID":162,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2226}
+{"test":{"id":163,"name":"AuthService Comprehensive Tests Initialization should initialize with no existing session","suiteID":4,"groupIDs":[159,160,161],"metadata":{"skip":false,"skipReason":null},"line":45,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":2226}
+{"testID":163,"messageType":"print","message":"ℹ️ No existing user session found","type":"print","time":2228}
+{"testID":163,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2229}
+{"test":{"id":164,"name":"AuthService Comprehensive Tests Initialization should restore existing session","suiteID":4,"groupIDs":[159,160,161],"metadata":{"skip":false,"skipReason":null},"line":53,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":2229}
+{"testID":164,"messageType":"print","message":"✅ User session restored: test@example.com","type":"print","time":2233}
+{"testID":164,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2234}
+{"test":{"id":165,"name":"AuthService Comprehensive Tests Initialization should handle corrupted session data gracefully","suiteID":4,"groupIDs":[159,160,161],"metadata":{"skip":false,"skipReason":null},"line":68,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":2234}
+{"testID":165,"messageType":"print","message":"❌ Auth initialization error: FormatException: Unexpected character (at character 1)\ninvalid_json\n^\n","type":"print","time":2236}
+{"testID":165,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2236}
+{"test":{"id":166,"name":"AuthService Comprehensive Tests Initialization should handle incomplete session data","suiteID":4,"groupIDs":[159,160,161],"metadata":{"skip":false,"skipReason":null},"line":81,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":2236}
+{"testID":166,"messageType":"print","message":"ℹ️ No existing user session found","type":"print","time":2237}
+{"testID":166,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2237}
+{"group":{"id":167,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests Apple Sign In","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":94,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":2237}
+{"test":{"id":168,"name":"AuthService Comprehensive Tests Apple Sign In should successfully sign in with Apple","suiteID":4,"groupIDs":[159,160,167],"metadata":{"skip":false,"skipReason":null},"line":95,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":2237}
+{"testID":168,"messageType":"print","message":"🍎 Starting Apple Sign In...","type":"print","time":2238}
+{"testID":7,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":2509}
+{"group":{"id":169,"suiteID":6,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":13,"line":null,"column":null,"url":null},"type":"group","time":2509}
+{"group":{"id":170,"suiteID":6,"parentID":169,"name":"BackgroundAudioHandler - Basic Tests","metadata":{"skip":false,"skipReason":null},"testCount":13,"line":18,"column":3,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2509}
+{"group":{"id":171,"suiteID":6,"parentID":170,"name":"BackgroundAudioHandler - Basic Tests Basic Interface Tests","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":61,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2509}
+{"test":{"id":172,"name":"BackgroundAudioHandler - Basic Tests Basic Interface Tests should provide playback state stream","suiteID":6,"groupIDs":[169,170,171],"metadata":{"skip":false,"skipReason":null},"line":62,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2509}
+{"testID":172,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2524}
+{"test":{"id":173,"name":"BackgroundAudioHandler - Basic Tests Basic Interface Tests should provide media item stream","suiteID":6,"groupIDs":[169,170,171],"metadata":{"skip":false,"skipReason":null},"line":67,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2524}
+{"testID":173,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2526}
+{"test":{"id":174,"name":"BackgroundAudioHandler - Basic Tests Basic Interface Tests should provide duration property","suiteID":6,"groupIDs":[169,170,171],"metadata":{"skip":false,"skipReason":null},"line":72,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2526}
+{"testID":174,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2527}
+{"group":{"id":175,"suiteID":6,"parentID":170,"name":"BackgroundAudioHandler - Basic Tests Basic Playback Control","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":77,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2527}
+{"test":{"id":176,"name":"BackgroundAudioHandler - Basic Tests Basic Playback Control should handle play command","suiteID":6,"groupIDs":[169,170,175],"metadata":{"skip":false,"skipReason":null},"line":78,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2527}
+{"testID":176,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2530}
+{"test":{"id":177,"name":"BackgroundAudioHandler - Basic Tests Basic Playback Control should handle pause command","suiteID":6,"groupIDs":[169,170,175],"metadata":{"skip":false,"skipReason":null},"line":84,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2530}
+{"testID":177,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2531}
+{"test":{"id":178,"name":"BackgroundAudioHandler - Basic Tests Basic Playback Control should handle stop command","suiteID":6,"groupIDs":[169,170,175],"metadata":{"skip":false,"skipReason":null},"line":90,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2531}
+{"testID":178,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2533}
+{"test":{"id":179,"name":"BackgroundAudioHandler - Basic Tests Basic Playback Control should handle seek command","suiteID":6,"groupIDs":[169,170,175],"metadata":{"skip":false,"skipReason":null},"line":96,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2533}
+{"testID":179,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2534}
+{"group":{"id":180,"suiteID":6,"parentID":170,"name":"BackgroundAudioHandler - Basic Tests Audio Source Setup","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":104,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2534}
+{"test":{"id":181,"name":"BackgroundAudioHandler - Basic Tests Audio Source Setup should handle setAudioSource with basic parameters","suiteID":6,"groupIDs":[169,170,180],"metadata":{"skip":false,"skipReason":null},"line":105,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2534}
+{"testID":181,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2537}
+{"group":{"id":182,"suiteID":6,"parentID":170,"name":"BackgroundAudioHandler - Basic Tests Episode Navigation","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":131,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2537}
+{"test":{"id":183,"name":"BackgroundAudioHandler - Basic Tests Episode Navigation should handle skipToNext command","suiteID":6,"groupIDs":[169,170,182],"metadata":{"skip":false,"skipReason":null},"line":132,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2537}
+{"testID":183,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2538}
+{"test":{"id":184,"name":"BackgroundAudioHandler - Basic Tests Episode Navigation should handle skipToPrevious command","suiteID":6,"groupIDs":[169,170,182],"metadata":{"skip":false,"skipReason":null},"line":138,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2538}
+{"testID":184,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2539}
+{"group":{"id":185,"suiteID":6,"parentID":170,"name":"BackgroundAudioHandler - Basic Tests Custom Actions","metadata":{"skip":false,"skipReason":null},"testCount":2,"line":145,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2539}
+{"test":{"id":186,"name":"BackgroundAudioHandler - Basic Tests Custom Actions should handle setSpeed custom action","suiteID":6,"groupIDs":[169,170,185],"metadata":{"skip":false,"skipReason":null},"line":146,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2539}
+{"testID":186,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2540}
+{"test":{"id":187,"name":"BackgroundAudioHandler - Basic Tests Custom Actions should handle getPosition custom action","suiteID":6,"groupIDs":[169,170,185],"metadata":{"skip":false,"skipReason":null},"line":156,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2540}
+{"testID":187,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2541}
+{"group":{"id":188,"suiteID":6,"parentID":170,"name":"BackgroundAudioHandler - Basic Tests Error Handling","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":167,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"group","time":2541}
+{"test":{"id":189,"name":"BackgroundAudioHandler - Basic Tests Error Handling should handle errors gracefully without crashing","suiteID":6,"groupIDs":[169,170,188],"metadata":{"skip":false,"skipReason":null},"line":168,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/background_audio_handler_test.dart"},"type":"testStart","time":2541}
+{"testID":189,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":2543}
+{"testID":168,"messageType":"print","message":"✅ Sign in completed for: apple.user@example.com","type":"print","time":4249}
+{"testID":168,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4251}
+{"test":{"id":190,"name":"AuthService Comprehensive Tests Apple Sign In should go through authenticating state during Apple sign in","suiteID":4,"groupIDs":[159,160,167],"metadata":{"skip":false,"skipReason":null},"line":107,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":4251}
+{"testID":190,"messageType":"print","message":"🍎 Starting Apple Sign In...","type":"print","time":4256}
+{"testID":190,"messageType":"print","message":"✅ Sign in completed for: apple.user@example.com","type":"print","time":6263}
+{"testID":190,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":6266}
+{"test":{"id":191,"name":"AuthService Comprehensive Tests Apple Sign In should persist Apple user session","suiteID":4,"groupIDs":[159,160,167],"metadata":{"skip":false,"skipReason":null},"line":120,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":6267}
+{"testID":191,"messageType":"print","message":"🍎 Starting Apple Sign In...","type":"print","time":6272}
+{"testID":191,"messageType":"print","message":"✅ Sign in completed for: apple.user@example.com","type":"print","time":8279}
+{"testID":191,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8296}
+{"test":{"id":192,"name":"AuthService Comprehensive Tests Apple Sign In should handle Apple sign in errors","suiteID":4,"groupIDs":[159,160,167],"metadata":{"skip":false,"skipReason":null},"line":135,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":8297}
+{"testID":192,"messageType":"print","message":"🍎 Starting Apple Sign In...","type":"print","time":8302}
+{"testID":192,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":8303}
+{"group":{"id":193,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests Google Sign In","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":142,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":8303}
+{"test":{"id":194,"name":"AuthService Comprehensive Tests Google Sign In should successfully sign in with Google","suiteID":4,"groupIDs":[159,160,193],"metadata":{"skip":false,"skipReason":null},"line":143,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":8304}
+{"testID":194,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":8307}
+{"testID":192,"messageType":"print","message":"❌ Apple Sign In error: A AuthService was used after being disposed.\nOnce you have called dispose() on a AuthService, it can no longer be used.","type":"print","time":10333}
+{"testID":192,"error":"A AuthService was used after being disposed.\nOnce you have called dispose() on a AuthService, it can no longer be used.","stackTrace":"package:flutter/src/foundation/change_notifier.dart 182:9            ChangeNotifier.debugAssertNotDisposed.<fn>\npackage:flutter/src/foundation/change_notifier.dart 189:6            ChangeNotifier.debugAssertNotDisposed\npackage:flutter/src/foundation/change_notifier.dart 414:27           ChangeNotifier.notifyListeners\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 367:5  AuthService._setError\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 157:9  AuthService.signInWithApple\n===== asynchronous gap ===========================\ndart:async                                                           _CustomZone.registerBinaryCallback\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 140:7  AuthService.signInWithApple\npackage:matcher                                                      expect\npackage:flutter_test/src/widget_tester.dart 474:18                   expect\ntest/services/auth_service_test.dart 138:9                           main.<fn>.<fn>.<fn>\n","isFailure":false,"type":"error","time":10349}
+{"testID":192,"error":"This test failed after it had already completed.\nMake sure to use a matching library which informs the test runner\nof pending async work.","stackTrace":"package:flutter/src/foundation/change_notifier.dart 182:9            ChangeNotifier.debugAssertNotDisposed.<fn>\npackage:flutter/src/foundation/change_notifier.dart 189:6            ChangeNotifier.debugAssertNotDisposed\npackage:flutter/src/foundation/change_notifier.dart 414:27           ChangeNotifier.notifyListeners\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 367:5  AuthService._setError\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 157:9  AuthService.signInWithApple\n===== asynchronous gap ===========================\ndart:async                                                           _CustomZone.registerBinaryCallback\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 140:7  AuthService.signInWithApple\npackage:matcher                                                      expect\npackage:flutter_test/src/widget_tester.dart 474:18                   expect\ntest/services/auth_service_test.dart 138:9                           main.<fn>.<fn>.<fn>\n","isFailure":false,"type":"error","time":10350}
+{"testID":194,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":10351}
+{"testID":194,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":10352}
+{"test":{"id":195,"name":"AuthService Comprehensive Tests Google Sign In should go through authenticating state during Google sign in","suiteID":4,"groupIDs":[159,160,193],"metadata":{"skip":false,"skipReason":null},"line":156,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":10352}
+{"testID":195,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":10354}
+{"testID":195,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":12360}
+{"testID":195,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":12363}
+{"test":{"id":196,"name":"AuthService Comprehensive Tests Google Sign In should persist Google user session","suiteID":4,"groupIDs":[159,160,193],"metadata":{"skip":false,"skipReason":null},"line":169,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":12364}
+{"testID":196,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":12370}
+{"testID":196,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":14382}
+{"testID":196,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14384}
+{"test":{"id":197,"name":"AuthService Comprehensive Tests Google Sign In should handle Google sign in errors","suiteID":4,"groupIDs":[159,160,193],"metadata":{"skip":false,"skipReason":null},"line":185,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":14385}
+{"testID":197,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":14390}
+{"testID":197,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":14392}
+{"group":{"id":198,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests Sign Out","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":192,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":14392}
+{"test":{"id":199,"name":"AuthService Comprehensive Tests Sign Out should successfully sign out authenticated user","suiteID":4,"groupIDs":[159,160,198],"metadata":{"skip":false,"skipReason":null},"line":193,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":14393}
+{"testID":199,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":14398}
+{"testID":197,"messageType":"print","message":"❌ Google Sign In error: A AuthService was used after being disposed.\nOnce you have called dispose() on a AuthService, it can no longer be used.","type":"print","time":16397}
+{"testID":197,"error":"A AuthService was used after being disposed.\nOnce you have called dispose() on a AuthService, it can no longer be used.","stackTrace":"package:flutter/src/foundation/change_notifier.dart 182:9            ChangeNotifier.debugAssertNotDisposed.<fn>\npackage:flutter/src/foundation/change_notifier.dart 189:6            ChangeNotifier.debugAssertNotDisposed\npackage:flutter/src/foundation/change_notifier.dart 414:27           ChangeNotifier.notifyListeners\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 367:5  AuthService._setError\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 188:9  AuthService.signInWithGoogle\n===== asynchronous gap ===========================\ndart:async                                                           _CustomZone.registerBinaryCallback\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 177:7  AuthService.signInWithGoogle\npackage:matcher                                                      expect\npackage:flutter_test/src/widget_tester.dart 474:18                   expect\ntest/services/auth_service_test.dart 188:9                           main.<fn>.<fn>.<fn>\n","isFailure":false,"type":"error","time":16406}
+{"testID":197,"error":"This test failed after it had already completed.\nMake sure to use a matching library which informs the test runner\nof pending async work.","stackTrace":"package:flutter/src/foundation/change_notifier.dart 182:9            ChangeNotifier.debugAssertNotDisposed.<fn>\npackage:flutter/src/foundation/change_notifier.dart 189:6            ChangeNotifier.debugAssertNotDisposed\npackage:flutter/src/foundation/change_notifier.dart 414:27           ChangeNotifier.notifyListeners\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 367:5  AuthService._setError\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 188:9  AuthService.signInWithGoogle\n===== asynchronous gap ===========================\ndart:async                                                           _CustomZone.registerBinaryCallback\npackage:from_fed_to_chain_app/services/auth/auth_service.dart 177:7  AuthService.signInWithGoogle\npackage:matcher                                                      expect\npackage:flutter_test/src/widget_tester.dart 474:18                   expect\ntest/services/auth_service_test.dart 188:9                           main.<fn>.<fn>.<fn>\n","isFailure":false,"type":"error","time":16408}
+{"testID":199,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":16409}
+{"testID":199,"messageType":"print","message":"👋 Signing out user: google.user@gmail.com","type":"print","time":16410}
+{"testID":199,"messageType":"print","message":"✅ User signed out successfully","type":"print","time":16410}
+{"testID":199,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16411}
+{"test":{"id":200,"name":"AuthService Comprehensive Tests Sign Out should clear persisted session data on sign out","suiteID":4,"groupIDs":[159,160,198],"metadata":{"skip":false,"skipReason":null},"line":207,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":16412}
+{"testID":200,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":16414}
+{"testID":200,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":18419}
+{"testID":200,"messageType":"print","message":"👋 Signing out user: google.user@gmail.com","type":"print","time":18419}
+{"testID":200,"messageType":"print","message":"✅ User signed out successfully","type":"print","time":18420}
+{"testID":200,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":18422}
+{"test":{"id":201,"name":"AuthService Comprehensive Tests Sign Out should handle sign out when not authenticated","suiteID":4,"groupIDs":[159,160,198],"metadata":{"skip":false,"skipReason":null},"line":222,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":18423}
+{"testID":201,"messageType":"print","message":"👋 Signing out user: null","type":"print","time":18426}
+{"testID":201,"messageType":"print","message":"✅ User signed out successfully","type":"print","time":18426}
+{"testID":201,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":18428}
+{"group":{"id":202,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests Profile Updates","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":232,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":18428}
+{"test":{"id":203,"name":"AuthService Comprehensive Tests Profile Updates should update user profile name","suiteID":4,"groupIDs":[159,160,202],"metadata":{"skip":false,"skipReason":null},"line":233,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":18428}
+{"testID":203,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":18430}
+{"testID":203,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":20436}
+{"testID":203,"messageType":"print","message":"✅ User profile updated","type":"print","time":20439}
+{"testID":203,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":20442}
+{"test":{"id":204,"name":"AuthService Comprehensive Tests Profile Updates should update user profile photo URL","suiteID":4,"groupIDs":[159,160,202],"metadata":{"skip":false,"skipReason":null},"line":247,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":20443}
+{"testID":204,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":20447}
+{"testID":204,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":22457}
+{"testID":204,"messageType":"print","message":"✅ User profile updated","type":"print","time":22459}
+{"testID":204,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":22461}
+{"test":{"id":205,"name":"AuthService Comprehensive Tests Profile Updates should update both name and photo URL","suiteID":4,"groupIDs":[159,160,202],"metadata":{"skip":false,"skipReason":null},"line":262,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":22462}
+{"testID":205,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":22466}
+{"testID":205,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":24472}
+{"testID":205,"messageType":"print","message":"✅ User profile updated","type":"print","time":24473}
+{"testID":205,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":24476}
+{"test":{"id":206,"name":"AuthService Comprehensive Tests Profile Updates should persist profile updates","suiteID":4,"groupIDs":[159,160,202],"metadata":{"skip":false,"skipReason":null},"line":279,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":24476}
+{"testID":206,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":24481}
+{"testID":206,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":26487}
+{"testID":206,"messageType":"print","message":"✅ User profile updated","type":"print","time":26488}
+{"testID":206,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":26491}
+{"test":{"id":207,"name":"AuthService Comprehensive Tests Profile Updates should update lastLoginAt timestamp on profile update","suiteID":4,"groupIDs":[159,160,202],"metadata":{"skip":false,"skipReason":null},"line":295,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":26492}
+{"testID":207,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":26496}
+{"testID":207,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":28502}
+{"testID":207,"messageType":"print","message":"✅ User profile updated","type":"print","time":28517}
+{"testID":207,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":28521}
+{"test":{"id":208,"name":"AuthService Comprehensive Tests Profile Updates should fail to update profile when not authenticated","suiteID":4,"groupIDs":[159,160,202],"metadata":{"skip":false,"skipReason":null},"line":308,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":28521}
+{"testID":208,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":28528}
+{"group":{"id":209,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests Account Deletion","metadata":{"skip":false,"skipReason":null},"testCount":3,"line":318,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":28529}
+{"test":{"id":210,"name":"AuthService Comprehensive Tests Account Deletion should delete account successfully","suiteID":4,"groupIDs":[159,160,209],"metadata":{"skip":false,"skipReason":null},"line":319,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":28529}
+{"testID":210,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":28533}
+{"testID":210,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":30540}
+{"testID":210,"messageType":"print","message":"🗑️ Deleting account for: google.user@gmail.com","type":"print","time":30542}
+{"testID":210,"messageType":"print","message":"👋 Signing out user: google.user@gmail.com","type":"print","time":31547}
+{"testID":210,"messageType":"print","message":"✅ User signed out successfully","type":"print","time":31548}
+{"testID":210,"messageType":"print","message":"✅ Account deleted successfully","type":"print","time":31548}
+{"testID":210,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":31554}
+{"test":{"id":211,"name":"AuthService Comprehensive Tests Account Deletion should clear session data on account deletion","suiteID":4,"groupIDs":[159,160,209],"metadata":{"skip":false,"skipReason":null},"line":333,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":31555}
+{"testID":211,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":31562}
+{"testID":211,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":33567}
+{"testID":211,"messageType":"print","message":"🗑️ Deleting account for: google.user@gmail.com","type":"print","time":33568}
+{"testID":211,"messageType":"print","message":"👋 Signing out user: google.user@gmail.com","type":"print","time":34572}
+{"testID":211,"messageType":"print","message":"✅ User signed out successfully","type":"print","time":34573}
+{"testID":211,"messageType":"print","message":"✅ Account deleted successfully","type":"print","time":34574}
+{"testID":211,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":34576}
+{"test":{"id":212,"name":"AuthService Comprehensive Tests Account Deletion should fail to delete account when not authenticated","suiteID":4,"groupIDs":[159,160,209],"metadata":{"skip":false,"skipReason":null},"line":348,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":34577}
+{"testID":212,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":34583}
+{"group":{"id":213,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests State Management","metadata":{"skip":false,"skipReason":null},"testCount":4,"line":358,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":34584}
+{"test":{"id":214,"name":"AuthService Comprehensive Tests State Management should notify listeners on state changes","suiteID":4,"groupIDs":[159,160,213],"metadata":{"skip":false,"skipReason":null},"line":359,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":34584}
+{"testID":214,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":34588}
+{"testID":214,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":36594}
+{"testID":214,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":36597}
+{"test":{"id":215,"name":"AuthService Comprehensive Tests State Management should handle loading states correctly","suiteID":4,"groupIDs":[159,160,213],"metadata":{"skip":false,"skipReason":null},"line":370,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":36598}
+{"testID":215,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":36602}
+{"testID":215,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":38608}
+{"testID":215,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":38611}
+{"test":{"id":216,"name":"AuthService Comprehensive Tests State Management should handle error states correctly","suiteID":4,"groupIDs":[159,160,213],"metadata":{"skip":false,"skipReason":null},"line":383,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":38611}
+{"testID":216,"messageType":"print","message":"❌ Auth initialization error: FormatException: Unexpected character (at character 1)\ninvalid_json\n^\n","type":"print","time":38618}
+{"testID":216,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":38619}
+{"test":{"id":217,"name":"AuthService Comprehensive Tests State Management should clear errors on successful operations","suiteID":4,"groupIDs":[159,160,213],"metadata":{"skip":false,"skipReason":null},"line":397,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":38620}
+{"testID":217,"messageType":"print","message":"❌ Auth initialization error: FormatException: Unexpected character (at character 1)\ninvalid_json\n^\n","type":"print","time":38624}
+{"testID":217,"messageType":"print","message":"🔍 Starting Google Sign In...","type":"print","time":38625}
+{"testID":217,"messageType":"print","message":"✅ Sign in completed for: google.user@gmail.com","type":"print","time":40629}
+{"testID":217,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40631}
+{"group":{"id":218,"suiteID":4,"parentID":160,"name":"AuthService Comprehensive Tests AppUser Model","metadata":{"skip":false,"skipReason":null},"testCount":6,"line":417,"column":5,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"group","time":40632}
+{"test":{"id":219,"name":"AuthService Comprehensive Tests AppUser Model should create user with all properties","suiteID":4,"groupIDs":[159,160,218],"metadata":{"skip":false,"skipReason":null},"line":418,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":40632}
+{"testID":219,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40637}
+{"test":{"id":220,"name":"AuthService Comprehensive Tests AppUser Model should serialize to JSON correctly","suiteID":4,"groupIDs":[159,160,218],"metadata":{"skip":false,"skipReason":null},"line":428,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":40638}
+{"testID":220,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40642}
+{"test":{"id":221,"name":"AuthService Comprehensive Tests AppUser Model should deserialize from JSON correctly","suiteID":4,"groupIDs":[159,160,218],"metadata":{"skip":false,"skipReason":null},"line":440,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":40642}
+{"testID":221,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40645}
+{"test":{"id":222,"name":"AuthService Comprehensive Tests AppUser Model should handle null photoUrl in serialization","suiteID":4,"groupIDs":[159,160,218],"metadata":{"skip":false,"skipReason":null},"line":453,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":40645}
+{"testID":222,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40648}
+{"test":{"id":223,"name":"AuthService Comprehensive Tests AppUser Model should create copy with updated properties","suiteID":4,"groupIDs":[159,160,218],"metadata":{"skip":false,"skipReason":null},"line":471,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":40648}
+{"testID":223,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40650}
+{"test":{"id":224,"name":"AuthService Comprehensive Tests AppUser Model should handle copyWith with no changes when called with no parameters","suiteID":4,"groupIDs":[159,160,218],"metadata":{"skip":false,"skipReason":null},"line":490,"column":7,"url":"file:///Users/chouyasushi/htdocs/all-weather-protocol/FromFedToChain/app/test/services/auth_service_test.dart"},"type":"testStart","time":40651}
+{"testID":224,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":40652}
+{"success":false,"type":"done","time":40658}

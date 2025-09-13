@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mockito/mockito.dart';
 import 'dart:convert';
 
 import 'package:from_fed_to_chain_app/services/auth/auth_service.dart';
@@ -249,7 +248,6 @@ void main() {
       test('should update user profile photo URL', () async {
         // First sign in
         await authService.signInWithGoogle();
-        final originalPhotoUrl = authService.currentUser?.photoUrl;
 
         // Update profile
         const newPhotoUrl = 'https://example.com/new-photo.jpg';
