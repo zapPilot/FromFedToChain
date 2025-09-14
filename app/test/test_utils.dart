@@ -190,7 +190,7 @@ class TestUtils {
       category: category,
       streamingUrl: streamingUrl,
       path: '$id.m3u8',
-      duration: duration ?? const Duration(minutes: 5),
+      duration: duration,
       fileSizeBytes: fileSizeBytes ?? 1024 * 1024,
       lastModified: lastModified ?? DateTime.now(),
     );
@@ -236,7 +236,7 @@ class TestUtils {
     return Playlist(
       id: id,
       name: name,
-      episodes: episodes ?? [createSampleAudioFile()],
+      episodes: episodes ?? [createSampleAudioFile(duration: const Duration(minutes: 5))],
       createdAt: createdAt ?? DateTime.now(),
       updatedAt: updatedAt ?? DateTime.now(),
     );
@@ -496,6 +496,75 @@ class TestUtils {
   static Future<T> mockAsyncError<T>(String message, {Duration? delay}) async {
     await Future.delayed(delay ?? const Duration(milliseconds: 100));
     throw Exception(message);
+  }
+}
+
+/// Test data factory class for creating mock objects
+class TestDataFactory {
+  /// Create mock AudioFile for testing
+  static AudioFile createMockAudioFile({
+    String? id,
+    String? title,
+    String? language,
+    String? category,
+    String? streamingUrl,
+    String? path,
+    Duration? duration,
+    int? fileSizeBytes,
+    DateTime? lastModified,
+  }) {
+    return TestUtils.createSampleAudioFile(
+      id: id ?? 'mock-audio-${DateTime.now().millisecondsSinceEpoch}',
+      title: title ?? 'Mock Audio File',
+      language: language ?? 'en-US',
+      category: category ?? 'daily-news',
+      streamingUrl: streamingUrl ?? 'https://example.com/mock.m3u8',
+      duration: duration,
+      fileSizeBytes: fileSizeBytes ?? 1024 * 1024,
+      lastModified: lastModified ?? DateTime.now(),
+    );
+  }
+
+  /// Create mock AudioContent for testing
+  static AudioContent createMockAudioContent({
+    String? id,
+    String? title,
+    String? language,
+    String? category,
+    String? status,
+    String? description,
+    List<String>? references,
+    DateTime? updatedAt,
+  }) {
+    final now = DateTime.now();
+    return AudioContent(
+      id: id ?? 'mock-content-${now.millisecondsSinceEpoch}',
+      title: title ?? 'Mock Audio Content',
+      language: language ?? 'en-US',
+      category: category ?? 'daily-news',
+      date: now,
+      status: status ?? 'published',
+      description: description ?? 'Mock content text',
+      references: references ?? ['Mock Reference'],
+      updatedAt: updatedAt ?? now,
+    );
+  }
+
+  /// Create mock Playlist for testing
+  static Playlist createMockPlaylist({
+    String? id,
+    String? name,
+    List<AudioFile>? episodes,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Playlist(
+      id: id ?? 'mock-playlist-${DateTime.now().millisecondsSinceEpoch}',
+      name: name ?? 'Mock Playlist',
+      episodes: episodes ?? [createMockAudioFile()],
+      createdAt: createdAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
   }
 }
 

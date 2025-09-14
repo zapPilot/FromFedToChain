@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' as dart_async;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -63,7 +63,7 @@ class StreamingApiService {
             'StreamingApiService: This usually indicates CORS or network issues');
       }
       throw NetworkException('Network connection error: ${e.message}');
-    } on TimeoutException catch (e) {
+    } on dart_async.TimeoutException catch (e) {
       if (kDebugMode) {
         print(
             'StreamingApiService: Request timed out after ${ApiConfig.apiTimeout.inSeconds} seconds');
