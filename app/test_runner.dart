@@ -26,7 +26,8 @@ void main(List<String> args) async {
   List<String> failedTests = [];
   List<String> failureDetails = [];
 
-  await for (String line in process.stdout.transform(utf8.decoder).transform(LineSplitter())) {
+  await for (String line
+      in process.stdout.transform(utf8.decoder).transform(LineSplitter())) {
     try {
       final json = jsonDecode(line);
 

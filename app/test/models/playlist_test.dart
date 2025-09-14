@@ -136,7 +136,8 @@ void main() {
               'id': '2025-01-01-test',
               'path': 'zh-TW/daily-news/2025-01-01-test.m3u8',
               'title': 'Test Episode',
-              'streaming_url': 'https://test-api.example.com/zh-TW/daily-news/2025-01-01-test.m3u8',
+              'streaming_url':
+                  'https://test-api.example.com/zh-TW/daily-news/2025-01-01-test.m3u8',
               'category': 'daily-news',
               'language': 'zh-TW',
               'size': 1024,

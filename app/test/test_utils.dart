@@ -236,7 +236,8 @@ class TestUtils {
     return Playlist(
       id: id,
       name: name,
-      episodes: episodes ?? [createSampleAudioFile(duration: const Duration(minutes: 5))],
+      episodes: episodes ??
+          [createSampleAudioFile(duration: const Duration(minutes: 5))],
       createdAt: createdAt ?? DateTime.now(),
       updatedAt: updatedAt ?? DateTime.now(),
     );

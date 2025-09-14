@@ -223,12 +223,13 @@ ENVIRONMENT=test
       });
 
       test('should throw TimeoutException for timeout', () async {
-        when(mockHttpClient.get(any, headers: anyNamed('headers')))
-            .thenThrow(async.TimeoutException('Request timed out', Duration(seconds: 30)));
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenThrow(
+            async.TimeoutException('Request timed out', Duration(seconds: 30)));
 
         expect(
           () => StreamingApiService.getEpisodeList('zh-TW', 'startup'),
-          throwsA(predicate((e) => e is TimeoutException && e.message.contains('timed out'))),
+          throwsA(predicate(
+              (e) => e is TimeoutException && e.message.contains('timed out'))),
         );
       });
 
