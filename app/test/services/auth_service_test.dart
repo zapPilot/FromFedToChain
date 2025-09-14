@@ -71,6 +71,9 @@ void main() {
           'auth_token': 'test_token_123',
         });
 
+        // Allow mock to fully settle
+        await Future.delayed(Duration.zero);
+
         await authService.initialize();
 
         expect(authService.authState, AuthState.error);
@@ -387,6 +390,9 @@ void main() {
           'auth_token': 'test_token_123',
         });
 
+        // Allow mock to fully settle
+        await Future.delayed(Duration.zero);
+
         await authService.initialize();
 
         expect(authService.authState, AuthState.error);
@@ -401,11 +407,17 @@ void main() {
           'auth_token': 'test_token_123',
         });
 
+        // Allow mock to fully settle
+        await Future.delayed(Duration.zero);
+
         await authService.initialize();
         expect(authService.errorMessage, isNotNull);
 
         // Reset SharedPreferences for clean sign in
         SharedPreferences.setMockInitialValues({});
+
+        // Allow mock to fully settle
+        await Future.delayed(Duration.zero);
 
         // Successful sign in should clear error
         await authService.signInWithGoogle();

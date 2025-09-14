@@ -8,14 +8,17 @@ import '../models/audio_file.dart';
 /// Background audio handler for media session controls and system integration
 class BackgroundAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
-  final _player = AudioPlayer();
+  final AudioPlayer _player;
+  final AudioSession? _audioSession;
 
   // Episode navigation callbacks
   Function(AudioFile)? onSkipToNextEpisode;
   Function(AudioFile)? onSkipToPreviousEpisode;
   AudioFile? _currentAudioFile;
 
-  BackgroundAudioHandler() {
+  BackgroundAudioHandler({AudioPlayer? audioPlayer, AudioSession? audioSession})
+      : _player = audioPlayer ?? AudioPlayer(),
+        _audioSession = audioSession {
     if (kDebugMode) {
       print('🎵 BackgroundAudioHandler: Constructor called');
       print('🎵 Starting initialization for media session support...');
@@ -30,7 +33,7 @@ class BackgroundAudioHandler extends BaseAudioHandler
     }
 
     try {
-      final session = await AudioSession.instance;
+      final session = _audioSession ?? await AudioSession.instance;
       // Use the music preset - it includes all necessary settings for media notifications
       await session.configure(const AudioSessionConfiguration.music());
       await session.setActive(true);

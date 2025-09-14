@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' as dart_async;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -63,12 +63,30 @@ class StreamingApiService {
             'StreamingApiService: This usually indicates CORS or network issues');
       }
       throw NetworkException('Network connection error: ${e.message}');
-    } on TimeoutException catch (e) {
+    } on dart_async.TimeoutException catch (e) {
       if (kDebugMode) {
         print(
             'StreamingApiService: Request timed out after ${ApiConfig.apiTimeout.inSeconds} seconds');
       }
       throw TimeoutException('Request timed out: ${e.message}');
+    } on FormatException catch (e) {
+      // Let FormatException pass through for JSON parsing errors
+      if (kDebugMode) {
+        print('StreamingApiService: FormatException: $e');
+      }
+      rethrow;
+    } on StateError catch (e) {
+      // Let StateError pass through for collection operations (.first, .single on empty)
+      if (kDebugMode) {
+        print('StreamingApiService: StateError: $e');
+      }
+      rethrow;
+    } on RangeError catch (e) {
+      // Let RangeError pass through for string manipulation issues
+      if (kDebugMode) {
+        print('StreamingApiService: RangeError: $e');
+      }
+      rethrow;
     } catch (e) {
       if (kDebugMode) {
         print('StreamingApiService: Unexpected error: $e');
