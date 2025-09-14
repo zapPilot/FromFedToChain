@@ -69,6 +69,24 @@ class StreamingApiService {
             'StreamingApiService: Request timed out after ${ApiConfig.apiTimeout.inSeconds} seconds');
       }
       throw TimeoutException('Request timed out: ${e.message}');
+    } on FormatException catch (e) {
+      // Let FormatException pass through for JSON parsing errors
+      if (kDebugMode) {
+        print('StreamingApiService: FormatException: $e');
+      }
+      rethrow;
+    } on StateError catch (e) {
+      // Let StateError pass through for collection operations (.first, .single on empty)
+      if (kDebugMode) {
+        print('StreamingApiService: StateError: $e');
+      }
+      rethrow;
+    } on RangeError catch (e) {
+      // Let RangeError pass through for string manipulation issues
+      if (kDebugMode) {
+        print('StreamingApiService: RangeError: $e');
+      }
+      rethrow;
     } catch (e) {
       if (kDebugMode) {
         print('StreamingApiService: Unexpected error: $e');

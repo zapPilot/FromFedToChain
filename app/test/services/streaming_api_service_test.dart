@@ -361,7 +361,10 @@ ENVIRONMENT=test
         when(mockHttpClient.get(any, headers: anyNamed('headers')))
             .thenAnswer((invocation) async {
           final uri = invocation.positionalArguments[0] as Uri;
-          final category = uri.pathSegments.last.split('.').first;
+          // Extract category from query parameter: prefix=audio/{language}/{category}/
+          final prefix = uri.queryParameters['prefix'] ?? '';
+          final parts = prefix.split('/');
+          final category = parts.length >= 3 ? parts[2] : 'startup';
 
           final mockResponse = [
             {
@@ -392,7 +395,10 @@ ENVIRONMENT=test
         when(mockHttpClient.get(any, headers: anyNamed('headers')))
             .thenAnswer((invocation) async {
           final uri = invocation.positionalArguments[0] as Uri;
-          final category = uri.pathSegments.last.split('.').first;
+          // Extract category from query parameter: prefix=audio/{language}/{category}/
+          final prefix = uri.queryParameters['prefix'] ?? '';
+          final parts = prefix.split('/');
+          final category = parts.length >= 3 ? parts[2] : 'startup';
 
           if (category == 'startup') {
             // Simulate error for startup category
@@ -475,9 +481,11 @@ ENVIRONMENT=test
         when(mockHttpClient.get(any, headers: anyNamed('headers')))
             .thenAnswer((invocation) async {
           final uri = invocation.positionalArguments[0] as Uri;
-          final pathParts = uri.pathSegments;
-          final language = pathParts[pathParts.length - 2];
-          final category = pathParts.last.split('.').first;
+          // Extract language and category from query parameter: prefix=audio/{language}/{category}/
+          final prefix = uri.queryParameters['prefix'] ?? '';
+          final parts = prefix.split('/');
+          final language = parts.length >= 2 ? parts[1] : 'zh-TW';
+          final category = parts.length >= 3 ? parts[2] : 'startup';
 
           final mockResponse = [
             {
@@ -517,9 +525,11 @@ ENVIRONMENT=test
           }
 
           final uri = invocation.positionalArguments[0] as Uri;
-          final pathParts = uri.pathSegments;
-          final language = pathParts[pathParts.length - 2];
-          final category = pathParts.last.split('.').first;
+          // Extract language and category from query parameter: prefix=audio/{language}/{category}/
+          final prefix = uri.queryParameters['prefix'] ?? '';
+          final parts = prefix.split('/');
+          final language = parts.length >= 2 ? parts[1] : 'zh-TW';
+          final category = parts.length >= 3 ? parts[2] : 'startup';
 
           final mockResponse = [
             {
@@ -546,9 +556,11 @@ ENVIRONMENT=test
         when(mockHttpClient.get(any, headers: anyNamed('headers')))
             .thenAnswer((invocation) async {
           final uri = invocation.positionalArguments[0] as Uri;
-          final pathParts = uri.pathSegments;
-          final language = pathParts[pathParts.length - 2];
-          final category = pathParts.last.split('.').first;
+          // Extract language and category from query parameter: prefix=audio/{language}/{category}/
+          final prefix = uri.queryParameters['prefix'] ?? '';
+          final parts = prefix.split('/');
+          final language = parts.length >= 2 ? parts[1] : 'zh-TW';
+          final category = parts.length >= 3 ? parts[2] : 'startup';
 
           final mockResponse = [
             {
@@ -666,9 +678,11 @@ ENVIRONMENT=test
         when(mockHttpClient.get(any, headers: anyNamed('headers')))
             .thenAnswer((invocation) async {
           final uri = invocation.positionalArguments[0] as Uri;
-          final pathParts = uri.pathSegments;
-          final language = pathParts[pathParts.length - 2];
-          final category = pathParts.last.split('.').first;
+          // Extract language and category from query parameter: prefix=audio/{language}/{category}/
+          final prefix = uri.queryParameters['prefix'] ?? '';
+          final parts = prefix.split('/');
+          final language = parts.length >= 2 ? parts[1] : 'zh-TW';
+          final category = parts.length >= 3 ? parts[2] : 'startup';
 
           final mockResponse = [
             {

@@ -4,10 +4,10 @@ coverage_options:
   # Coverage thresholds (percentage) - Realistic targets for audio streaming app
   thresholds:
     global:
-      statements: 58
-      branches: 58
-      functions: 58
-      lines: 58
+      statements: 70
+      branches: 70
+      functions: 70
+      lines: 70
 
   # Exclude files/directories from coverage (reduced exclusions)
   excludes:
