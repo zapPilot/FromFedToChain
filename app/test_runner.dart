@@ -12,7 +12,6 @@ void main(List<String> args) async {
   print('🧪 Running Flutter Tests with Enhanced Output\n');
 
   final coverageFlag = noCoverage ? '' : '--coverage';
-  final reporter = showFailuresOnly ? 'failures-only' : 'expanded';
 
   // Run tests with JSON reporter for parsing
   final process = await Process.start(

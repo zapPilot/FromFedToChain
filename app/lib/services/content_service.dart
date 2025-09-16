@@ -12,6 +12,9 @@ import 'streaming_api_service.dart';
 
 /// Service for managing audio content, playlists, and episode navigation
 class ContentService extends ChangeNotifier {
+  static List<AudioFile>? _allEpisodesOverride;
+  static bool _preserveEpisodeOrderForTesting = false;
+
   List<AudioFile> _allEpisodes = [];
   List<AudioFile> _filteredEpisodes = [];
   Playlist? _currentPlaylist;
@@ -30,7 +33,9 @@ class ContentService extends ChangeNotifier {
   // Listen history (episodeId -> last listened timestamp)
   final Map<String, DateTime> _listenHistory = {};
 
-  static final _httpClient = http.Client();
+  static http.Client? _httpClientOverride;
+  final http.Client _httpClient;
+  final bool _ownsHttpClient;
 
   // Getters
   List<AudioFile> get allEpisodes => _allEpisodes;
@@ -72,7 +77,9 @@ class ContentService extends ChangeNotifier {
       getEpisodeCompletion(episodeId) > 0.0 &&
       getEpisodeCompletion(episodeId) < 0.9;
 
-  ContentService() {
+  ContentService({http.Client? httpClient})
+      : _httpClient = httpClient ?? _httpClientOverride ?? http.Client(),
+        _ownsHttpClient = httpClient == null && _httpClientOverride == null {
     _loadPreferences();
   }
 
@@ -253,12 +260,25 @@ class ContentService extends ChangeNotifier {
   static Future<AudioContent?> getContentById(String contentId) async {
     // First try to find the audio file in the loaded episodes
     final instance = ContentService();
-    await instance.loadAllEpisodes();
+    if (_allEpisodesOverride != null) {
+      instance._allEpisodes = List<AudioFile>.from(_allEpisodesOverride!);
+      instance._applyFilters();
+    } else {
+      await instance.loadAllEpisodes();
+    }
 
-    final audioFile = instance._allEpisodes.firstWhere(
-      (episode) => episode.id == contentId,
-      orElse: () => throw StateError('Content not found'),
-    );
+    AudioFile audioFile;
+    try {
+      audioFile = instance._allEpisodes.firstWhere(
+        (episode) => episode.id == contentId,
+        orElse: () => throw StateError('Content not found'),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('ContentService: Content not found for ID: $contentId');
+      }
+      return null;
+    }
 
     try {
       // Found the audio file, now fetch its content
@@ -858,7 +878,9 @@ class ContentService extends ChangeNotifier {
   @override
   void dispose() {
     StreamingApiService.dispose();
-    _httpClient.close();
+    if (_ownsHttpClient) {
+      _httpClient.close();
+    }
     _contentCache.clear();
     super.dispose();
   }
@@ -866,8 +888,20 @@ class ContentService extends ChangeNotifier {
   // Testing methods - only available in debug builds
   @visibleForTesting
   void setEpisodesForTesting(List<AudioFile> episodes) {
-    _allEpisodes = episodes;
+    _allEpisodes = List<AudioFile>.from(episodes);
     _applyFilters();
+
+    if (_preserveEpisodeOrderForTesting && episodes.isNotEmpty) {
+      final order = {
+        for (var i = 0; i < episodes.length; i++) episodes[i].id: i
+      };
+      _filteredEpisodes.sort((a, b) {
+        final indexA = order[a.id] ?? 0;
+        final indexB = order[b.id] ?? 0;
+        return indexA.compareTo(indexB);
+      });
+    }
+
     notifyListeners();
   }
 
@@ -901,6 +935,17 @@ class ContentService extends ChangeNotifier {
 
   @visibleForTesting
   static void setHttpClientForTesting(http.Client? client) {
+    _httpClientOverride = client;
     StreamingApiService.setHttpClient(client);
+  }
+
+  @visibleForTesting
+  static void setAllEpisodesForTesting(List<AudioFile>? episodes) {
+    _allEpisodesOverride = episodes;
+  }
+
+  @visibleForTesting
+  static void setPreserveEpisodeOrderForTesting(bool preserve) {
+    _preserveEpisodeOrderForTesting = preserve;
   }
 }

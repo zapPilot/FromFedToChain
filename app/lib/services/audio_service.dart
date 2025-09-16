@@ -21,6 +21,7 @@ class AudioService extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   final BackgroundAudioHandler? _audioHandler;
   final ContentService? _contentService;
+  final AudioPlayer? _providedAudioPlayer;
 
   // Stream subscriptions for proper disposal
   StreamSubscription? _playbackStateSubscription;
@@ -79,7 +80,9 @@ class AudioService extends ChangeNotifier {
 
   String? get currentAudioId => _currentAudioFile?.id;
 
-  AudioService(this._audioHandler, [this._contentService]) {
+  AudioService(this._audioHandler,
+      [this._contentService, AudioPlayer? localAudioPlayer])
+      : _providedAudioPlayer = localAudioPlayer {
     if (kDebugMode) {
       print('🎧 AudioService: Initializing...');
       print(
@@ -157,7 +160,7 @@ class AudioService extends ChangeNotifier {
       }
 
       // Fallback to local player if background handler not available
-      _audioPlayer = AudioPlayer();
+      _audioPlayer = _providedAudioPlayer ?? AudioPlayer();
 
       // Listen to position changes
       _positionSubscription = _audioPlayer.positionStream.listen((position) {

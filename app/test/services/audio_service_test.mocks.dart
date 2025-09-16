@@ -78,14 +78,14 @@ class _FakeValueStream_3<T> extends _i1.SmartFake
 /// See the documentation for Mockito's code generation for more information.
 class MockBackgroundAudioHandler extends _i1.Mock
     implements _i3.BackgroundAudioHandler {
-  MockBackgroundAudioHandler() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   Duration get duration => (super.noSuchMethod(
         Invocation.getter(#duration),
         returnValue: _FakeDuration_0(
+          this,
+          Invocation.getter(#duration),
+        ),
+        returnValueForMissingStub: _FakeDuration_0(
           this,
           Invocation.getter(#duration),
         ),
@@ -121,12 +121,20 @@ class MockBackgroundAudioHandler extends _i1.Mock
           this,
           Invocation.getter(#playbackState),
         ),
+        returnValueForMissingStub: _FakeBehaviorSubject_1<_i5.PlaybackState>(
+          this,
+          Invocation.getter(#playbackState),
+        ),
       ) as _i2.BehaviorSubject<_i5.PlaybackState>);
 
   @override
   _i2.BehaviorSubject<List<_i5.MediaItem>> get queue => (super.noSuchMethod(
         Invocation.getter(#queue),
         returnValue: _FakeBehaviorSubject_1<List<_i5.MediaItem>>(
+          this,
+          Invocation.getter(#queue),
+        ),
+        returnValueForMissingStub: _FakeBehaviorSubject_1<List<_i5.MediaItem>>(
           this,
           Invocation.getter(#queue),
         ),
@@ -139,12 +147,20 @@ class MockBackgroundAudioHandler extends _i1.Mock
           this,
           Invocation.getter(#queueTitle),
         ),
+        returnValueForMissingStub: _FakeBehaviorSubject_1<String>(
+          this,
+          Invocation.getter(#queueTitle),
+        ),
       ) as _i2.BehaviorSubject<String>);
 
   @override
   _i2.BehaviorSubject<_i5.MediaItem?> get mediaItem => (super.noSuchMethod(
         Invocation.getter(#mediaItem),
         returnValue: _FakeBehaviorSubject_1<_i5.MediaItem?>(
+          this,
+          Invocation.getter(#mediaItem),
+        ),
+        returnValueForMissingStub: _FakeBehaviorSubject_1<_i5.MediaItem?>(
           this,
           Invocation.getter(#mediaItem),
         ),
@@ -158,12 +174,21 @@ class MockBackgroundAudioHandler extends _i1.Mock
           this,
           Invocation.getter(#androidPlaybackInfo),
         ),
+        returnValueForMissingStub:
+            _FakeBehaviorSubject_1<_i5.AndroidPlaybackInfo>(
+          this,
+          Invocation.getter(#androidPlaybackInfo),
+        ),
       ) as _i2.BehaviorSubject<_i5.AndroidPlaybackInfo>);
 
   @override
   _i2.BehaviorSubject<_i5.RatingStyle> get ratingStyle => (super.noSuchMethod(
         Invocation.getter(#ratingStyle),
         returnValue: _FakeBehaviorSubject_1<_i5.RatingStyle>(
+          this,
+          Invocation.getter(#ratingStyle),
+        ),
+        returnValueForMissingStub: _FakeBehaviorSubject_1<_i5.RatingStyle>(
           this,
           Invocation.getter(#ratingStyle),
         ),
@@ -176,12 +201,20 @@ class MockBackgroundAudioHandler extends _i1.Mock
           this,
           Invocation.getter(#customEvent),
         ),
+        returnValueForMissingStub: _FakePublishSubject_2<dynamic>(
+          this,
+          Invocation.getter(#customEvent),
+        ),
       ) as _i2.PublishSubject<dynamic>);
 
   @override
   _i2.BehaviorSubject<dynamic> get customState => (super.noSuchMethod(
         Invocation.getter(#customState),
         returnValue: _FakeBehaviorSubject_1<dynamic>(
+          this,
+          Invocation.getter(#customState),
+        ),
+        returnValueForMissingStub: _FakeBehaviorSubject_1<dynamic>(
           this,
           Invocation.getter(#customState),
         ),
@@ -321,6 +354,7 @@ class MockBackgroundAudioHandler extends _i1.Mock
           ],
         ),
         returnValue: _i6.Future<dynamic>.value(),
+        returnValueForMissingStub: _i6.Future<dynamic>.value(),
       ) as _i6.Future<dynamic>);
 
   @override
@@ -681,6 +715,8 @@ class MockBackgroundAudioHandler extends _i1.Mock
           ],
         ),
         returnValue: _i6.Future<List<_i5.MediaItem>>.value(<_i5.MediaItem>[]),
+        returnValueForMissingStub:
+            _i6.Future<List<_i5.MediaItem>>.value(<_i5.MediaItem>[]),
       ) as _i6.Future<List<_i5.MediaItem>>);
 
   @override
@@ -698,6 +734,13 @@ class MockBackgroundAudioHandler extends _i1.Mock
             [parentMediaId],
           ),
         ),
+        returnValueForMissingStub: _FakeValueStream_3<Map<String, dynamic>>(
+          this,
+          Invocation.method(
+            #subscribeToChildren,
+            [parentMediaId],
+          ),
+        ),
       ) as _i2.ValueStream<Map<String, dynamic>>);
 
   @override
@@ -708,6 +751,7 @@ class MockBackgroundAudioHandler extends _i1.Mock
           [mediaId],
         ),
         returnValue: _i6.Future<_i5.MediaItem?>.value(),
+        returnValueForMissingStub: _i6.Future<_i5.MediaItem?>.value(),
       ) as _i6.Future<_i5.MediaItem?>);
 
   @override
@@ -724,6 +768,8 @@ class MockBackgroundAudioHandler extends _i1.Mock
           ],
         ),
         returnValue: _i6.Future<List<_i5.MediaItem>>.value(<_i5.MediaItem>[]),
+        returnValueForMissingStub:
+            _i6.Future<List<_i5.MediaItem>>.value(<_i5.MediaItem>[]),
       ) as _i6.Future<List<_i5.MediaItem>>);
 
   @override
@@ -754,26 +800,28 @@ class MockBackgroundAudioHandler extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockContentService extends _i1.Mock implements _i7.ContentService {
-  MockContentService() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   List<_i4.AudioFile> get allEpisodes => (super.noSuchMethod(
         Invocation.getter(#allEpisodes),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
   List<_i4.AudioFile> get filteredEpisodes => (super.noSuchMethod(
         Invocation.getter(#filteredEpisodes),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
   String get selectedLanguage => (super.noSuchMethod(
         Invocation.getter(#selectedLanguage),
         returnValue: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#selectedLanguage),
+        ),
+        returnValueForMissingStub: _i8.dummyValue<String>(
           this,
           Invocation.getter(#selectedLanguage),
         ),
@@ -786,6 +834,10 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           this,
           Invocation.getter(#selectedCategory),
         ),
+        returnValueForMissingStub: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#selectedCategory),
+        ),
       ) as String);
 
   @override
@@ -795,18 +847,24 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           this,
           Invocation.getter(#searchQuery),
         ),
+        returnValueForMissingStub: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#searchQuery),
+        ),
       ) as String);
 
   @override
   bool get isLoading => (super.noSuchMethod(
         Invocation.getter(#isLoading),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
   bool get hasError => (super.noSuchMethod(
         Invocation.getter(#hasError),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
@@ -816,30 +874,38 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           this,
           Invocation.getter(#sortOrder),
         ),
+        returnValueForMissingStub: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#sortOrder),
+        ),
       ) as String);
 
   @override
   Map<String, DateTime> get listenHistory => (super.noSuchMethod(
         Invocation.getter(#listenHistory),
         returnValue: <String, DateTime>{},
+        returnValueForMissingStub: <String, DateTime>{},
       ) as Map<String, DateTime>);
 
   @override
   bool get hasEpisodes => (super.noSuchMethod(
         Invocation.getter(#hasEpisodes),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
   bool get hasFilteredResults => (super.noSuchMethod(
         Invocation.getter(#hasFilteredResults),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
   bool get hasListeners => (super.noSuchMethod(
         Invocation.getter(#hasListeners),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
@@ -851,6 +917,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           {#limit: limit},
         ),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
@@ -860,6 +927,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [episodeId],
         ),
         returnValue: 0.0,
+        returnValueForMissingStub: 0.0,
       ) as double);
 
   @override
@@ -869,6 +937,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [episodeId],
         ),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
@@ -878,6 +947,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [episodeId],
         ),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override
@@ -932,6 +1002,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           ],
         ),
         returnValue: _i6.Future<_i9.AudioContent?>.value(),
+        returnValueForMissingStub: _i6.Future<_i9.AudioContent?>.value(),
       ) as _i6.Future<_i9.AudioContent?>);
 
   @override
@@ -943,6 +1014,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [audioFile],
         ),
         returnValue: _i6.Future<_i9.AudioContent?>.value(),
+        returnValueForMissingStub: _i6.Future<_i9.AudioContent?>.value(),
       ) as _i6.Future<_i9.AudioContent?>);
 
   @override
@@ -951,14 +1023,17 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
     String? language,
     String? category,
   ) =>
-      (super.noSuchMethod(Invocation.method(
-        #getCachedContent,
-        [
-          id,
-          language,
-          category,
-        ],
-      )) as _i9.AudioContent?);
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCachedContent,
+          [
+            id,
+            language,
+            category,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      ) as _i9.AudioContent?);
 
   @override
   _i6.Future<_i4.AudioFile?> getAudioFileById(String? contentId) =>
@@ -968,6 +1043,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [contentId],
         ),
         returnValue: _i6.Future<_i4.AudioFile?>.value(),
+        returnValueForMissingStub: _i6.Future<_i4.AudioFile?>.value(),
       ) as _i6.Future<_i4.AudioFile?>);
 
   @override
@@ -1025,6 +1101,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [],
         ),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
@@ -1132,17 +1209,23 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
 
   @override
   _i4.AudioFile? getNextEpisode(_i4.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(Invocation.method(
-        #getNextEpisode,
-        [currentEpisode],
-      )) as _i4.AudioFile?);
+      (super.noSuchMethod(
+        Invocation.method(
+          #getNextEpisode,
+          [currentEpisode],
+        ),
+        returnValueForMissingStub: null,
+      ) as _i4.AudioFile?);
 
   @override
   _i4.AudioFile? getPreviousEpisode(_i4.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(Invocation.method(
-        #getPreviousEpisode,
-        [currentEpisode],
-      )) as _i4.AudioFile?);
+      (super.noSuchMethod(
+        Invocation.method(
+          #getPreviousEpisode,
+          [currentEpisode],
+        ),
+        returnValueForMissingStub: null,
+      ) as _i4.AudioFile?);
 
   @override
   List<_i4.AudioFile> getEpisodesByLanguage(String? language) =>
@@ -1152,6 +1235,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [language],
         ),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
@@ -1162,6 +1246,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [category],
         ),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
@@ -1178,6 +1263,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           ],
         ),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override
@@ -1187,6 +1273,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [],
         ),
         returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
       ) as Map<String, dynamic>);
 
   @override
@@ -1216,6 +1303,8 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [query],
         ),
         returnValue: _i6.Future<List<_i4.AudioFile>>.value(<_i4.AudioFile>[]),
+        returnValueForMissingStub:
+            _i6.Future<List<_i4.AudioFile>>.value(<_i4.AudioFile>[]),
       ) as _i6.Future<List<_i4.AudioFile>>);
 
   @override
@@ -1226,6 +1315,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [audioFile],
         ),
         returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
       ) as Map<String, dynamic>);
 
   @override
@@ -1281,6 +1371,7 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
           [],
         ),
         returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
 
   @override

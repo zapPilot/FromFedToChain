@@ -9,8 +9,9 @@ import 'package:from_fed_to_chain_app/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/services/content_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
-// Generate mocks for dependencies
-@GenerateMocks([BackgroundAudioHandler, ContentService])
+// Generate nice mocks for dependencies (returns sensible defaults instead of throwing errors)
+@GenerateNiceMocks(
+    [MockSpec<BackgroundAudioHandler>(), MockSpec<ContentService>()])
 import 'audio_service_test.mocks.dart';
 
 void main() {
