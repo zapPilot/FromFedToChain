@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:from_fed_to_chain_app/services/content_service.dart';
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
 void main() {
-  group('ContentService Basic Tests', () {
-    late ContentService contentService;
+  group('ContentFacadeService Basic Tests', () {
+    late ContentFacadeService contentService;
 
     setUpAll(() async {
       // Initialize dotenv with test environment variables
@@ -20,7 +20,7 @@ ENVIRONMENT=test
       // Initialize test binding and mock SharedPreferences
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
-      contentService = ContentService();
+      contentService = ContentFacadeService();
     });
 
     tearDown(() {

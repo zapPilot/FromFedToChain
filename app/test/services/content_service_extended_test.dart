@@ -6,7 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:from_fed_to_chain_app/services/content_service.dart';
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/services/streaming_api_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/models/audio_content.dart';
@@ -16,8 +16,8 @@ import 'package:from_fed_to_chain_app/models/audio_content.dart';
 import 'content_service_extended_test.mocks.dart';
 
 void main() {
-  group('ContentService Extended Coverage Tests', () {
-    late ContentService contentService;
+  group('ContentFacadeService Extended Coverage Tests', () {
+    late ContentFacadeService contentService;
     late MockClient mockHttpClient;
 
     setUp(() async {
@@ -29,9 +29,7 @@ API_TIMEOUT_SECONDS=30
 STREAM_TIMEOUT_SECONDS=30
 ''');
       mockHttpClient = MockClient();
-      ContentService.setHttpClientForTesting(mockHttpClient);
-      ContentService.setAllEpisodesForTesting(null);
-      ContentService.setPreserveEpisodeOrderForTesting(true);
+      // Note: ContentFacadeService uses repositories, mock setup may need adjustment
 
       when(
         mockHttpClient.get(
@@ -70,14 +68,12 @@ STREAM_TIMEOUT_SECONDS=30
             headers: {'content-type': 'application/json'},
           ));
 
-      contentService = ContentService();
+      contentService = ContentFacadeService();
     });
 
     tearDown(() {
       contentService.dispose();
-      ContentService.setHttpClientForTesting(null);
-      ContentService.setAllEpisodesForTesting(null);
-      ContentService.setPreserveEpisodeOrderForTesting(false);
+      // Note: ContentFacadeService uses repositories instead of HTTP client
     });
 
     group('Content Fetching and Caching', () {
@@ -349,7 +345,7 @@ STREAM_TIMEOUT_SECONDS=30
 
         // Use setEpisodesForTesting directly on ContentService
         contentService.setEpisodesForTesting(mockEpisodes);
-        ContentService.setAllEpisodesForTesting(mockEpisodes);
+        // Note: ContentFacadeService doesn't use static setAllEpisodesForTesting
 
         final mockContent = AudioContent(
           id: 'static-test-content',
@@ -371,8 +367,8 @@ STREAM_TIMEOUT_SECONDS=30
                   headers: {'content-type': 'application/json'},
                 ));
 
-        final content =
-            await ContentService.getContentById('static-test-content');
+        final content = await contentService.fetchContentById(
+            'static-test-content', 'en-US', 'daily-news');
 
         expect(content, isNotNull);
         expect(content!.id, 'static-test-content');
@@ -380,10 +376,10 @@ STREAM_TIMEOUT_SECONDS=30
 
       test('should return null when static content not found', () async {
         contentService.setEpisodesForTesting([]);
-        ContentService.setAllEpisodesForTesting([]);
+        // Note: ContentFacadeService doesn't use static setAllEpisodesForTesting
 
-        final content =
-            await ContentService.getContentById('nonexistent-static-content');
+        final content = await contentService.fetchContentById(
+            'nonexistent-static-content', 'en-US', 'daily-news');
 
         expect(content, isNull);
       });

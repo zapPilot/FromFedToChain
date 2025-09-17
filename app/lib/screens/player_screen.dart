@@ -4,7 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../themes/app_theme.dart';
 import '../services/audio_service.dart';
-import '../services/content_service.dart';
+import '../services/content_facade_service.dart';
 import '../services/deep_link_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/audio_controls.dart';
@@ -65,7 +65,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   /// Load and automatically play content by ID (for deep linking)
   Future<void> _loadAndPlayContent(String contentId) async {
     try {
-      final contentService = context.read<ContentService>();
+      final contentService = context.read<ContentFacadeService>();
       final audioService = context.read<AudioService>();
 
       // Get the AudioFile by contentId
@@ -114,7 +114,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Consumer2<AudioService, ContentService>(
+      body: Consumer2<AudioService, ContentFacadeService>(
         builder: (context, audioService, contentService, child) {
           final currentAudio = audioService.currentAudioFile;
 
@@ -422,7 +422,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build main playback controls
   Widget _buildMainControls(
-      AudioService audioService, ContentService contentService) {
+      AudioService audioService, ContentFacadeService contentService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: AudioControls(
@@ -441,7 +441,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build additional controls
   Widget _buildAdditionalControls(
-      AudioService audioService, ContentService contentService) {
+      AudioService audioService, ContentFacadeService contentService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: Column(
@@ -568,7 +568,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                   final currentAudio = audioService.currentAudioFile;
                   if (currentAudio != null) {
                     context
-                        .read<ContentService>()
+                        .read<ContentFacadeService>()
                         .addToCurrentPlaylist(currentAudio);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -594,7 +594,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build compact layout (without content script)
   Widget _buildCompactLayout(BuildContext context, AudioFile currentAudio,
-      AudioService audioService, ContentService contentService) {
+      AudioService audioService, ContentFacadeService contentService) {
     return Column(
       children: [
         // Header with back button and options
@@ -637,7 +637,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build expanded layout (with content script)
   Widget _buildExpandedLayout(BuildContext context, AudioFile currentAudio,
-      AudioService audioService, ContentService contentService) {
+      AudioService audioService, ContentFacadeService contentService) {
     return CustomScrollView(
       slivers: [
         // Fixed header
@@ -776,7 +776,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Share current content using social hook and deep linking
   Future<void> _shareCurrentContent(BuildContext context,
-      AudioService audioService, ContentService contentService) async {
+      AudioService audioService, ContentFacadeService contentService) async {
     final currentAudio = audioService.currentAudioFile;
     if (currentAudio == null) return;
 

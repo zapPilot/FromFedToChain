@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../themes/app_theme.dart';
-import '../services/content_service.dart';
+import '../services/content_facade_service.dart';
 import '../services/audio_service.dart';
 import '../models/audio_file.dart';
 import '../widgets/filter_bar.dart';
@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     // Load content when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ContentService>().loadAllEpisodes();
+      context.read<ContentFacadeService>().loadAllEpisodes();
     });
   }
 
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer2<ContentService, AudioService>(
+      body: Consumer2<ContentFacadeService, AudioService>(
         builder: (context, contentService, audioService, child) {
           return SafeArea(
             child: Column(
@@ -82,7 +82,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build app header with title and search toggle
-  Widget _buildAppHeader(BuildContext context, ContentService contentService) {
+  Widget _buildAppHeader(
+      BuildContext context, ContentFacadeService contentService) {
     return Container(
       padding: AppTheme.safeHorizontalPadding,
       child: Row(
@@ -97,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen>
                   style: AppTheme.headlineMedium,
                 ),
                 const SizedBox(height: AppTheme.spacingXS),
-                Consumer<ContentService>(
+                Consumer<ContentFacadeService>(
                   builder: (context, service, child) {
                     final stats = service.getStatistics();
                     final totalEpisodes = stats['totalEpisodes'] as int;
@@ -168,7 +169,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build animated search bar
-  Widget _buildSearchBar(BuildContext context, ContentService contentService) {
+  Widget _buildSearchBar(
+      BuildContext context, ContentFacadeService contentService) {
     return AnimatedContainer(
       duration: AppTheme.animationMedium,
       curve: Curves.easeInOut,
@@ -186,7 +188,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build filter bar with language and category selection
-  Widget _buildFilterBar(BuildContext context, ContentService contentService) {
+  Widget _buildFilterBar(
+      BuildContext context, ContentFacadeService contentService) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacingM,
@@ -208,10 +211,10 @@ class _HomeScreenState extends State<HomeScreen>
   /// Build main content area with tabs
   Widget _buildMainContent(
     BuildContext context,
-    ContentService contentService,
+    ContentFacadeService contentService,
     AudioService audioService,
   ) {
-    if (contentService.isLoading && !contentService.hasEpisodes) {
+    if (contentService.isLoading && contentService.allEpisodes.isEmpty) {
       return _buildLoadingState();
     }
 
@@ -219,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen>
       return _buildErrorState(contentService);
     }
 
-    if (!contentService.hasFilteredResults) {
+    if (contentService.filteredEpisodes.isEmpty) {
       return _buildEmptyState(contentService);
     }
 
@@ -263,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build recent episodes tab
   Widget _buildRecentTab(
-      ContentService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioService audioService) {
     final recentEpisodes = contentService.filteredEpisodes.take(20).toList();
 
     return AnimationLimiter(
@@ -278,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build all episodes tab
   Widget _buildAllTab(
-      ContentService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioService audioService) {
     return AnimationLimiter(
       child: AudioList(
         episodes: contentService.filteredEpisodes,
@@ -291,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build unfinished episodes tab
   Widget _buildUnfinishedTab(
-      ContentService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioService audioService) {
     final unfinishedEpisodes = contentService.getUnfinishedEpisodes();
 
     if (unfinishedEpisodes.isEmpty) {
@@ -359,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build error state
-  Widget _buildErrorState(ContentService contentService) {
+  Widget _buildErrorState(ContentFacadeService contentService) {
     return Center(
       child: Padding(
         padding: AppTheme.safePadding,
@@ -397,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build empty state
-  Widget _buildEmptyState(ContentService contentService) {
+  Widget _buildEmptyState(ContentFacadeService contentService) {
     return Center(
       child: Padding(
         padding: AppTheme.safePadding,
@@ -536,7 +539,9 @@ class _HomeScreenState extends State<HomeScreen>
             title: const Text('Add to Playlist'),
             onTap: () {
               Navigator.pop(context);
-              context.read<ContentService>().addToCurrentPlaylist(episode);
+              context
+                  .read<ContentFacadeService>()
+                  .addToCurrentPlaylist(episode);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added "${episode.displayTitle}" to playlist'),
@@ -563,7 +568,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build sort selector dropdown
   Widget _buildSortSelector(
-      BuildContext context, ContentService contentService) {
+      BuildContext context, ContentFacadeService contentService) {
     return Container(
       margin: AppTheme.safeHorizontalPadding,
       padding: const EdgeInsets.symmetric(

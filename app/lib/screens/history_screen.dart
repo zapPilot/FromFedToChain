@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../themes/app_theme.dart';
-import '../services/content_service.dart';
+import '../services/content_facade_service.dart';
 import '../services/audio_service.dart';
 import '../models/audio_file.dart';
 
@@ -30,7 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer2<ContentService, AudioService>(
+      body: Consumer2<ContentFacadeService, AudioService>(
         builder: (context, contentService, audioService, child) {
           return SafeArea(
             child: Column(
@@ -55,7 +55,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   /// Build app header with title
-  Widget _buildAppHeader(BuildContext context, ContentService contentService) {
+  Widget _buildAppHeader(
+      BuildContext context, ContentFacadeService contentService) {
     return Container(
       padding: AppTheme.safeHorizontalPadding,
       child: Row(
@@ -70,7 +71,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   style: AppTheme.headlineMedium,
                 ),
                 const SizedBox(height: AppTheme.spacingXS),
-                Consumer<ContentService>(
+                Consumer<ContentFacadeService>(
                   builder: (context, service, child) {
                     final historyEpisodes = service.getListenHistoryEpisodes();
                     final count = historyEpisodes.length;
@@ -92,7 +93,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
 
           // Clear history button
-          Consumer<ContentService>(
+          Consumer<ContentFacadeService>(
             builder: (context, service, child) {
               final historyEpisodes = service.getListenHistoryEpisodes();
               if (historyEpisodes.isEmpty) return const SizedBox.shrink();
@@ -144,8 +145,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   /// Build history content
   Widget _buildHistoryContent(
-      ContentService contentService, AudioService audioService) {
-    if (contentService.isLoading && !contentService.hasEpisodes) {
+      ContentFacadeService contentService, AudioService audioService) {
+    if (contentService.isLoading && contentService.allEpisodes.isEmpty) {
       return _buildLoadingState();
     }
 
@@ -323,7 +324,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             title: const Text('Add to Playlist'),
             onTap: () {
               Navigator.pop(context);
-              context.read<ContentService>().addToCurrentPlaylist(episode);
+              context
+                  .read<ContentFacadeService>()
+                  .addToCurrentPlaylist(episode);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added "${episode.displayTitle}" to playlist'),
@@ -359,7 +362,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   /// Remove episode from history
   void _removeFromHistory(BuildContext context, AudioFile episode) {
-    context.read<ContentService>().removeFromListenHistory(episode.id);
+    context.read<ContentFacadeService>().removeFromListenHistory(episode.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Removed "${episode.displayTitle}" from history'),
@@ -376,7 +379,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   /// Show clear history confirmation dialog
   void _showClearHistoryDialog(
-      BuildContext context, ContentService contentService) {
+      BuildContext context, ContentFacadeService contentService) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

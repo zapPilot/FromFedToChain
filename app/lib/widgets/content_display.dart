@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../models/audio_file.dart';
 import '../models/audio_content.dart';
-import '../services/content_service.dart';
+import '../services/content_facade_service.dart';
 
 /// Widget for displaying content/script of currently playing audio
 /// Useful for language learning to read along with audio
 class ContentDisplay extends StatefulWidget {
   final AudioFile? currentAudioFile;
-  final ContentService contentService;
+  final ContentFacadeService contentService;
   final bool isExpanded;
   final VoidCallback? onToggleExpanded;
 

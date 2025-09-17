@@ -11,7 +11,8 @@ import 'package:from_fed_to_chain_app/models/audio_content.dart' as _i9;
 import 'package:from_fed_to_chain_app/models/audio_file.dart' as _i4;
 import 'package:from_fed_to_chain_app/services/background_audio_handler.dart'
     as _i3;
-import 'package:from_fed_to_chain_app/services/content_service.dart' as _i7;
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart'
+    as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i8;
 import 'package:rxdart/rxdart.dart' as _i2;
@@ -796,10 +797,11 @@ class MockBackgroundAudioHandler extends _i1.Mock
       ) as _i6.Future<void>);
 }
 
-/// A class which mocks [ContentService].
+/// A class which mocks [ContentFacadeService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockContentService extends _i1.Mock implements _i7.ContentService {
+class MockContentFacadeService extends _i1.Mock
+    implements _i7.ContentFacadeService {
   @override
   List<_i4.AudioFile> get allEpisodes => (super.noSuchMethod(
         Invocation.getter(#allEpisodes),
@@ -854,6 +856,19 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       ) as String);
 
   @override
+  String get sortOrder => (super.noSuchMethod(
+        Invocation.getter(#sortOrder),
+        returnValue: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#sortOrder),
+        ),
+        returnValueForMissingStub: _i8.dummyValue<String>(
+          this,
+          Invocation.getter(#sortOrder),
+        ),
+      ) as String);
+
+  @override
   bool get isLoading => (super.noSuchMethod(
         Invocation.getter(#isLoading),
         returnValue: false,
@@ -868,26 +883,6 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       ) as bool);
 
   @override
-  String get sortOrder => (super.noSuchMethod(
-        Invocation.getter(#sortOrder),
-        returnValue: _i8.dummyValue<String>(
-          this,
-          Invocation.getter(#sortOrder),
-        ),
-        returnValueForMissingStub: _i8.dummyValue<String>(
-          this,
-          Invocation.getter(#sortOrder),
-        ),
-      ) as String);
-
-  @override
-  Map<String, DateTime> get listenHistory => (super.noSuchMethod(
-        Invocation.getter(#listenHistory),
-        returnValue: <String, DateTime>{},
-        returnValueForMissingStub: <String, DateTime>{},
-      ) as Map<String, DateTime>);
-
-  @override
   bool get hasEpisodes => (super.noSuchMethod(
         Invocation.getter(#hasEpisodes),
         returnValue: false,
@@ -900,6 +895,13 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
+
+  @override
+  Map<String, DateTime> get listenHistory => (super.noSuchMethod(
+        Invocation.getter(#listenHistory),
+        returnValue: <String, DateTime>{},
+        returnValueForMissingStub: <String, DateTime>{},
+      ) as Map<String, DateTime>);
 
   @override
   bool get hasListeners => (super.noSuchMethod(
@@ -919,16 +921,6 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
         returnValue: <_i4.AudioFile>[],
         returnValueForMissingStub: <_i4.AudioFile>[],
       ) as List<_i4.AudioFile>);
-
-  @override
-  double getEpisodeCompletion(String? episodeId) => (super.noSuchMethod(
-        Invocation.method(
-          #getEpisodeCompletion,
-          [episodeId],
-        ),
-        returnValue: 0.0,
-        returnValueForMissingStub: 0.0,
-      ) as double);
 
   @override
   bool isEpisodeFinished(String? episodeId) => (super.noSuchMethod(
@@ -1018,24 +1010,6 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       ) as _i6.Future<_i9.AudioContent?>);
 
   @override
-  _i9.AudioContent? getCachedContent(
-    String? id,
-    String? language,
-    String? category,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getCachedContent,
-          [
-            id,
-            language,
-            category,
-          ],
-        ),
-        returnValueForMissingStub: null,
-      ) as _i9.AudioContent?);
-
-  @override
   _i6.Future<_i4.AudioFile?> getAudioFileById(String? contentId) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1093,6 +1067,16 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
       ) as _i6.Future<void>);
+
+  @override
+  double getEpisodeCompletion(String? episodeId) => (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodeCompletion,
+          [episodeId],
+        ),
+        returnValue: 0.0,
+        returnValueForMissingStub: 0.0,
+      ) as double);
 
   @override
   List<_i4.AudioFile> getUnfinishedEpisodes() => (super.noSuchMethod(
@@ -1208,24 +1192,13 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       );
 
   @override
-  _i4.AudioFile? getNextEpisode(_i4.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(
+  void clearCurrentPlaylist() => super.noSuchMethod(
         Invocation.method(
-          #getNextEpisode,
-          [currentEpisode],
+          #clearCurrentPlaylist,
+          [],
         ),
         returnValueForMissingStub: null,
-      ) as _i4.AudioFile?);
-
-  @override
-  _i4.AudioFile? getPreviousEpisode(_i4.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getPreviousEpisode,
-          [currentEpisode],
-        ),
-        returnValueForMissingStub: null,
-      ) as _i4.AudioFile?);
+      );
 
   @override
   List<_i4.AudioFile> getEpisodesByLanguage(String? language) =>
@@ -1336,15 +1309,6 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       ) as _i6.Future<void>);
 
   @override
-  void clearCurrentPlaylist() => super.noSuchMethod(
-        Invocation.method(
-          #clearCurrentPlaylist,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
   void cacheContent(
     String? id,
     String? language,
@@ -1365,6 +1329,24 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       );
 
   @override
+  _i9.AudioContent? getCachedContent(
+    String? id,
+    String? language,
+    String? category,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCachedContent,
+          [
+            id,
+            language,
+            category,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      ) as _i9.AudioContent?);
+
+  @override
   List<_i4.AudioFile> getFilteredEpisodes() => (super.noSuchMethod(
         Invocation.method(
           #getFilteredEpisodes,
@@ -1375,13 +1357,24 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
       ) as List<_i4.AudioFile>);
 
   @override
-  void dispose() => super.noSuchMethod(
+  _i4.AudioFile? getNextEpisode(_i4.AudioFile? currentEpisode) =>
+      (super.noSuchMethod(
         Invocation.method(
-          #dispose,
-          [],
+          #getNextEpisode,
+          [currentEpisode],
         ),
         returnValueForMissingStub: null,
-      );
+      ) as _i4.AudioFile?);
+
+  @override
+  _i4.AudioFile? getPreviousEpisode(_i4.AudioFile? currentEpisode) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getPreviousEpisode,
+          [currentEpisode],
+        ),
+        returnValueForMissingStub: null,
+      ) as _i4.AudioFile?);
 
   @override
   void setEpisodesForTesting(List<_i4.AudioFile>? episodes) =>
@@ -1425,6 +1418,15 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
         Invocation.method(
           #setSelectedCategory,
           [category],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
         ),
         returnValueForMissingStub: null,
       );

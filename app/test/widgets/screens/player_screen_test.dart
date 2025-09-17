@@ -6,22 +6,22 @@ import 'package:mockito/annotations.dart';
 
 import 'package:from_fed_to_chain_app/screens/player_screen.dart';
 import 'package:from_fed_to_chain_app/services/audio_service.dart';
-import 'package:from_fed_to_chain_app/services/content_service.dart';
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
 // Generate mocks for dependencies
-@GenerateMocks([AudioService, ContentService])
+@GenerateMocks([AudioService, ContentFacadeService])
 import 'player_screen_test.mocks.dart';
 
 void main() {
   group('PlayerScreen - Basic Tests', () {
     late MockAudioService mockAudioService;
-    late MockContentService mockContentService;
+    late MockContentFacadeService mockContentService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioService = MockAudioService();
-      mockContentService = MockContentService();
+      mockContentService = MockContentFacadeService();
 
       testAudioFile = AudioFile(
         id: 'test-episode',
@@ -88,7 +88,7 @@ void main() {
             providers: [
               ChangeNotifierProvider<AudioService>.value(
                   value: mockAudioService),
-              ChangeNotifierProvider<ContentService>.value(
+              ChangeNotifierProvider<ContentFacadeService>.value(
                   value: mockContentService),
             ],
             child: PlayerScreen(contentId: contentId),

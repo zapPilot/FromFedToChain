@@ -5,7 +5,7 @@ import 'package:audio_service/audio_service.dart' as audio_service_pkg;
 
 import '../models/audio_file.dart';
 import 'background_audio_handler.dart';
-import 'content_service.dart';
+import 'content_facade_service.dart';
 
 /// Playback states for the audio player
 enum PlaybackState {
@@ -20,7 +20,7 @@ enum PlaybackState {
 class AudioService extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   final BackgroundAudioHandler? _audioHandler;
-  final ContentService? _contentService;
+  final ContentFacadeService? _contentService;
   final AudioPlayer? _providedAudioPlayer;
 
   // Stream subscriptions for proper disposal

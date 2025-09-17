@@ -10,13 +10,13 @@ import 'package:flutter/services.dart';
 
 import 'package:from_fed_to_chain_app/services/audio_service.dart';
 import 'package:from_fed_to_chain_app/services/background_audio_handler.dart';
-import 'package:from_fed_to_chain_app/services/content_service.dart';
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 
 // Generate nice mocks for dependencies (returns sensible defaults instead of throwing errors)
 @GenerateNiceMocks([
   MockSpec<BackgroundAudioHandler>(),
-  MockSpec<ContentService>(),
+  MockSpec<ContentFacadeService>(),
   MockSpec<AudioPlayer>()
 ])
 import 'audio_service_error_handling_test.mocks.dart';
@@ -68,13 +68,13 @@ void main() {
   group('AudioService - Error Handling and Uncovered Paths', () {
     late AudioService audioService;
     late MockBackgroundAudioHandler mockAudioHandler;
-    late MockContentService mockContentService;
+    late MockContentFacadeService mockContentService;
     late MockAudioPlayer mockAudioPlayer;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioHandler = MockBackgroundAudioHandler();
-      mockContentService = MockContentService();
+      mockContentService = MockContentFacadeService();
       mockAudioPlayer = MockAudioPlayer();
 
       when(mockContentService.addToListenHistory(any)).thenAnswer((_) async {});

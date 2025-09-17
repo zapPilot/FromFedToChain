@@ -2,17 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-import 'package:from_fed_to_chain_app/services/content_service.dart';
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import '../test_utils.dart';
 
 void main() {
-  group('ContentService Enhanced Tests', () {
-    late ContentService contentService;
+  group('ContentFacadeService Enhanced Tests', () {
+    late ContentFacadeService contentService;
 
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
-      contentService = ContentService();
+      contentService = ContentFacadeService();
     });
 
     tearDown(() {
@@ -166,7 +166,7 @@ void main() {
         });
 
         // Should not throw when creating service
-        expect(() => ContentService(), returnsNormally);
+        expect(() => ContentFacadeService(), returnsNormally);
       });
 
       test('should handle invalid dates in history gracefully', () async {
@@ -177,7 +177,7 @@ void main() {
           }),
         });
 
-        final testService = ContentService();
+        final testService = ContentFacadeService();
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Should only load valid dates
@@ -205,7 +205,7 @@ void main() {
 
       test('should handle disposal correctly', () {
         // Create a separate instance for disposal test
-        final testService = ContentService();
+        final testService = ContentFacadeService();
         expect(() => testService.dispose(), returnsNormally);
       });
     });

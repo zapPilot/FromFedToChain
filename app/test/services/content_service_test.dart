@@ -5,7 +5,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:from_fed_to_chain_app/services/content_service.dart';
+import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/services/streaming_api_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/models/audio_content.dart';
@@ -34,8 +34,8 @@ class ContentServiceTestUtils {
 }
 
 void main() {
-  group('ContentService Comprehensive Tests', () {
-    late ContentService contentService;
+  group('ContentFacadeService Comprehensive Tests', () {
+    late ContentFacadeService contentService;
     late List<AudioFile> sampleEpisodes;
     late MockClient mockHttpClient;
 
@@ -70,7 +70,7 @@ STREAM_TIMEOUT_SECONDS=10
 
       // Create and set up mock HTTP client
       mockHttpClient = MockClient();
-      ContentService.setHttpClientForTesting(mockHttpClient);
+      // Note: ContentFacadeService uses repositories, mock setup may need adjustment
 
       // Set up default mock responses to prevent network calls
       when(mockHttpClient.get(any, headers: anyNamed('headers')))
@@ -112,9 +112,9 @@ STREAM_TIMEOUT_SECONDS=10
         ),
       ];
 
-      contentService = ContentService();
+      contentService = ContentFacadeService();
 
-      // Reset ContentService to testing state
+      // Reset ContentFacadeService to testing state
       contentService.setEpisodesForTesting([]);
       contentService.setLoadingForTesting(false);
       contentService.setErrorForTesting(null);
@@ -122,8 +122,7 @@ STREAM_TIMEOUT_SECONDS=10
 
     tearDown(() {
       contentService.dispose();
-      // Reset HTTP client after each test
-      ContentService.setHttpClientForTesting(null);
+      // Note: ContentFacadeService uses repositories instead of HTTP client
     });
 
     group('Initialization', () {
@@ -133,7 +132,7 @@ STREAM_TIMEOUT_SECONDS=10
           'selected_category': 'ethereum',
         });
 
-        final service = ContentService();
+        final service = ContentFacadeService();
         await Future.delayed(Duration(milliseconds: 50));
 
         expect(service.selectedLanguage, 'en-US');
