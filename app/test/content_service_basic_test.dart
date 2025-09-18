@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/repositories/repository_factory.dart';
 
 void main() {
   group('ContentFacadeService Basic Tests', () {
@@ -20,11 +21,19 @@ ENVIRONMENT=test
       // Initialize test binding and mock SharedPreferences
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
+
+      // Reset the repository factory to ensure clean state for each test
+      RepositoryFactory.reset();
+
       contentService = ContentFacadeService();
     });
 
     tearDown(() {
+      // Dispose the content service first
       contentService.dispose();
+
+      // Reset the repository factory to clean up singletons
+      RepositoryFactory.reset();
     });
 
     test('initializes with default values', () {
@@ -152,8 +161,16 @@ ENVIRONMENT=test
 
       expect(stats, containsPair('totalEpisodes', isA<int>()));
       expect(stats, containsPair('filteredEpisodes', isA<int>()));
-      expect(stats, containsPair('languages', isA<Map>()));
-      expect(stats, containsPair('categories', isA<Map>()));
+      expect(stats, containsPair('selectedLanguage', isA<String>()));
+      expect(stats, containsPair('selectedCategory', isA<String>()));
+      expect(stats, containsPair('listeningStats', isA<Map>()));
+      expect(stats, containsPair('cacheStats', isA<Map>()));
+
+      // Check nested cache stats structure
+      final cacheStats = stats['cacheStats'] as Map<String, dynamic>;
+      expect(cacheStats, containsPair('totalItems', isA<int>()));
+      expect(cacheStats, containsPair('languages', isA<Map>()));
+      expect(cacheStats, containsPair('categories', isA<Map>()));
     });
   });
 }

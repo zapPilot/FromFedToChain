@@ -27,6 +27,7 @@ class ContentFacadeService extends ChangeNotifier {
   List<AudioFile> _filteredEpisodes = [];
   bool _isLoading = false;
   String? _errorMessage;
+  bool _disposed = false;
 
   // Constructor - initialize all services
   ContentFacadeService() {
@@ -59,6 +60,7 @@ class ContentFacadeService extends ChangeNotifier {
   }
 
   void _onServiceChange() {
+    if (_disposed) return;
     notifyListeners();
   }
 
@@ -118,8 +120,37 @@ class ContentFacadeService extends ChangeNotifier {
   Future<AudioFile?> getAudioFileById(String contentId) async {
     // Search for the audio file by ID in the loaded episodes
     try {
+      // First try exact match
       return allEpisodes.firstWhere((episode) => episode.id == contentId);
     } catch (e) {
+      // If exact match fails, try date pattern matching
+      try {
+        // Extract date pattern from contentId (YYYY-MM-DD)
+        final dateRegex = RegExp(r'(\d{4}-\d{2}-\d{2})');
+        final match = dateRegex.firstMatch(contentId);
+
+        if (match != null) {
+          final dateStr = match.group(1)!;
+          final searchDate = DateTime.parse(dateStr);
+
+          // Find episode with matching date (either in ID or lastModified)
+          return allEpisodes.firstWhere((episode) {
+            // Check if episode ID contains the date
+            if (episode.id.contains(dateStr)) {
+              return true;
+            }
+
+            // Check if episode's publishDate matches
+            final episodeDate = episode.publishDate;
+            return episodeDate.year == searchDate.year &&
+                episodeDate.month == searchDate.month &&
+                episodeDate.day == searchDate.day;
+          });
+        }
+      } catch (e) {
+        // If date pattern matching also fails, return null
+      }
+
       return null;
     }
   }
@@ -207,18 +238,45 @@ class ContentFacadeService extends ChangeNotifier {
   }
 
   Future<void> setLanguage(String language) async {
+    // Validate language
+    const validLanguages = ['zh-TW', 'en-US', 'ja-JP'];
+    if (!validLanguages.contains(language)) {
+      _errorMessage = 'Unsupported language: $language';
+      notifyListeners();
+      return;
+    }
+
+    _clearError();
     await _preferencesRepository.setLanguage(language);
     await loadEpisodesForLanguage(language);
     notifyListeners();
   }
 
   Future<void> setCategory(String category) async {
+    // Validate category
+    const validCategories = [
+      'all',
+      'daily-news',
+      'ethereum',
+      'macro',
+      'startup',
+      'ai'
+    ];
+    if (!validCategories.contains(category)) {
+      _errorMessage = 'Unsupported category: $category';
+      notifyListeners();
+      return;
+    }
+
+    _clearError();
     await _preferencesRepository.setCategory(category);
     _applyCurrentFilters();
     notifyListeners();
   }
 
   void setSearchQuery(String query) {
+    if (_disposed) return;
+
     _preferencesRepository.setSearchQuery(query);
     _applyCurrentFilters();
     notifyListeners();
@@ -297,18 +355,29 @@ class ContentFacadeService extends ChangeNotifier {
   }
 
   Map<String, dynamic> getDebugInfo(AudioFile? audioFile) {
+    if (audioFile == null) {
+      return {'error': 'No audio file provided'};
+    }
+
     return {
+      'id': audioFile.id,
+      'title': audioFile.title,
+      'language': audioFile.language,
+      'category': audioFile.category,
+      'streamingUrl': audioFile.streamingUrl,
+      'totalEpisodes': allEpisodes.length,
+      'filteredEpisodes': filteredEpisodes.length,
+      'selectedLanguage': selectedLanguage,
+      'selectedCategory': selectedCategory,
+      'isLoading': isLoading,
+      'hasError': hasError,
       'facade_service': 'ContentFacadeService',
       'episode_count': allEpisodes.length,
       'filtered_count': filteredEpisodes.length,
       'current_playlist': currentPlaylist?.name,
-      'selected_language': selectedLanguage,
-      'selected_category': selectedCategory,
       'search_query': searchQuery,
-      'is_loading': isLoading,
-      'has_error': hasError,
       'error_message': errorMessage,
-      'audio_file': audioFile?.toJson(),
+      'audio_file': audioFile.toJson(),
     };
   }
 
@@ -407,6 +476,9 @@ class ContentFacadeService extends ChangeNotifier {
 
   @override
   void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+
     _playlistService.removeListener(_onServiceChange);
     _playlistService.dispose();
     _contentRepository.dispose();

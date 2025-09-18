@@ -3,15 +3,22 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i3;
-import 'dart:convert' as _i4;
-import 'dart:typed_data' as _i6;
+import 'dart:async' as _i4;
 
-import 'package:from_fed_to_chain_app/services/streaming_api_service.dart'
+import 'package:from_fed_to_chain_app/models/audio_content.dart' as _i5;
+import 'package:from_fed_to_chain_app/models/audio_file.dart' as _i6;
+import 'package:from_fed_to_chain_app/repositories/content_repository.dart'
+    as _i3;
+import 'package:from_fed_to_chain_app/repositories/episode_repository.dart'
     as _i7;
-import 'package:http/http.dart' as _i2;
+import 'package:from_fed_to_chain_app/repositories/preferences_repository.dart'
+    as _i9;
+import 'package:from_fed_to_chain_app/repositories/progress_repository.dart'
+    as _i8;
+import 'package:from_fed_to_chain_app/services/streaming_api_service.dart'
+    as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i10;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -27,269 +34,989 @@ import 'package:mockito/src/dummies.dart' as _i5;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeResponse_0 extends _i1.SmartFake implements _i2.Response {
-  _FakeResponse_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-class _FakeStreamedResponse_1 extends _i1.SmartFake
-    implements _i2.StreamedResponse {
-  _FakeStreamedResponse_1(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-/// A class which mocks [Client].
+/// A class which mocks [StreamingApiService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockClient extends _i1.Mock implements _i2.Client {
-  MockClient() {
-    _i1.throwOnMissingStub(this);
-  }
+class MockStreamingApiService extends _i1.Mock
+    implements _i2.StreamingApiService {}
 
+/// A class which mocks [ContentRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockContentRepository extends _i1.Mock implements _i3.ContentRepository {
   @override
-  _i3.Future<_i2.Response> head(
-    Uri? url, {
-    Map<String, String>? headers,
-  }) =>
+  _i4.Future<_i5.AudioContent?> fetchContentById(
+    String? id,
+    String? language,
+    String? category,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #head,
-          [url],
-          {#headers: headers},
+          #fetchContentById,
+          [
+            id,
+            language,
+            category,
+          ],
         ),
-        returnValue: _i3.Future<_i2.Response>.value(_FakeResponse_0(
-          this,
-          Invocation.method(
-            #head,
-            [url],
-            {#headers: headers},
-          ),
-        )),
-      ) as _i3.Future<_i2.Response>);
+        returnValue: _i4.Future<_i5.AudioContent?>.value(),
+        returnValueForMissingStub: _i4.Future<_i5.AudioContent?>.value(),
+      ) as _i4.Future<_i5.AudioContent?>);
 
   @override
-  _i3.Future<_i2.Response> get(
-    Uri? url, {
-    Map<String, String>? headers,
-  }) =>
+  _i4.Future<_i5.AudioContent?> getContentForAudioFile(
+          _i6.AudioFile? audioFile) =>
       (super.noSuchMethod(
         Invocation.method(
-          #get,
-          [url],
-          {#headers: headers},
+          #getContentForAudioFile,
+          [audioFile],
         ),
-        returnValue: _i3.Future<_i2.Response>.value(_FakeResponse_0(
-          this,
-          Invocation.method(
-            #get,
-            [url],
-            {#headers: headers},
-          ),
-        )),
-      ) as _i3.Future<_i2.Response>);
+        returnValue: _i4.Future<_i5.AudioContent?>.value(),
+        returnValueForMissingStub: _i4.Future<_i5.AudioContent?>.value(),
+      ) as _i4.Future<_i5.AudioContent?>);
 
   @override
-  _i3.Future<_i2.Response> post(
-    Uri? url, {
-    Map<String, String>? headers,
-    Object? body,
-    _i4.Encoding? encoding,
-  }) =>
+  _i5.AudioContent? getCachedContent(
+    String? id,
+    String? language,
+    String? category,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #post,
-          [url],
-          {
-            #headers: headers,
-            #body: body,
-            #encoding: encoding,
-          },
+          #getCachedContent,
+          [
+            id,
+            language,
+            category,
+          ],
         ),
-        returnValue: _i3.Future<_i2.Response>.value(_FakeResponse_0(
-          this,
-          Invocation.method(
-            #post,
-            [url],
-            {
-              #headers: headers,
-              #body: body,
-              #encoding: encoding,
-            },
-          ),
-        )),
-      ) as _i3.Future<_i2.Response>);
+        returnValueForMissingStub: null,
+      ) as _i5.AudioContent?);
 
   @override
-  _i3.Future<_i2.Response> put(
-    Uri? url, {
-    Map<String, String>? headers,
-    Object? body,
-    _i4.Encoding? encoding,
-  }) =>
+  _i4.Future<_i5.AudioContent?> getContentById(
+    String? contentId,
+    List<_i6.AudioFile>? allEpisodes,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #put,
-          [url],
-          {
-            #headers: headers,
-            #body: body,
-            #encoding: encoding,
-          },
+          #getContentById,
+          [
+            contentId,
+            allEpisodes,
+          ],
         ),
-        returnValue: _i3.Future<_i2.Response>.value(_FakeResponse_0(
-          this,
-          Invocation.method(
-            #put,
-            [url],
-            {
-              #headers: headers,
-              #body: body,
-              #encoding: encoding,
-            },
-          ),
-        )),
-      ) as _i3.Future<_i2.Response>);
+        returnValue: _i4.Future<_i5.AudioContent?>.value(),
+        returnValueForMissingStub: _i4.Future<_i5.AudioContent?>.value(),
+      ) as _i4.Future<_i5.AudioContent?>);
 
   @override
-  _i3.Future<_i2.Response> patch(
-    Uri? url, {
-    Map<String, String>? headers,
-    Object? body,
-    _i4.Encoding? encoding,
-  }) =>
+  _i4.Future<void> prefetchContent(List<_i6.AudioFile>? audioFiles) =>
       (super.noSuchMethod(
         Invocation.method(
-          #patch,
-          [url],
-          {
-            #headers: headers,
-            #body: body,
-            #encoding: encoding,
-          },
+          #prefetchContent,
+          [audioFiles],
         ),
-        returnValue: _i3.Future<_i2.Response>.value(_FakeResponse_0(
-          this,
-          Invocation.method(
-            #patch,
-            [url],
-            {
-              #headers: headers,
-              #body: body,
-              #encoding: encoding,
-            },
-          ),
-        )),
-      ) as _i3.Future<_i2.Response>);
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
-  _i3.Future<_i2.Response> delete(
-    Uri? url, {
-    Map<String, String>? headers,
-    Object? body,
-    _i4.Encoding? encoding,
-  }) =>
+  _i4.Future<void> prefetchContentForLanguage(
+    List<_i6.AudioFile>? audioFiles,
+    String? language,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #delete,
-          [url],
-          {
-            #headers: headers,
-            #body: body,
-            #encoding: encoding,
-          },
+          #prefetchContentForLanguage,
+          [
+            audioFiles,
+            language,
+          ],
         ),
-        returnValue: _i3.Future<_i2.Response>.value(_FakeResponse_0(
-          this,
-          Invocation.method(
-            #delete,
-            [url],
-            {
-              #headers: headers,
-              #body: body,
-              #encoding: encoding,
-            },
-          ),
-        )),
-      ) as _i3.Future<_i2.Response>);
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
-  _i3.Future<String> read(
-    Uri? url, {
-    Map<String, String>? headers,
-  }) =>
+  _i4.Future<void> prefetchContentForCategory(
+    List<_i6.AudioFile>? audioFiles,
+    String? category,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #read,
-          [url],
-          {#headers: headers},
+          #prefetchContentForCategory,
+          [
+            audioFiles,
+            category,
+          ],
         ),
-        returnValue: _i3.Future<String>.value(_i5.dummyValue<String>(
-          this,
-          Invocation.method(
-            #read,
-            [url],
-            {#headers: headers},
-          ),
-        )),
-      ) as _i3.Future<String>);
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
-  _i3.Future<_i6.Uint8List> readBytes(
-    Uri? url, {
-    Map<String, String>? headers,
-  }) =>
+  void cacheContent(
+    String? id,
+    String? language,
+    String? category,
+    _i5.AudioContent? content,
+  ) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #cacheContent,
+          [
+            id,
+            language,
+            category,
+            content,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  bool removeFromCache(
+    String? id,
+    String? language,
+    String? category,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #readBytes,
-          [url],
-          {#headers: headers},
+          #removeFromCache,
+          [
+            id,
+            language,
+            category,
+          ],
         ),
-        returnValue: _i3.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i3.Future<_i6.Uint8List>);
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
 
   @override
-  _i3.Future<_i2.StreamedResponse> send(_i2.BaseRequest? request) =>
+  void clearContentCache() => super.noSuchMethod(
+        Invocation.method(
+          #clearContentCache,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void clearCacheForLanguage(String? language) => super.noSuchMethod(
+        Invocation.method(
+          #clearCacheForLanguage,
+          [language],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void clearCacheForCategory(String? category) => super.noSuchMethod(
+        Invocation.method(
+          #clearCacheForCategory,
+          [category],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  Map<String, dynamic> getCacheStatistics() => (super.noSuchMethod(
+        Invocation.method(
+          #getCacheStatistics,
+          [],
+        ),
+        returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
+      ) as Map<String, dynamic>);
+
+  @override
+  bool isContentCached(
+    String? id,
+    String? language,
+    String? category,
+  ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #send,
-          [request],
+          #isContentCached,
+          [
+            id,
+            language,
+            category,
+          ],
         ),
-        returnValue:
-            _i3.Future<_i2.StreamedResponse>.value(_FakeStreamedResponse_1(
-          this,
-          Invocation.method(
-            #send,
-            [request],
-          ),
-        )),
-      ) as _i3.Future<_i2.StreamedResponse>);
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
 
   @override
-  void close() => super.noSuchMethod(
+  int getEstimatedCacheSize() => (super.noSuchMethod(
         Invocation.method(
-          #close,
+          #getEstimatedCacheSize,
+          [],
+        ),
+        returnValue: 0,
+        returnValueForMissingStub: 0,
+      ) as int);
+
+  @override
+  void cleanupCache({int? maxItems = 100}) => super.noSuchMethod(
+        Invocation.method(
+          #cleanupCache,
+          [],
+          {#maxItems: maxItems},
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i4.Future<void> warmUpCache(List<_i6.AudioFile>? priorityEpisodes) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #warmUpCache,
+          [priorityEpisodes],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
           [],
         ),
         returnValueForMissingStub: null,
       );
 }
 
-/// A class which mocks [StreamingApiService].
+/// A class which mocks [EpisodeRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockStreamingApiService extends _i1.Mock
-    implements _i7.StreamingApiService {
-  MockStreamingApiService() {
-    _i1.throwOnMissingStub(this);
-  }
+class MockEpisodeRepository extends _i1.Mock implements _i7.EpisodeRepository {
+  @override
+  _i4.Future<List<_i6.AudioFile>> loadAllEpisodes() => (super.noSuchMethod(
+        Invocation.method(
+          #loadAllEpisodes,
+          [],
+        ),
+        returnValue: _i4.Future<List<_i6.AudioFile>>.value(<_i6.AudioFile>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i6.AudioFile>>.value(<_i6.AudioFile>[]),
+      ) as _i4.Future<List<_i6.AudioFile>>);
+
+  @override
+  _i4.Future<List<_i6.AudioFile>> loadEpisodesForLanguage(String? language) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #loadEpisodesForLanguage,
+          [language],
+        ),
+        returnValue: _i4.Future<List<_i6.AudioFile>>.value(<_i6.AudioFile>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i6.AudioFile>>.value(<_i6.AudioFile>[]),
+      ) as _i4.Future<List<_i6.AudioFile>>);
+
+  @override
+  _i4.Future<List<_i6.AudioFile>> searchEpisodes(String? query) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #searchEpisodes,
+          [query],
+        ),
+        returnValue: _i4.Future<List<_i6.AudioFile>>.value(<_i6.AudioFile>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i6.AudioFile>>.value(<_i6.AudioFile>[]),
+      ) as _i4.Future<List<_i6.AudioFile>>);
+
+  @override
+  _i4.Future<_i6.AudioFile?> getEpisodeById(
+    String? contentId, {
+    String? preferredLanguage,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodeById,
+          [contentId],
+          {#preferredLanguage: preferredLanguage},
+        ),
+        returnValue: _i4.Future<_i6.AudioFile?>.value(),
+        returnValueForMissingStub: _i4.Future<_i6.AudioFile?>.value(),
+      ) as _i4.Future<_i6.AudioFile?>);
+
+  @override
+  List<_i6.AudioFile> getEpisodesByLanguage(
+    List<_i6.AudioFile>? episodes,
+    String? language,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodesByLanguage,
+          [
+            episodes,
+            language,
+          ],
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  List<_i6.AudioFile> getEpisodesByCategory(
+    List<_i6.AudioFile>? episodes,
+    String? category,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodesByCategory,
+          [
+            episodes,
+            category,
+          ],
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  List<_i6.AudioFile> getEpisodesByLanguageAndCategory(
+    List<_i6.AudioFile>? episodes,
+    String? language,
+    String? category,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodesByLanguageAndCategory,
+          [
+            episodes,
+            language,
+            category,
+          ],
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  List<_i6.AudioFile> filterEpisodesByQuery(
+    List<_i6.AudioFile>? episodes,
+    String? query,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #filterEpisodesByQuery,
+          [
+            episodes,
+            query,
+          ],
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  Map<String, dynamic> getEpisodeStatistics(List<_i6.AudioFile>? episodes) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodeStatistics,
+          [episodes],
+        ),
+        returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
+      ) as Map<String, dynamic>);
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [ProgressRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockProgressRepository extends _i1.Mock
+    implements _i8.ProgressRepository {
+  @override
+  Map<String, DateTime> get listenHistory => (super.noSuchMethod(
+        Invocation.getter(#listenHistory),
+        returnValue: <String, DateTime>{},
+        returnValueForMissingStub: <String, DateTime>{},
+      ) as Map<String, DateTime>);
+
+  @override
+  _i4.Future<void> initialize() => (super.noSuchMethod(
+        Invocation.method(
+          #initialize,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  double getEpisodeCompletion(String? episodeId) => (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodeCompletion,
+          [episodeId],
+        ),
+        returnValue: 0.0,
+        returnValueForMissingStub: 0.0,
+      ) as double);
+
+  @override
+  bool isEpisodeFinished(String? episodeId) => (super.noSuchMethod(
+        Invocation.method(
+          #isEpisodeFinished,
+          [episodeId],
+        ),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool isEpisodeUnfinished(String? episodeId) => (super.noSuchMethod(
+        Invocation.method(
+          #isEpisodeUnfinished,
+          [episodeId],
+        ),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  _i4.Future<void> updateEpisodeCompletion(
+    String? episodeId,
+    double? completion,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateEpisodeCompletion,
+          [
+            episodeId,
+            completion,
+          ],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> markEpisodeAsFinished(String? episodeId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #markEpisodeAsFinished,
+          [episodeId],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> resetEpisodeProgress(String? episodeId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #resetEpisodeProgress,
+          [episodeId],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> addToListenHistory(
+    _i6.AudioFile? episode, {
+    DateTime? at,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #addToListenHistory,
+          [episode],
+          {#at: at},
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> removeFromListenHistory(String? episodeId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #removeFromListenHistory,
+          [episodeId],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> clearListenHistory() => (super.noSuchMethod(
+        Invocation.method(
+          #clearListenHistory,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  List<_i6.AudioFile> getListenHistoryEpisodes(
+    List<_i6.AudioFile>? allEpisodes, {
+    int? limit = 50,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getListenHistoryEpisodes,
+          [allEpisodes],
+          {#limit: limit},
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  List<_i6.AudioFile> getUnfinishedEpisodes(List<_i6.AudioFile>? episodes) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getUnfinishedEpisodes,
+          [episodes],
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  List<_i6.AudioFile> getFinishedEpisodes(List<_i6.AudioFile>? episodes) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getFinishedEpisodes,
+          [episodes],
+        ),
+        returnValue: <_i6.AudioFile>[],
+        returnValueForMissingStub: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  void startListeningSession(String? episodeId) => super.noSuchMethod(
+        Invocation.method(
+          #startListeningSession,
+          [episodeId],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void updateSessionDuration(Duration? duration) => super.noSuchMethod(
+        Invocation.method(
+          #updateSessionDuration,
+          [duration],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i4.Future<void> endListeningSession({double? finalCompletion}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #endListeningSession,
+          [],
+          {#finalCompletion: finalCompletion},
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  Map<String, dynamic> getListeningStatistics(
+          List<_i6.AudioFile>? allEpisodes) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getListeningStatistics,
+          [allEpisodes],
+        ),
+        returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
+      ) as Map<String, dynamic>);
+
+  @override
+  Map<String, dynamic> exportProgressData() => (super.noSuchMethod(
+        Invocation.method(
+          #exportProgressData,
+          [],
+        ),
+        returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
+      ) as Map<String, dynamic>);
+
+  @override
+  _i4.Future<void> importProgressData(Map<String, dynamic>? data) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #importProgressData,
+          [data],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> clearAllProgress() => (super.noSuchMethod(
+        Invocation.method(
+          #clearAllProgress,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [PreferencesRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPreferencesRepository extends _i1.Mock
+    implements _i9.PreferencesRepository {
+  @override
+  String get selectedLanguage => (super.noSuchMethod(
+        Invocation.getter(#selectedLanguage),
+        returnValue: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#selectedLanguage),
+        ),
+        returnValueForMissingStub: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#selectedLanguage),
+        ),
+      ) as String);
+
+  @override
+  String get selectedCategory => (super.noSuchMethod(
+        Invocation.getter(#selectedCategory),
+        returnValue: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#selectedCategory),
+        ),
+        returnValueForMissingStub: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#selectedCategory),
+        ),
+      ) as String);
+
+  @override
+  String get searchQuery => (super.noSuchMethod(
+        Invocation.getter(#searchQuery),
+        returnValue: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#searchQuery),
+        ),
+        returnValueForMissingStub: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#searchQuery),
+        ),
+      ) as String);
+
+  @override
+  String get sortOrder => (super.noSuchMethod(
+        Invocation.getter(#sortOrder),
+        returnValue: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#sortOrder),
+        ),
+        returnValueForMissingStub: _i10.dummyValue<String>(
+          this,
+          Invocation.getter(#sortOrder),
+        ),
+      ) as String);
+
+  @override
+  bool get isDarkMode => (super.noSuchMethod(
+        Invocation.getter(#isDarkMode),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  double get playbackSpeed => (super.noSuchMethod(
+        Invocation.getter(#playbackSpeed),
+        returnValue: 0.0,
+        returnValueForMissingStub: 0.0,
+      ) as double);
+
+  @override
+  bool get autoplayEnabled => (super.noSuchMethod(
+        Invocation.getter(#autoplayEnabled),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get downloadOverWifiOnly => (super.noSuchMethod(
+        Invocation.getter(#downloadOverWifiOnly),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  int get cacheSize => (super.noSuchMethod(
+        Invocation.getter(#cacheSize),
+        returnValue: 0,
+        returnValueForMissingStub: 0,
+      ) as int);
+
+  @override
+  bool get notificationsEnabled => (super.noSuchMethod(
+        Invocation.getter(#notificationsEnabled),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get newEpisodeNotifications => (super.noSuchMethod(
+        Invocation.getter(#newEpisodeNotifications),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get downloadCompleteNotifications => (super.noSuchMethod(
+        Invocation.getter(#downloadCompleteNotifications),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  double get textScaleFactor => (super.noSuchMethod(
+        Invocation.getter(#textScaleFactor),
+        returnValue: 0.0,
+        returnValueForMissingStub: 0.0,
+      ) as double);
+
+  @override
+  bool get highContrastMode => (super.noSuchMethod(
+        Invocation.getter(#highContrastMode),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get reducedMotion => (super.noSuchMethod(
+        Invocation.getter(#reducedMotion),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  _i4.Future<void> initialize() => (super.noSuchMethod(
+        Invocation.method(
+          #initialize,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setLanguage(String? language) => (super.noSuchMethod(
+        Invocation.method(
+          #setLanguage,
+          [language],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setCategory(String? category) => (super.noSuchMethod(
+        Invocation.method(
+          #setCategory,
+          [category],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  void setSearchQuery(String? query) => super.noSuchMethod(
+        Invocation.method(
+          #setSearchQuery,
+          [query],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i4.Future<void> setSortOrder(String? sortOrder) => (super.noSuchMethod(
+        Invocation.method(
+          #setSortOrder,
+          [sortOrder],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setDarkMode(bool? isDark) => (super.noSuchMethod(
+        Invocation.method(
+          #setDarkMode,
+          [isDark],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setPlaybackSpeed(double? speed) => (super.noSuchMethod(
+        Invocation.method(
+          #setPlaybackSpeed,
+          [speed],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setAutoplayEnabled(bool? enabled) => (super.noSuchMethod(
+        Invocation.method(
+          #setAutoplayEnabled,
+          [enabled],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setDownloadOverWifiOnly(bool? wifiOnly) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setDownloadOverWifiOnly,
+          [wifiOnly],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setCacheSize(int? size) => (super.noSuchMethod(
+        Invocation.method(
+          #setCacheSize,
+          [size],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setNotificationsEnabled(bool? enabled) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setNotificationsEnabled,
+          [enabled],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setNewEpisodeNotifications(bool? enabled) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setNewEpisodeNotifications,
+          [enabled],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setDownloadCompleteNotifications(bool? enabled) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #setDownloadCompleteNotifications,
+          [enabled],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setTextScaleFactor(double? factor) => (super.noSuchMethod(
+        Invocation.method(
+          #setTextScaleFactor,
+          [factor],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setHighContrastMode(bool? enabled) => (super.noSuchMethod(
+        Invocation.method(
+          #setHighContrastMode,
+          [enabled],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setReducedMotion(bool? enabled) => (super.noSuchMethod(
+        Invocation.method(
+          #setReducedMotion,
+          [enabled],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> resetToDefaults() => (super.noSuchMethod(
+        Invocation.method(
+          #resetToDefaults,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  Map<String, dynamic> exportPreferences() => (super.noSuchMethod(
+        Invocation.method(
+          #exportPreferences,
+          [],
+        ),
+        returnValue: <String, dynamic>{},
+        returnValueForMissingStub: <String, dynamic>{},
+      ) as Map<String, dynamic>);
+
+  @override
+  _i4.Future<void> importPreferences(Map<String, dynamic>? preferences) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #importPreferences,
+          [preferences],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
 }

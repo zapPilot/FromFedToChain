@@ -13,6 +13,8 @@ class UserPreferencesService extends ChangeNotifier
   String _searchQuery = '';
   String _sortOrder = 'newest'; // 'newest', 'oldest', 'alphabetical'
 
+  bool _disposed = false;
+
   // Theme and UI preferences
   bool _isDarkMode = true;
   double _playbackSpeed = 1.0;
@@ -49,6 +51,7 @@ class UserPreferencesService extends ChangeNotifier
 
   /// Initialize and load user preferences
   Future<void> initialize() async {
+    if (_disposed) return;
     await _loadPreferences();
   }
 
@@ -127,6 +130,8 @@ class UserPreferencesService extends ChangeNotifier
 
   /// Save user preferences to SharedPreferences
   Future<void> _savePreferences() async {
+    if (_disposed) return;
+
     try {
       final prefs = await SharedPreferences.getInstance();
 
@@ -167,6 +172,8 @@ class UserPreferencesService extends ChangeNotifier
   /// Set selected language filter
   @override
   Future<void> setLanguage(String language) async {
+    if (_disposed) return;
+
     if (!ApiConfig.isValidLanguage(language)) {
       if (kDebugMode) {
         print('UserPreferencesService: Unsupported language: $language');
@@ -177,7 +184,10 @@ class UserPreferencesService extends ChangeNotifier
     if (_selectedLanguage != language) {
       _selectedLanguage = language;
       await _savePreferences();
-      notifyListeners();
+
+      if (!_disposed) {
+        notifyListeners();
+      }
 
       if (kDebugMode) {
         print('UserPreferencesService: Language changed to $language');
@@ -188,6 +198,8 @@ class UserPreferencesService extends ChangeNotifier
   /// Set selected category filter
   @override
   Future<void> setCategory(String category) async {
+    if (_disposed) return;
+
     if (category != 'all' && !ApiConfig.isValidCategory(category)) {
       if (kDebugMode) {
         print('UserPreferencesService: Unsupported category: $category');
@@ -198,7 +210,10 @@ class UserPreferencesService extends ChangeNotifier
     if (_selectedCategory != category) {
       _selectedCategory = category;
       await _savePreferences();
-      notifyListeners();
+
+      if (!_disposed) {
+        notifyListeners();
+      }
 
       if (kDebugMode) {
         print('UserPreferencesService: Category changed to $category');
@@ -208,6 +223,8 @@ class UserPreferencesService extends ChangeNotifier
 
   /// Set search query (not persisted)
   void setSearchQuery(String query) {
+    if (_disposed) return;
+
     if (_searchQuery != query) {
       _searchQuery = query;
       notifyListeners();
@@ -217,6 +234,8 @@ class UserPreferencesService extends ChangeNotifier
   /// Set sort order and persist
   @override
   Future<void> setSortOrder(String sortOrder) async {
+    if (_disposed) return;
+
     if (!['newest', 'oldest', 'alphabetical'].contains(sortOrder)) {
       if (kDebugMode) {
         print('UserPreferencesService: Invalid sort order: $sortOrder');
@@ -227,7 +246,10 @@ class UserPreferencesService extends ChangeNotifier
     if (_sortOrder != sortOrder) {
       _sortOrder = sortOrder;
       await _savePreferences();
-      notifyListeners();
+
+      if (!_disposed) {
+        notifyListeners();
+      }
 
       if (kDebugMode) {
         print('UserPreferencesService: Sort order changed to $sortOrder');
@@ -499,6 +521,8 @@ class UserPreferencesService extends ChangeNotifier
 
   @override
   void dispose() {
+    if (_disposed) return;
+    _disposed = true;
     super.dispose();
   }
 

@@ -20,6 +20,8 @@ class ProgressTrackingService extends ChangeNotifier
   DateTime? _sessionStartTime;
   Duration _sessionDuration = Duration.zero;
 
+  bool _disposed = false;
+
   // Getters
   Map<String, double> get episodeCompletion =>
       Map.unmodifiable(_episodeCompletion);
@@ -30,6 +32,7 @@ class ProgressTrackingService extends ChangeNotifier
 
   /// Initialize and load progress data
   Future<void> initialize() async {
+    if (_disposed) return;
     await _loadProgressData();
   }
 
@@ -120,12 +123,17 @@ class ProgressTrackingService extends ChangeNotifier
   @override
   Future<void> updateEpisodeCompletion(
       String episodeId, double completion) async {
+    if (_disposed) return;
+
     final clampedCompletion = completion.clamp(0.0, 1.0);
 
     if (_episodeCompletion[episodeId] != clampedCompletion) {
       _episodeCompletion[episodeId] = clampedCompletion;
       await _saveProgressData();
-      notifyListeners();
+
+      if (!_disposed) {
+        notifyListeners();
+      }
 
       if (kDebugMode) {
         print(
@@ -155,6 +163,8 @@ class ProgressTrackingService extends ChangeNotifier
   /// Record an episode in listen history (update timestamp, cap size)
   @override
   Future<void> addToListenHistory(AudioFile episode, {DateTime? at}) async {
+    if (_disposed) return;
+
     final timestamp = at ?? DateTime.now();
     _listenHistory[episode.id] = timestamp;
 
@@ -169,7 +179,10 @@ class ProgressTrackingService extends ChangeNotifier
     }
 
     await _saveProgressData();
-    notifyListeners();
+
+    if (!_disposed) {
+      notifyListeners();
+    }
 
     if (kDebugMode) {
       print(
@@ -464,6 +477,9 @@ class ProgressTrackingService extends ChangeNotifier
 
   @override
   void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+
     _episodeCompletion.clear();
     _listenHistory.clear();
     super.dispose();

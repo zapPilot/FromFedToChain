@@ -15,6 +15,9 @@ void main() {
       // Reset SharedPreferences before each test
       SharedPreferences.setMockInitialValues({});
 
+      // Allow the mock to fully reset
+      await Future.delayed(Duration.zero);
+
       authService = AuthService();
 
       testUser = AppUser(
@@ -28,8 +31,12 @@ void main() {
       );
     });
 
-    tearDown(() {
+    tearDown(() async {
       authService.dispose();
+
+      // Ensure SharedPreferences is clean for the next test
+      SharedPreferences.setMockInitialValues({});
+      await Future.delayed(Duration.zero);
     });
 
     group('Initialization', () {
@@ -78,6 +85,10 @@ void main() {
 
         expect(authService.authState, AuthState.error);
         expect(authService.errorMessage, contains('Failed to initialize'));
+
+        // Reset SharedPreferences to clean state for next tests
+        SharedPreferences.setMockInitialValues({});
+        await Future.delayed(Duration.zero);
       });
 
       test('should handle incomplete session data', () async {
@@ -398,6 +409,10 @@ void main() {
         expect(authService.authState, AuthState.error);
         expect(authService.errorMessage, isNotNull);
         expect(authService.isAuthenticated, isFalse);
+
+        // Reset SharedPreferences to clean state for next tests
+        SharedPreferences.setMockInitialValues({});
+        await Future.delayed(Duration.zero);
       });
 
       test('should clear errors on successful operations', () async {
@@ -423,6 +438,10 @@ void main() {
         await authService.signInWithGoogle();
         expect(authService.errorMessage, isNull);
         expect(authService.authState, AuthState.authenticated);
+
+        // Reset SharedPreferences to clean state for next tests
+        SharedPreferences.setMockInitialValues({});
+        await Future.delayed(Duration.zero);
       });
     });
 

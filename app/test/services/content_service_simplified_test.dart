@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
+import 'package:from_fed_to_chain_app/repositories/repository_factory.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -12,11 +13,19 @@ void main() {
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
+      // Reset the repository factory to ensure clean state between tests
+      RepositoryFactory.reset();
       contentService = ContentFacadeService();
+      // Allow services to initialize
+      await Future.delayed(const Duration(milliseconds: 10));
     });
 
-    tearDown(() {
+    tearDown(() async {
+      // Wait for any pending operations to complete before disposal
+      await Future.delayed(const Duration(milliseconds: 5));
       contentService.dispose();
+      // Reset repository factory to prevent shared state issues
+      RepositoryFactory.reset();
     });
 
     group('Listen History Management', () {
@@ -30,12 +39,20 @@ void main() {
       });
 
       test('should cap listen history to 100 entries', () async {
+        // Clear any existing history to ensure clean start
+        await contentService.clearListenHistory();
+        expect(contentService.listenHistory.length, equals(0));
+
         // Add 101 episodes to history
         for (int i = 0; i < 101; i++) {
-          final episode = TestDataFactory.createMockAudioFile(id: 'episode-$i');
+          final episode =
+              TestDataFactory.createMockAudioFile(id: 'test-cap-episode-$i');
           final timestamp = DateTime.now().add(Duration(minutes: i));
           await contentService.addToListenHistory(episode, at: timestamp);
         }
+
+        // Allow final save operations to complete and multiple processing cycles
+        await Future.delayed(const Duration(milliseconds: 50));
 
         expect(contentService.listenHistory.length, equals(100));
       });
@@ -66,6 +83,8 @@ void main() {
     group('Episode Completion Tracking', () {
       test('should update episode completion', () async {
         await contentService.updateEpisodeCompletion('test-episode', 0.65);
+        // Allow save operation to complete
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(
             contentService.getEpisodeCompletion('test-episode'), equals(0.65));
@@ -75,6 +94,8 @@ void main() {
 
       test('should mark episode as finished', () async {
         await contentService.markEpisodeAsFinished('test-episode');
+        // Allow save operation to complete
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(
             contentService.getEpisodeCompletion('test-episode'), equals(1.0));
@@ -86,6 +107,8 @@ void main() {
         await contentService.updateEpisodeCompletion('finished-episode', 0.95);
         await contentService.updateEpisodeCompletion('unfinished-episode', 0.5);
         await contentService.updateEpisodeCompletion('barely-started', 0.1);
+        // Allow save operations to complete
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.isEpisodeFinished('finished-episode'), isTrue);
         expect(contentService.isEpisodeFinished('unfinished-episode'), isFalse);
@@ -96,6 +119,8 @@ void main() {
 
       test('should handle completion values correctly', () async {
         await contentService.updateEpisodeCompletion('test', 1.5); // Over 1.0
+        // Allow save operation to complete
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.getEpisodeCompletion('test'),
             equals(1.0)); // Clamped to 1.0
@@ -128,21 +153,29 @@ void main() {
     });
 
     group('Basic State Management', () {
-      test('should handle search query updates', () {
+      test('should handle search query updates', () async {
         const query = 'bitcoin';
         contentService.setSearchQuery(query);
+        // Allow repository sync to complete
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.searchQuery, equals(query));
       });
 
-      test('should handle language selection', () {
-        contentService.setSelectedLanguage('en-US');
+      test('should handle language selection', () async {
+        await contentService.setLanguage('en-US');
 
         expect(contentService.selectedLanguage, equals('en-US'));
       });
 
-      test('should handle category selection', () {
-        contentService.setSelectedCategory('ethereum');
+      test('should handle category selection', () async {
+        // Ensure we start with the default category
+        expect(contentService.selectedCategory, equals('all'));
+
+        await contentService.setCategory('ethereum');
+
+        // Allow some time for the async operation to complete
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.selectedCategory, equals('ethereum'));
       });
@@ -152,8 +185,8 @@ void main() {
 
         expect(stats, containsPair('totalEpisodes', isA<int>()));
         expect(stats, containsPair('filteredEpisodes', isA<int>()));
-        expect(stats, containsPair('languages', isA<Map>()));
-        expect(stats, containsPair('categories', isA<Map>()));
+        expect(stats, containsPair('cacheStats', isA<Map>()));
+        expect(stats, containsPair('listeningStats', isA<Map>()));
       });
     });
 
@@ -199,8 +232,8 @@ void main() {
 
         expect(stats['totalEpisodes'], equals(0));
         expect(stats['filteredEpisodes'], equals(0));
-        expect(stats['languages'], isEmpty);
-        expect(stats['categories'], isEmpty);
+        expect(stats['cacheStats'], isA<Map>());
+        expect(stats['listeningStats'], isA<Map>());
       });
 
       test('should handle disposal correctly', () {

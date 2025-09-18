@@ -44,6 +44,9 @@ class SearchService {
 
   /// Filter episodes by language
   List<AudioFile> _filterByLanguage(List<AudioFile> episodes, String language) {
+    if (language == 'all') {
+      return episodes; // Don't filter when 'all' is selected
+    }
     return episodes.where((episode) => episode.language == language).toList();
   }
 
