@@ -51,6 +51,9 @@ export class TranslationService {
     const translatedTitle = await this.translateText(title, targetLanguage);
     const translatedContent = await this.translateText(content, targetLanguage);
 
+    // Prepare knowledge concepts (copy from source, don't translate)
+    const knowledgeConcepts = sourceContent.knowledge_concepts_used || [];
+
     // Add translation to content (creates new language file)
     await ContentManager.addTranslation(
       id,
@@ -58,6 +61,7 @@ export class TranslationService {
       translatedTitle,
       translatedContent,
       sourceContent.framework,
+      knowledgeConcepts, // Pass knowledge concepts
     );
 
     // Update source status if all translations are complete

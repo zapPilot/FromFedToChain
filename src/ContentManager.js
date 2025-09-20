@@ -205,7 +205,14 @@ export class ContentManager {
   }
 
   // Add translation (creates new file in target language)
-  static async addTranslation(id, targetLanguage, title, content, framework) {
+  static async addTranslation(
+    id,
+    targetLanguage,
+    title,
+    content,
+    framework,
+    knowledgeConcepts = [],
+  ) {
     // Read source content to get category and references
     const sourceContent = await this.read(id, "zh-TW");
 
@@ -222,6 +229,11 @@ export class ContentManager {
 
     // Set status to translated
     translationData.status = "translated";
+
+    // Add knowledge concepts (copy from source, don't translate)
+    if (knowledgeConcepts.length > 0) {
+      translationData.knowledge_concepts_used = knowledgeConcepts;
+    }
 
     // Create directory and save file
     const dir = path.join(

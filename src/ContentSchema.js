@@ -24,6 +24,7 @@ export class ContentSchema {
       framework,
       audio_file: null,
       social_hook: null,
+      knowledge_concepts_used: [], // 新增知識概念字段
       feedback: {
         content_review: null,
       },
@@ -104,6 +105,22 @@ export class ContentSchema {
       typeof content.framework !== "string"
     ) {
       throw new Error("Framework must be a string if provided");
+    }
+
+    // 驗證 knowledge_concepts_used 字段（可選）
+    if (content.knowledge_concepts_used !== undefined) {
+      if (!Array.isArray(content.knowledge_concepts_used)) {
+        throw new Error("knowledge_concepts_used must be an array if provided");
+      }
+
+      // 驗證每個概念ID都是字符串
+      for (const conceptId of content.knowledge_concepts_used) {
+        if (typeof conceptId !== "string") {
+          throw new Error(
+            "All concept IDs in knowledge_concepts_used must be strings",
+          );
+        }
+      }
     }
 
     return true;

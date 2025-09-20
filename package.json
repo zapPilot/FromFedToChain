@@ -6,6 +6,7 @@
   "scripts": {
     "review": "node src/cli.js review",
     "pipeline": "node src/cli.js pipeline",
+    "concepts": "node src/cli.js concepts",
     "test": "npm run test:node && npm run test:flutter",
     "test:node": "node tests/run-tests.js",
     "test:flutter": "echo '🧪 Running Flutter tests...' && cd app && flutter test test --coverage --reporter compact && dart run scripts/coverage_check.dart",

@@ -19,6 +19,11 @@ async function main() {
       case "pipeline":
         await handlePipeline();
         break;
+      case "concepts":
+        // 導入 ConceptCli 來處理概念相關命令
+        const { ConceptCli } = await import("./ConceptCli.js");
+        await ConceptCli.handleCommand(args.slice(1));
+        break;
       default:
         showHelp();
     }
@@ -407,6 +412,9 @@ function showHelp() {
   console.log(
     "  npm run pipeline                               - Process content through translation → audio → social",
   );
+  console.log(
+    "  npm run concepts <command>                     - Manage knowledge concepts",
+  );
 
   console.log(chalk.gray("\nWorkflow Steps:"));
   console.log("  1️⃣ Create content files in content/zh-TW/");
@@ -424,6 +432,20 @@ function showHelp() {
     "  npm run pipeline 2025-06-30-bitcoin           - Process specific content",
   );
 
+  console.log(chalk.gray("\nKnowledge Concepts:"));
+  console.log(
+    "  npm run concepts list                          - List all concepts",
+  );
+  console.log(
+    "  npm run concepts search '確定性溢價'             - Search concepts",
+  );
+  console.log(
+    "  npm run concepts show certainty-premium        - Show concept details",
+  );
+  console.log(
+    "  npm run concepts stats                         - Show statistics",
+  );
+
   console.log("");
   console.log(chalk.yellow("Review Controls:"));
   console.log("  [a]ccept    - Approve content (optional feedback)");
@@ -438,6 +460,7 @@ function showHelp() {
   console.log("  • Resumes from where you left off");
   console.log("  • Processes multiple content items in one command");
   console.log("  • Discrete audio steps for testing and debugging");
+  console.log("  • Knowledge concepts are preserved across all languages");
 }
 
 main();
