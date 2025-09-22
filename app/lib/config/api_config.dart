@@ -9,9 +9,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// ✅ Backwards compatibility with path-based URL construction
 /// ✅ .env file support
 class ApiConfig {
-  // Environment detection
-  static String get environment =>
-      dotenv.get('ENVIRONMENT', fallback: 'production');
+  // Environment detection with safe fallback
+  static String get environment {
+    try {
+      return dotenv.get('ENVIRONMENT', fallback: 'production');
+    } catch (e) {
+      // If dotenv is not initialized, return test environment for tests
+      return const bool.fromEnvironment('FLUTTER_TEST', defaultValue: false)
+          ? 'test'
+          : 'production';
+    }
+  }
+
   static const bool isTest =
       bool.fromEnvironment('FLUTTER_TEST', defaultValue: false);
 
@@ -24,13 +33,17 @@ class ApiConfig {
     'test': 'http://mock-api.test',
   };
 
-  // Dynamic URL resolution
+  // Dynamic URL resolution with safe fallback
   static String get streamingBaseUrl {
     if (isTest) return _streamingUrls['test']!;
 
-    // Check for direct URL override in .env
-    final envUrl = dotenv.get('STREAMING_BASE_URL', fallback: '');
-    if (envUrl.isNotEmpty) return envUrl;
+    // Check for direct URL override in .env (with safe fallback)
+    try {
+      final envUrl = dotenv.get('STREAMING_BASE_URL', fallback: '');
+      if (envUrl.isNotEmpty) return envUrl;
+    } catch (e) {
+      // dotenv not initialized, use default
+    }
 
     return _streamingUrls[environment] ?? _streamingUrls['production']!;
   }
@@ -44,11 +57,27 @@ class ApiConfig {
   static String getContentUrl(String language, String category, String id) =>
       '$streamingBaseUrl/api/content/$language/$category/$id';
 
-  // Configuration constants
-  static Duration get apiTimeout => Duration(
-      seconds: int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));
-  static Duration get streamTimeout => Duration(
-      seconds: int.parse(dotenv.get('STREAM_TIMEOUT_SECONDS', fallback: '30')));
+  // Configuration constants with safe fallback
+  static Duration get apiTimeout {
+    try {
+      return Duration(
+          seconds:
+              int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));
+    } catch (e) {
+      return const Duration(seconds: 30); // Default fallback
+    }
+  }
+
+  static Duration get streamTimeout {
+    try {
+      return Duration(
+          seconds:
+              int.parse(dotenv.get('STREAM_TIMEOUT_SECONDS', fallback: '30')));
+    } catch (e) {
+      return const Duration(seconds: 30); // Default fallback
+    }
+  }
+
   static const int retryAttempts = 3;
 
   // Supported languages and categories (synced with ContentSchema.js)

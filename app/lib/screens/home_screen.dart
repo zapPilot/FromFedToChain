@@ -12,6 +12,54 @@ import '../widgets/mini_player.dart';
 import '../widgets/search_bar.dart';
 import 'player_screen.dart';
 
+/// State class for content service to enable granular rebuilds
+class ContentServiceState {
+  final List<AudioFile> allEpisodes;
+  final List<AudioFile> filteredEpisodes;
+  final bool isLoading;
+  final bool hasError;
+  final String? errorMessage;
+  final String selectedLanguage;
+  final String selectedCategory;
+  final String searchQuery;
+
+  const ContentServiceState({
+    required this.allEpisodes,
+    required this.filteredEpisodes,
+    required this.isLoading,
+    required this.hasError,
+    required this.errorMessage,
+    required this.selectedLanguage,
+    required this.selectedCategory,
+    required this.searchQuery,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ContentServiceState &&
+          runtimeType == other.runtimeType &&
+          allEpisodes.length == other.allEpisodes.length &&
+          filteredEpisodes.length == other.filteredEpisodes.length &&
+          isLoading == other.isLoading &&
+          hasError == other.hasError &&
+          errorMessage == other.errorMessage &&
+          selectedLanguage == other.selectedLanguage &&
+          selectedCategory == other.selectedCategory &&
+          searchQuery == other.searchQuery;
+
+  @override
+  int get hashCode =>
+      allEpisodes.length.hashCode ^
+      filteredEpisodes.length.hashCode ^
+      isLoading.hashCode ^
+      hasError.hashCode ^
+      errorMessage.hashCode ^
+      selectedLanguage.hashCode ^
+      selectedCategory.hashCode ^
+      searchQuery.hashCode;
+}
+
 /// Main home screen displaying episodes with filtering and search
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,36 +95,69 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer2<ContentFacadeService, AudioService>(
-        builder: (context, contentService, audioService, child) {
-          return SafeArea(
-            child: Column(
-              children: [
-                // App header with search toggle
-                _buildAppHeader(context, contentService),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Content-related UI (only rebuilds when ContentFacadeService changes)
+            Selector<ContentFacadeService, ContentServiceState>(
+              selector: (context, service) => ContentServiceState(
+                allEpisodes: service.allEpisodes,
+                filteredEpisodes: service.filteredEpisodes,
+                isLoading: service.isLoading,
+                hasError: service.hasError,
+                errorMessage: service.errorMessage,
+                selectedLanguage: service.selectedLanguage,
+                selectedCategory: service.selectedCategory,
+                searchQuery: service.searchQuery,
+              ),
+              builder: (context, state, child) {
+                final contentService = context.read<ContentFacadeService>();
+                return Column(
+                  children: [
+                    // App header with search toggle
+                    _buildAppHeader(context, contentService),
 
-                // Search bar (animated)
-                if (_showSearchBar) _buildSearchBar(context, contentService),
+                    // Search bar (animated)
+                    if (_showSearchBar)
+                      _buildSearchBar(context, contentService),
 
-                // Filter bar
-                _buildFilterBar(context, contentService),
+                    // Filter bar
+                    _buildFilterBar(context, contentService),
 
-                // Sort selector
-                _buildSortSelector(context, contentService),
-
-                // Main content area
-                Expanded(
-                  child:
-                      _buildMainContent(context, contentService, audioService),
-                ),
-
-                // Mini player (if audio is playing)
-                if (audioService.currentAudioFile != null)
-                  _buildMiniPlayer(context, audioService),
-              ],
+                    // Sort selector
+                    _buildSortSelector(context, contentService),
+                  ],
+                );
+              },
             ),
-          );
-        },
+
+            // Main content area (needs both services for episode interaction)
+            Expanded(
+              child: Consumer2<ContentFacadeService, AudioService>(
+                builder: (context, contentService, audioService, child) {
+                  return _buildMainContent(
+                      context, contentService, audioService);
+                },
+              ),
+            ),
+
+            // Mini player (only rebuilds when AudioService changes)
+            Selector<AudioService, AudioFile?>(
+              selector: (context, service) => service.currentAudioFile,
+              builder: (context, currentAudioFile, child) {
+                if (currentAudioFile == null) return const SizedBox.shrink();
+
+                return Selector<AudioService, PlaybackState>(
+                  selector: (context, service) => service.playbackState,
+                  builder: (context, playbackState, child) {
+                    final audioService = context.read<AudioService>();
+                    return _buildMiniPlayer(context, audioService);
+                  },
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -369,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 80,
               color: AppTheme.errorColor,
@@ -449,12 +530,31 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildMiniPlayer(BuildContext context, AudioService audioService) {
     return MiniPlayer(
       audioFile: audioService.currentAudioFile!,
-      playbackState: audioService.playbackState,
+      isPlaying: audioService.isPlaying,
+      isPaused: audioService.isPaused,
+      isLoading: audioService.isLoading,
+      hasError: audioService.hasError,
+      stateText: _getStateText(audioService),
       onTap: () => _navigateToPlayer(context),
       onPlayPause: () => audioService.togglePlayPause(),
       onNext: () => audioService.skipToNextEpisode(),
       onPrevious: () => audioService.skipToPreviousEpisode(),
     );
+  }
+
+  /// Helper method to get state text from AudioService
+  String _getStateText(AudioService audioService) {
+    if (audioService.hasError) {
+      return 'Error';
+    } else if (audioService.isLoading) {
+      return 'Loading';
+    } else if (audioService.isPlaying) {
+      return 'Playing';
+    } else if (audioService.isPaused) {
+      return 'Paused';
+    } else {
+      return 'Stopped';
+    }
   }
 
   /// Play episode

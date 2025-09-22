@@ -4,6 +4,8 @@ import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/services/audio_service.dart';
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
 import 'package:from_fed_to_chain_app/config/api_config.dart';
+import 'package:from_fed_to_chain_app/widgets/mini_player.dart';
+import '../test_utils.dart';
 
 /// Widget test utilities specifically for audio control widgets
 class WidgetTestUtils {
@@ -636,6 +638,33 @@ class WidgetTestUtils {
       'ja-JP': '日本語',
     };
     return languageNames[language] ?? language;
+  }
+
+  /// Create MiniPlayer widget using new boolean API
+  /// Helper method for test migration after MiniPlayer API refactor
+  static MiniPlayer createMiniPlayer({
+    required AudioFile audioFile,
+    required PlaybackState playbackState,
+    VoidCallback? onTap,
+    VoidCallback? onPlayPause,
+    VoidCallback? onNext,
+    VoidCallback? onPrevious,
+  }) {
+    final params =
+        TestUtils.convertPlaybackStateToMiniPlayerParams(playbackState);
+
+    return MiniPlayer(
+      audioFile: audioFile,
+      isPlaying: params['isPlaying'],
+      isPaused: params['isPaused'],
+      isLoading: params['isLoading'],
+      hasError: params['hasError'],
+      stateText: params['stateText'],
+      onTap: onTap ?? mockTap,
+      onPlayPause: onPlayPause ?? mockPlayPause,
+      onNext: onNext ?? mockNext,
+      onPrevious: onPrevious ?? mockPrevious,
+    );
   }
 }
 

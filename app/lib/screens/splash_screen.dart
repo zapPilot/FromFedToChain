@@ -328,7 +328,7 @@ class _SplashScreenState extends State<SplashScreen>
                     return LinearProgressIndicator(
                       value: _progressAnimation.value,
                       backgroundColor: AppTheme.cardColor,
-                      valueColor: AlwaysStoppedAnimation<Color>(
+                      valueColor: const AlwaysStoppedAnimation<Color>(
                         AppTheme.primaryColor,
                       ),
                       minHeight: 3,
@@ -346,7 +346,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget _buildErrorSection() {
     return Column(
       children: [
-        Icon(
+        const Icon(
           Icons.error_outline_rounded,
           size: 48,
           color: AppTheme.errorColor,

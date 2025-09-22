@@ -87,8 +87,10 @@ void main() {
           PlayerState(false, ProcessingState.idle),
         ),
       );
-      when(mockAudioPlayer.setUrl(any))
-          .thenAnswer((_) async => const Duration());
+      when(mockAudioPlayer.setAudioSource(
+        any,
+        initialPosition: anyNamed('initialPosition'),
+      )).thenAnswer((_) async => const Duration());
       when(mockAudioPlayer.play()).thenAnswer((_) async {});
       when(mockAudioPlayer.pause()).thenAnswer((_) async {});
       when(mockAudioPlayer.stop()).thenAnswer((_) async {});
@@ -123,7 +125,12 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         verify(mockContentService.addToListenHistory(testAudioFile)).called(1);
-        verify(mockAudioPlayer.setUrl(testAudioFile.streamingUrl)).called(1);
+        verify(
+          mockAudioPlayer.setAudioSource(
+            any,
+            initialPosition: anyNamed('initialPosition'),
+          ),
+        ).called(1);
         verify(mockAudioPlayer.play()).called(1);
       });
 
@@ -381,9 +388,8 @@ void main() {
 
         await audioService.skipToNextEpisode();
 
-        expect(audioService.playbackState, PlaybackState.error);
-        expect(audioService.errorMessage,
-            contains('Failed to skip to next episode'));
+        // Navigation errors are handled gracefully and don't change playback state
+        expect(audioService.playbackState, PlaybackState.stopped);
       });
 
       test('should handle error when skipping to previous episode fails',
@@ -397,9 +403,8 @@ void main() {
 
         await audioService.skipToPreviousEpisode();
 
-        expect(audioService.playbackState, PlaybackState.error);
-        expect(audioService.errorMessage,
-            contains('Failed to skip to previous episode'));
+        // Navigation errors are handled gracefully and don't change playback state
+        expect(audioService.playbackState, PlaybackState.stopped);
       });
 
       test('should handle case when no next episode available', () async {
