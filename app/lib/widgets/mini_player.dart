@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import '../themes/app_theme.dart';
 import '../models/audio_file.dart';
-import '../services/audio_service.dart';
 
 /// Compact audio player widget shown at bottom of home screen
+/// Now decoupled from AudioService for better reusability
 class MiniPlayer extends StatelessWidget {
   final AudioFile audioFile;
-  final PlaybackState playbackState;
+  final bool isPlaying;
+  final bool isPaused;
+  final bool isLoading;
+  final bool hasError;
+  final String stateText;
   final VoidCallback onTap;
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
@@ -15,7 +19,11 @@ class MiniPlayer extends StatelessWidget {
   const MiniPlayer({
     super.key,
     required this.audioFile,
-    required this.playbackState,
+    required this.isPlaying,
+    required this.isPaused,
+    required this.isLoading,
+    required this.hasError,
+    required this.stateText,
     required this.onTap,
     required this.onPlayPause,
     required this.onNext,
@@ -164,26 +172,21 @@ class MiniPlayer extends StatelessWidget {
     Color indicatorColor;
     IconData indicatorIcon;
 
-    switch (playbackState) {
-      case PlaybackState.playing:
-        indicatorColor = AppTheme.playingColor;
-        indicatorIcon = Icons.graphic_eq;
-        break;
-      case PlaybackState.paused:
-        indicatorColor = AppTheme.pausedColor;
-        indicatorIcon = Icons.pause_circle_outline;
-        break;
-      case PlaybackState.loading:
-        indicatorColor = AppTheme.loadingColor;
-        indicatorIcon = Icons.hourglass_empty;
-        break;
-      case PlaybackState.error:
-        indicatorColor = AppTheme.errorStateColor;
-        indicatorIcon = Icons.error_outline;
-        break;
-      default:
-        indicatorColor = AppTheme.onSurfaceColor.withOpacity(0.5);
-        indicatorIcon = Icons.stop_circle;
+    if (hasError) {
+      indicatorColor = AppTheme.errorStateColor;
+      indicatorIcon = Icons.error_outline;
+    } else if (isLoading) {
+      indicatorColor = AppTheme.loadingColor;
+      indicatorIcon = Icons.hourglass_empty;
+    } else if (isPlaying) {
+      indicatorColor = AppTheme.playingColor;
+      indicatorIcon = Icons.graphic_eq;
+    } else if (isPaused) {
+      indicatorColor = AppTheme.pausedColor;
+      indicatorIcon = Icons.pause_circle_outline;
+    } else {
+      indicatorColor = AppTheme.onSurfaceColor.withOpacity(0.5);
+      indicatorIcon = Icons.stop_circle;
     }
 
     return Row(
@@ -196,7 +199,7 @@ class MiniPlayer extends StatelessWidget {
         ),
         const SizedBox(width: AppTheme.spacingXS),
         Text(
-          _getPlaybackStateText(playbackState),
+          stateText,
           style: AppTheme.bodySmall.copyWith(
             color: indicatorColor,
             fontSize: 10,
@@ -275,11 +278,11 @@ class MiniPlayer extends StatelessWidget {
       width: size,
       height: size,
       child: IconButton(
-        onPressed: playbackState == PlaybackState.loading && isPrimary
+        onPressed: isLoading && isPrimary
             ? null
             : onPressed,
         tooltip: semanticLabel,
-        icon: playbackState == PlaybackState.loading && isPrimary
+        icon: isLoading && isPrimary
             ? SizedBox(
                 width: iconSize,
                 height: iconSize,
@@ -312,16 +315,12 @@ class MiniPlayer extends StatelessWidget {
 
   /// Get appropriate play/pause icon
   IconData _getPlayPauseIcon() {
-    switch (playbackState) {
-      case PlaybackState.playing:
-        return Icons.pause;
-      case PlaybackState.paused:
-      case PlaybackState.stopped:
-        return Icons.play_arrow;
-      case PlaybackState.loading:
-        return Icons.play_arrow; // Will be replaced by loading indicator
-      case PlaybackState.error:
-        return Icons.refresh;
+    if (hasError) {
+      return Icons.refresh;
+    } else if (isPlaying) {
+      return Icons.pause;
+    } else {
+      return Icons.play_arrow; // For paused, stopped, loading states
     }
   }
 
@@ -345,34 +344,16 @@ class MiniPlayer extends StatelessWidget {
     }
   }
 
-  /// Get playback state text for display
-  String _getPlaybackStateText(PlaybackState state) {
-    switch (state) {
-      case PlaybackState.playing:
-        return 'Playing';
-      case PlaybackState.paused:
-        return 'Paused';
-      case PlaybackState.loading:
-        return 'Loading';
-      case PlaybackState.error:
-        return 'Error';
-      case PlaybackState.stopped:
-        return 'Stopped';
-    }
-  }
-
   /// Get semantic label for play/pause button based on current state
   String _getPlayPauseSemanticLabel() {
-    switch (playbackState) {
-      case PlaybackState.playing:
-        return 'Pause';
-      case PlaybackState.paused:
-      case PlaybackState.stopped:
-        return 'Play';
-      case PlaybackState.loading:
-        return 'Loading, please wait';
-      case PlaybackState.error:
-        return 'Retry playback';
+    if (hasError) {
+      return 'Retry playback';
+    } else if (isLoading) {
+      return 'Loading, please wait';
+    } else if (isPlaying) {
+      return 'Pause';
+    } else {
+      return 'Play'; // For paused, stopped states
     }
   }
 }

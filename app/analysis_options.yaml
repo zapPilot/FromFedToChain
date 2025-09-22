@@ -6,9 +6,9 @@
 # invoked from the command line by running `flutter analyze`.
 #
 # CONFIGURATION RATIONALE:
-# - Cosmetic deprecation warnings (withOpacity, surfaceVariant) are suppressed
-#   as they don't affect audio streaming functionality and would require
-#   extensive refactoring for minimal benefit
+# - Deprecation warnings now enabled as warnings to track technical debt
+#   TODO: Replace withOpacity with withValues() across codebase (537 instances)
+#   This is cosmetic but should be addressed in dedicated tech debt sprint
 # - BuildContext async warnings suppressed for demo files only
 # - Focus on legitimate code quality issues (unused imports, unused elements)
 
@@ -18,8 +18,8 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   errors:
-    # Suppress cosmetic deprecation warnings
-    deprecated_member_use: ignore
+    # Enable deprecation warnings to track technical debt
+    deprecated_member_use: warning
     # Suppress BuildContext async warnings (demo file only)
     use_build_context_synchronously: ignore
     # Allow other info-level issues in development
@@ -35,7 +35,8 @@ linter:
   rules:
     # Disable noisy rules for development productivity
     avoid_print: false
-    prefer_const_constructors: false
-    prefer_const_literals_to_create_immutables: false
+    # Enable const constructor optimization for performance
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

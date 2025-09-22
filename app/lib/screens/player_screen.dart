@@ -937,7 +937,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           const SizedBox(height: AppTheme.spacingL),
 
           // Audio details
-          Text(
+          const Text(
             'Audio Details',
             style: AppTheme.headlineSmall,
           ),

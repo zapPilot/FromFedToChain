@@ -80,12 +80,19 @@ void main() {
 
         // Allow mock to fully settle
         await Future.delayed(Duration.zero);
+        
+        // Create new AuthService instance AFTER setting mock values
+        // This ensures the service uses the corrupted mock data
+        final testAuthService = AuthService();
 
-        await authService.initialize();
+        await testAuthService.initialize();
 
-        expect(authService.authState, AuthState.error);
-        expect(authService.errorMessage, contains('Failed to initialize'));
+        expect(testAuthService.authState, AuthState.error);
+        expect(testAuthService.errorMessage, contains('Failed to initialize'));
 
+        // Clean up
+        testAuthService.dispose();
+        
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});
         await Future.delayed(Duration.zero);
@@ -403,12 +410,17 @@ void main() {
 
         // Allow mock to fully settle
         await Future.delayed(Duration.zero);
+        
+        // Create new AuthService instance AFTER setting mock values
+        final testAuthService = AuthService();
+        await testAuthService.initialize();
 
-        await authService.initialize();
-
-        expect(authService.authState, AuthState.error);
-        expect(authService.errorMessage, isNotNull);
-        expect(authService.isAuthenticated, isFalse);
+        expect(testAuthService.authState, AuthState.error);
+        expect(testAuthService.errorMessage, isNotNull);
+        expect(testAuthService.isAuthenticated, isFalse);
+        
+        // Clean up
+        testAuthService.dispose();
 
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});
@@ -424,9 +436,11 @@ void main() {
 
         // Allow mock to fully settle
         await Future.delayed(Duration.zero);
-
-        await authService.initialize();
-        expect(authService.errorMessage, isNotNull);
+        
+        // Create new AuthService instance AFTER setting mock values
+        final testAuthService = AuthService();
+        await testAuthService.initialize();
+        expect(testAuthService.errorMessage, isNotNull);
 
         // Reset SharedPreferences for clean sign in
         SharedPreferences.setMockInitialValues({});
@@ -435,9 +449,12 @@ void main() {
         await Future.delayed(Duration.zero);
 
         // Successful sign in should clear error
-        await authService.signInWithGoogle();
-        expect(authService.errorMessage, isNull);
-        expect(authService.authState, AuthState.authenticated);
+        await testAuthService.signInWithGoogle();
+        expect(testAuthService.errorMessage, isNull);
+        expect(testAuthService.authState, AuthState.authenticated);
+        
+        // Clean up
+        testAuthService.dispose();
 
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});

@@ -4,6 +4,7 @@ import 'package:from_fed_to_chain_app/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/models/playlist.dart';
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
+import 'package:from_fed_to_chain_app/services/audio_service.dart';
 
 /// Custom matchers for testing
 /// Matches at least N widgets
@@ -497,6 +498,46 @@ class TestUtils {
   static Future<T> mockAsyncError<T>(String message, {Duration? delay}) async {
     await Future.delayed(delay ?? const Duration(milliseconds: 100));
     throw Exception(message);
+  }
+
+  /// Convert PlaybackState enum to MiniPlayer boolean parameters
+  /// Helper method for MiniPlayer test migration after API refactor
+  static Map<String, dynamic> convertPlaybackStateToMiniPlayerParams(PlaybackState playbackState) {
+    String stateText;
+    bool isPlaying = false;
+    bool isPaused = false;
+    bool isLoading = false;
+    bool hasError = false;
+
+    switch (playbackState) {
+      case PlaybackState.playing:
+        isPlaying = true;
+        stateText = 'Playing';
+        break;
+      case PlaybackState.paused:
+        isPaused = true;
+        stateText = 'Paused';
+        break;
+      case PlaybackState.loading:
+        isLoading = true;
+        stateText = 'Loading';
+        break;
+      case PlaybackState.error:
+        hasError = true;
+        stateText = 'Error';
+        break;
+      case PlaybackState.stopped:
+        stateText = 'Stopped';
+        break;
+    }
+
+    return {
+      'isPlaying': isPlaying,
+      'isPaused': isPaused,
+      'isLoading': isLoading,
+      'hasError': hasError,
+      'stateText': stateText,
+    };
   }
 }
 

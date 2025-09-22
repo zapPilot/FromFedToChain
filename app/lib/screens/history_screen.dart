@@ -234,12 +234,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildMiniPlayer(BuildContext context, AudioService audioService) {
     return MiniPlayer(
       audioFile: audioService.currentAudioFile!,
-      playbackState: audioService.playbackState,
+      isPlaying: audioService.isPlaying,
+      isPaused: audioService.isPaused,
+      isLoading: audioService.isLoading,
+      hasError: audioService.hasError,
+      stateText: _getStateText(audioService),
       onTap: () => _navigateToPlayer(context),
       onPlayPause: () => audioService.togglePlayPause(),
       onNext: () => audioService.skipToNextEpisode(),
       onPrevious: () => audioService.skipToPreviousEpisode(),
     );
+  }
+
+  /// Helper method to get state text from AudioService
+  String _getStateText(AudioService audioService) {
+    if (audioService.hasError) {
+      return 'Error';
+    } else if (audioService.isLoading) {
+      return 'Loading';
+    } else if (audioService.isPlaying) {
+      return 'Playing';
+    } else if (audioService.isPaused) {
+      return 'Paused';
+    } else {
+      return 'Stopped';
+    }
   }
 
   /// Play episode

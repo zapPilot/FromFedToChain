@@ -42,6 +42,7 @@ void main() {
       when(mockContentService.sortOrder).thenReturn('newest');
       when(mockContentService.isLoading).thenReturn(false);
       when(mockContentService.hasError).thenReturn(false);
+      when(mockContentService.errorMessage).thenReturn(null);
       when(mockContentService.allEpisodes).thenReturn([testAudioFile]);
       when(mockContentService.filteredEpisodes).thenReturn([testAudioFile]);
       when(mockContentService.hasEpisodes).thenReturn(true);
@@ -67,6 +68,8 @@ void main() {
       when(mockAudioService.isPlaying).thenReturn(false);
       when(mockAudioService.isPaused).thenReturn(false);
       when(mockAudioService.isLoading).thenReturn(false);
+      when(mockAudioService.hasError).thenReturn(false);
+      when(mockAudioService.errorMessage).thenReturn(null);
     });
 
     tearDown(() {
@@ -90,6 +93,12 @@ void main() {
 
     group('Basic Widget Creation', () {
       testWidgets('should render HomeScreen without crashing', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -97,6 +106,12 @@ void main() {
       });
 
       testWidgets('should display app title', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -104,6 +119,12 @@ void main() {
       });
 
       testWidgets('should display episode when available', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -113,6 +134,12 @@ void main() {
 
     group('Filter Interactions', () {
       testWidgets('should handle language filter tap', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -126,6 +153,12 @@ void main() {
       });
 
       testWidgets('should handle category filter tap', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -141,6 +174,12 @@ void main() {
 
     group('Audio Playback', () {
       testWidgets('should handle episode tap for playback', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -158,6 +197,12 @@ void main() {
         when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
         when(mockAudioService.isPlaying).thenReturn(true);
 
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -168,6 +213,12 @@ void main() {
 
     group('Search Functionality', () {
       testWidgets('should handle search input', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -185,6 +236,12 @@ void main() {
       testWidgets('should show loading indicator when loading', (tester) async {
         when(mockContentService.isLoading).thenReturn(true);
 
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -196,6 +253,12 @@ void main() {
         when(mockContentService.hasError).thenReturn(true);
         when(mockContentService.errorMessage).thenReturn('Network error');
 
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -205,6 +268,12 @@ void main() {
       testWidgets('should show empty state when no episodes', (tester) async {
         when(mockContentService.hasEpisodes).thenReturn(false);
         when(mockContentService.filteredEpisodes).thenReturn([]);
+
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -216,6 +285,12 @@ void main() {
 
     group('Statistics Display', () {
       testWidgets('should show episode statistics', (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -230,6 +305,12 @@ void main() {
     group('Navigation', () {
       testWidgets('should navigate to player on episode selection',
           (tester) async {
+        // Set a larger screen size to prevent RenderFlex overflow
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 

@@ -21,13 +21,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -81,13 +77,9 @@ void main() {
 
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
-              MiniPlayer(
+              WidgetTestUtils.createMiniPlayer(
                 audioFile: audioFile,
                 playbackState: PlaybackState.paused,
-                onTap: WidgetTestUtils.mockTap,
-                onPlayPause: WidgetTestUtils.mockPlayPause,
-                onNext: WidgetTestUtils.mockNext,
-                onPrevious: WidgetTestUtils.mockPrevious,
               ),
             ),
           );
@@ -108,13 +100,9 @@ void main() {
 
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
-              MiniPlayer(
+              WidgetTestUtils.createMiniPlayer(
                 audioFile: audioFile,
                 playbackState: PlaybackState.paused,
-                onTap: WidgetTestUtils.mockTap,
-                onPlayPause: WidgetTestUtils.mockPlayPause,
-                onNext: WidgetTestUtils.mockNext,
-                onPrevious: WidgetTestUtils.mockPrevious,
               ),
             ),
           );
@@ -131,13 +119,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -149,13 +133,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.playing,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -167,13 +147,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.loading,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -185,13 +161,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.error,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -211,13 +183,9 @@ void main() {
         for (final (state, icon, text) in testCases) {
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
-              MiniPlayer(
+              WidgetTestUtils.createMiniPlayer(
                 audioFile: testAudioFile,
                 playbackState: state,
-                onTap: WidgetTestUtils.mockTap,
-                onPlayPause: WidgetTestUtils.mockPlayPause,
-                onNext: WidgetTestUtils.mockNext,
-                onPrevious: WidgetTestUtils.mockPrevious,
               ),
             ),
           );
@@ -236,13 +204,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -258,13 +222,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -282,13 +242,9 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -305,13 +261,9 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -329,13 +281,9 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.loading,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -359,13 +307,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -381,13 +325,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -413,13 +353,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -459,13 +395,9 @@ void main() {
         for (final (state, _) in stateColors) {
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
-              MiniPlayer(
+              WidgetTestUtils.createMiniPlayer(
                 audioFile: testAudioFile,
                 playbackState: state,
-                onTap: WidgetTestUtils.mockTap,
-                onPlayPause: WidgetTestUtils.mockPlayPause,
-                onNext: WidgetTestUtils.mockNext,
-                onPrevious: WidgetTestUtils.mockPrevious,
               ),
             ),
           );
@@ -489,13 +421,9 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: longTitleAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -515,13 +443,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -535,13 +459,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -556,13 +476,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -573,13 +489,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -605,13 +517,9 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -631,17 +539,14 @@ void main() {
           StatefulBuilder(
             builder: (context, setState) {
               return WidgetTestUtils.createTestWrapper(
-                MiniPlayer(
+                WidgetTestUtils.createMiniPlayer(
                   audioFile: testAudioFile,
                   playbackState: currentState,
-                  onTap: WidgetTestUtils.mockTap,
                   onPlayPause: () => setState(() {
                     currentState = currentState == PlaybackState.playing
                         ? PlaybackState.paused
                         : PlaybackState.playing;
                   }),
-                  onNext: WidgetTestUtils.mockNext,
-                  onPrevious: WidgetTestUtils.mockPrevious,
                 ),
               );
             },
@@ -670,13 +575,9 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          MiniPlayer(
+          WidgetTestUtils.createMiniPlayer(
             audioFile: specialTitleAudioFile,
             playbackState: PlaybackState.paused,
-            onTap: WidgetTestUtils.mockTap,
-            onPlayPause: WidgetTestUtils.mockPlayPause,
-            onNext: WidgetTestUtils.mockNext,
-            onPrevious: WidgetTestUtils.mockPrevious,
           ),
         );
 
@@ -689,13 +590,9 @@ void main() {
         for (final state in PlaybackState.values) {
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
-              MiniPlayer(
+              WidgetTestUtils.createMiniPlayer(
                 audioFile: testAudioFile,
                 playbackState: state,
-                onTap: WidgetTestUtils.mockTap,
-                onPlayPause: WidgetTestUtils.mockPlayPause,
-                onNext: WidgetTestUtils.mockNext,
-                onPrevious: WidgetTestUtils.mockPrevious,
               ),
             ),
           );
@@ -717,13 +614,9 @@ void main() {
 
           await WidgetTestUtils.pumpWidgetWithTheme(
             tester,
-            MiniPlayer(
+            WidgetTestUtils.createMiniPlayer(
               audioFile: testAudioFile,
               playbackState: PlaybackState.paused,
-              onTap: WidgetTestUtils.mockTap,
-              onPlayPause: WidgetTestUtils.mockPlayPause,
-              onNext: WidgetTestUtils.mockNext,
-              onPrevious: WidgetTestUtils.mockPrevious,
             ),
           );
 
