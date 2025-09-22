@@ -650,7 +650,8 @@ class WidgetTestUtils {
     VoidCallback? onNext,
     VoidCallback? onPrevious,
   }) {
-    final params = TestUtils.convertPlaybackStateToMiniPlayerParams(playbackState);
+    final params =
+        TestUtils.convertPlaybackStateToMiniPlayerParams(playbackState);
 
     return MiniPlayer(
       audioFile: audioFile,

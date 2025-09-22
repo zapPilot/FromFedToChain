@@ -118,7 +118,8 @@ class _HomeScreenState extends State<HomeScreen>
                     _buildAppHeader(context, contentService),
 
                     // Search bar (animated)
-                    if (_showSearchBar) _buildSearchBar(context, contentService),
+                    if (_showSearchBar)
+                      _buildSearchBar(context, contentService),
 
                     // Filter bar
                     _buildFilterBar(context, contentService),
@@ -134,7 +135,8 @@ class _HomeScreenState extends State<HomeScreen>
             Expanded(
               child: Consumer2<ContentFacadeService, AudioService>(
                 builder: (context, contentService, audioService, child) {
-                  return _buildMainContent(context, contentService, audioService);
+                  return _buildMainContent(
+                      context, contentService, audioService);
                 },
               ),
             ),

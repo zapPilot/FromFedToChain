@@ -20,6 +20,7 @@ class ApiConfig {
           : 'production';
     }
   }
+
   static const bool isTest =
       bool.fromEnvironment('FLUTTER_TEST', defaultValue: false);
 
@@ -60,7 +61,8 @@ class ApiConfig {
   static Duration get apiTimeout {
     try {
       return Duration(
-          seconds: int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));
+          seconds:
+              int.parse(dotenv.get('API_TIMEOUT_SECONDS', fallback: '30')));
     } catch (e) {
       return const Duration(seconds: 30); // Default fallback
     }
@@ -69,11 +71,13 @@ class ApiConfig {
   static Duration get streamTimeout {
     try {
       return Duration(
-          seconds: int.parse(dotenv.get('STREAM_TIMEOUT_SECONDS', fallback: '30')));
+          seconds:
+              int.parse(dotenv.get('STREAM_TIMEOUT_SECONDS', fallback: '30')));
     } catch (e) {
       return const Duration(seconds: 30); // Default fallback
     }
   }
+
   static const int retryAttempts = 3;
 
   // Supported languages and categories (synced with ContentSchema.js)

@@ -278,9 +278,7 @@ class MiniPlayer extends StatelessWidget {
       width: size,
       height: size,
       child: IconButton(
-        onPressed: isLoading && isPrimary
-            ? null
-            : onPressed,
+        onPressed: isLoading && isPrimary ? null : onPressed,
         tooltip: semanticLabel,
         icon: isLoading && isPrimary
             ? SizedBox(

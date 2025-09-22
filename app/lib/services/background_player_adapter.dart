@@ -83,7 +83,8 @@ class BackgroundPlayerAdapter implements IPlayerAdapter {
   }
 
   /// Map audio_service_pkg.AudioProcessingState to AppPlaybackState
-  AppPlaybackState _mapPlaybackState(audio_service_pkg.AudioProcessingState processingState, bool playing) {
+  AppPlaybackState _mapPlaybackState(
+      audio_service_pkg.AudioProcessingState processingState, bool playing) {
     switch (processingState) {
       case audio_service_pkg.AudioProcessingState.idle:
         return AppPlaybackState.stopped;
@@ -185,7 +186,8 @@ class BackgroundPlayerAdapter implements IPlayerAdapter {
   }
 
   @override
-  Future<void> skipForward([Duration duration = const Duration(seconds: 30)]) async {
+  Future<void> skipForward(
+      [Duration duration = const Duration(seconds: 30)]) async {
     try {
       await _handler.fastForward();
     } catch (e) {
@@ -194,7 +196,8 @@ class BackgroundPlayerAdapter implements IPlayerAdapter {
   }
 
   @override
-  Future<void> skipBackward([Duration duration = const Duration(seconds: 10)]) async {
+  Future<void> skipBackward(
+      [Duration duration = const Duration(seconds: 10)]) async {
     try {
       await _handler.rewind();
     } catch (e) {

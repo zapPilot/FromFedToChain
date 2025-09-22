@@ -25,12 +25,12 @@ class AudioService extends ChangeNotifier {
   // Enhanced service instance (new architecture)
   late final EnhancedAudioService _enhancedService;
 
-
   // Disposal guard
   bool _disposed = false;
 
   // Getters (delegate to enhanced service with state mapping)
-  PlaybackState get playbackState => _mapToLegacyState(_enhancedService.playbackState);
+  PlaybackState get playbackState =>
+      _mapToLegacyState(_enhancedService.playbackState);
   AudioFile? get currentAudioFile => _enhancedService.currentAudioFile;
   Duration get currentPosition => _enhancedService.currentPosition;
   Duration get totalDuration => _enhancedService.totalDuration;
@@ -46,7 +46,8 @@ class AudioService extends ChangeNotifier {
   bool get hasError => _enhancedService.hasError;
   bool get isIdle => _enhancedService.isIdle;
   double get progress => _enhancedService.progress;
-  String get formattedCurrentPosition => _enhancedService.formattedCurrentPosition;
+  String get formattedCurrentPosition =>
+      _enhancedService.formattedCurrentPosition;
   String get formattedTotalDuration => _enhancedService.formattedTotalDuration;
   String? get currentAudioId => _enhancedService.currentAudioId;
 
@@ -60,7 +61,8 @@ class AudioService extends ChangeNotifier {
     }
 
     // Create enhanced service instance
-    _enhancedService = EnhancedAudioService(audioHandler, contentService, localAudioPlayer);
+    _enhancedService =
+        EnhancedAudioService(audioHandler, contentService, localAudioPlayer);
 
     // Set up state synchronization
     _enhancedService.addListener(() {
@@ -86,7 +88,8 @@ class AudioService extends ChangeNotifier {
       case AppPlaybackState.loading:
         return PlaybackState.loading;
       case AppPlaybackState.completed:
-        return PlaybackState.stopped; // Map completed to stopped for backward compatibility
+        return PlaybackState
+            .stopped; // Map completed to stopped for backward compatibility
       case AppPlaybackState.error:
         return PlaybackState.error;
     }
@@ -142,12 +145,12 @@ class AudioService extends ChangeNotifier {
     await _enhancedService.setPlaybackSpeed(speed);
   }
 
-
   /// Test method to verify media session is working
   Future<void> testMediaSession() async {
     // Note: This is a testing method - enhanced service handles media session internally
     if (kDebugMode) {
-      print('🧪 AudioService: Media session testing delegated to enhanced service');
+      print(
+          '🧪 AudioService: Media session testing delegated to enhanced service');
     }
   }
 
@@ -162,7 +165,6 @@ class AudioService extends ChangeNotifier {
 
   /// Skip backward by 10 seconds (alias for seekBackward)
   Future<void> seekBackward() async => skipBackward();
-
 
   /// Play audio file (alias for playAudio for test compatibility)
   Future<void> play(AudioFile audioFile) => playAudio(audioFile);
@@ -298,5 +300,4 @@ class AudioService extends ChangeNotifier {
         return AppPlaybackState.error;
     }
   }
-
 }

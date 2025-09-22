@@ -162,7 +162,8 @@ class PlayerController {
   }
 
   /// Skip forward by specified duration (default 30 seconds)
-  Future<void> skipForward([Duration duration = const Duration(seconds: 30)]) async {
+  Future<void> skipForward(
+      [Duration duration = const Duration(seconds: 30)]) async {
     try {
       if (kDebugMode) {
         print('⏭️ PlayerController: Skipping forward ${duration.inSeconds}s');
@@ -178,7 +179,8 @@ class PlayerController {
   }
 
   /// Skip backward by specified duration (default 10 seconds)
-  Future<void> skipBackward([Duration duration = const Duration(seconds: 10)]) async {
+  Future<void> skipBackward(
+      [Duration duration = const Duration(seconds: 10)]) async {
     try {
       if (kDebugMode) {
         print('⏮️ PlayerController: Skipping backward ${duration.inSeconds}s');
@@ -200,7 +202,8 @@ class PlayerController {
   ) async {
     try {
       if (kDebugMode) {
-        print('🔧 PlayerController: Setting up audio source: ${audioFile.streamingUrl}');
+        print(
+            '🔧 PlayerController: Setting up audio source: ${audioFile.streamingUrl}');
       }
       await _player.setAudioSource(
         audioFile,

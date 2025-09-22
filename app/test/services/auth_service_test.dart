@@ -80,7 +80,7 @@ void main() {
 
         // Allow mock to fully settle
         await Future.delayed(Duration.zero);
-        
+
         // Create new AuthService instance AFTER setting mock values
         // This ensures the service uses the corrupted mock data
         final testAuthService = AuthService();
@@ -92,7 +92,7 @@ void main() {
 
         // Clean up
         testAuthService.dispose();
-        
+
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});
         await Future.delayed(Duration.zero);
@@ -410,7 +410,7 @@ void main() {
 
         // Allow mock to fully settle
         await Future.delayed(Duration.zero);
-        
+
         // Create new AuthService instance AFTER setting mock values
         final testAuthService = AuthService();
         await testAuthService.initialize();
@@ -418,7 +418,7 @@ void main() {
         expect(testAuthService.authState, AuthState.error);
         expect(testAuthService.errorMessage, isNotNull);
         expect(testAuthService.isAuthenticated, isFalse);
-        
+
         // Clean up
         testAuthService.dispose();
 
@@ -436,7 +436,7 @@ void main() {
 
         // Allow mock to fully settle
         await Future.delayed(Duration.zero);
-        
+
         // Create new AuthService instance AFTER setting mock values
         final testAuthService = AuthService();
         await testAuthService.initialize();
@@ -452,7 +452,7 @@ void main() {
         await testAuthService.signInWithGoogle();
         expect(testAuthService.errorMessage, isNull);
         expect(testAuthService.authState, AuthState.authenticated);
-        
+
         // Clean up
         testAuthService.dispose();
 

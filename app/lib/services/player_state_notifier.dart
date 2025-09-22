@@ -41,7 +41,8 @@ class PlayerStateNotifier extends ChangeNotifier {
   /// Progress as a value between 0.0 and 1.0
   double get progress {
     if (_totalDuration.inMilliseconds <= 0) return 0.0;
-    final result = _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
+    final result =
+        _currentPosition.inMilliseconds / _totalDuration.inMilliseconds;
     return result.clamp(0.0, 1.0);
   }
 

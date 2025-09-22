@@ -43,7 +43,8 @@ class AudioProgressTracker {
 
       // Log progress every 10% for debugging
       if (kDebugMode && progress % 0.1 < 0.01) {
-        print('📊 AudioProgressTracker: Episode $episodeId progress: ${(progress * 100).toInt()}%');
+        print(
+            '📊 AudioProgressTracker: Episode $episodeId progress: ${(progress * 100).toInt()}%');
       }
     }
   }
@@ -55,7 +56,8 @@ class AudioProgressTracker {
   Future<void> markEpisodeCompleted(String episodeId) async {
     if (_contentService == null) {
       if (kDebugMode) {
-        print('⚠️ AudioProgressTracker: Cannot mark episode as finished - no content service');
+        print(
+            '⚠️ AudioProgressTracker: Cannot mark episode as finished - no content service');
       }
       return;
     }
@@ -67,7 +69,8 @@ class AudioProgressTracker {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('⚠️ AudioProgressTracker: Failed to mark episode as finished: $e');
+        print(
+            '⚠️ AudioProgressTracker: Failed to mark episode as finished: $e');
       }
       // Don't rethrow - this shouldn't block other operations
     }
@@ -86,7 +89,8 @@ class AudioProgressTracker {
     _contentService!.updateEpisodeCompletion(episodeId, progress);
 
     if (kDebugMode) {
-      print('💾 AudioProgressTracker: Saved progress for $episodeId: ${(progress * 100).toInt()}%');
+      print(
+          '💾 AudioProgressTracker: Saved progress for $episodeId: ${(progress * 100).toInt()}%');
     }
   }
 
@@ -127,7 +131,8 @@ class AudioProgressTracker {
     );
 
     if (kDebugMode) {
-      print('🔄 AudioProgressTracker: Resume position for $episodeId: ${resumePosition.inSeconds}s (${(progress * 100).toInt()}%)');
+      print(
+          '🔄 AudioProgressTracker: Resume position for $episodeId: ${resumePosition.inSeconds}s (${(progress * 100).toInt()}%)');
     }
 
     return resumePosition;
@@ -136,7 +141,8 @@ class AudioProgressTracker {
   /// Check if progress update should be throttled
   bool _shouldThrottleUpdate() {
     final now = DateTime.now();
-    return now.difference(_lastProgressUpdate).inMilliseconds < _updateThrottleMs;
+    return now.difference(_lastProgressUpdate).inMilliseconds <
+        _updateThrottleMs;
   }
 
   /// Calculate progress as a value between 0.0 and 1.0

@@ -98,7 +98,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -111,7 +111,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -124,7 +124,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -139,7 +139,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -158,7 +158,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -179,7 +179,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -218,7 +218,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -290,7 +290,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -310,7 +310,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        
+
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 

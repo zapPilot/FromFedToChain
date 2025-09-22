@@ -502,7 +502,8 @@ class TestUtils {
 
   /// Convert PlaybackState enum to MiniPlayer boolean parameters
   /// Helper method for MiniPlayer test migration after API refactor
-  static Map<String, dynamic> convertPlaybackStateToMiniPlayerParams(PlaybackState playbackState) {
+  static Map<String, dynamic> convertPlaybackStateToMiniPlayerParams(
+      PlaybackState playbackState) {
     String stateText;
     bool isPlaying = false;
     bool isPaused = false;

@@ -32,7 +32,8 @@ class LocalPlayerAdapter implements IPlayerAdapter {
 
   bool _disposed = false;
 
-  LocalPlayerAdapter({AudioPlayer? audioPlayer}) : _player = audioPlayer ?? AudioPlayer() {
+  LocalPlayerAdapter({AudioPlayer? audioPlayer})
+      : _player = audioPlayer ?? AudioPlayer() {
     _initializeStreams();
     _setupSubscriptions();
   }
@@ -84,7 +85,8 @@ class LocalPlayerAdapter implements IPlayerAdapter {
   }
 
   /// Map just_audio.ProcessingState to AppPlaybackState
-  AppPlaybackState _mapPlayerState(ProcessingState processingState, bool playing) {
+  AppPlaybackState _mapPlayerState(
+      ProcessingState processingState, bool playing) {
     switch (processingState) {
       case ProcessingState.idle:
         return AppPlaybackState.stopped;
@@ -187,11 +189,13 @@ class LocalPlayerAdapter implements IPlayerAdapter {
   }
 
   @override
-  Future<void> skipForward([Duration duration = const Duration(seconds: 30)]) async {
+  Future<void> skipForward(
+      [Duration duration = const Duration(seconds: 30)]) async {
     try {
       final newPosition = _currentPosition + duration;
       final maxPosition = _currentDuration ?? Duration.zero;
-      final seekPosition = newPosition < maxPosition ? newPosition : maxPosition;
+      final seekPosition =
+          newPosition < maxPosition ? newPosition : maxPosition;
       await seek(seekPosition);
     } catch (e) {
       throw PlayerAdapterException('Failed to skip forward', e);
@@ -199,10 +203,12 @@ class LocalPlayerAdapter implements IPlayerAdapter {
   }
 
   @override
-  Future<void> skipBackward([Duration duration = const Duration(seconds: 10)]) async {
+  Future<void> skipBackward(
+      [Duration duration = const Duration(seconds: 10)]) async {
     try {
       final newPosition = _currentPosition - duration;
-      final seekPosition = newPosition > Duration.zero ? newPosition : Duration.zero;
+      final seekPosition =
+          newPosition > Duration.zero ? newPosition : Duration.zero;
       await seek(seekPosition);
     } catch (e) {
       throw PlayerAdapterException('Failed to skip backward', e);

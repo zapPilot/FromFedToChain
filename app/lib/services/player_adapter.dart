@@ -72,5 +72,6 @@ class PlayerAdapterException implements Exception {
   const PlayerAdapterException(this.message, [this.cause]);
 
   @override
-  String toString() => 'PlayerAdapterException: $message${cause != null ? ' (caused by $cause)' : ''}';
+  String toString() =>
+      'PlayerAdapterException: $message${cause != null ? ' (caused by $cause)' : ''}';
 }

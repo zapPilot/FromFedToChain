@@ -42,8 +42,10 @@ class EnhancedAudioService extends ChangeNotifier {
     AudioPlayer? localAudioPlayer,
   ]) : _providedAudioPlayer = localAudioPlayer {
     if (kDebugMode) {
-      print('🎧 EnhancedAudioService: Initializing with decomposed architecture...');
-      print('🎧 Background handler: ${_audioHandler != null ? "PRESENT" : "NULL"}');
+      print(
+          '🎧 EnhancedAudioService: Initializing with decomposed architecture...');
+      print(
+          '🎧 Background handler: ${_audioHandler != null ? "PRESENT" : "NULL"}');
     }
     _initializeComponents();
     _setupStateListener();
@@ -170,8 +172,7 @@ class EnhancedAudioService extends ChangeNotifier {
       // Delegate to player controller
       await _playerController.play(
         audioFile,
-        initialPosition:
-            resumePosition > Duration.zero ? resumePosition : null,
+        initialPosition: resumePosition > Duration.zero ? resumePosition : null,
       );
 
       if (resumePosition > Duration.zero) {
@@ -201,7 +202,8 @@ class EnhancedAudioService extends ChangeNotifier {
   /// Skip to next episode
   Future<void> skipToNextEpisode() async {
     if (_currentAudioFile != null) {
-      final nextEpisode = await _navigationService.skipToNext(_currentAudioFile!);
+      final nextEpisode =
+          await _navigationService.skipToNext(_currentAudioFile!);
       if (nextEpisode != null) {
         _currentAudioFile = nextEpisode;
       }
@@ -302,7 +304,8 @@ class EnhancedAudioService extends ChangeNotifier {
   double get progress => _stateNotifier.progress;
 
   /// Formatted current position
-  String get formattedCurrentPosition => _stateNotifier.formattedCurrentPosition;
+  String get formattedCurrentPosition =>
+      _stateNotifier.formattedCurrentPosition;
 
   /// Formatted total duration
   String get formattedTotalDuration => _stateNotifier.formattedTotalDuration;

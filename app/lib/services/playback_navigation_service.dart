@@ -35,7 +35,8 @@ class PlaybackNavigationService {
     if (_autoplayEnabled != enabled) {
       _autoplayEnabled = enabled;
       if (kDebugMode) {
-        print('🔄 PlaybackNavigationService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
+        print(
+            '🔄 PlaybackNavigationService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
       }
     }
   }
@@ -45,7 +46,8 @@ class PlaybackNavigationService {
     if (_repeatEnabled != enabled) {
       _repeatEnabled = enabled;
       if (kDebugMode) {
-        print('🔄 PlaybackNavigationService: Repeat ${enabled ? 'enabled' : 'disabled'}');
+        print(
+            '🔄 PlaybackNavigationService: Repeat ${enabled ? 'enabled' : 'disabled'}');
       }
     }
   }
@@ -64,7 +66,8 @@ class PlaybackNavigationService {
   Future<AudioFile?> skipToNext(AudioFile currentEpisode) async {
     if (_contentService == null) {
       if (kDebugMode) {
-        print('❌ PlaybackNavigationService: Cannot skip to next - no content service');
+        print(
+            '❌ PlaybackNavigationService: Cannot skip to next - no content service');
       }
       return null;
     }
@@ -73,7 +76,8 @@ class PlaybackNavigationService {
       final nextEpisode = _contentService!.getNextEpisode(currentEpisode);
       if (nextEpisode != null) {
         if (kDebugMode) {
-          print('⏭️ PlaybackNavigationService: Skipping to next episode: ${nextEpisode.id}');
+          print(
+              '⏭️ PlaybackNavigationService: Skipping to next episode: ${nextEpisode.id}');
         }
         final resumePosition = _progressTracker.calculateResumePosition(
           nextEpisode.id,
@@ -92,7 +96,8 @@ class PlaybackNavigationService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ PlaybackNavigationService: Failed to skip to next episode: $e');
+        print(
+            '❌ PlaybackNavigationService: Failed to skip to next episode: $e');
       }
       // Don't rethrow - navigation errors shouldn't crash the app
     }
@@ -104,16 +109,19 @@ class PlaybackNavigationService {
   Future<AudioFile?> skipToPrevious(AudioFile currentEpisode) async {
     if (_contentService == null) {
       if (kDebugMode) {
-        print('❌ PlaybackNavigationService: Cannot skip to previous - no content service');
+        print(
+            '❌ PlaybackNavigationService: Cannot skip to previous - no content service');
       }
       return null;
     }
 
     try {
-      final previousEpisode = _contentService!.getPreviousEpisode(currentEpisode);
+      final previousEpisode =
+          _contentService!.getPreviousEpisode(currentEpisode);
       if (previousEpisode != null) {
         if (kDebugMode) {
-          print('⏮️ PlaybackNavigationService: Skipping to previous episode: ${previousEpisode.id}');
+          print(
+              '⏮️ PlaybackNavigationService: Skipping to previous episode: ${previousEpisode.id}');
         }
         final resumePosition = _progressTracker.calculateResumePosition(
           previousEpisode.id,
@@ -132,7 +140,8 @@ class PlaybackNavigationService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ PlaybackNavigationService: Failed to skip to previous episode: $e');
+        print(
+            '❌ PlaybackNavigationService: Failed to skip to previous episode: $e');
       }
       // Don't rethrow - navigation errors shouldn't crash the app
     }
@@ -146,7 +155,8 @@ class PlaybackNavigationService {
   /// finishes playing. Repeat mode takes precedence over autoplay.
   Future<AudioFile?> handleEpisodeCompletion(AudioFile completedEpisode) async {
     if (kDebugMode) {
-      print('🎵 PlaybackNavigationService: Episode completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
+      print(
+          '🎵 PlaybackNavigationService: Episode completed. Repeat: $_repeatEnabled, Autoplay: $_autoplayEnabled');
     }
 
     // Repeat mode takes precedence over autoplay
@@ -177,7 +187,8 @@ class PlaybackNavigationService {
     // If autoplay is disabled, stop here
     if (!_autoplayEnabled) {
       if (kDebugMode) {
-        print('📝 PlaybackNavigationService: Autoplay disabled, stopping playback');
+        print(
+            '📝 PlaybackNavigationService: Autoplay disabled, stopping playback');
       }
       return null;
     }
@@ -185,7 +196,8 @@ class PlaybackNavigationService {
     // Check if content service is available for autoplay
     if (_contentService == null) {
       if (kDebugMode) {
-        print('❌ PlaybackNavigationService: ContentService not available for autoplay');
+        print(
+            '❌ PlaybackNavigationService: ContentService not available for autoplay');
       }
       return null;
     }
@@ -195,7 +207,8 @@ class PlaybackNavigationService {
       final nextEpisode = _contentService!.getNextEpisode(completedEpisode);
       if (nextEpisode != null) {
         if (kDebugMode) {
-          print('⏭️ PlaybackNavigationService: Autoplay starting next episode: ${nextEpisode.id}');
+          print(
+              '⏭️ PlaybackNavigationService: Autoplay starting next episode: ${nextEpisode.id}');
         }
 
         // Small delay to ensure smooth transition
@@ -218,7 +231,8 @@ class PlaybackNavigationService {
       }
 
       if (kDebugMode) {
-        print('📝 PlaybackNavigationService: No next episode available for autoplay');
+        print(
+            '📝 PlaybackNavigationService: No next episode available for autoplay');
       }
     } catch (e) {
       if (kDebugMode) {
