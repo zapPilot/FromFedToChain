@@ -7,7 +7,7 @@ import 'package:audio_service/audio_service.dart';
 
 import 'themes/app_theme.dart';
 import 'services/background_audio_handler.dart';
-import 'services/audio_service.dart' as local_audio;
+import 'services/audio_player_service.dart';
 import 'services/content_facade_service.dart';
 import 'services/deep_link_service.dart';
 import 'screens/main_navigation_screen.dart';
@@ -136,7 +136,7 @@ class FromFedToChainApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) {
             final contentService = context.read<ContentFacadeService>();
-            return local_audio.AudioService(audioHandler, contentService);
+            return AudioPlayerService(audioHandler, contentService);
           },
         ),
       ],

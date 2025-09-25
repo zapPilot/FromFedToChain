@@ -1,24 +1,30 @@
+@Tags([
+  'sequential'
+]) // Avoids shared BackgroundAudioHandler state across isolates.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:audio_service/audio_service.dart' as audio_service_pkg;
 import 'package:rxdart/rxdart.dart';
 
-import 'package:from_fed_to_chain_app/services/audio_service.dart';
+import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
 
 // Generate nice mocks for dependencies (returns sensible defaults instead of throwing errors)
 @GenerateNiceMocks(
     [MockSpec<BackgroundAudioHandler>(), MockSpec<ContentFacadeService>()])
 import 'audio_service_test.mocks.dart';
 
+// Serial execution avoids shared BackgroundAudioHandler mocks colliding across isolates.
+@Tags(['sequential'])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('AudioService - Simplified Unit Tests', () {
-    late AudioService audioService;
+  group('AudioPlayerService - Simplified Unit Tests', () {
+    late AudioPlayerService audioService;
     late MockBackgroundAudioHandler mockAudioHandler;
     late MockContentFacadeService mockContentService;
     late AudioFile testAudioFile;
@@ -58,6 +64,8 @@ void main() {
       when(mockAudioHandler.pause()).thenAnswer((_) async => {});
       when(mockAudioHandler.stop()).thenAnswer((_) async => {});
       when(mockAudioHandler.seek(any)).thenAnswer((_) async => {});
+      when(mockAudioHandler.fastForward()).thenAnswer((_) async => {});
+      when(mockAudioHandler.rewind()).thenAnswer((_) async => {});
 
       testAudioFile = AudioFile(
         id: 'test-episode',
@@ -70,7 +78,18 @@ void main() {
         lastModified: DateTime.now(),
       );
 
-      audioService = AudioService(mockAudioHandler, mockContentService);
+      when(mockAudioHandler.setEpisodeNavigationCallbacks(
+              onNext: anyNamed('onNext'), onPrevious: anyNamed('onPrevious')))
+          .thenReturn(null);
+      when(mockContentService.addToListenHistory(any))
+          .thenAnswer((_) async => {});
+      when(mockContentService.updateEpisodeCompletion(any, any))
+          .thenAnswer((_) async {});
+      when(mockContentService.markEpisodeAsFinished(any))
+          .thenAnswer((_) async {});
+      when(mockContentService.getEpisodeCompletion(any)).thenReturn(0.0);
+
+      audioService = AudioPlayerService(mockAudioHandler, mockContentService);
     });
 
     tearDown(() {
@@ -80,22 +99,22 @@ void main() {
 
     group('Basic State Management', () {
       test('should initialize with default state', () {
-        expect(audioService.playbackState, PlaybackState.stopped);
+        expect(audioService.playbackState, AppPlaybackState.stopped);
         expect(audioService.currentAudioFile, isNull);
         expect(audioService.autoplayEnabled, isTrue);
         expect(audioService.repeatEnabled, isFalse);
       });
 
       test('should calculate computed properties correctly', () {
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
         expect(audioService.isPlaying, isTrue);
         expect(audioService.isPaused, isFalse);
 
-        audioService.setPlaybackStateForTesting(PlaybackState.paused);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.paused);
         expect(audioService.isPlaying, isFalse);
         expect(audioService.isPaused, isTrue);
 
-        audioService.setPlaybackStateForTesting(PlaybackState.loading);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.loading);
         expect(audioService.isLoading, isTrue);
       });
     });
@@ -115,7 +134,7 @@ void main() {
 
       test('should call handler pause method', () async {
         // Set up state to be playing so togglePlayPause calls pause
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
         await audioService.togglePlayPause();
         verify(mockAudioHandler.pause()).called(1);
       });
@@ -259,94 +278,94 @@ void main() {
     group('State Transitions', () {
       test('should transition from stopped to loading when playing audio',
           () async {
-        expect(audioService.playbackState, PlaybackState.stopped);
+        expect(audioService.playbackState, AppPlaybackState.stopped);
 
         // Simulate loading state during audio setup
-        audioService.setPlaybackStateForTesting(PlaybackState.loading);
-        expect(audioService.playbackState, PlaybackState.loading);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.loading);
+        expect(audioService.playbackState, AppPlaybackState.loading);
         expect(audioService.isLoading, isTrue);
 
         // Then transition to playing
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
-        expect(audioService.playbackState, PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
+        expect(audioService.playbackState, AppPlaybackState.playing);
         expect(audioService.isPlaying, isTrue);
       });
 
       test('should transition between playing and paused states', () {
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
         expect(audioService.isPlaying, isTrue);
         expect(audioService.isPaused, isFalse);
 
-        audioService.setPlaybackStateForTesting(PlaybackState.paused);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.paused);
         expect(audioService.isPlaying, isFalse);
         expect(audioService.isPaused, isTrue);
 
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
         expect(audioService.isPlaying, isTrue);
         expect(audioService.isPaused, isFalse);
       });
 
       test('should handle loading state properly', () {
-        audioService.setPlaybackStateForTesting(PlaybackState.loading);
-        expect(audioService.playbackState, PlaybackState.loading);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.loading);
+        expect(audioService.playbackState, AppPlaybackState.loading);
         expect(audioService.isLoading, isTrue);
         expect(audioService.isPlaying, isFalse);
         expect(audioService.isPaused, isFalse);
       });
 
       test('should handle error state', () {
-        audioService.setPlaybackStateForTesting(PlaybackState.error);
-        expect(audioService.playbackState, PlaybackState.error);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.error);
+        expect(audioService.playbackState, AppPlaybackState.error);
         expect(audioService.isPlaying, isFalse);
         expect(audioService.isPaused, isFalse);
         expect(audioService.hasError, isTrue);
       });
 
       test('should check idle state correctly', () {
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
         expect(audioService.isIdle, isTrue);
 
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
         expect(audioService.isIdle, isFalse);
       });
 
       test('should return to stopped state after stop', () async {
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
-        expect(audioService.playbackState, PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
+        expect(audioService.playbackState, AppPlaybackState.playing);
 
         await audioService.stop();
 
         // Verify the stop method was called and state was updated
         verify(mockAudioHandler.stop()).called(1);
-        expect(audioService.playbackState, PlaybackState.stopped);
+        expect(audioService.playbackState, AppPlaybackState.stopped);
       });
 
       test('should handle complex state transition sequence', () {
         // Start from stopped
-        expect(audioService.playbackState, PlaybackState.stopped);
+        expect(audioService.playbackState, AppPlaybackState.stopped);
 
         // Move to loading
-        audioService.setPlaybackStateForTesting(PlaybackState.loading);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.loading);
         expect(audioService.isLoading, isTrue);
         expect(audioService.isPlaying, isFalse);
 
         // Move to playing
-        audioService.setPlaybackStateForTesting(PlaybackState.playing);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.playing);
         expect(audioService.isPlaying, isTrue);
         expect(audioService.isLoading, isFalse);
 
         // Move to paused
-        audioService.setPlaybackStateForTesting(PlaybackState.paused);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.paused);
         expect(audioService.isPaused, isTrue);
         expect(audioService.isPlaying, isFalse);
 
         // Move to error
-        audioService.setPlaybackStateForTesting(PlaybackState.error);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.error);
         expect(audioService.hasError, isTrue);
         expect(audioService.isPaused, isFalse);
 
         // Back to stopped
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
         expect(audioService.isIdle, isTrue);
         expect(audioService.hasError, isFalse);
       });
@@ -359,7 +378,7 @@ void main() {
         expect(audioService.repeatEnabled, isTrue);
 
         // Simulate reaching end of audio (stopped state after playing)
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
 
         // With repeat enabled, should replay current episode
         await audioService.playAudio(testAudioFile);
@@ -391,7 +410,7 @@ void main() {
             .thenReturn(nextEpisode);
 
         // Simulate completion and autoplay
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
         await audioService.skipToNext();
 
         verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
@@ -405,7 +424,7 @@ void main() {
         when(mockContentService.getNextEpisode(testAudioFile)).thenReturn(null);
 
         // Simulate completion with no next episode
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
         await audioService.skipToNext();
 
         verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
@@ -418,7 +437,7 @@ void main() {
         expect(audioService.autoplayEnabled, isFalse);
 
         // Simulate completion (audio finishes, state goes to stopped)
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
 
         // With autoplay disabled, should not automatically play next
         verifyNever(mockContentService.getNextEpisode(any));
@@ -459,7 +478,7 @@ void main() {
             .thenAnswer((_) async => {});
 
         // Simulate completion (audio finishes and goes to stopped)
-        audioService.setPlaybackStateForTesting(PlaybackState.stopped);
+        audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
 
         // Verify that completion was recorded
         // Note: This would normally happen in _handleAudioCompletion
@@ -659,13 +678,14 @@ void main() {
       });
 
       test('should handle network timeout', () {
-        audioService.handleNetworkTimeout();
+        audioService.handlePlaybackError('Network timeout while streaming');
         expect(audioService.hasError, isTrue);
         expect(audioService.errorMessage, contains('Network timeout'));
       });
 
       test('should handle invalid URL', () {
-        audioService.handleInvalidUrl(testAudioFile);
+        audioService.handlePlaybackError(
+            'Invalid audio URL: ${testAudioFile.streamingUrl}');
         expect(audioService.hasError, isTrue);
         expect(audioService.errorMessage, contains('Invalid audio URL'));
       });
@@ -688,7 +708,7 @@ void main() {
         when(mockContentService.markEpisodeAsFinished(testAudioFile.id))
             .thenAnswer((_) async => {});
 
-        await audioService.onEpisodeCompleted();
+        await audioService.onEpisodeCompletedManually();
         // This should trigger the completion handler
         // Note: In real implementation, this would trigger autoplay/repeat logic
       });
@@ -779,24 +799,6 @@ void main() {
         // Test passes if no exception thrown
         expect(audioService.autoplayEnabled, isTrue);
         expect(audioService.repeatEnabled, isFalse);
-      });
-    });
-
-    group('Media Session Integration', () {
-      test('should test media session when handler available', () async {
-        // In the new architecture, media session testing is handled internally
-        // and delegates to the enhanced service
-        await audioService.testMediaSession();
-
-        // The test passes if no exception is thrown
-        // Media session integration is handled by the enhanced service
-      });
-
-      test('should handle media session test errors gracefully', () async {
-        // Should not throw - errors should be handled gracefully
-        await audioService.testMediaSession();
-
-        // The test passes if no exception is thrown
       });
     });
   });

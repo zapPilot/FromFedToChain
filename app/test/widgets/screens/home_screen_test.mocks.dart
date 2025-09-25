@@ -8,9 +8,12 @@ import 'dart:ui' as _i7;
 
 import 'package:from_fed_to_chain_app/models/audio_content.dart' as _i6;
 import 'package:from_fed_to_chain_app/models/audio_file.dart' as _i3;
-import 'package:from_fed_to_chain_app/services/audio_service.dart' as _i8;
+import 'package:from_fed_to_chain_app/services/audio_player_service.dart'
+    as _i8;
 import 'package:from_fed_to_chain_app/services/content_facade_service.dart'
     as _i2;
+import 'package:from_fed_to_chain_app/services/player_state_notifier.dart'
+    as _i9;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
 
@@ -655,19 +658,20 @@ class MockContentFacadeService extends _i1.Mock
       );
 }
 
-/// A class which mocks [AudioService].
+/// A class which mocks [AudioPlayerService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAudioService extends _i1.Mock implements _i8.AudioService {
-  MockAudioService() {
+class MockAudioPlayerService extends _i1.Mock
+    implements _i8.AudioPlayerService {
+  MockAudioPlayerService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.PlaybackState get playbackState => (super.noSuchMethod(
+  _i9.AppPlaybackState get playbackState => (super.noSuchMethod(
         Invocation.getter(#playbackState),
-        returnValue: _i8.PlaybackState.stopped,
-      ) as _i8.PlaybackState);
+        returnValue: _i9.AppPlaybackState.stopped,
+      ) as _i9.AppPlaybackState);
 
   @override
   Duration get currentPosition => (super.noSuchMethod(
@@ -776,24 +780,6 @@ class MockAudioService extends _i1.Mock implements _i8.AudioService {
       ) as _i5.Future<void>);
 
   @override
-  void setAutoplayEnabled(bool? enabled) => super.noSuchMethod(
-        Invocation.method(
-          #setAutoplayEnabled,
-          [enabled],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void setRepeatEnabled(bool? enabled) => super.noSuchMethod(
-        Invocation.method(
-          #setRepeatEnabled,
-          [enabled],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
   _i5.Future<void> togglePlayPause() => (super.noSuchMethod(
         Invocation.method(
           #togglePlayPause,
@@ -864,49 +850,92 @@ class MockAudioService extends _i1.Mock implements _i8.AudioService {
       ) as _i5.Future<void>);
 
   @override
-  _i5.Future<void> testMediaSession() => (super.noSuchMethod(
+  void setAutoplayEnabled(bool? enabled) => super.noSuchMethod(
         Invocation.method(
-          #testMediaSession,
+          #setAutoplayEnabled,
+          [enabled],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void setRepeatEnabled(bool? enabled) => super.noSuchMethod(
+        Invocation.method(
+          #setRepeatEnabled,
+          [enabled],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void toggleAutoplay() => super.noSuchMethod(
+        Invocation.method(
+          #toggleAutoplay,
           [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void toggleRepeat() => super.noSuchMethod(
+        Invocation.method(
+          #toggleRepeat,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  bool isValidAudioFile(_i3.AudioFile? audioFile) => (super.noSuchMethod(
+        Invocation.method(
+          #isValidAudioFile,
+          [audioFile],
+        ),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  void savePlaybackState() => super.noSuchMethod(
+        Invocation.method(
+          #savePlaybackState,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void updateProgress(Duration? position) => super.noSuchMethod(
+        Invocation.method(
+          #updateProgress,
+          [position],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void handlePlaybackError(String? message) => super.noSuchMethod(
+        Invocation.method(
+          #handlePlaybackError,
+          [message],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i5.Future<void> restorePlaybackPosition(_i3.AudioFile? audioFile) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #restorePlaybackPosition,
+          [audioFile],
         ),
         returnValue: _i5.Future<void>.value(),
         returnValueForMissingStub: _i5.Future<void>.value(),
       ) as _i5.Future<void>);
 
   @override
-  _i5.Future<void> skipToNext() => (super.noSuchMethod(
+  _i5.Future<void> onEpisodeCompletedManually() => (super.noSuchMethod(
         Invocation.method(
-          #skipToNext,
-          [],
-        ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
-
-  @override
-  _i5.Future<void> skipToPrevious() => (super.noSuchMethod(
-        Invocation.method(
-          #skipToPrevious,
-          [],
-        ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
-
-  @override
-  _i5.Future<void> seekForward() => (super.noSuchMethod(
-        Invocation.method(
-          #seekForward,
-          [],
-        ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
-
-  @override
-  _i5.Future<void> seekBackward() => (super.noSuchMethod(
-        Invocation.method(
-          #seekBackward,
+          #onEpisodeCompletedManually,
           [],
         ),
         returnValue: _i5.Future<void>.value(),
@@ -954,22 +983,44 @@ class MockAudioService extends _i1.Mock implements _i8.AudioService {
       ) as _i5.Future<void>);
 
   @override
-  void toggleAutoplay() => super.noSuchMethod(
+  _i5.Future<void> skipToNext() => (super.noSuchMethod(
         Invocation.method(
-          #toggleAutoplay,
+          #skipToNext,
           [],
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
   @override
-  void toggleRepeat() => super.noSuchMethod(
+  _i5.Future<void> skipToPrevious() => (super.noSuchMethod(
         Invocation.method(
-          #toggleRepeat,
+          #skipToPrevious,
           [],
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> seekForward() => (super.noSuchMethod(
+        Invocation.method(
+          #seekForward,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> seekBackward() => (super.noSuchMethod(
+        Invocation.method(
+          #seekBackward,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
   @override
   void enableAutoplay(bool? enabled) => super.noSuchMethod(
@@ -981,91 +1032,7 @@ class MockAudioService extends _i1.Mock implements _i8.AudioService {
       );
 
   @override
-  _i5.Future<void> onEpisodeCompleted() => (super.noSuchMethod(
-        Invocation.method(
-          #onEpisodeCompleted,
-          [],
-        ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
-
-  @override
-  void updateProgress(Duration? position) => super.noSuchMethod(
-        Invocation.method(
-          #updateProgress,
-          [position],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void handlePlaybackError(String? message) => super.noSuchMethod(
-        Invocation.method(
-          #handlePlaybackError,
-          [message],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void handleNetworkTimeout() => super.noSuchMethod(
-        Invocation.method(
-          #handleNetworkTimeout,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void handleInvalidUrl(_i3.AudioFile? audioFile) => super.noSuchMethod(
-        Invocation.method(
-          #handleInvalidUrl,
-          [audioFile],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  bool isValidAudioFile(_i3.AudioFile? audioFile) => (super.noSuchMethod(
-        Invocation.method(
-          #isValidAudioFile,
-          [audioFile],
-        ),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  void savePlaybackState() => super.noSuchMethod(
-        Invocation.method(
-          #savePlaybackState,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  _i5.Future<void> restorePlaybackPosition(_i3.AudioFile? audioFile) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #restorePlaybackPosition,
-          [audioFile],
-        ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
-
-  @override
-  void dispose() => super.noSuchMethod(
-        Invocation.method(
-          #dispose,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void setPlaybackStateForTesting(_i8.PlaybackState? state) =>
+  void setPlaybackStateForTesting(_i9.AppPlaybackState? state) =>
       super.noSuchMethod(
         Invocation.method(
           #setPlaybackStateForTesting,
@@ -1115,6 +1082,15 @@ class MockAudioService extends _i1.Mock implements _i8.AudioService {
   void clearErrorForTesting() => super.noSuchMethod(
         Invocation.method(
           #clearErrorForTesting,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
           [],
         ),
         returnValueForMissingStub: null,

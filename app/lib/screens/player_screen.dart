@@ -3,9 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../themes/app_theme.dart';
-import '../services/audio_service.dart';
+import '../services/audio_player_service.dart';
 import '../services/content_facade_service.dart';
 import '../services/deep_link_service.dart';
+import '../services/player_state_notifier.dart';
 import '../models/audio_file.dart';
 import '../widgets/audio_controls.dart';
 import '../widgets/playback_speed_selector.dart';
@@ -66,7 +67,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   Future<void> _loadAndPlayContent(String contentId) async {
     try {
       final contentService = context.read<ContentFacadeService>();
-      final audioService = context.read<AudioService>();
+      final audioService = context.read<AudioPlayerService>();
 
       // Get the AudioFile by contentId
       final audioFile = await contentService.getAudioFileById(contentId);
@@ -114,7 +115,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Consumer2<AudioService, ContentFacadeService>(
+      body: Consumer2<AudioPlayerService, ContentFacadeService>(
         builder: (context, audioService, contentService, child) {
           final currentAudio = audioService.currentAudioFile;
 
@@ -189,7 +190,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build album art section with animation
   Widget _buildAlbumArtSection(
-      AudioFile currentAudio, AudioService audioService) {
+      AudioFile currentAudio, AudioPlayerService audioService) {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Make album art responsive to available space
@@ -237,7 +238,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                       .clamp(8.0, AppTheme.spacingL)), // Scale spacing
 
               // Playback state indicator
-              _buildPlaybackStateIndicator(audioService),
+              _buildAppPlaybackStateIndicator(audioService),
             ],
           ),
         );
@@ -246,28 +247,28 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Build playback state indicator
-  Widget _buildPlaybackStateIndicator(AudioService audioService) {
+  Widget _buildAppPlaybackStateIndicator(AudioPlayerService audioService) {
     String stateText;
     Color stateColor;
     IconData stateIcon;
 
     switch (audioService.playbackState) {
-      case PlaybackState.playing:
+      case AppPlaybackState.playing:
         stateText = 'Playing';
         stateColor = AppTheme.playingColor;
         stateIcon = Icons.play_arrow;
         break;
-      case PlaybackState.paused:
+      case AppPlaybackState.paused:
         stateText = 'Paused';
         stateColor = AppTheme.pausedColor;
         stateIcon = Icons.pause;
         break;
-      case PlaybackState.loading:
+      case AppPlaybackState.loading:
         stateText = 'Loading...';
         stateColor = AppTheme.loadingColor;
         stateIcon = Icons.hourglass_empty;
         break;
-      case PlaybackState.error:
+      case AppPlaybackState.error:
         stateText = 'Error';
         stateColor = AppTheme.errorStateColor;
         stateIcon = Icons.error;
@@ -366,7 +367,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Build progress section with seek bar
-  Widget _buildProgressSection(AudioService audioService) {
+  Widget _buildProgressSection(AudioPlayerService audioService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: Column(
@@ -422,7 +423,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build main playback controls
   Widget _buildMainControls(
-      AudioService audioService, ContentFacadeService contentService) {
+      AudioPlayerService audioService, ContentFacadeService contentService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: AudioControls(
@@ -441,7 +442,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build additional controls
   Widget _buildAdditionalControls(
-      AudioService audioService, ContentFacadeService contentService) {
+      AudioPlayerService audioService, ContentFacadeService contentService) {
     return Padding(
       padding: AppTheme.safeHorizontalPadding,
       child: Column(
@@ -594,7 +595,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build compact layout (without content script)
   Widget _buildCompactLayout(BuildContext context, AudioFile currentAudio,
-      AudioService audioService, ContentFacadeService contentService) {
+      AudioPlayerService audioService, ContentFacadeService contentService) {
     return Column(
       children: [
         // Header with back button and options
@@ -637,7 +638,7 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   /// Build expanded layout (with content script)
   Widget _buildExpandedLayout(BuildContext context, AudioFile currentAudio,
-      AudioService audioService, ContentFacadeService contentService) {
+      AudioPlayerService audioService, ContentFacadeService contentService) {
     return CustomScrollView(
       slivers: [
         // Fixed header
@@ -775,8 +776,10 @@ class _PlayerScreenState extends State<PlayerScreen>
   }
 
   /// Share current content using social hook and deep linking
-  Future<void> _shareCurrentContent(BuildContext context,
-      AudioService audioService, ContentFacadeService contentService) async {
+  Future<void> _shareCurrentContent(
+      BuildContext context,
+      AudioPlayerService audioService,
+      ContentFacadeService contentService) async {
     final currentAudio = audioService.currentAudioFile;
     if (currentAudio == null) return;
 

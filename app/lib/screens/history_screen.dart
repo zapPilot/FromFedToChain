@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../themes/app_theme.dart';
 import '../services/content_facade_service.dart';
-import '../services/audio_service.dart';
+import '../services/audio_player_service.dart';
 import '../models/audio_file.dart';
 
 import '../widgets/audio_list.dart';
@@ -30,7 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer2<ContentFacadeService, AudioService>(
+      body: Consumer2<ContentFacadeService, AudioPlayerService>(
         builder: (context, contentService, audioService, child) {
           return SafeArea(
             child: Column(
@@ -145,7 +145,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   /// Build history content
   Widget _buildHistoryContent(
-      ContentFacadeService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioPlayerService audioService) {
     if (contentService.isLoading && contentService.allEpisodes.isEmpty) {
       return _buildLoadingState();
     }
@@ -231,7 +231,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   /// Build mini player
-  Widget _buildMiniPlayer(BuildContext context, AudioService audioService) {
+  Widget _buildMiniPlayer(
+      BuildContext context, AudioPlayerService audioService) {
     return MiniPlayer(
       audioFile: audioService.currentAudioFile!,
       isPlaying: audioService.isPlaying,
@@ -246,8 +247,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  /// Helper method to get state text from AudioService
-  String _getStateText(AudioService audioService) {
+  /// Helper method to get state text from AudioPlayerService
+  String _getStateText(AudioPlayerService audioService) {
     if (audioService.hasError) {
       return 'Error';
     } else if (audioService.isLoading) {
@@ -262,7 +263,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   /// Play episode
-  void _playEpisode(AudioFile episode, AudioService audioService) {
+  void _playEpisode(AudioFile episode, AudioPlayerService audioService) {
     audioService.playAudio(episode);
   }
 
@@ -325,7 +326,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             title: const Text('Play'),
             onTap: () {
               Navigator.pop(context);
-              _playEpisode(episode, context.read<AudioService>());
+              _playEpisode(episode, context.read<AudioPlayerService>());
             },
           ),
 

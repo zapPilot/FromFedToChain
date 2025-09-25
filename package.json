@@ -9,7 +9,7 @@
     "concepts": "node src/cli.js concepts",
     "test": "npm run test:node && npm run test:flutter",
     "test:node": "node tests/run-tests.js",
-    "test:flutter": "echo '🧪 Running Flutter tests...' && cd app && flutter test test --coverage --reporter compact && dart run scripts/coverage_check.dart",
+    "test:flutter": "echo '🧪 Running Flutter tests...' && cd app && flutter test test --coverage --reporter compact --concurrency=2 && dart run scripts/coverage_check.dart",
     "test:flutter:failures": "cd app && flutter test --reporter failures-only",
     "test:flutter:expanded": "cd app && flutter test --reporter expanded",
     "test:flutter:json": "cd app && flutter test --reporter json --coverage > test_results.json",

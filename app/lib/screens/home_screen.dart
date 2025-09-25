@@ -4,7 +4,8 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../themes/app_theme.dart';
 import '../services/content_facade_service.dart';
-import '../services/audio_service.dart';
+import '../services/audio_player_service.dart';
+import '../services/player_state_notifier.dart';
 import '../models/audio_file.dart';
 import '../widgets/filter_bar.dart';
 import '../widgets/audio_list.dart';
@@ -133,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen>
 
             // Main content area (needs both services for episode interaction)
             Expanded(
-              child: Consumer2<ContentFacadeService, AudioService>(
+              child: Consumer2<ContentFacadeService, AudioPlayerService>(
                 builder: (context, contentService, audioService, child) {
                   return _buildMainContent(
                       context, contentService, audioService);
@@ -141,16 +142,16 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
 
-            // Mini player (only rebuilds when AudioService changes)
-            Selector<AudioService, AudioFile?>(
+            // Mini player (only rebuilds when AudioPlayerService changes)
+            Selector<AudioPlayerService, AudioFile?>(
               selector: (context, service) => service.currentAudioFile,
               builder: (context, currentAudioFile, child) {
                 if (currentAudioFile == null) return const SizedBox.shrink();
 
-                return Selector<AudioService, PlaybackState>(
+                return Selector<AudioPlayerService, AppPlaybackState>(
                   selector: (context, service) => service.playbackState,
                   builder: (context, playbackState, child) {
-                    final audioService = context.read<AudioService>();
+                    final audioService = context.read<AudioPlayerService>();
                     return _buildMiniPlayer(context, audioService);
                   },
                 );
@@ -293,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildMainContent(
     BuildContext context,
     ContentFacadeService contentService,
-    AudioService audioService,
+    AudioPlayerService audioService,
   ) {
     if (contentService.isLoading && contentService.allEpisodes.isEmpty) {
       return _buildLoadingState();
@@ -347,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build recent episodes tab
   Widget _buildRecentTab(
-      ContentFacadeService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioPlayerService audioService) {
     final recentEpisodes = contentService.filteredEpisodes.take(20).toList();
 
     return AnimationLimiter(
@@ -362,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build all episodes tab
   Widget _buildAllTab(
-      ContentFacadeService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioPlayerService audioService) {
     return AnimationLimiter(
       child: AudioList(
         episodes: contentService.filteredEpisodes,
@@ -375,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build unfinished episodes tab
   Widget _buildUnfinishedTab(
-      ContentFacadeService contentService, AudioService audioService) {
+      ContentFacadeService contentService, AudioPlayerService audioService) {
     final unfinishedEpisodes = contentService.getUnfinishedEpisodes();
 
     if (unfinishedEpisodes.isEmpty) {
@@ -527,7 +528,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Build mini player
-  Widget _buildMiniPlayer(BuildContext context, AudioService audioService) {
+  Widget _buildMiniPlayer(
+      BuildContext context, AudioPlayerService audioService) {
     return MiniPlayer(
       audioFile: audioService.currentAudioFile!,
       isPlaying: audioService.isPlaying,
@@ -542,8 +544,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  /// Helper method to get state text from AudioService
-  String _getStateText(AudioService audioService) {
+  /// Helper method to get state text from AudioPlayerService
+  String _getStateText(AudioPlayerService audioService) {
     if (audioService.hasError) {
       return 'Error';
     } else if (audioService.isLoading) {
@@ -558,7 +560,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Play episode
-  void _playEpisode(AudioFile episode, AudioService audioService) {
+  void _playEpisode(AudioFile episode, AudioPlayerService audioService) {
     audioService.playAudio(episode);
   }
 
@@ -621,7 +623,7 @@ class _HomeScreenState extends State<HomeScreen>
             title: const Text('Play'),
             onTap: () {
               Navigator.pop(context);
-              _playEpisode(episode, context.read<AudioService>());
+              _playEpisode(episode, context.read<AudioPlayerService>());
             },
           ),
 

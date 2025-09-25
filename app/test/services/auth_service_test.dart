@@ -1,3 +1,4 @@
+@Tags(['sequential']) // Avoids channel collisions with other suites.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -12,11 +13,11 @@ void main() {
     late AppUser testUser;
 
     setUp(() async {
-      // Reset SharedPreferences before each test
+      // Reset SharedPreferences before each test with explicit cleanup
       SharedPreferences.setMockInitialValues({});
 
-      // Allow the mock to fully reset
-      await Future.delayed(Duration.zero);
+      // Allow the mock to fully reset with longer delay for test isolation
+      await Future.delayed(const Duration(milliseconds: 1));
 
       authService = AuthService();
 
@@ -32,11 +33,14 @@ void main() {
     });
 
     tearDown(() async {
+      // Dispose authService first
       authService.dispose();
 
-      // Ensure SharedPreferences is clean for the next test
+      // Ensure complete cleanup of SharedPreferences state
       SharedPreferences.setMockInitialValues({});
-      await Future.delayed(Duration.zero);
+
+      // Longer delay to ensure complete state reset between tests
+      await Future.delayed(const Duration(milliseconds: 1));
     });
 
     group('Initialization', () {
@@ -78,14 +82,19 @@ void main() {
           'auth_token': 'test_token_123',
         });
 
-        // Allow mock to fully settle
-        await Future.delayed(Duration.zero);
+        // Allow mock to fully settle with proper delay
+        await Future.delayed(const Duration(milliseconds: 1));
 
         // Create new AuthService instance AFTER setting mock values
         // This ensures the service uses the corrupted mock data
         final testAuthService = AuthService();
 
         await testAuthService.initialize();
+
+        // Debug output to understand what's happening
+        print('DEBUG: authState = ${testAuthService.authState}');
+        print('DEBUG: errorMessage = "${testAuthService.errorMessage}"');
+        print('DEBUG: isAuthenticated = ${testAuthService.isAuthenticated}');
 
         expect(testAuthService.authState, AuthState.error);
         expect(testAuthService.errorMessage, contains('Failed to initialize'));
@@ -95,7 +104,7 @@ void main() {
 
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});
-        await Future.delayed(Duration.zero);
+        await Future.delayed(const Duration(milliseconds: 1));
       });
 
       test('should handle incomplete session data', () async {
@@ -408,8 +417,8 @@ void main() {
           'auth_token': 'test_token_123',
         });
 
-        // Allow mock to fully settle
-        await Future.delayed(Duration.zero);
+        // Allow mock to fully settle with proper delay
+        await Future.delayed(const Duration(milliseconds: 1));
 
         // Create new AuthService instance AFTER setting mock values
         final testAuthService = AuthService();
@@ -424,7 +433,7 @@ void main() {
 
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});
-        await Future.delayed(Duration.zero);
+        await Future.delayed(const Duration(milliseconds: 1));
       });
 
       test('should clear errors on successful operations', () async {
@@ -434,8 +443,8 @@ void main() {
           'auth_token': 'test_token_123',
         });
 
-        // Allow mock to fully settle
-        await Future.delayed(Duration.zero);
+        // Allow mock to fully settle with proper delay
+        await Future.delayed(const Duration(milliseconds: 1));
 
         // Create new AuthService instance AFTER setting mock values
         final testAuthService = AuthService();
@@ -445,8 +454,8 @@ void main() {
         // Reset SharedPreferences for clean sign in
         SharedPreferences.setMockInitialValues({});
 
-        // Allow mock to fully settle
-        await Future.delayed(Duration.zero);
+        // Allow mock to fully settle with proper delay
+        await Future.delayed(const Duration(milliseconds: 1));
 
         // Successful sign in should clear error
         await testAuthService.signInWithGoogle();
@@ -458,7 +467,7 @@ void main() {
 
         // Reset SharedPreferences to clean state for next tests
         SharedPreferences.setMockInitialValues({});
-        await Future.delayed(Duration.zero);
+        await Future.delayed(const Duration(milliseconds: 1));
       });
     });
 

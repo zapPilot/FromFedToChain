@@ -675,7 +675,7 @@ void main() {
       });
     });
 
-    group('Edge Cases', () {
+    group('Edge Cases and Boundary Conditions', () {
       testWidgets('should handle null optional parameters gracefully',
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
@@ -721,6 +721,64 @@ void main() {
             tester, find.byKey(AudioItemCard.cardKey));
       });
 
+      testWidgets('should handle empty title gracefully',
+          (WidgetTester tester) async {
+        final emptyTitleAudio = AudioFile(
+          id: 'empty-title-test',
+          title: '', // Empty title
+          language: 'en-US',
+          category: 'daily-news',
+          streamingUrl: 'https://example.com/audio.m3u8',
+          path: 'audio/test.m3u8',
+          lastModified: DateTime.now(),
+        );
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          AudioItemCard(
+            audioFile: emptyTitleAudio,
+            onTap: WidgetTestUtils.mockTap,
+            showPlayButton: true,
+            isCurrentlyPlaying: false,
+          ),
+        );
+
+        // Should render without errors and show fallback text
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        expect(find.text(emptyTitleAudio.displayTitle), findsOneWidget);
+      });
+
+      testWidgets('should handle extremely long title gracefully',
+          (WidgetTester tester) async {
+        final extremelyLongTitle = 'This is an ' * 100 +
+            'extremely long title that tests the limits of text rendering and memory usage in the AudioItemCard widget component';
+
+        final longTitleAudio = WidgetTestUtils.createTestAudioFile(
+          title: extremelyLongTitle,
+        );
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          AudioItemCard(
+            audioFile: longTitleAudio,
+            onTap: WidgetTestUtils.mockTap,
+            showPlayButton: true,
+            isCurrentlyPlaying: false,
+          ),
+        );
+
+        // Should render without errors
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(tester.takeException(), isNull);
+
+        // Verify text is properly truncated
+        final titleWidget =
+            tester.widget<Text>(find.text(longTitleAudio.displayTitle));
+        expect(titleWidget.maxLines, equals(2));
+        expect(titleWidget.overflow, equals(TextOverflow.ellipsis));
+      });
+
       testWidgets('should handle extreme duration values',
           (WidgetTester tester) async {
         final extremeDurationAudioFile = WidgetTestUtils.createTestAudioFile(
@@ -745,11 +803,76 @@ void main() {
             findsWidgets);
       });
 
+      testWidgets('should handle zero duration gracefully',
+          (WidgetTester tester) async {
+        final zeroDurationAudio = WidgetTestUtils.createTestAudioFile(
+          duration: Duration.zero,
+        );
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          AudioItemCard(
+            audioFile: zeroDurationAudio,
+            onTap: WidgetTestUtils.mockTap,
+            showPlayButton: false, // Show duration instead of play button
+            isCurrentlyPlaying: false,
+          ),
+        );
+
+        // Should render without errors
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        expect(find.text(zeroDurationAudio.formattedDuration), findsWidgets);
+      });
+
+      testWidgets('should handle extremely large file size',
+          (WidgetTester tester) async {
+        final largeFileSizeAudio = WidgetTestUtils.createTestAudioFile(
+          fileSizeBytes: 999999999999, // ~1TB file
+        );
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          AudioItemCard(
+            audioFile: largeFileSizeAudio,
+            onTap: WidgetTestUtils.mockTap,
+            showPlayButton: true,
+            isCurrentlyPlaying: false,
+          ),
+        );
+
+        // Should render without errors
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        expect(find.text(largeFileSizeAudio.formattedFileSize), findsWidgets);
+      });
+
+      testWidgets('should handle zero byte file size',
+          (WidgetTester tester) async {
+        final zeroSizeAudio = WidgetTestUtils.createTestAudioFile(
+          fileSizeBytes: 0,
+        );
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          AudioItemCard(
+            audioFile: zeroSizeAudio,
+            onTap: WidgetTestUtils.mockTap,
+            showPlayButton: true,
+            isCurrentlyPlaying: false,
+          ),
+        );
+
+        // Should render without errors
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
       testWidgets('should handle special characters in title and metadata',
           (WidgetTester tester) async {
         final specialCharAudioFile = WidgetTestUtils.createTestAudioFile(
           title:
-              '🎵 Special Characters & Symbols! @#\$%^&*() "Quotes" \'Apostrophes\'',
+              '🎵 Bitcoin & Ethereum: 加密货币 📈 Analysis (Part 2/3) — Testing «Special» Characters!',
         );
 
         await WidgetTestUtils.pumpWidgetWithTheme(
@@ -765,6 +888,7 @@ void main() {
         // Should handle special characters without errors
         expect(find.byType(AudioItemCard), findsOneWidget);
         expect(find.text(specialCharAudioFile.displayTitle), findsOneWidget);
+        expect(tester.takeException(), isNull);
       });
 
       testWidgets('should handle unknown category gracefully',
@@ -786,6 +910,59 @@ void main() {
         // Should render with default icon for unknown category
         expect(find.byType(AudioItemCard), findsOneWidget);
         expect(find.byIcon(Icons.headphones), findsOneWidget); // Default icon
+      });
+
+      testWidgets('should handle invalid URLs gracefully',
+          (WidgetTester tester) async {
+        final invalidUrlAudio = AudioFile(
+          id: 'invalid-url-test',
+          title: 'Invalid URL Test',
+          language: 'en-US',
+          category: 'daily-news',
+          streamingUrl: 'not-a-valid-url',
+          path: 'invalid://path',
+          lastModified: DateTime.now(),
+        );
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          AudioItemCard(
+            audioFile: invalidUrlAudio,
+            onTap: WidgetTestUtils.mockTap,
+            showPlayButton: true,
+            isCurrentlyPlaying: false,
+          ),
+        );
+
+        // Should render without errors even with invalid URLs
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(find.text(invalidUrlAudio.displayTitle), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('should handle layout constraints gracefully',
+          (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: Scaffold(
+              body: SizedBox(
+                width: 320, // Reasonable minimum width
+                height: 200, // Reasonable minimum height
+                child: AudioItemCard(
+                  audioFile: testAudioFile,
+                  onTap: WidgetTestUtils.mockTap,
+                  showPlayButton: true,
+                  isCurrentlyPlaying: false,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Should render without overflow errors
+        expect(find.byType(AudioItemCard), findsOneWidget);
+        expect(tester.takeException(), isNull);
       });
     });
 

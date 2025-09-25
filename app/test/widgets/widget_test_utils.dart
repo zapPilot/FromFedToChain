@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/services/audio_service.dart';
+import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
 import 'package:from_fed_to_chain_app/config/api_config.dart';
 import 'package:from_fed_to_chain_app/widgets/mini_player.dart';
@@ -225,8 +226,8 @@ class WidgetTestUtils {
   }
 
   /// Test different playback states
-  static List<PlaybackState> getAllPlaybackStates() {
-    return PlaybackState.values;
+  static List<AppPlaybackState> getAllPlaybackStates() {
+    return AppPlaybackState.values;
   }
 
   /// Test different audio control sizes
@@ -451,7 +452,7 @@ class WidgetTestUtils {
   static void verifyMiniPlayerState({
     required WidgetTester tester,
     required AudioFile audioFile,
-    required PlaybackState playbackState,
+    required AppPlaybackState playbackState,
     required bool shouldShowCorrectIcon,
   }) {
     // Verify audio file information
@@ -462,16 +463,16 @@ class WidgetTestUtils {
     // Verify playback state icon
     if (shouldShowCorrectIcon) {
       switch (playbackState) {
-        case PlaybackState.playing:
+        case AppPlaybackState.playing:
           expect(find.byIcon(Icons.pause), findsOneWidget);
           break;
-        case PlaybackState.paused:
+        case AppPlaybackState.paused:
           expect(find.byIcon(Icons.play_arrow), findsOneWidget);
           break;
-        case PlaybackState.loading:
+        case AppPlaybackState.loading:
           expect(find.byType(CircularProgressIndicator), findsOneWidget);
           break;
-        case PlaybackState.error:
+        case AppPlaybackState.error:
           expect(find.byIcon(Icons.refresh), findsOneWidget);
           break;
         default:
@@ -517,28 +518,28 @@ class WidgetTestUtils {
     return [
       {
         'audioFile': createTestAudioFile(),
-        'playbackState': PlaybackState.paused,
+        'playbackState': AppPlaybackState.paused,
         'isPlaying': false,
         'isLoading': false,
         'hasError': false,
       },
       {
         'audioFile': createTestAudioFileWithCategory('ethereum'),
-        'playbackState': PlaybackState.playing,
+        'playbackState': AppPlaybackState.playing,
         'isPlaying': true,
         'isLoading': false,
         'hasError': false,
       },
       {
         'audioFile': createTestAudioFileWithLanguage('ja-JP'),
-        'playbackState': PlaybackState.loading,
+        'playbackState': AppPlaybackState.loading,
         'isPlaying': false,
         'isLoading': true,
         'hasError': false,
       },
       {
         'audioFile': createTestAudioFileWithCategory('ai'),
-        'playbackState': PlaybackState.error,
+        'playbackState': AppPlaybackState.error,
         'isPlaying': false,
         'isLoading': false,
         'hasError': true,
@@ -644,7 +645,7 @@ class WidgetTestUtils {
   /// Helper method for test migration after MiniPlayer API refactor
   static MiniPlayer createMiniPlayer({
     required AudioFile audioFile,
-    required PlaybackState playbackState,
+    required AppPlaybackState playbackState,
     VoidCallback? onTap,
     VoidCallback? onPlayPause,
     VoidCallback? onNext,

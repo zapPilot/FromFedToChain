@@ -685,7 +685,7 @@ void main() {
       });
     });
 
-    group('Edge Cases', () {
+    group('Edge Cases and Boundary Conditions', () {
       testWidgets('should handle null callback gracefully',
           (WidgetTester tester) async {
         // This would cause compilation error, but testing defensive programming
@@ -733,6 +733,27 @@ void main() {
         expect(find.byIcon(Icons.clear), findsOneWidget);
       });
 
+      testWidgets('should handle extremely long search text input',
+          (WidgetTester tester) async {
+        final longSearchText = 'Bitcoin ' * 1000; // Very long search query
+
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          SearchBarWidget(
+            onSearchChanged: WidgetTestUtils.mockSearchChanged,
+            initialValue: longSearchText,
+          ),
+        );
+
+        // Should render without errors
+        expect(find.byType(SearchBarWidget), findsOneWidget);
+        expect(tester.takeException(), isNull);
+
+        // Should handle the long initial value
+        final textField = find.byType(TextField);
+        expect(textField, findsOneWidget);
+      });
+
       testWidgets('should handle unicode and emoji in search',
           (WidgetTester tester) async {
         const unicodeText = '🎵 音楽 🎧 подкаст 🎙️ пудкаст العربية';
@@ -754,6 +775,110 @@ void main() {
 
         // Should handle unicode without errors
         expect(WidgetTestUtils.lastSearchText, equals(unicodeText));
+      });
+
+      testWidgets(
+          'should handle special characters and Unicode comprehensively',
+          (WidgetTester tester) async {
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          SearchBarWidget(
+            onSearchChanged: WidgetTestUtils.mockSearchChanged,
+          ),
+        );
+
+        final specialText =
+            '🔥 Bitcoin & Ethereum: 加密货币 📈 (測試) — Special «Characters» ñañá';
+
+        await tester.enterText(find.byType(TextField), specialText);
+        await tester.pump();
+
+        // Should handle special characters without errors
+        expect(tester.takeException(), isNull);
+        expect(WidgetTestUtils.lastSearchText, equals(specialText));
+      });
+
+      testWidgets('should handle empty string input gracefully',
+          (WidgetTester tester) async {
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          SearchBarWidget(
+            onSearchChanged: WidgetTestUtils.mockSearchChanged,
+            initialValue: 'Initial Text',
+          ),
+        );
+
+        // Clear the text field
+        await tester.enterText(find.byType(TextField), '');
+        await tester.pump();
+
+        // Should handle empty string gracefully
+        expect(tester.takeException(), isNull);
+        expect(WidgetTestUtils.lastSearchText, equals(''));
+
+        // Clear button should not be visible with empty text
+        expect(find.byIcon(Icons.clear), findsNothing);
+      });
+
+      testWidgets('should handle whitespace-only input',
+          (WidgetTester tester) async {
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          SearchBarWidget(
+            onSearchChanged: WidgetTestUtils.mockSearchChanged,
+          ),
+        );
+
+        final whitespaceText =
+            '   \t   '; // Various whitespace characters (newlines stripped by TextField)
+        final inputText = '   \t\n   '; // Input with newline
+
+        await tester.enterText(find.byType(TextField), inputText);
+        await tester.pump();
+
+        // Should handle whitespace input (newlines are stripped in single-line TextField)
+        expect(tester.takeException(), isNull);
+        expect(WidgetTestUtils.lastSearchText, equals(whitespaceText));
+      });
+
+      testWidgets('should handle numeric input', (WidgetTester tester) async {
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          SearchBarWidget(
+            onSearchChanged: WidgetTestUtils.mockSearchChanged,
+          ),
+        );
+
+        const numericText = '12345.67890';
+
+        await tester.enterText(find.byType(TextField), numericText);
+        await tester.pump();
+
+        // Should handle numeric input
+        expect(tester.takeException(), isNull);
+        expect(WidgetTestUtils.lastSearchText, equals(numericText));
+      });
+
+      testWidgets('should handle rapid text input changes',
+          (WidgetTester tester) async {
+        await WidgetTestUtils.pumpWidgetWithTheme(
+          tester,
+          SearchBarWidget(
+            onSearchChanged: WidgetTestUtils.mockSearchChanged,
+          ),
+        );
+
+        final textField = find.byType(TextField);
+
+        // Rapidly change text multiple times
+        for (int i = 0; i < 10; i++) {
+          await tester.enterText(textField, 'Query $i');
+          await tester.pump(const Duration(milliseconds: 10));
+        }
+
+        // Should handle rapid changes without errors
+        expect(tester.takeException(), isNull);
+        expect(WidgetTestUtils.lastSearchText, equals('Query 9'));
       });
 
       testWidgets('should handle rapid focus changes',
@@ -782,6 +907,53 @@ void main() {
         }
 
         // Should handle rapid focus changes without errors
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('should handle layout constraints gracefully',
+          (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: Scaffold(
+              body: SizedBox(
+                width: 250, // Narrow constraint
+                height: 80, // Limited height
+                child: SearchBarWidget(
+                  onSearchChanged: WidgetTestUtils.mockSearchChanged,
+                  hintText: 'Search...',
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Should render without overflow errors
+        expect(find.byType(SearchBarWidget), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('should handle memory pressure during rapid operations',
+          (WidgetTester tester) async {
+        // Create and destroy widgets multiple times to simulate memory pressure
+        for (int i = 0; i < 20; i++) {
+          await tester.pumpWidget(
+            WidgetTestUtils.createTestWrapper(
+              SearchBarWidget(
+                onSearchChanged: WidgetTestUtils.mockSearchChanged,
+                initialValue: 'Memory Test $i' * 5, // Various lengths
+              ),
+            ),
+          );
+
+          await tester.pump();
+
+          // Clear the widget
+          await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
+          await tester.pump();
+        }
+
+        // Should handle repeated creation/destruction without errors
         expect(tester.takeException(), isNull);
       });
     });

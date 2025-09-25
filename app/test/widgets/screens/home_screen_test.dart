@@ -6,22 +6,23 @@ import 'package:mockito/annotations.dart';
 
 import 'package:from_fed_to_chain_app/screens/home_screen.dart';
 import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/services/audio_service.dart';
+import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
 
 // Generate mocks for dependencies
-@GenerateMocks([ContentFacadeService, AudioService])
+@GenerateMocks([ContentFacadeService, AudioPlayerService])
 import 'home_screen_test.mocks.dart';
 
 void main() {
   group('HomeScreen - Basic Tests', () {
     late MockContentFacadeService mockContentService;
-    late MockAudioService mockAudioService;
+    late MockAudioPlayerService mockAudioService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockContentService = MockContentFacadeService();
-      mockAudioService = MockAudioService();
+      mockAudioService = MockAudioPlayerService();
 
       testAudioFile = AudioFile(
         id: 'test-1',
@@ -61,7 +62,7 @@ void main() {
 
       // Basic AudioService setup
       when(mockAudioService.currentAudioFile).thenReturn(null);
-      when(mockAudioService.playbackState).thenReturn(PlaybackState.stopped);
+      when(mockAudioService.playbackState).thenReturn(AppPlaybackState.stopped);
       when(mockAudioService.currentPosition).thenReturn(Duration.zero);
       when(mockAudioService.totalDuration)
           .thenReturn(const Duration(minutes: 10));
@@ -84,7 +85,8 @@ void main() {
           providers: [
             ChangeNotifierProvider<ContentFacadeService>.value(
                 value: mockContentService),
-            ChangeNotifierProvider<AudioService>.value(value: mockAudioService),
+            ChangeNotifierProvider<AudioPlayerService>.value(
+                value: mockAudioService),
           ],
           child: const HomeScreen(),
         ),

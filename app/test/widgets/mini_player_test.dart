@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:from_fed_to_chain_app/widgets/mini_player.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/services/audio_service.dart';
+import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
 import 'package:from_fed_to_chain_app/themes/app_theme.dart';
 
 import 'widget_test_utils.dart';
@@ -23,7 +23,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -79,7 +79,7 @@ void main() {
             WidgetTestUtils.createTestWrapper(
               WidgetTestUtils.createMiniPlayer(
                 audioFile: audioFile,
-                playbackState: PlaybackState.paused,
+                playbackState: AppPlaybackState.paused,
               ),
             ),
           );
@@ -102,7 +102,7 @@ void main() {
             WidgetTestUtils.createTestWrapper(
               WidgetTestUtils.createMiniPlayer(
                 audioFile: audioFile,
-                playbackState: PlaybackState.paused,
+                playbackState: AppPlaybackState.paused,
               ),
             ),
           );
@@ -121,7 +121,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -135,7 +135,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.playing,
+            playbackState: AppPlaybackState.playing,
           ),
         );
 
@@ -149,7 +149,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.loading,
+            playbackState: AppPlaybackState.loading,
           ),
         );
 
@@ -163,7 +163,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.error,
+            playbackState: AppPlaybackState.error,
           ),
         );
 
@@ -173,11 +173,11 @@ void main() {
       testWidgets('should display correct playback state indicator',
           (WidgetTester tester) async {
         final testCases = [
-          (PlaybackState.playing, Icons.graphic_eq, 'Playing'),
-          (PlaybackState.paused, Icons.pause_circle_outline, 'Paused'),
-          (PlaybackState.loading, Icons.hourglass_empty, 'Loading'),
-          (PlaybackState.error, Icons.error_outline, 'Error'),
-          (PlaybackState.stopped, Icons.stop_circle, 'Stopped'),
+          (AppPlaybackState.playing, Icons.graphic_eq, 'Playing'),
+          (AppPlaybackState.paused, Icons.pause_circle_outline, 'Paused'),
+          (AppPlaybackState.loading, Icons.hourglass_empty, 'Loading'),
+          (AppPlaybackState.error, Icons.error_outline, 'Error'),
+          (AppPlaybackState.stopped, Icons.stop_circle, 'Stopped'),
         ];
 
         for (final (state, icon, text) in testCases) {
@@ -206,7 +206,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -224,7 +224,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -244,7 +244,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -263,7 +263,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -283,7 +283,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.loading,
+            playbackState: AppPlaybackState.loading,
           ),
         );
 
@@ -309,7 +309,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -327,7 +327,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -355,7 +355,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -386,10 +386,10 @@ void main() {
       testWidgets('should apply correct colors based on state',
           (WidgetTester tester) async {
         final stateColors = [
-          (PlaybackState.playing, AppTheme.playingColor),
-          (PlaybackState.paused, AppTheme.pausedColor),
-          (PlaybackState.loading, AppTheme.loadingColor),
-          (PlaybackState.error, AppTheme.errorStateColor),
+          (AppPlaybackState.playing, AppTheme.playingColor),
+          (AppPlaybackState.paused, AppTheme.pausedColor),
+          (AppPlaybackState.loading, AppTheme.loadingColor),
+          (AppPlaybackState.error, AppTheme.errorStateColor),
         ];
 
         for (final (state, _) in stateColors) {
@@ -423,7 +423,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: longTitleAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -445,7 +445,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -461,7 +461,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -478,7 +478,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -491,7 +491,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -519,7 +519,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: testAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -533,7 +533,7 @@ void main() {
     group('Edge Cases', () {
       testWidgets('should handle rapid state changes',
           (WidgetTester tester) async {
-        PlaybackState currentState = PlaybackState.paused;
+        AppPlaybackState currentState = AppPlaybackState.paused;
 
         await tester.pumpWidget(
           StatefulBuilder(
@@ -543,9 +543,9 @@ void main() {
                   audioFile: testAudioFile,
                   playbackState: currentState,
                   onPlayPause: () => setState(() {
-                    currentState = currentState == PlaybackState.playing
-                        ? PlaybackState.paused
-                        : PlaybackState.playing;
+                    currentState = currentState == AppPlaybackState.playing
+                        ? AppPlaybackState.paused
+                        : AppPlaybackState.playing;
                   }),
                 ),
               );
@@ -577,7 +577,7 @@ void main() {
           tester,
           WidgetTestUtils.createMiniPlayer(
             audioFile: specialTitleAudioFile,
-            playbackState: PlaybackState.paused,
+            playbackState: AppPlaybackState.paused,
           ),
         );
 
@@ -585,9 +585,9 @@ void main() {
         expect(find.text(specialTitleAudioFile.displayTitle), findsOneWidget);
       });
 
-      testWidgets('should handle all PlaybackState values',
+      testWidgets('should handle all AppPlaybackState values',
           (WidgetTester tester) async {
-        for (final state in PlaybackState.values) {
+        for (final state in AppPlaybackState.values) {
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
               WidgetTestUtils.createMiniPlayer(
@@ -616,7 +616,7 @@ void main() {
             tester,
             WidgetTestUtils.createMiniPlayer(
               audioFile: testAudioFile,
-              playbackState: PlaybackState.paused,
+              playbackState: AppPlaybackState.paused,
             ),
           );
 

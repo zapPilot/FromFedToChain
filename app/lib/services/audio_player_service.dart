@@ -13,13 +13,13 @@ import 'player_adapter.dart';
 import 'player_controller.dart';
 import 'player_state_notifier.dart';
 
-/// Enhanced AudioService that coordinates all playback components
+/// Unified audio service that coordinates all playback components
 ///
-/// This service maintains the existing AudioService API for backward compatibility
-/// while internally using the decomposed component architecture. It acts as a
-/// coordinator that delegates operations to focused components and manages
-/// state synchronization between them.
-class EnhancedAudioService extends ChangeNotifier {
+/// This service acts as the main coordinator for audio playbook functionality,
+/// managing playback state, progress tracking, episode navigation, and
+/// background audio support. It delegates operations to focused components
+/// and manages state synchronization between them.
+class AudioPlayerService extends ChangeNotifier {
   // Core components
   late final PlayerStateNotifier _stateNotifier;
   late final PlayerController _playerController;
@@ -36,14 +36,13 @@ class EnhancedAudioService extends ChangeNotifier {
   bool _disposed = false;
   bool _suspendProgressUpdates = false;
 
-  EnhancedAudioService(
+  AudioPlayerService(
     this._audioHandler,
     this._contentService, [
     AudioPlayer? localAudioPlayer,
   ]) : _providedAudioPlayer = localAudioPlayer {
     if (kDebugMode) {
-      print(
-          '🎧 EnhancedAudioService: Initializing with decomposed architecture...');
+      print('🎧 AudioPlayerService: Initializing...');
       print(
           '🎧 Background handler: ${_audioHandler != null ? "PRESENT" : "NULL"}');
     }
@@ -60,7 +59,7 @@ class EnhancedAudioService extends ChangeNotifier {
     final IPlayerAdapter playerAdapter;
     if (_audioHandler != null) {
       if (kDebugMode) {
-        print('🎧 EnhancedAudioService: Using background audio adapter');
+        print('🎧 AudioPlayerService: Using background audio adapter');
       }
       playerAdapter = BackgroundPlayerAdapter(_audioHandler!);
 
@@ -71,7 +70,7 @@ class EnhancedAudioService extends ChangeNotifier {
       );
     } else {
       if (kDebugMode) {
-        print('🎧 EnhancedAudioService: Using local audio adapter');
+        print('🎧 AudioPlayerService: Using local audio adapter');
       }
       playerAdapter = LocalPlayerAdapter(audioPlayer: _providedAudioPlayer);
     }
@@ -90,7 +89,7 @@ class EnhancedAudioService extends ChangeNotifier {
     );
 
     if (kDebugMode) {
-      print('✅ EnhancedAudioService: All components initialized successfully');
+      print('✅ AudioPlayerService: All components initialized successfully');
     }
   }
 
@@ -149,7 +148,7 @@ class EnhancedAudioService extends ChangeNotifier {
   Future<void> playAudio(AudioFile audioFile) async {
     try {
       if (kDebugMode) {
-        print('▶️ EnhancedAudioService: Playing audio: ${audioFile.title}');
+        print('▶️ AudioPlayerService: Playing audio: ${audioFile.title}');
       }
 
       _currentAudioFile = audioFile;
@@ -180,11 +179,11 @@ class EnhancedAudioService extends ChangeNotifier {
       }
 
       if (kDebugMode) {
-        print('✅ EnhancedAudioService: Successfully started playback');
+        print('✅ AudioPlayerService: Successfully started playback');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ EnhancedAudioService: Failed to play audio: $e');
+        print('❌ AudioPlayerService: Failed to play audio: $e');
       }
       rethrow;
     }
@@ -469,7 +468,7 @@ class EnhancedAudioService extends ChangeNotifier {
     _disposed = true;
 
     if (kDebugMode) {
-      print('🗑️ EnhancedAudioService: Disposing all components...');
+      print('🗑️ AudioPlayerService: Disposing all components...');
     }
 
     // Remove state change listener
@@ -482,7 +481,7 @@ class EnhancedAudioService extends ChangeNotifier {
     super.dispose();
 
     if (kDebugMode) {
-      print('✅ EnhancedAudioService: Disposal complete');
+      print('✅ AudioPlayerService: Disposal complete');
     }
   }
 }

@@ -5,22 +5,23 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
 import 'package:from_fed_to_chain_app/screens/player_screen.dart';
-import 'package:from_fed_to_chain_app/services/audio_service.dart';
+import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
 import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
 
 // Generate mocks for dependencies
-@GenerateMocks([AudioService, ContentFacadeService])
+@GenerateMocks([AudioPlayerService, ContentFacadeService])
 import 'player_screen_test.mocks.dart';
 
 void main() {
   group('PlayerScreen - Basic Tests', () {
-    late MockAudioService mockAudioService;
+    late MockAudioPlayerService mockAudioService;
     late MockContentFacadeService mockContentService;
     late AudioFile testAudioFile;
 
     setUp(() {
-      mockAudioService = MockAudioService();
+      mockAudioService = MockAudioPlayerService();
       mockContentService = MockContentFacadeService();
 
       testAudioFile = AudioFile(
@@ -36,7 +37,7 @@ void main() {
 
       // Basic AudioService setup
       when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
-      when(mockAudioService.playbackState).thenReturn(PlaybackState.stopped);
+      when(mockAudioService.playbackState).thenReturn(AppPlaybackState.stopped);
       when(mockAudioService.currentPosition).thenReturn(Duration.zero);
       when(mockAudioService.totalDuration)
           .thenReturn(const Duration(minutes: 5));
@@ -86,7 +87,7 @@ void main() {
           theme: ThemeData.dark(),
           home: MultiProvider(
             providers: [
-              ChangeNotifierProvider<AudioService>.value(
+              ChangeNotifierProvider<AudioPlayerService>.value(
                   value: mockAudioService),
               ChangeNotifierProvider<ContentFacadeService>.value(
                   value: mockContentService),

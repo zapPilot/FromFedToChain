@@ -17,6 +17,11 @@ ENVIRONMENT=test
 ''');
     });
 
+    tearDownAll(() async {
+      // Clear dotenv to prevent state contamination between test suites
+      dotenv.clean();
+    });
+
     setUp(() async {
       // Initialize test binding and mock SharedPreferences
       TestWidgetsFlutterBinding.ensureInitialized();

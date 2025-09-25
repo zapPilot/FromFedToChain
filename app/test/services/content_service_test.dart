@@ -65,6 +65,11 @@ STREAM_TIMEOUT_SECONDS=10
 ''');
     });
 
+    tearDownAll(() async {
+      // Clear dotenv to prevent state contamination between test suites
+      dotenv.clean();
+    });
+
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
 

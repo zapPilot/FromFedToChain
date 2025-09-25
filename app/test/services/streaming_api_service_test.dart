@@ -24,6 +24,11 @@ ENVIRONMENT=test
 ''');
     });
 
+    tearDownAll(() async {
+      // Clear dotenv to prevent state contamination between test suites
+      dotenv.clean();
+    });
+
     setUp(() {
       mockHttpClient = MockClient();
       StreamingApiService.setHttpClient(mockHttpClient);
