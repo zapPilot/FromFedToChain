@@ -1,6 +1,6 @@
 {
   "id": "2025-09-22-vitalik-low-risk-defi-ethereum-google-search",
-  "status": "content",
+  "status": "social",
   "category": "defi",
   "date": "2025-09-22",
   "language": "zh-TW",
@@ -17,7 +17,7 @@
   ],
   "framework": "解讀分析式風格.md",
   "audio_file": "audio/zh-TW/defi/2025-09-22-vitalik-low-risk-defi-ethereum-google-search.wav",
-  "social_hook": null,
+  "social_hook": "🎯 V神突然改口挺DeFi！從「投機賭博」到「以太坊的Google搜尋」—低風險DeFi為何成為他眼中的「印鈔機」？這篇必聽！🎧 Eng | 中 | 日 版本現已上線 Apple Podcasts、Spotify\n\n🎧 Listen: fromfedtochain://audio/2025-09-22-vitalik-low-risk-defi-...",
   "feedback": {
     "content_review": {
       "status": "accepted",
@@ -27,7 +27,7 @@
       "comments": "這篇除了原文還有延伸力入 google 的 chrome, AI 等業務不賺錢，是個很好的類比"
     }
   },
-  "updated_at": "2025-09-22T12:26:26.570Z",
+  "updated_at": "2025-09-30T13:12:45.232Z",
   "knowledge_concepts_used": [
     "network-effect",
     "regulatory-arbitrage",

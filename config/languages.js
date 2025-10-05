@@ -145,7 +145,14 @@ export const LANGUAGES = {
 };
 
 // Content categories
-export const CATEGORIES = ["daily-news", "ethereum", "macro"];
+export const CATEGORIES = [
+  "daily-news",
+  "ethereum",
+  "macro",
+  "startup",
+  "ai",
+  "defi",
+];
 
 // File system paths
 export const PATHS = {
