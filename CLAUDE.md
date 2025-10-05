@@ -239,6 +239,228 @@ npm run review
 - **Flutter Integration**: Flutter app provides modern UI for audio playback of generated content
 - **Coexisting Dependencies**: Node.js (package.json) and Flutter (pubspec.yaml) dependencies coexist
 
+## 🔄 Schema Synchronization Requirements
+
+**CRITICAL**: This project maintains a compound codebase with TypeScript/Node.js (CLI pipeline) and Dart/Flutter (mobile/web app). Certain schema elements and configuration constants **MUST** remain synchronized between both platforms to prevent integration failures.
+
+### Core Schema Fields (MUST SYNC)
+
+These fields exist in both `src/ContentSchema.js` (TypeScript) and `app/lib/models/audio_content.dart` (Dart):
+
+| Field Name    | TypeScript | Dart             | Notes                                   |
+| ------------- | ---------- | ---------------- | --------------------------------------- |
+| `id`          | ✅         | ✅               | Content unique identifier               |
+| `status`      | ✅         | ✅               | Pipeline status (see Status Flow below) |
+| `category`    | ✅         | ✅               | Content category (see Categories below) |
+| `date`        | ✅         | ✅               | Publication date (ISO 8601)             |
+| `language`    | ✅         | ✅               | Language code (see Languages below)     |
+| `title`       | ✅         | ✅               | Content title                           |
+| `content`     | ✅         | ✅ `description` | **Field name differs!**                 |
+| `references`  | ✅         | ✅               | Source references array                 |
+| `social_hook` | ✅         | ✅ `socialHook`  | **Field name differs!**                 |
+| `updated_at`  | ✅         | ✅ `updatedAt`   | **Field name differs!**                 |
+
+**Field Mapping Notes**:
+
+- `content` (TypeScript) maps to `description` (Dart) via `AudioContent.fromJson()`
+- `social_hook` (TypeScript) maps to `socialHook` (Dart) - camelCase conversion
+- `updated_at` (TypeScript) maps to `updatedAt` (Dart) - camelCase conversion
+
+### TypeScript-Only Fields (Not in Flutter)
+
+These fields exist only in the Node.js pipeline and are **NOT** consumed by the Flutter app:
+
+- `framework` - Writing style framework (e.g., "万维钢风格.md")
+- `knowledge_concepts_used[]` - Array of knowledge concept IDs
+- `feedback.content_review` - Detailed review workflow feedback
+- `audio_file` - Local file path (Flutter uses `streaming_urls` instead)
+
+### Flutter-Only Fields (Not in TypeScript)
+
+These fields are added by the streaming API and exist only in the Flutter app:
+
+- `duration` - Audio duration in seconds
+- `fileSizeBytes` - Audio file size
+- `lastModified` - File modification timestamp
+- `streamingUrl` - Cloudflare R2 streaming URL
+
+### Configuration Constants (MUST SYNC)
+
+#### Languages
+
+**Locations**:
+
+- TypeScript: `src/ContentSchema.js` line 38 + `config/languages.js` lines 6-132
+- Dart: `app/lib/config/api_config.dart` line 84
+
+**Synchronized Values**:
+
+```javascript
+["zh-TW", "en-US", "ja-JP"];
+```
+
+**Change Process**:
+
+1. Update `src/ContentSchema.js` - add/remove language
+2. Update `config/languages.js` - add full language configuration
+3. Update `app/lib/config/api_config.dart` - add language code
+4. Update display names in both platforms
+5. Run tests: `npm test` and `flutter test`
+
+#### Categories
+
+**Locations**:
+
+- TypeScript: `src/ContentSchema.js` line 42 + `config/languages.js` line 148
+- Dart: `app/lib/config/api_config.dart` line 89
+
+**Synchronized Values**:
+
+```javascript
+["daily-news", "ethereum", "macro", "startup", "ai", "defi"];
+```
+
+**Change Process**:
+
+1. Update `src/ContentSchema.js` - add/remove category
+2. Update `config/languages.js` CATEGORIES constant
+3. Update `app/lib/config/api_config.dart` - add category code
+4. Add emoji mapping in Flutter models (see UI Constants below)
+5. Run tests: `npm test` and `flutter test`
+
+#### Status Flow (Pipeline Progression)
+
+**TypeScript Pipeline** (`src/ContentSchema.js` lines 46-57):
+
+```
+draft → reviewed → translated → wav → m3u8 → cloudflare → content → social
+```
+
+**Flutter Playback Recognition** (`app/lib/models/audio_content.dart`):
+
+```dart
+// Audio is available from 'wav' status onwards
+['wav', 'm3u8', 'cloudflare', 'content', 'social']
+```
+
+**Critical**: Flutter's `hasAudio` getter must recognize all statuses from `wav` onwards. Content in earlier statuses (`draft`, `reviewed`, `translated`) does not yet have audio files.
+
+**Change Process**:
+
+1. Adding new status: Update `ContentSchema.getPipelineConfig()` in TypeScript
+2. If status is post-audio: Update Flutter `hasAudio` getter to include new status
+3. Update pipeline documentation in this file
+4. Run full integration tests
+
+### UI Constants (Flutter-Specific, Optional Sync)
+
+These constants affect Flutter UI display but don't impact data integrity:
+
+#### Category Emoji Mappings
+
+**Location**: `app/lib/models/audio_content.dart` + `app/lib/models/audio_file.dart`
+
+```dart
+'daily-news': '📰', 'ethereum': '⚡', 'macro': '📊',
+'startup': '🚀', 'ai': '🤖', 'defi': '💎'
+```
+
+**Change Process**: When adding category, choose appropriate emoji and update both model files.
+
+#### Language Flag Mappings
+
+**Location**: `app/lib/models/audio_content.dart` + `app/lib/models/audio_file.dart`
+
+```dart
+'zh-TW': '🇹🇼', 'en-US': '🇺🇸', 'ja-JP': '🇯🇵'
+```
+
+**Change Process**: When adding language, choose appropriate flag emoji and update both model files.
+
+#### Display Names
+
+**Locations**:
+
+- TypeScript: `config/languages.js` (language names and regions)
+- Dart: `app/lib/config/api_config.dart` (languageNames, categoryNames)
+- Dart: `app/lib/themes/app_theme.dart` (duplicate - should consolidate)
+
+**Synchronized Values**:
+
+```dart
+Languages: 'en-US': 'English', 'ja-JP': '日本語', 'zh-TW': '繁體中文'
+Categories: 'daily-news': 'Daily News', 'ethereum': 'Ethereum', 'macro': 'Macro Economics'
+```
+
+### File Path Patterns (MUST MATCH)
+
+Both platforms use identical file path structures:
+
+**Content Files**:
+
+```
+content/{language}/{category}/{id}.json
+```
+
+**Audio Files**:
+
+```
+audio/{language}/{category}/{id}.wav
+audio/{language}/{category}/{id}/audio.m3u8
+audio/{language}/{category}/{id}/segment-*.ts
+```
+
+**API Paths**:
+
+```
+GET {baseUrl}?prefix=audio/{language}/{category}/
+GET {baseUrl}/proxy/audio/{language}/{category}/{id}/audio.m3u8
+```
+
+### Validation & Testing
+
+#### Pre-Deployment Checklist
+
+Before merging schema/config changes:
+
+1. ✅ Update TypeScript schema constants
+2. ✅ Update Dart model constants
+3. ✅ Verify field name mappings in `AudioContent.fromJson()`
+4. ✅ Run Node.js tests: `npm run test:node`
+5. ✅ Run Flutter tests: `flutter test`
+6. ✅ Test full pipeline: `npm run pipeline <test-content-id>`
+7. ✅ Verify Flutter app loads content correctly
+8. ✅ Check CI passes all checks
+
+#### Common Sync Issues
+
+**Problem**: Flutter app doesn't show content with new category
+
+- **Cause**: Category not added to `api_config.dart`
+- **Fix**: Add category to `supportedCategories` array
+
+**Problem**: Flutter shows "no audio" for content with audio files
+
+- **Cause**: Status not recognized in `hasAudio` getter
+- **Fix**: Add status to audioStatuses array in `audio_content.dart`
+
+**Problem**: Content creation fails in CLI
+
+- **Cause**: Category list in `languages.js` outdated
+- **Fix**: Sync `CATEGORIES` in `config/languages.js` with `ContentSchema.js`
+
+### Future Improvements
+
+To reduce manual synchronization burden, consider:
+
+1. **Schema Generation**: Generate Dart models from TypeScript schema using code generation
+2. **Shared JSON Schema**: Maintain canonical schema in JSON Schema format, generate both platforms
+3. **API-Driven Config**: Flutter queries `/api/config` endpoint for languages/categories instead of hardcoding
+4. **Contract Testing**: Automated tests verifying TypeScript output matches Dart expectations
+5. **CI Schema Validation**: GitHub Actions step comparing schema constants across platforms
+
+---
+
 ## 🔧 Pipeline Dependencies
 
 ### Required Dependencies

@@ -110,7 +110,20 @@ class AudioContent extends Equatable {
   }
 
   /// Check if content has audio available
-  bool get hasAudio => status == 'published' || status == 'reviewed';
+  /// Audio is available from 'wav' status onwards in the pipeline
+  /// Pipeline: draft → reviewed → translated → wav → m3u8 → cloudflare → content → social
+  bool get hasAudio {
+    switch (status) {
+      case 'wav':
+      case 'm3u8':
+      case 'cloudflare':
+      case 'content':
+      case 'social':
+        return true;
+      default:
+        return false;
+    }
+  }
 
   /// Get category emoji
   String get categoryEmoji {
