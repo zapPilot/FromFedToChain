@@ -290,7 +290,7 @@ These fields are added by the streaming API and exist only in the Flutter app:
 
 **Locations**:
 
-- TypeScript: `src/ContentSchema.js` (lines 36-45) + `config/languages.js` (lines 6-132)
+- TypeScript: `src/ContentSchema.js` line 38 + `config/languages.js` lines 6-132
 - Dart: `app/lib/config/api_config.dart` line 84
 
 **Synchronized Values**:
@@ -299,18 +299,11 @@ These fields are added by the streaming API and exist only in the Flutter app:
 ["zh-TW", "en-US", "ja-JP"];
 ```
 
-**Important Distinction**:
-
-- `ContentSchema.getSupportedLanguages()` → Returns **translation targets only**: `["en-US", "ja-JP"]`
-- `ContentSchema.getAllLanguages()` → Returns **all languages** including source: `["zh-TW", "en-US", "ja-JP"]`
-- Flutter `api_config.dart` should match `getAllLanguages()` for complete language support
-- `config/languages.js` `LANGUAGES.SUPPORTED` matches `getAllLanguages()` (includes all three languages)
-
 **Change Process**:
 
-1. Update `src/ContentSchema.js` - add/remove language in both `getSupportedLanguages()` and `getAllLanguages()`
-2. Update `config/languages.js` - add full language configuration and update `LANGUAGES.SUPPORTED`
-3. Update `app/lib/config/api_config.dart` - add language code to `supportedLanguages`
+1. Update `src/ContentSchema.js` - add/remove language
+2. Update `config/languages.js` - add full language configuration
+3. Update `app/lib/config/api_config.dart` - add language code
 4. Update display names in both platforms
 5. Run tests: `npm test` and `flutter test`
 

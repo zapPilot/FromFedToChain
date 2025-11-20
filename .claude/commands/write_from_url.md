@@ -1,76 +1,85 @@
-# From Fed to Chain — 深度音頻故事稿寫作準則 (v4)
+1. review the existing content in `/content/zh-TW/**/*.json`, focusing on each item's `title`, `content`, `feedback.content_review.status`, and `feedback.content_review.comments` as learning data. Avoid repeating the same knowledge points—it's okay to use the same topic, but make sure to extend it or present different knowledge angles.
 
-## 核心目標
+1.5. **Knowledge Concepts Research**: Before writing, research existing concepts in our knowledge base:
 
-將給定的一組URL，轉化為一篇**引人入勝、具備深度洞見、且專為音頻設計的長篇故事性講稿**。最終產出的不是一篇書面文章，而是一份可以直接朗讀、充滿「畫面感」和「聊天感」的音頻腳本。
+- Use `npm run concepts search "相關主題關鍵詞"` to find existing concepts related to your topic
+- Use `npm run concepts list [category]` to browse concepts by category (經濟學, 技術, 商業, 政策, 歷史)
+- Review existing concept definitions to avoid duplication and ensure consistency
+- Identify which concepts you can reference vs. which new concepts you may need to create
+- Plan how to integrate concept references naturally into your article structure
 
----
+2. Read the multiple URLs specified in `$ARGUMENTS`. Assume that readers are beginners, so use "in a nutshell" to explain this topic to them, providing some background knowledge first.
+3. Use `zen` to conduct additional research on this topic (deep dive / ultrathink).
+4. Use `claude` to conduct further research on the same topic (deep dive / ultrathink).
+5. `Collect` and keep all reference `URLs` from Steps 1 – 3.
+6. Write one conversational explainer article in Traditional Chinese. Choose the most appropriate writing framework from the guidelines/\*.md files, bearing in mind that the audience is international. You may refer to a specific country as an example when appropriate, but do not assume that all readers are from the same country. And assign the framework file name to $FRAMEWORK.
 
-### **第一階段：解構與核心論點提煉 (尋找故事的靈魂)**
+   **Knowledge Concepts Integration Guidelines:**
+   - For **existing concepts**: Use brief mentions with natural integration, e.g., "這就是我們之前討論過的確定性溢價概念"
+   - For **new concepts**: Provide full explanations using the 【】bracket format for key terms, e.g., "【確定性溢價】指人們願意為降低不確定性而支付的額外費用"
+   - Identify 3-5 key concepts that should be tracked for this article
+   - Ensure concept usage aligns with our established definitions from the knowledge base
 
-1.  **初步閱讀與合成**：快速通讀所有`$ARGUMENTS`中的URL，不要立刻開始寫作。首要任務是理解這些文章的**核心觀點、主要衝突和關鍵參與者**。
+7. `Categorize` the article `into one of the sub-folders` under `/content/zh-TW/*`, e.g.
+   `/content/zh-TW/daily-news`, `/content/zh-TW/ethereum`, `/content/zh-TW/macro`, `/content/zh-TW/startup`, `/content/zh-TW/ai`.
 
-2.  **尋找敘事主線**：在腦中回答以下問題，以找到故事的「靈魂」：
-    - **歷史的錨點是什麼？** (例如：網景的創立、某個舊協議的誕生)
-    - **核心的「衝突」或「張力」在哪裡？** (例如：中心化 vs. 去中心化、舊模式 vs. 新模式、理想 vs. 現實)
-    - **最令人驚訝或「反直覺」的洞見是什麼？** (例如：一個錯誤碼成為商業模式的核心)
-    - **背後的「權力遊戲」是什麼？** (例如：某公司是否在推動有利於自己的標準？)
+8. **Knowledge Concepts Tagging**: After writing, identify and tag the concepts used:
+   - List all key concepts referenced or introduced in your article
+   - For existing concepts: Use their exact concept IDs (e.g., "certainty-premium", "network-effect")
+   - For new concepts: Note which ones should be added to the knowledge base later
+   - This list will be added to the `knowledge_concepts_used` field in the content schema
 
-3.  **形成核心論點**：基於以上思考，確立本期音頻稿要傳達的**一個核心思想**。例如：「x402協議不僅是技術創新，更是一場關於未來網路商業模式的權力博弈。」
+9. Use the following content schema:
 
----
+```javascript
+import { ContentSchema } from "./src/ContentSchema.js";
 
-### **第二階段：知識庫整合與情報擴充 (建立內容的連續性)**
+// Create new content
+const content = ContentSchema.createContent(
+  "2025-06-30-bitcoin-surge", // id (YYYY-MM-DD-topic-slug)
+  "$CATEGORY", // category (chosen in Step 7)
+  "zh-TW", // language
+  "Bitcoin機構投資者大舉進場", // title (Chinese)
+  "你有沒有想過，當全世界最保守的錢...", // content (Chinese)
+  ["https://bloomberg.com/", "https://www.coindesk.com/"], // references
+  "$FRAMEWORK", // framework (chosen in step 6, e.g. 解讀分析式風格.md)
+);
 
-1.  **識別核心概念**：在第一階段的基礎上，明確列出本次內容將涉及的**所有關鍵技術、經濟或歷史概念**（例如：「PeerDAS」、「意圖驅動」、「ERC-8021」等）。
+// Add knowledge concepts used in this article (from Step 8)
+content.knowledge_concepts_used = [
+  "certainty-premium", // 確定性溢價
+  "network-effect", // 網絡效應
+  "institutional-adoption", // 機構採用 (if this is a new concept, note for later addition)
+];
 
-2.  **查詢知識庫**：對於每一個核心概念，**必須使用`npm run concepts search '概念關鍵詞'`指令，查詢它是否已存在於知識庫中**。
+// Validate content
+ContentSchema.validate(content);
+```
 
-3.  **規劃敘事策略**：
-    - **對於「新概念」**：必須在講稿中進行詳細、生動、從零開始的解釋。
-    - **對於「舊概念」**：必須在講稿中，用自然的語氣提及它與過去某一集的關聯。例如：「關於『意圖』這個概念，我們在之前聊『AI代理經濟』那一集裡其實有初步提過，今天我們來把它徹底講透。」這能極大地增強節目的深度和聽眾的忠誠度。如果一個概念被提及太多次，則只引用最早或最重要的一集。
+10. Save the file to `/content/zh-TW/$CATEGORY/${YYYY-MM-DD}-topic-slug.json`.
 
-4.  **深度調研**：使用`google_web_search`主動搜尋，以補充原文中缺失或不夠深入的資訊，特別是針對那些在知識庫中不存在的「新概念」。
+## Knowledge Concepts Best Practices
 
-5.  **融合用戶洞察**：如果在指令中包含用戶的「反思」或「觀點」，必須將其視為**專家級輸入**，並在稿件中以自然的方式，將這些深刻見解呈現給聽眾。
+### When to Reference Existing Concepts
 
----
+- Use `npm run concepts references <concept-id>` to see which articles already explain a concept
+- If a concept was thoroughly explained in a recent article (within 5-10 articles), simply reference it: "正如我們在討論ETHGas時提到的確定性溢價概念"
+- If it's been a while or the context is different, provide a brief refresher before diving deeper
 
-### **第三階段：敘事結構設計 (搭建故事的骨架)**
+### When to Create New Concepts
 
-採用經過驗證的「時光之旅」故事結構來組織稿件，確保聽眾能跟隨一個清晰的脈絡，從過去走向未來。同時，必須遵循**「最大化趣味原則」**。
+- The concept is central to understanding the current topic
+- It's likely to be referenced in future articles
+- It represents a fundamental principle or framework that transcends individual projects
+- Examples of good concepts: "確定性溢價", "網絡效應", "監管套利", "代際財富轉移"
 
-#### **最大化趣味原則 (Principle of Maximum Interest)**
+### Concept Naming Conventions
 
-**結構是為故事服務的，而非相反。** 在遵循「時光之旅」大致脈絡的同時，**應在最有趣、最關鍵、或用戶最關心的部分，不惜篇幅地進行深度挖掘。** 如果某個技術細節、歷史故事或商業博弈特別精彩，允許其篇幅遠超其他部分。目標是「把一個點講透」，而不是「把所有點平均地講完」。
+- Use English IDs with hyphens: "certainty-premium", "regulatory-arbitrage"
+- Keep names descriptive but concise
+- Check existing concepts first to avoid duplication
 
-#### **「時光之旅」結構：**
+### After Publishing
 
-1.  **開場 (The Hook)**
-2.  **歷史溯源 (The Past)**
-3.  **當下轉折 (The Present)**
-4.  **深度剖析 (The Deep Dive)**
-5.  **未來展望 (The Future)**
-6.  **總結 (The Takeaway)**
-
----
-
-### **第四階段：講稿化寫作 (賦予故事聲音)**
-
-嚴格遵守「為耳朵而寫」的原則。
-
-1.  **固定開場白**：稿件開頭必須使用固定的節目開場白：「歡迎收聽 From Fed to Chain，一個帶你從傳統金融的舊世界，穿越到加密宇宙新大陸的節目。」
-2.  **極度口語化與明確化**：
-    - 想像自己正在跟一個聰明的朋友聊天，用詞要自然、親切。
-    - **絕不使用模糊指代**。所有提到的協議、標準、框架，都必須明確說出其名稱，例如：「...一個叫做『開放意圖框架』（Open Intents Framework, OIF）的通用語言...」。
-    - 大量使用問句和口語化的連接詞。
-    - 將長句拆解成短句。
-3.  **杜絕書面格式**：嚴禁使用任何Markdown格式或與內容無關的提示。
-
----
-
-### **第五階段：最終產出與知識索引**
-
-1.  將最終完成的、純文字的音頻講稿，儲存為一個`.txt`檔案。
-2.  在產出講稿後，**必須明確列出本集中引入或深度討論的核心概念**，以便後續可以通過`KnowledgeIndexManager.js`的工具，將這些概念與本集內容進行關聯。
-3.  檔案命名格式為：`/content/zh-TW/$CATEGORY/${YYYY-MM-DD}-final-audio-script.txt`。
+- For new concepts introduced in your article, consider adding them to the knowledge base using the concept management tools
+- This ensures future articles can reference them properly and maintain knowledge continuity across the content pipeline

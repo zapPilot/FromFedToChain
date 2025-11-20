@@ -7,7 +7,6 @@
     "review": "node src/cli.js review",
     "pipeline": "node src/cli.js pipeline",
     "concepts": "node src/cli.js concepts",
-    "validate:schema": "node scripts/validate-schema-sync.js",
     "test": "npm run test:node && npm run test:flutter",
     "test:node": "node tests/run-tests.js",
     "test:flutter": "echo '🧪 Running Flutter tests...' && cd app && flutter test test --coverage --reporter compact --concurrency=2 && dart run scripts/coverage_check.dart",
