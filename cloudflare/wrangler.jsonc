@@ -1,0 +1,11 @@
+{
+    "name": "signed-url",
+    "main": "index.js",
+    "compatibility_date": "2025-12-21",
+    "r2_buckets": [
+        {
+            "binding": "R2_BUCKET",
+            "bucket_name": "fromfedtochain"
+        }
+    ]
+}

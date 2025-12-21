@@ -158,13 +158,10 @@ export default {
     }
 
     // ✨ 3. List available episodes under a language/category path with content metadata
+    // NOTE: We use content files as source of truth (not audio directories) because
+    // content files are reliably synced, while audio may be in a different bucket.
     const prefix = url.searchParams.get("prefix");
     if (prefix) {
-      const list = await env.R2_BUCKET.list({
-        prefix,
-        delimiter: "/", // 只列出下一層的資料夾
-      });
-
       // Extract language and category from prefix (e.g., "audio/en-US/daily-news/")
       const prefixParts = prefix.split("/").filter((part) => part.length > 0);
       let language = null;
@@ -175,54 +172,100 @@ export default {
         category = prefixParts[2];
       }
 
-      // Process each episode and fetch content metadata
-      const results = await Promise.all(
-        list.delimitedPrefixes.map(async (p) => {
-          const episodeId = p.replace(prefix, "").replace(/\/$/, "");
+      // If we have language and category, list content files instead of audio directories
+      // This is more reliable because content files are always synced
+      if (language && category) {
+        const contentPrefix = `content/${language}/${category}/`;
+        const contentList = await env.R2_BUCKET.list({
+          prefix: contentPrefix,
+        });
 
-          let episodeData = {
-            id: episodeId,
-            path: `${prefix}${episodeId}/playlist.m3u8`,
-            playlistUrl: `${url.origin}/proxy/${prefix}${episodeId}/playlist.m3u8`,
-            title: episodeId, // Fallback to ID if content not found
-            hasContent: false,
-          };
+        // Process each content file and build episode data
+        const results = await Promise.all(
+          contentList.objects
+            .filter((obj) => obj.key.endsWith(".json"))
+            .map(async (obj) => {
+              const episodeId = obj.key
+                .replace(contentPrefix, "")
+                .replace(".json", "");
 
-          // Try to fetch content metadata if we have language and category
-          if (language && category) {
-            try {
-              const contentKey = `content/${language}/${category}/${episodeId}.json`;
-              const contentObject = await env.R2_BUCKET.get(contentKey);
+              let episodeData = {
+                id: episodeId,
+                path: `audio/${language}/${category}/${episodeId}/playlist.m3u8`,
+                playlistUrl: `${url.origin}/proxy/audio/${language}/${category}/${episodeId}/playlist.m3u8`,
+                title: episodeId,
+                hasContent: false,
+              };
 
-              if (contentObject) {
-                const contentText = await contentObject.text();
-                const contentData = JSON.parse(contentText);
+              // Fetch content metadata
+              try {
+                const contentObject = await env.R2_BUCKET.get(obj.key);
+                if (contentObject) {
+                  const contentText = await contentObject.text();
+                  const contentData = JSON.parse(contentText);
 
-                // Enrich episode data with content metadata
-                episodeData = {
-                  ...episodeData,
-                  title: contentData.title || episodeId,
-                  date: contentData.date,
-                  category: contentData.category,
-                  language: contentData.language,
-                  hasContent: true,
-                };
+                  // Only include episodes that have streaming_urls (audio available)
+                  if (
+                    contentData.streaming_urls &&
+                    contentData.streaming_urls.m3u8
+                  ) {
+                    episodeData = {
+                      ...episodeData,
+                      title: contentData.title || episodeId,
+                      date: contentData.date,
+                      category: contentData.category,
+                      language: contentData.language,
+                      hasContent: true,
+                    };
+                    return episodeData;
+                  }
+                }
+              } catch (error) {
+                console.error(
+                  `Failed to fetch content for ${episodeId}:`,
+                  error,
+                );
               }
-            } catch (error) {
-              // Continue with fallback data if content fetch fails
-              console.error(`Failed to fetch content for ${episodeId}:`, error);
-            }
-          }
 
-          return episodeData;
-        }),
-      );
+              // Return null for episodes without audio (will be filtered out)
+              return null;
+            }),
+        );
+
+        // Filter out null entries (episodes without audio)
+        const filteredResults = results.filter((r) => r !== null);
+
+        return Response.json(filteredResults, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=1800", // 30-minute cache
+          },
+        });
+      }
+
+      // Fallback: if no language/category, use original audio directory listing
+      const list = await env.R2_BUCKET.list({
+        prefix,
+        delimiter: "/",
+      });
+
+      const results = list.delimitedPrefixes.map((p) => {
+        const episodeId = p.replace(prefix, "").replace(/\/$/, "");
+        return {
+          id: episodeId,
+          path: `${prefix}${episodeId}/playlist.m3u8`,
+          playlistUrl: `${url.origin}/proxy/${prefix}${episodeId}/playlist.m3u8`,
+          title: episodeId,
+          hasContent: false,
+        };
+      });
 
       return Response.json(results, {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=1800", // 30-minute cache
+          "Cache-Control": "public, max-age=1800",
         },
       });
     }
