@@ -13,23 +13,23 @@ export class ConceptCli {
     console.log(chalk.yellow("Available commands:"));
     console.log(
       chalk.cyan("  concepts list [category]       ") +
-        "List all concepts or by category",
+      "List all concepts or by category",
     );
     console.log(
       chalk.cyan("  concepts search <query>        ") +
-        "Search concepts by name or content",
+      "Search concepts by name or content",
     );
     console.log(
       chalk.cyan("  concepts show <concept-id>     ") +
-        "Show detailed concept information",
+      "Show detailed concept information",
     );
     console.log(
       chalk.cyan("  concepts references <concept-id>") +
-        "Show articles that use this concept",
+      "Show articles that use this concept",
     );
     console.log(
       chalk.cyan("  concepts stats                ") +
-        "Show knowledge base statistics",
+      "Show knowledge base statistics",
     );
     console.log("");
     console.log(chalk.gray("Examples:"));
@@ -192,7 +192,7 @@ export class ConceptCli {
       if (concept.related_concepts && concept.related_concepts.length > 0) {
         console.log(
           chalk.cyan("Related Concepts: ") +
-            chalk.gray(concept.related_concepts.join(", ")),
+          chalk.gray(concept.related_concepts.join(", ")),
         );
       }
 
