@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:from_fed_to_chain_app/services/deep_link_service.dart';
+import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
 
 void main() {
   group('DeepLinkService Tests', () {

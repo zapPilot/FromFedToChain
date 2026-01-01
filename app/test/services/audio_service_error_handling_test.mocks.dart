@@ -8,11 +8,13 @@ import 'dart:ui' as _i11;
 
 import 'package:audio_service/audio_service.dart' as _i6;
 import 'package:audio_session/audio_session.dart' as _i12;
-import 'package:from_fed_to_chain_app/models/audio_content.dart' as _i10;
-import 'package:from_fed_to_chain_app/models/audio_file.dart' as _i5;
-import 'package:from_fed_to_chain_app/services/background_audio_handler.dart'
+import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart'
+    as _i10;
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart'
+    as _i5;
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart'
     as _i4;
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart'
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart'
     as _i8;
 import 'package:just_audio/just_audio.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
@@ -819,11 +821,10 @@ class MockBackgroundAudioHandler extends _i1.Mock
       ) as _i7.Future<void>);
 }
 
-/// A class which mocks [ContentFacadeService].
+/// A class which mocks [ContentService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockContentFacadeService extends _i1.Mock
-    implements _i8.ContentFacadeService {
+class MockContentService extends _i1.Mock implements _i8.ContentService {
   @override
   List<_i5.AudioFile> get allEpisodes => (super.noSuchMethod(
         Invocation.getter(#allEpisodes),

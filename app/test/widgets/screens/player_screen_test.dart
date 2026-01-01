@@ -4,25 +4,25 @@ import 'package:provider/provider.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
-import 'package:from_fed_to_chain_app/screens/player_screen.dart';
-import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/audio/screens/player_screen.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 // Generate mocks for dependencies
-@GenerateMocks([AudioPlayerService, ContentFacadeService])
+@GenerateMocks([AudioPlayerService, ContentService])
 import 'player_screen_test.mocks.dart';
 
 void main() {
   group('PlayerScreen - Basic Tests', () {
     late MockAudioPlayerService mockAudioService;
-    late MockContentFacadeService mockContentService;
+    late MockContentService mockContentService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioService = MockAudioPlayerService();
-      mockContentService = MockContentFacadeService();
+      mockContentService = MockContentService();
 
       testAudioFile = AudioFile(
         id: 'test-episode',
@@ -89,7 +89,7 @@ void main() {
             providers: [
               ChangeNotifierProvider<AudioPlayerService>.value(
                   value: mockAudioService),
-              ChangeNotifierProvider<ContentFacadeService>.value(
+              ChangeNotifierProvider<ContentService>.value(
                   value: mockContentService),
             ],
             child: PlayerScreen(contentId: contentId),

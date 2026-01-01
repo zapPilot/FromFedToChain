@@ -4,11 +4,7 @@
   "type": "module",
   "description": "Streamlined content pipeline: Review → Translation → TTS → Social Hooks (Manual Publishing)",
   "scripts": {
-    "review": "node src/cli.js review",
-    "pipeline": "node src/cli.js pipeline",
-    "concepts": "node src/cli.js concepts",
-    "test": "npm run test:node && npm run test:flutter",
-    "test:node": "node tests/run-tests.js",
+    "test": "npm run test:flutter",
     "test:flutter": "echo '🧪 Running Flutter tests...' && cd app && flutter test test --coverage --reporter compact --concurrency=2 && dart run scripts/coverage_check.dart",
     "test:flutter:failures": "cd app && flutter test --reporter failures-only",
     "test:flutter:expanded": "cd app && flutter test --reporter expanded",
@@ -28,12 +24,6 @@
     "verify:precommit-ci-alignment": "echo '✅ Verifying pre-commit and CI alignment...' && npm run precommit:test && echo '✅ Pre-commit checks match CI quality gates'"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.846.0",
-    "@aws-sdk/s3-request-presigner": "^3.846.0",
-    "@google-cloud/text-to-speech": "^5.0.0",
-    "@google-cloud/translate": "^9.1.0",
-    "chalk": "^5.4.1",
-    "fluent-ffmpeg": "^2.1.2",
     "prettier": "^3.6.2"
   },
   "devDependencies": {

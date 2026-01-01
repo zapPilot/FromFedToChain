@@ -9,16 +9,16 @@ import 'package:rxdart/rxdart.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/services.dart';
 
-import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
-import 'package:from_fed_to_chain_app/services/background_audio_handler.dart';
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 // Generate nice mocks for dependencies (returns sensible defaults instead of throwing errors)
 @GenerateNiceMocks([
   MockSpec<BackgroundAudioHandler>(),
-  MockSpec<ContentFacadeService>(),
+  MockSpec<ContentService>(),
   MockSpec<AudioPlayer>()
 ])
 import 'audio_service_error_handling_test.mocks.dart';
@@ -70,13 +70,13 @@ void main() {
   group('AudioPlayerService - Error Handling and Uncovered Paths', () {
     late AudioPlayerService audioService;
     late MockBackgroundAudioHandler mockAudioHandler;
-    late MockContentFacadeService mockContentService;
+    late MockContentService mockContentService;
     late MockAudioPlayer mockAudioPlayer;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioHandler = MockBackgroundAudioHandler();
-      mockContentService = MockContentFacadeService();
+      mockContentService = MockContentService();
       mockAudioPlayer = MockAudioPlayer();
 
       when(mockContentService.addToListenHistory(any)).thenAnswer((_) async {});

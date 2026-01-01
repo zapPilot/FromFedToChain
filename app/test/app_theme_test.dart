@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:from_fed_to_chain_app/themes/app_theme.dart';
+import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 
 void main() {
   group('App Theme Tests', () {

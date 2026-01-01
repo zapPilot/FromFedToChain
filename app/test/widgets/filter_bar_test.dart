@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:from_fed_to_chain_app/widgets/filter_bar.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';
 
 void main() {
   group('FilterBar - Basic Tests', () {

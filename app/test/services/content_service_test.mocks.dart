@@ -7,7 +7,7 @@ import 'dart:async' as _i3;
 import 'dart:convert' as _i4;
 import 'dart:typed_data' as _i6;
 
-import 'package:from_fed_to_chain_app/services/streaming_api_service.dart'
+import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart'
     as _i7;
 import 'package:http/http.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;

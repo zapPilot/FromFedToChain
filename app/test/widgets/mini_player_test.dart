@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:from_fed_to_chain_app/widgets/mini_player.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
-import 'package:from_fed_to_chain_app/themes/app_theme.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/mini_player.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 
 import 'widget_test_utils.dart';
 

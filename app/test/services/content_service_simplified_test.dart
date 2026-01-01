@@ -2,20 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/repositories/repository_factory.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import '../test_utils.dart';
 
 void main() {
-  group('ContentFacadeService Enhanced Tests', () {
-    late ContentFacadeService contentService;
+  group('ContentService Enhanced Tests', () {
+    late ContentService contentService;
 
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
-      // Reset the repository factory to ensure clean state between tests
-      RepositoryFactory.reset();
-      contentService = ContentFacadeService();
+      contentService = ContentService();
       // Allow services to initialize
       await Future.delayed(const Duration(milliseconds: 10));
     });
@@ -24,8 +21,6 @@ void main() {
       // Wait for any pending operations to complete before disposal
       await Future.delayed(const Duration(milliseconds: 5));
       contentService.dispose();
-      // Reset repository factory to prevent shared state issues
-      RepositoryFactory.reset();
     });
 
     group('Listen History Management', () {
@@ -199,7 +194,7 @@ void main() {
         });
 
         // Should not throw when creating service
-        expect(() => ContentFacadeService(), returnsNormally);
+        expect(() => ContentService(), returnsNormally);
       });
 
       test('should handle invalid dates in history gracefully', () async {
@@ -210,7 +205,7 @@ void main() {
           }),
         });
 
-        final testService = ContentFacadeService();
+        final testService = ContentService();
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Should only load valid dates
@@ -238,7 +233,7 @@ void main() {
 
       test('should handle disposal correctly', () {
         // Create a separate instance for disposal test
-        final testService = ContentFacadeService();
+        final testService = ContentService();
         expect(() => testService.dispose(), returnsNormally);
       });
     });

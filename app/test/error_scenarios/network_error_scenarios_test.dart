@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:from_fed_to_chain_app/services/streaming_api_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/widgets/audio_list.dart';
-import 'package:from_fed_to_chain_app/widgets/mini_player.dart';
-import 'package:from_fed_to_chain_app/screens/home_screen.dart';
+import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/audio_list.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/mini_player.dart';
+import 'package:from_fed_to_chain_app/features/content/screens/home_screen.dart';
 import '../widgets/widget_test_utils.dart';
 
 /// Error scenario tests for network failures and edge cases

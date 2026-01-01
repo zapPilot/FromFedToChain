@@ -1,13 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/repositories/repository_factory.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 
 void main() {
-  group('ContentFacadeService Basic Tests', () {
-    late ContentFacadeService contentService;
+  group('ContentService Basic Tests', () {
+    late ContentService contentService;
 
     setUpAll(() async {
       // Initialize dotenv with test environment variables
@@ -27,18 +26,12 @@ ENVIRONMENT=test
       TestWidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
 
-      // Reset the repository factory to ensure clean state for each test
-      RepositoryFactory.reset();
-
-      contentService = ContentFacadeService();
+      contentService = ContentService();
     });
 
     tearDown(() {
       // Dispose the content service first
       contentService.dispose();
-
-      // Reset the repository factory to clean up singletons
-      RepositoryFactory.reset();
     });
 
     test('initializes with default values', () {

@@ -5,15 +5,14 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'dart:convert';
 
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/services/streaming_api_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import 'package:from_fed_to_chain_app/repositories/repository_factory.dart';
-import 'package:from_fed_to_chain_app/repositories/content_repository.dart';
-import 'package:from_fed_to_chain_app/repositories/episode_repository.dart';
-import 'package:from_fed_to_chain_app/repositories/progress_repository.dart';
-import 'package:from_fed_to_chain_app/repositories/preferences_repository.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
+import 'package:from_fed_to_chain_app/features/content/data/content_repository.dart';
+import 'package:from_fed_to_chain_app/features/content/data/episode_repository.dart';
+import 'package:from_fed_to_chain_app/features/content/data/progress_repository.dart';
+import 'package:from_fed_to_chain_app/features/content/data/preferences_repository.dart';
 
 // Generate mocks for repository dependencies
 @GenerateNiceMocks([
@@ -26,8 +25,8 @@ import 'package:from_fed_to_chain_app/repositories/preferences_repository.dart';
 import 'content_service_extended_test.mocks.dart';
 
 void main() {
-  group('ContentFacadeService Extended Coverage Tests', () {
-    late ContentFacadeService contentService;
+  group('ContentService Extended Coverage Tests', () {
+    late ContentService contentService;
     late MockContentRepository mockContentRepository;
     late MockEpisodeRepository mockEpisodeRepository;
     late MockProgressRepository mockProgressRepository;
@@ -41,9 +40,6 @@ STREAMING_BASE_URL=https://example.com
 API_TIMEOUT_SECONDS=30
 STREAM_TIMEOUT_SECONDS=30
 ''');
-
-      // Reset the repository factory to ensure clean state for each test
-      RepositoryFactory.reset();
 
       // Create mock repositories
       mockContentRepository = MockContentRepository();
@@ -66,6 +62,14 @@ STREAM_TIMEOUT_SECONDS=30
       when(mockProgressRepository.listenHistory).thenReturn({});
       when(mockProgressRepository.isEpisodeFinished(any)).thenReturn(false);
       when(mockProgressRepository.isEpisodeUnfinished(any)).thenReturn(false);
+      when(mockProgressRepository.getListeningStatistics(any))
+          .thenReturn(<String, dynamic>{});
+
+      when(mockContentRepository.getCacheStatistics()).thenReturn({
+        'totalItems': 0,
+        'languages': <String, int>{},
+        'categories': <String, int>{},
+      });
 
       // Set up default mock behavior for episode repository
       final mockEpisodes = [
@@ -102,23 +106,17 @@ STREAM_TIMEOUT_SECONDS=30
           .thenAnswer((_) async => mockEpisodes);
       when(mockEpisodeRepository.dispose()).thenReturn(null);
 
-      // Inject mock repositories into the factory
-      RepositoryFactory.instance.setRepositoriesForTesting(
+      contentService = ContentService(
         contentRepository: mockContentRepository,
         episodeRepository: mockEpisodeRepository,
         progressRepository: mockProgressRepository,
         preferencesRepository: mockPreferencesRepository,
       );
-
-      contentService = ContentFacadeService();
     });
 
     tearDown(() {
       // Dispose the content service first
       contentService.dispose();
-
-      // Reset the repository factory to clean up singletons
-      RepositoryFactory.reset();
     });
 
     group('Content Fetching and Caching', () {
@@ -255,7 +253,7 @@ STREAM_TIMEOUT_SECONDS=30
           'daily-news',
         )).thenThrow(Exception('Network error'));
 
-        // Expect exception to be thrown since ContentFacadeService doesn't handle it
+        // Expect exception to be thrown since ContentService doesn't handle it
         expect(
           () => contentService.fetchContentById(
               'error-content', 'en-US', 'daily-news'),
@@ -285,7 +283,7 @@ STREAM_TIMEOUT_SECONDS=30
           'daily-news',
         )).thenThrow(const FormatException('Invalid JSON'));
 
-        // Expect format exception to be thrown since ContentFacadeService doesn't handle it
+        // Expect format exception to be thrown since ContentService doesn't handle it
         expect(
           () => contentService.fetchContentById(
               'malformed-content', 'en-US', 'daily-news'),
@@ -447,7 +445,7 @@ STREAM_TIMEOUT_SECONDS=30
 
         // Use setEpisodesForTesting directly on ContentService
         contentService.setEpisodesForTesting(mockEpisodes);
-        // Note: ContentFacadeService doesn't use static setAllEpisodesForTesting
+        // Note: ContentService doesn't use static setAllEpisodesForTesting
 
         final mockContent = AudioContent(
           id: 'static-test-content',
@@ -462,7 +460,7 @@ STREAM_TIMEOUT_SECONDS=30
           updatedAt: DateTime(2025, 1, 15),
         );
 
-        // Note: ContentFacadeService uses repository pattern, not direct HTTP client
+        // Note: ContentService uses repository pattern, not direct HTTP client
         // Mock the content repository to return our test content
         when(mockContentRepository.fetchContentById(
           'static-test-content',
@@ -479,7 +477,7 @@ STREAM_TIMEOUT_SECONDS=30
 
       test('should return null when static content not found', () async {
         contentService.setEpisodesForTesting([]);
-        // Note: ContentFacadeService doesn't use static setAllEpisodesForTesting
+        // Note: ContentService doesn't use static setAllEpisodesForTesting
 
         final content = await contentService.fetchContentById(
             'nonexistent-static-content', 'en-US', 'daily-news');
@@ -910,7 +908,7 @@ STREAM_TIMEOUT_SECONDS=30
         expect(cachedContent2, isNotNull);
         expect(cachedContent2!.id, 'prefetch-2');
 
-        // Note: ContentFacadeService uses repository pattern, not direct HTTP client
+        // Note: ContentService uses repository pattern, not direct HTTP client
         // verify(
         //   mockHttpClient.get(
         //     argThat(predicate<Uri>((uri) =>
@@ -924,7 +922,7 @@ STREAM_TIMEOUT_SECONDS=30
 
       test('should handle prefetch with empty episode list', () async {
         await contentService.prefetchContent([]);
-        // Note: ContentFacadeService uses repository pattern, not direct HTTP client
+        // Note: ContentService uses repository pattern, not direct HTTP client
         // verifyNever(mockHttpClient.get(any, headers: anyNamed('headers')));
       });
 
@@ -951,7 +949,7 @@ STREAM_TIMEOUT_SECONDS=30
         // Should complete without throwing
         await contentService.prefetchContent(episodes);
 
-        // Note: ContentFacadeService uses repository pattern, not direct HTTP client
+        // Note: ContentService uses repository pattern, not direct HTTP client
         // The test should verify that prefetchContent completes without throwing
         // regardless of individual content fetch failures
         // verify(

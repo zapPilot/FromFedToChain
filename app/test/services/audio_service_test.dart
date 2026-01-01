@@ -7,15 +7,15 @@ import 'package:mockito/annotations.dart';
 import 'package:audio_service/audio_service.dart' as audio_service_pkg;
 import 'package:rxdart/rxdart.dart';
 
-import 'package:from_fed_to_chain_app/services/audio_player_service.dart';
-import 'package:from_fed_to_chain_app/services/background_audio_handler.dart';
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 // Generate nice mocks for dependencies (returns sensible defaults instead of throwing errors)
 @GenerateNiceMocks(
-    [MockSpec<BackgroundAudioHandler>(), MockSpec<ContentFacadeService>()])
+    [MockSpec<BackgroundAudioHandler>(), MockSpec<ContentService>()])
 import 'audio_service_test.mocks.dart';
 
 // Serial execution avoids shared BackgroundAudioHandler mocks colliding across isolates.
@@ -26,12 +26,12 @@ void main() {
   group('AudioPlayerService - Simplified Unit Tests', () {
     late AudioPlayerService audioService;
     late MockBackgroundAudioHandler mockAudioHandler;
-    late MockContentFacadeService mockContentService;
+    late MockContentService mockContentService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioHandler = MockBackgroundAudioHandler();
-      mockContentService = MockContentFacadeService();
+      mockContentService = MockContentService();
 
       // Simple stream setup
       final playbackStateStream =

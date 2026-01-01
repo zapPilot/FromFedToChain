@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:from_fed_to_chain_app/config/api_config.dart';
+import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 
 void main() {
   group('ApiConfig Tests', () {

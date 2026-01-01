@@ -1,10 +1,8 @@
 1. review the existing content in `/content/zh-TW/**/*.json`, focusing on each item's `title`, `content`, `feedback.content_review.status`, and `feedback.content_review.comments` as learning data. Avoid repeating the same knowledge points—it's okay to use the same topic, but make sure to extend it or present different knowledge angles.
 
-1.5. **Knowledge Concepts Research**: Before writing, research existing concepts in our knowledge base:
+1.5. **Knowledge Concepts Research**: Before writing, research existing concepts:
 
-- Use `npm run concepts search "相關主題關鍵詞"` to find existing concepts related to your topic
-- Use `npm run concepts list [category]` to browse concepts by category (經濟學, 技術, 商業, 政策, 歷史)
-- Review existing concept definitions to avoid duplication and ensure consistency
+- Review existing content files in `/content/zh-TW/` to find related concepts
 - Identify which concepts you can reference vs. which new concepts you may need to create
 - Plan how to integrate concept references naturally into your article structure
 
@@ -62,7 +60,7 @@ ContentSchema.validate(content);
 
 ### When to Reference Existing Concepts
 
-- Use `npm run concepts references <concept-id>` to see which articles already explain a concept
+- Review existing content files to see which articles already explain a concept
 - If a concept was thoroughly explained in a recent article (within 5-10 articles), simply reference it: "正如我們在討論ETHGas時提到的確定性溢價概念"
 - If it's been a while or the context is different, provide a brief refresher before diving deeper
 

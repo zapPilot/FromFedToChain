@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:async' as async;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'package:from_fed_to_chain_app/services/streaming_api_service.dart';
+import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
 
 // Generate mocks
 @GenerateMocks([http.Client])

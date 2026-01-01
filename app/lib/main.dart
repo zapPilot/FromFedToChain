@@ -5,17 +5,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:audio_service/audio_service.dart';
 
-import 'themes/app_theme.dart';
-import 'services/background_audio_handler.dart';
-import 'services/audio_player_service.dart';
-import 'services/content_facade_service.dart';
-import 'services/deep_link_service.dart';
-import 'screens/main_navigation_screen.dart';
-import 'screens/splash_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/auth/auth_screen.dart';
-import 'services/auth/auth_service.dart';
-import 'screens/auth/login_screen.dart';
+import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
+import 'package:from_fed_to_chain_app/features/app/screens/main_navigation_screen.dart';
+import 'package:from_fed_to_chain_app/features/app/screens/splash_screen.dart';
+import 'package:from_fed_to_chain_app/features/app/screens/onboarding_screen.dart';
+import 'package:from_fed_to_chain_app/features/auth/screens/auth_screen.dart';
+import 'package:from_fed_to_chain_app/features/auth/services/auth_service.dart';
+import 'package:from_fed_to_chain_app/features/auth/screens/login_screen.dart';
 
 /// Global navigator key for deep linking and navigation
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -129,18 +129,18 @@ class FromFedToChainApp extends StatelessWidget {
 
         // Content service (manages episodes and playlists) - using new modular architecture
         ChangeNotifierProvider(
-          create: (_) => ContentFacadeService(),
+          create: (_) => ContentService(),
         ),
 
         // Audio service (manages playbook)
         ChangeNotifierProvider(
           create: (context) {
-            final contentService = context.read<ContentFacadeService>();
+            final contentService = context.read<ContentService>();
             return AudioPlayerService(audioHandler, contentService);
           },
         ),
       ],
-      child: Consumer<ContentFacadeService>(
+      child: Consumer<ContentService>(
         builder: (context, contentService, child) {
           return MaterialApp(
             // App configuration

@@ -5,11 +5,10 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart';
-import 'package:from_fed_to_chain_app/services/streaming_api_service.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import 'package:from_fed_to_chain_app/repositories/repository_factory.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 
 // Generate mocks for dependencies
 @GenerateMocks([http.Client, StreamingApiService])
@@ -35,8 +34,8 @@ class ContentServiceTestUtils {
 }
 
 void main() {
-  group('ContentFacadeService Comprehensive Tests', () {
-    late ContentFacadeService contentService;
+  group('ContentService Comprehensive Tests', () {
+    late ContentService contentService;
     late List<AudioFile> sampleEpisodes;
     late MockClient mockHttpClient;
 
@@ -73,15 +72,13 @@ STREAM_TIMEOUT_SECONDS=10
     setUp(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
 
-      // CRITICAL: Reset the singleton RepositoryFactory to ensure clean state
-      RepositoryFactory.reset();
-
       // Reset SharedPreferences with clean state
       SharedPreferences.setMockInitialValues({});
 
       // Create and set up mock HTTP client
       mockHttpClient = MockClient();
-      // Note: ContentFacadeService uses repositories, mock setup may need adjustment
+      StreamingApiService.setHttpClient(mockHttpClient);
+      // Note: ContentService uses repositories, mock setup may need adjustment
 
       // Set up default mock responses to prevent network calls
       when(mockHttpClient.get(any, headers: anyNamed('headers')))
@@ -124,12 +121,12 @@ STREAM_TIMEOUT_SECONDS=10
       ];
 
       // Create fresh service instance with clean repositories
-      contentService = ContentFacadeService();
+      contentService = ContentService();
 
       // Allow async initialization to complete
       await Future.delayed(Duration(milliseconds: 10));
 
-      // Reset ContentFacadeService to testing state
+      // Reset ContentService to testing state
       contentService.setEpisodesForTesting([]);
       contentService.setLoadingForTesting(false);
       contentService.setErrorForTesting(null);
@@ -147,8 +144,7 @@ STREAM_TIMEOUT_SECONDS=10
       // Dispose service first
       contentService.dispose();
 
-      // Reset RepositoryFactory to clean up all singletons
-      RepositoryFactory.reset();
+      StreamingApiService.dispose();
 
       // Allow cleanup to complete
       await Future.delayed(Duration(milliseconds: 5));
@@ -161,7 +157,7 @@ STREAM_TIMEOUT_SECONDS=10
           'selected_category': 'ethereum',
         });
 
-        final service = ContentFacadeService();
+        final service = ContentService();
         await Future.delayed(Duration(milliseconds: 50));
 
         expect(service.selectedLanguage, 'en-US');
@@ -289,12 +285,9 @@ STREAM_TIMEOUT_SECONDS=10
 
     group('Filtering and Search', () {
       setUp(() async {
-        // CRITICAL: Reset singleton to avoid state leakage
-        RepositoryFactory.reset();
-
         // Create a fresh service instance for this group to avoid state leakage
         contentService.dispose();
-        contentService = ContentFacadeService();
+        contentService = ContentService();
 
         // Allow async initialization to complete
         await Future.delayed(Duration(milliseconds: 10));
@@ -445,12 +438,9 @@ STREAM_TIMEOUT_SECONDS=10
 
     group('Sorting', () {
       setUp(() async {
-        // CRITICAL: Reset singleton to avoid state leakage
-        RepositoryFactory.reset();
-
         // Create a fresh service instance for this group to avoid state leakage
         contentService.dispose();
-        contentService = ContentFacadeService();
+        contentService = ContentService();
 
         // Allow async initialization to complete
         await Future.delayed(Duration(milliseconds: 10));

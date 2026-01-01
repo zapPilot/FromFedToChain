@@ -37,24 +37,11 @@ jobs:
       - name: Install lcov for coverage reporting
         run: sudo apt-get update && sudo apt-get install -y lcov
 
-      - name: Check Node.js code formatting
-        run: npx prettier --check "src/**/*.{js,mjs,json}" "tests/**/*.{js,mjs}" "*.{js,mjs,json,md}"
-
       - name: Create .env file for tests
         run: cp .env.example .env
         working-directory: app
-
-      - name: Create service account file for tests
-        run: cp service-account.json.example service-account.json
 
       - name: Run comprehensive Flutter quality checks
         run: |
           npm run test:flutter
           npm run precommit:test
-
-      - name: Run Node.js tests
-        run: npm run test:node
-
-      - name: Security audit (Node.js)
-        run: npm audit --audit-level=moderate
-        continue-on-error: true

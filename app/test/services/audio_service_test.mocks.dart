@@ -7,11 +7,13 @@ import 'dart:async' as _i6;
 import 'dart:ui' as _i10;
 
 import 'package:audio_service/audio_service.dart' as _i5;
-import 'package:from_fed_to_chain_app/models/audio_content.dart' as _i9;
-import 'package:from_fed_to_chain_app/models/audio_file.dart' as _i4;
-import 'package:from_fed_to_chain_app/services/background_audio_handler.dart'
+import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart'
+    as _i9;
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart'
+    as _i4;
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart'
     as _i3;
-import 'package:from_fed_to_chain_app/services/content_facade_service.dart'
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart'
     as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i8;
@@ -797,11 +799,10 @@ class MockBackgroundAudioHandler extends _i1.Mock
       ) as _i6.Future<void>);
 }
 
-/// A class which mocks [ContentFacadeService].
+/// A class which mocks [ContentService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockContentFacadeService extends _i1.Mock
-    implements _i7.ContentFacadeService {
+class MockContentService extends _i1.Mock implements _i7.ContentService {
   @override
   List<_i4.AudioFile> get allEpisodes => (super.noSuchMethod(
         Invocation.getter(#allEpisodes),

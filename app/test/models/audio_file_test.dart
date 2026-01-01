@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:from_fed_to_chain_app/models/audio_content.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 
 void main() {
   group('AudioFile Tests', () {

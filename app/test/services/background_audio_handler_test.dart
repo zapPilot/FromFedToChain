@@ -7,8 +7,8 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 
-import 'package:from_fed_to_chain_app/services/background_audio_handler.dart';
-import 'package:from_fed_to_chain_app/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import '../test_utils.dart';
 
 // Generate mocks
