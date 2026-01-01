@@ -8,6 +8,7 @@ import '../repositories/episode_repository.dart';
 import '../repositories/content_repository.dart';
 import '../repositories/progress_repository.dart';
 import '../repositories/preferences_repository.dart';
+import '../config/api_config.dart';
 import 'playlist_service.dart';
 import 'search_service.dart';
 
@@ -239,8 +240,7 @@ class ContentFacadeService extends ChangeNotifier {
 
   Future<void> setLanguage(String language) async {
     // Validate language
-    const validLanguages = ['zh-TW', 'en-US', 'ja-JP'];
-    if (!validLanguages.contains(language)) {
+    if (!ApiConfig.isValidLanguage(language)) {
       _errorMessage = 'Unsupported language: $language';
       notifyListeners();
       return;
@@ -254,15 +254,7 @@ class ContentFacadeService extends ChangeNotifier {
 
   Future<void> setCategory(String category) async {
     // Validate category
-    const validCategories = [
-      'all',
-      'daily-news',
-      'ethereum',
-      'macro',
-      'startup',
-      'ai'
-    ];
-    if (!validCategories.contains(category)) {
+    if (category != 'all' && !ApiConfig.isValidCategory(category)) {
       _errorMessage = 'Unsupported category: $category';
       notifyListeners();
       return;

@@ -560,8 +560,27 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   /// Play episode
-  void _playEpisode(AudioFile episode, AudioPlayerService audioService) {
-    audioService.playAudio(episode);
+  Future<void> _playEpisode(
+      AudioFile episode, AudioPlayerService audioService) async {
+    try {
+      await audioService.playAudio(episode);
+    } catch (e) {
+      if (!mounted) return;
+
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Cannot play audio: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          action: SnackBarAction(
+            label: 'OK',
+            textColor: Colors.white,
+            onPressed: () {},
+          ),
+        ),
+      );
+    }
   }
 
   /// Show episode options

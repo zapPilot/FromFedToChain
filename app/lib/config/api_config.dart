@@ -82,6 +82,8 @@ class ApiConfig {
 
   // Supported languages and categories (synced with ContentSchema.js)
   static const List<String> supportedLanguages = ['zh-TW', 'en-US', 'ja-JP'];
+  static const String defaultLanguage =
+      'zh-TW'; // Source language, matches first tab
   static const List<String> supportedCategories = [
     'daily-news',
     'ethereum',

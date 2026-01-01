@@ -8,7 +8,7 @@ import '../repositories/preferences_repository.dart';
 /// Handles language, category, sort order, and other user-specific settings
 class UserPreferencesService extends ChangeNotifier
     implements PreferencesRepository {
-  String _selectedLanguage = 'zh-TW';
+  String _selectedLanguage = ApiConfig.defaultLanguage;
   String _selectedCategory = 'all';
   String _searchQuery = '';
   String _sortOrder = 'newest'; // 'newest', 'oldest', 'alphabetical'
@@ -61,7 +61,8 @@ class UserPreferencesService extends ChangeNotifier
       final prefs = await SharedPreferences.getInstance();
 
       // Core content preferences
-      _selectedLanguage = prefs.getString('selected_language') ?? 'zh-TW';
+      _selectedLanguage =
+          prefs.getString('selected_language') ?? ApiConfig.defaultLanguage;
       _selectedCategory = prefs.getString('selected_category') ?? 'all';
       _sortOrder = prefs.getString('sort_order') ?? 'newest';
 
@@ -87,7 +88,7 @@ class UserPreferencesService extends ChangeNotifier
       // Validate loaded language (reset 'all' to default language)
       if (!ApiConfig.isValidLanguage(_selectedLanguage) ||
           _selectedLanguage == 'all') {
-        _selectedLanguage = 'zh-TW';
+        _selectedLanguage = ApiConfig.defaultLanguage;
       }
 
       // Validate category
@@ -436,7 +437,7 @@ class UserPreferencesService extends ChangeNotifier
   /// Reset all preferences to defaults
   @override
   Future<void> resetToDefaults() async {
-    _selectedLanguage = 'zh-TW';
+    _selectedLanguage = ApiConfig.defaultLanguage;
     _selectedCategory = 'all';
     _searchQuery = '';
     _sortOrder = 'newest';
@@ -485,7 +486,8 @@ class UserPreferencesService extends ChangeNotifier
   @override
   Future<void> importPreferences(Map<String, dynamic> preferences) async {
     try {
-      _selectedLanguage = preferences['selectedLanguage'] as String? ?? 'zh-TW';
+      _selectedLanguage = preferences['selectedLanguage'] as String? ??
+          ApiConfig.defaultLanguage;
       _selectedCategory = preferences['selectedCategory'] as String? ?? 'all';
       _sortOrder = preferences['sortOrder'] as String? ?? 'newest';
       _isDarkMode = preferences['isDarkMode'] as bool? ?? true;
