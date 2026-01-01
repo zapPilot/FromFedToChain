@@ -73,8 +73,7 @@ jobs:
         working-directory: app
 
       - name: Build Flutter web
-        run: flutter build web --release
-        working-directory: app
+        run: npm run build:flutter
 
       - name: Archive Flutter web build
         uses: actions/upload-artifact@v4
