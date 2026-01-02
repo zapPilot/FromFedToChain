@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:from_fed_to_chain_app/features/content/data/cache_service.dart';
-import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 import '../test_utils.dart';
 
 void main() {

@@ -20,7 +20,7 @@
     "build:flutter": "cd app && flutter build web",
     "install:flutter": "cd app && flutter pub get",
     "prepare": "husky install",
-    "precommit:test": "cd app && dart format --set-exit-if-changed lib/ test/ && (flutter analyze --no-congratulate || exit_code=$?; if [ ${exit_code:-0} -le 1 ]; then exit 0; else exit $exit_code; fi)",
+    "precommit:test": "cd app && dart format --set-exit-if-changed lib/ test/ && flutter analyze --no-congratulate --fatal-warnings",
     "verify:precommit-ci-alignment": "echo '✅ Verifying pre-commit and CI alignment...' && npm run precommit:test && echo '✅ Pre-commit checks match CI quality gates'"
   },
   "dependencies": {
