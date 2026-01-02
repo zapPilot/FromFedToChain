@@ -25,12 +25,14 @@ class ProgressTrackingService extends ChangeNotifier
   // Getters
   Map<String, double> get episodeCompletion =>
       Map.unmodifiable(_episodeCompletion);
+  @override
   Map<String, DateTime> get listenHistory => Map.unmodifiable(_listenHistory);
   String? get currentEpisodeId => _currentEpisodeId;
   DateTime? get sessionStartTime => _sessionStartTime;
   Duration get sessionDuration => _sessionDuration;
 
   /// Initialize and load progress data
+  @override
   Future<void> initialize() async {
     if (_disposed) return;
     await _loadProgressData();
@@ -109,11 +111,13 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Check if episode is considered finished (>= 90% completion)
+  @override
   bool isEpisodeFinished(String episodeId) {
     return getEpisodeCompletion(episodeId) >= 0.9;
   }
 
   /// Check if episode is unfinished (started but not completed)
+  @override
   bool isEpisodeUnfinished(String episodeId) {
     final completion = getEpisodeCompletion(episodeId);
     return completion > 0.0 && completion < 0.9;
@@ -143,11 +147,13 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Mark episode as finished (completion = 1.0)
+  @override
   Future<void> markEpisodeAsFinished(String episodeId) async {
     await updateEpisodeCompletion(episodeId, 1.0);
   }
 
   /// Reset episode progress
+  @override
   Future<void> resetEpisodeProgress(String episodeId) async {
     if (_episodeCompletion.containsKey(episodeId)) {
       _episodeCompletion.remove(episodeId);
@@ -240,6 +246,7 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Get unfinished episodes from a list
+  @override
   List<AudioFile> getUnfinishedEpisodes(List<AudioFile> episodes) {
     return episodes
         .where((episode) => isEpisodeUnfinished(episode.id))
@@ -247,11 +254,13 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Get finished episodes from a list
+  @override
   List<AudioFile> getFinishedEpisodes(List<AudioFile> episodes) {
     return episodes.where((episode) => isEpisodeFinished(episode.id)).toList();
   }
 
   /// Start tracking a listening session
+  @override
   void startListeningSession(String episodeId) {
     _currentEpisodeId = episodeId;
     _sessionStartTime = DateTime.now();
@@ -264,11 +273,13 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Update current session duration
+  @override
   void updateSessionDuration(Duration duration) {
     _sessionDuration = duration;
   }
 
   /// End listening session and record progress
+  @override
   Future<void> endListeningSession({double? finalCompletion}) async {
     if (_currentEpisodeId != null) {
       // Record in history
@@ -300,6 +311,7 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Get listening statistics
+  @override
   Map<String, dynamic> getListeningStatistics(List<AudioFile> allEpisodes) {
     final totalEpisodes = allEpisodes.length;
     final finishedCount =
@@ -413,6 +425,7 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Export progress data
+  @override
   Map<String, dynamic> exportProgressData() {
     return {
       'episodeCompletion': _episodeCompletion,
@@ -425,6 +438,7 @@ class ProgressTrackingService extends ChangeNotifier
   }
 
   /// Import progress data
+  @override
   Future<void> importProgressData(Map<String, dynamic> data) async {
     try {
       // Import completion data

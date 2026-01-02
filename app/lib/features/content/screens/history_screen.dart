@@ -82,7 +82,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               ? '1 episode in history'
                               : '$count episodes in history',
                       style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                        color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                       ),
                     );
                   },
@@ -102,7 +102,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 icon: const Icon(Icons.clear_all),
                 tooltip: 'Clear History',
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+                  backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusM),
                   ),
@@ -131,7 +131,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   )
                 : const Icon(Icons.refresh),
             style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
@@ -200,20 +200,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Icon(
               Icons.history,
               size: 80,
-              color: AppTheme.onSurfaceColor.withOpacity(0.3),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
             ),
             const SizedBox(height: AppTheme.spacingL),
             Text(
               'No Listening History',
               style: AppTheme.headlineSmall.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: AppTheme.spacingS),
             Text(
               'Episodes you listen to will appear here',
               style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.5),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
               ),
               textAlign: TextAlign.center,
             ),
@@ -294,7 +294,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.onSurfaceColor.withOpacity(0.3),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

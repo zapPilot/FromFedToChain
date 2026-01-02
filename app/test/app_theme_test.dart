@@ -21,7 +21,8 @@ void main() {
       expect(colorScheme.primary, equals(AppTheme.primaryColor));
       expect(colorScheme.secondary, equals(AppTheme.secondaryColor));
       expect(colorScheme.surface, equals(AppTheme.surfaceColor));
-      expect(colorScheme.background, equals(AppTheme.backgroundColor));
+      // Material 3: backgroundColor is now set via scaffoldBackgroundColor, not ColorScheme
+      expect(theme.scaffoldBackgroundColor, equals(AppTheme.backgroundColor));
     });
 
     testWidgets('AppBar theme is correctly configured', (tester) async {

@@ -6,16 +6,16 @@
 import 'dart:async' as _i5;
 import 'dart:ui' as _i7;
 
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart'
+    as _i2;
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart'
+    as _i3;
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart'
     as _i9;
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart'
     as _i6;
-import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart'
-    as _i2;
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart'
     as _i8;
-import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart'
-    as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
 
@@ -1041,6 +1041,36 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
         #getPreviousEpisode,
         [currentEpisode],
       )) as _i6.AudioFile?);
+
+  @override
+  List<_i6.AudioFile> advancedSearch(
+    List<_i6.AudioFile>? episodes, {
+    String? query,
+    List<String>? languages,
+    List<String>? categories,
+    DateTime? dateFrom,
+    DateTime? dateTo,
+    Duration? minDuration,
+    Duration? maxDuration,
+    String? sortOrder = 'newest',
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #advancedSearch,
+          [episodes],
+          {
+            #query: query,
+            #languages: languages,
+            #categories: categories,
+            #dateFrom: dateFrom,
+            #dateTo: dateTo,
+            #minDuration: minDuration,
+            #maxDuration: maxDuration,
+            #sortOrder: sortOrder,
+          },
+        ),
+        returnValue: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
 
   @override
   void setEpisodesForTesting(List<_i6.AudioFile>? episodes) =>

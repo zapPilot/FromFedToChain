@@ -19,7 +19,6 @@ import 'package:from_fed_to_chain_app/features/audio/services/player_state_notif
 import 'audio_service_test.mocks.dart';
 
 // Serial execution avoids shared BackgroundAudioHandler mocks colliding across isolates.
-@Tags(['sequential'])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -256,7 +255,7 @@ void main() {
         when(mockAudioHandler.seek(any)).thenThrow(Exception('Seek failed'));
 
         try {
-          await audioService.seekTo(Duration(seconds: 30));
+          await audioService.seekTo(const Duration(seconds: 30));
         } catch (e) {
           expect(audioService.hasError, isTrue);
           expect(audioService.errorMessage, contains('Seek failed'));

@@ -76,20 +76,20 @@ class AudioList extends StatelessWidget {
           Icon(
             Icons.headphones_outlined,
             size: 80,
-            color: AppTheme.onSurfaceColor.withOpacity(0.3),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
           ),
           const SizedBox(height: AppTheme.spacingL),
           Text(
             'No episodes found',
             style: AppTheme.headlineMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.6),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: AppTheme.spacingS),
           Text(
             'Try different filters or search terms',
             style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.5),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
             ),
             textAlign: TextAlign.center,
           ),
@@ -112,7 +112,7 @@ class AudioList extends StatelessWidget {
             Text(
               'Loading more episodes...',
               style: AppTheme.bodySmall.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
               ),
             ),
           ],

@@ -373,12 +373,12 @@ class BackgroundAudioHandler extends BaseAudioHandler
     }
 
     // Create test MediaItem
-    final testMediaItem = MediaItem(
+    const testMediaItem = MediaItem(
       id: 'test',
       title: 'Media Session Test',
       artist: 'From Fed to Chain',
       album: 'Testing',
-      duration: const Duration(minutes: 1),
+      duration: Duration(minutes: 1),
     );
 
     mediaItem.add(testMediaItem);

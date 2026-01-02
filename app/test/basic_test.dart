@@ -7,7 +7,6 @@ import 'package:from_fed_to_chain_app/features/content/widgets/search_bar.dart'
     as custom_search;
 import 'package:from_fed_to_chain_app/features/audio/widgets/mini_player.dart';
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 import 'widgets/widget_test_utils.dart';
@@ -35,13 +34,13 @@ void main() {
               body: Column(
                 children: [
                   // Filter bar with search
-                  FilterBar(
+                  const FilterBar(
                     selectedLanguage: 'en-US',
                     selectedCategory: 'all',
                     onLanguageChanged: WidgetTestUtils.mockLanguageChanged,
                     onCategoryChanged: WidgetTestUtils.mockCategoryChanged,
                   ),
-                  custom_search.SearchBarWidget(
+                  const custom_search.SearchBarWidget(
                     onSearchChanged: WidgetTestUtils.mockSearchChanged,
                   ),
                   // Audio list
@@ -116,7 +115,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: AppTheme.darkTheme,
-            home: Scaffold(
+            home: const Scaffold(
               body: Column(
                 children: [
                   custom_search.SearchBarWidget(
@@ -155,7 +154,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: AppTheme.darkTheme,
-            home: Scaffold(
+            home: const Scaffold(
               body: custom_search.SearchBarWidget(
                 onSearchChanged: WidgetTestUtils.mockSearchChanged,
                 initialValue: 'Initial Search',
@@ -260,10 +259,10 @@ void main() {
               backgroundColor: AppTheme.backgroundColor,
               body: Column(
                 children: [
-                  custom_search.SearchBarWidget(
+                  const custom_search.SearchBarWidget(
                     onSearchChanged: WidgetTestUtils.mockSearchChanged,
                   ),
-                  FilterBar(
+                  const FilterBar(
                     selectedLanguage: 'en-US',
                     selectedCategory: 'all',
                     onLanguageChanged: WidgetTestUtils.mockLanguageChanged,
@@ -296,7 +295,7 @@ void main() {
             home: Scaffold(
               body: Column(
                 children: [
-                  custom_search.SearchBarWidget(
+                  const custom_search.SearchBarWidget(
                     onSearchChanged: WidgetTestUtils.mockSearchChanged,
                   ),
                   AudioItemCard(
@@ -355,7 +354,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: AppTheme.darkTheme,
-            home: Scaffold(
+            home: const Scaffold(
               body: Column(
                 children: [
                   custom_search.SearchBarWidget(
@@ -367,7 +366,7 @@ void main() {
                     onLanguageChanged: WidgetTestUtils.mockLanguageChanged,
                     onCategoryChanged: WidgetTestUtils.mockCategoryChanged,
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text('No audio files found'),
                     ),

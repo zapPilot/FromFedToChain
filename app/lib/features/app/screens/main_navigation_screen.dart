@@ -31,7 +31,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppTheme.surfaceColor,
         selectedItemColor: AppTheme.primaryColor,
-        unselectedItemColor: AppTheme.onSurfaceColor.withOpacity(0.6),
+        unselectedItemColor: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {

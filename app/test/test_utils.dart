@@ -4,7 +4,6 @@ import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/features/content/models/playlist.dart';
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 /// Custom matchers for testing

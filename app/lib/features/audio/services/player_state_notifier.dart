@@ -144,38 +144,34 @@ class PlayerStateNotifier extends ChangeNotifier {
   }
 
   // Testing methods - only available in debug builds
-  @visibleForTesting
+  // Note: These are public (not @visibleForTesting) because they're used by
+  // audio_player_service.dart's test helper methods
   void setPlaybackStateForTesting(AppPlaybackState state) {
     _playbackState = state;
     notifyListeners();
   }
 
-  @visibleForTesting
   void setPositionForTesting(Duration position) {
     _currentPosition = position;
     notifyListeners();
   }
 
-  @visibleForTesting
   void setDurationForTesting(Duration duration) {
     _totalDuration = duration;
     notifyListeners();
   }
 
-  @visibleForTesting
   void setSpeedForTesting(double speed) {
     _playbackSpeed = speed;
     notifyListeners();
   }
 
-  @visibleForTesting
   void setErrorForTesting(String error) {
     _playbackState = AppPlaybackState.error;
     _errorMessage = error;
     notifyListeners();
   }
 
-  @visibleForTesting
   void clearErrorForTesting() {
     _errorMessage = null;
     _playbackState = AppPlaybackState.stopped;

@@ -88,7 +88,7 @@ class AudioControls extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withOpacity(0.4),
+            color: AppTheme.primaryColor.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -167,7 +167,7 @@ class AudioControls extends StatelessWidget {
             semanticLabel: tooltip, // Add semantic label to icon
           ),
           style: IconButton.styleFrom(
-            backgroundColor: AppTheme.cardColor.withOpacity(0.6),
+            backgroundColor: AppTheme.cardColor.withValues(alpha: 0.6),
             foregroundColor: AppTheme.onSurfaceColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(size / 2),
@@ -182,12 +182,12 @@ class AudioControls extends StatelessWidget {
   _ButtonSizes _getButtonSizes() {
     switch (size) {
       case AudioControlsSize.small:
-        return _ButtonSizes(
+        return const _ButtonSizes(
             primary: 48, secondary: 48); // Increased to meet accessibility
       case AudioControlsSize.medium:
-        return _ButtonSizes(primary: 64, secondary: 48);
+        return const _ButtonSizes(primary: 64, secondary: 48);
       case AudioControlsSize.large:
-        return _ButtonSizes(primary: 80, secondary: 56);
+        return const _ButtonSizes(primary: 80, secondary: 56);
     }
   }
 }

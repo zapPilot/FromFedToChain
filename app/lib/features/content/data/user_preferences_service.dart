@@ -33,23 +33,39 @@ class UserPreferencesService extends ChangeNotifier
   bool _reducedMotion = false;
 
   // Getters
+  @override
   String get selectedLanguage => _selectedLanguage;
+  @override
   String get selectedCategory => _selectedCategory;
+  @override
   String get searchQuery => _searchQuery;
+  @override
   String get sortOrder => _sortOrder;
+  @override
   bool get isDarkMode => _isDarkMode;
+  @override
   double get playbackSpeed => _playbackSpeed;
+  @override
   bool get autoplayEnabled => _autoplayEnabled;
+  @override
   bool get downloadOverWifiOnly => _downloadOverWifiOnly;
+  @override
   int get cacheSize => _cacheSize;
+  @override
   bool get notificationsEnabled => _notificationsEnabled;
+  @override
   bool get newEpisodeNotifications => _newEpisodeNotifications;
+  @override
   bool get downloadCompleteNotifications => _downloadCompleteNotifications;
+  @override
   double get textScaleFactor => _textScaleFactor;
+  @override
   bool get highContrastMode => _highContrastMode;
+  @override
   bool get reducedMotion => _reducedMotion;
 
   /// Initialize and load user preferences
+  @override
   Future<void> initialize() async {
     if (_disposed) return;
     await _loadPreferences();
@@ -223,6 +239,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set search query (not persisted)
+  @override
   void setSearchQuery(String query) {
     if (_disposed) return;
 
@@ -310,6 +327,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set download over WiFi only
+  @override
   Future<void> setDownloadOverWifiOnly(bool wifiOnly) async {
     if (_downloadOverWifiOnly != wifiOnly) {
       _downloadOverWifiOnly = wifiOnly;
@@ -324,6 +342,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set cache size
+  @override
   Future<void> setCacheSize(int size) async {
     if (size < 10 || size > 500) {
       if (kDebugMode) {
@@ -344,6 +363,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set notifications enabled
+  @override
   Future<void> setNotificationsEnabled(bool enabled) async {
     if (_notificationsEnabled != enabled) {
       _notificationsEnabled = enabled;
@@ -358,6 +378,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set new episode notifications
+  @override
   Future<void> setNewEpisodeNotifications(bool enabled) async {
     if (_newEpisodeNotifications != enabled) {
       _newEpisodeNotifications = enabled;
@@ -372,6 +393,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set download complete notifications
+  @override
   Future<void> setDownloadCompleteNotifications(bool enabled) async {
     if (_downloadCompleteNotifications != enabled) {
       _downloadCompleteNotifications = enabled;
@@ -386,6 +408,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set text scale factor
+  @override
   Future<void> setTextScaleFactor(double factor) async {
     if (factor < 0.8 || factor > 2.0) {
       if (kDebugMode) {
@@ -407,6 +430,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set high contrast mode
+  @override
   Future<void> setHighContrastMode(bool enabled) async {
     if (_highContrastMode != enabled) {
       _highContrastMode = enabled;
@@ -421,6 +445,7 @@ class UserPreferencesService extends ChangeNotifier
   }
 
   /// Set reduced motion
+  @override
   Future<void> setReducedMotion(bool enabled) async {
     if (_reducedMotion != enabled) {
       _reducedMotion = enabled;

@@ -71,7 +71,7 @@ void main() {
         date: DateTime.utc(2025, 6, 15),
         status: 'reviewed',
         description: 'Test description',
-        references: ['Ref 1'],
+        references: const ['Ref 1'],
         socialHook: 'Test hook',
         duration: const Duration(minutes: 3),
         updatedAt: DateTime.utc(2025, 6, 15, 12, 0, 0),

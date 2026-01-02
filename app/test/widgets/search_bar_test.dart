@@ -16,7 +16,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -41,7 +41,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
           ),
         );
@@ -54,7 +54,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: 'initial search text',
             hintText: 'Search episodes...',
@@ -71,7 +71,7 @@ void main() {
       testWidgets('should apply correct styling', (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -93,7 +93,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -120,7 +120,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -144,7 +144,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -203,7 +203,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -227,7 +227,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: 'initial text',
             hintText: 'Search episodes...',
@@ -252,7 +252,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -282,7 +282,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -313,7 +313,7 @@ void main() {
       testWidgets('should handle focus correctly', (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -331,7 +331,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -360,13 +360,13 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          Column(
+          const Column(
             children: [
               SearchBarWidget(
                 onSearchChanged: WidgetTestUtils.mockSearchChanged,
                 hintText: 'Search episodes...',
               ),
-              const TextField(
+              TextField(
                   decoration: InputDecoration(
                       hintText: 'Other field')), // Another focusable widget
             ],
@@ -393,7 +393,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -416,7 +416,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -430,15 +430,15 @@ void main() {
         expect(decoration.hintStyle, isA<TextStyle>());
 
         final hintStyle = decoration.hintStyle!;
-        expect(
-            hintStyle.color, equals(AppTheme.onSurfaceColor.withOpacity(0.5)));
+        expect(hintStyle.color,
+            equals(AppTheme.onSurfaceColor.withValues(alpha: 0.5)));
       });
 
       testWidgets('should apply correct icon colors',
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: 'test text',
             hintText: 'Search episodes...',
@@ -447,20 +447,20 @@ void main() {
 
         // Check search icon color
         final searchIcon = tester.widget<Icon>(find.byIcon(Icons.search));
-        expect(
-            searchIcon.color, equals(AppTheme.onSurfaceColor.withOpacity(0.6)));
+        expect(searchIcon.color,
+            equals(AppTheme.onSurfaceColor.withValues(alpha: 0.6)));
 
         // Check clear icon color
         final clearIcon = tester.widget<Icon>(find.byIcon(Icons.clear));
-        expect(
-            clearIcon.color, equals(AppTheme.onSurfaceColor.withOpacity(0.6)));
+        expect(clearIcon.color,
+            equals(AppTheme.onSurfaceColor.withValues(alpha: 0.6)));
       });
 
       testWidgets('should apply rounded corners and fill color',
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -471,8 +471,8 @@ void main() {
         final decoration = textField.decoration!;
 
         expect(decoration.filled, true);
-        expect(
-            decoration.fillColor, equals(AppTheme.cardColor.withOpacity(0.5)));
+        expect(decoration.fillColor,
+            equals(AppTheme.cardColor.withValues(alpha: 0.5)));
 
         expect(decoration.border, isA<OutlineInputBorder>());
         final border = decoration.border as OutlineInputBorder;
@@ -515,7 +515,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -550,7 +550,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: 'initial text',
             hintText: 'Search episodes...',
@@ -573,7 +573,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: null,
             hintText: 'Search episodes...',
@@ -589,7 +589,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: '',
             hintText: 'Search episodes...',
@@ -635,7 +635,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -648,7 +648,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: 'test text',
             hintText: 'Search episodes...',
@@ -671,7 +671,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search for podcasts...',
           ),
@@ -715,7 +715,7 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -760,7 +760,7 @@ void main() {
 
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -782,12 +782,12 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
           ),
         );
 
-        final specialText =
+        const specialText =
             '🔥 Bitcoin & Ethereum: 加密货币 📈 (測試) — Special «Characters» ñañá';
 
         await tester.enterText(find.byType(TextField), specialText);
@@ -802,7 +802,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             initialValue: 'Initial Text',
           ),
@@ -824,14 +824,14 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
           ),
         );
 
-        final whitespaceText =
+        const whitespaceText =
             '   \t   '; // Various whitespace characters (newlines stripped by TextField)
-        final inputText = '   \t\n   '; // Input with newline
+        const inputText = '   \t\n   '; // Input with newline
 
         await tester.enterText(find.byType(TextField), inputText);
         await tester.pump();
@@ -844,7 +844,7 @@ void main() {
       testWidgets('should handle numeric input', (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
           ),
         );
@@ -863,7 +863,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
           ),
         );
@@ -885,14 +885,13 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          Column(
+          const Column(
             children: [
               SearchBarWidget(
                 onSearchChanged: WidgetTestUtils.mockSearchChanged,
                 hintText: 'Search episodes...',
               ),
-              const TextField(
-                  decoration: InputDecoration(hintText: 'Other field')),
+              TextField(decoration: InputDecoration(hintText: 'Other field')),
             ],
           ),
         );
@@ -915,7 +914,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: AppTheme.darkTheme,
-            home: Scaffold(
+            home: const Scaffold(
               body: SizedBox(
                 width: 250, // Narrow constraint
                 height: 80, // Limited height
@@ -963,7 +962,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          SearchBarWidget(
+          const SearchBarWidget(
             onSearchChanged: WidgetTestUtils.mockSearchChanged,
             hintText: 'Search episodes...',
           ),
@@ -1008,7 +1007,7 @@ void main() {
           StatefulBuilder(
             builder: (context, setState) {
               return WidgetTestUtils.createTestWrapper(
-                SearchBarWidget(
+                const SearchBarWidget(
                   onSearchChanged: WidgetTestUtils.mockSearchChanged,
                   hintText: 'New hint text',
                 ),
@@ -1033,7 +1032,7 @@ void main() {
 
           await WidgetTestUtils.pumpWidgetWithTheme(
             tester,
-            SearchBarWidget(
+            const SearchBarWidget(
               onSearchChanged: WidgetTestUtils.mockSearchChanged,
               hintText: 'Search episodes...',
             ),

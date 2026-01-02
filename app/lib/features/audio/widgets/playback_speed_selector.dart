@@ -89,12 +89,12 @@ class PlaybackSpeedSelector extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? AppTheme.primaryColor
-                  : AppTheme.cardColor.withOpacity(0.5),
+                  : AppTheme.cardColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(AppTheme.radiusM),
               border: isSelected
                   ? null
                   : Border.all(
-                      color: AppTheme.onSurfaceColor.withOpacity(0.2),
+                      color: AppTheme.onSurfaceColor.withValues(alpha: 0.2),
                       width: 1,
                     ),
             ),
@@ -124,7 +124,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
           Text(
             'Custom Speed',
             style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.7),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
             ),
           ),
 
@@ -136,7 +136,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
                 '0.5x',
                 key: const Key('slider_min_label'),
                 style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                 ),
               ),
               Expanded(
@@ -152,7 +152,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
                     activeTrackColor: AppTheme.primaryColor,
                     inactiveTrackColor: AppTheme.cardColor,
                     thumbColor: AppTheme.primaryColor,
-                    overlayColor: AppTheme.primaryColor.withOpacity(0.2),
+                    overlayColor: AppTheme.primaryColor.withValues(alpha: 0.2),
                   ),
                   child: Slider(
                     value: currentSpeed.clamp(0.5, 2.0),
@@ -167,7 +167,7 @@ class PlaybackSpeedSelector extends StatelessWidget {
                 '2.0x',
                 key: const Key('slider_max_label'),
                 style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -181,10 +181,10 @@ class PlaybackSpeedSelector extends StatelessWidget {
                 vertical: AppTheme.spacingS,
               ),
               decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.1),
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusS),
                 border: Border.all(
-                  color: AppTheme.primaryColor.withOpacity(0.3),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),

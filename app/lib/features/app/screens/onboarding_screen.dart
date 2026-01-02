@@ -112,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text(
                         'Skip',
                         style: AppTheme.bodyMedium.copyWith(
-                          color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                          color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -193,15 +193,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppTheme.primaryColor.withOpacity(0.1),
-                  AppTheme.secondaryColor.withOpacity(0.1),
+                  AppTheme.primaryColor.withValues(alpha: 0.1),
+                  AppTheme.secondaryColor.withValues(alpha: 0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(AppTheme.radiusXL),
               border: Border.all(
-                color: AppTheme.primaryColor.withOpacity(0.2),
+                color: AppTheme.primaryColor.withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
@@ -217,7 +217,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: AppTheme.spacingXL),
 
           // Title
-          Text(
+          const Text(
             'Stream Web3/Finance Content',
             style: AppTheme.headlineLarge,
             textAlign: TextAlign.center,
@@ -229,7 +229,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             'Listen to expertly curated explanations about cryptocurrency, economics, and blockchain technology in Chinese with English translations available.',
             style: AppTheme.bodyLarge.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.8),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.8),
             ),
             textAlign: TextAlign.center,
           ),
@@ -254,15 +254,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppTheme.secondaryColor.withOpacity(0.1),
-                  AppTheme.primaryColor.withOpacity(0.1),
+                  AppTheme.secondaryColor.withValues(alpha: 0.1),
+                  AppTheme.primaryColor.withValues(alpha: 0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(AppTheme.radiusXL),
               border: Border.all(
-                color: AppTheme.secondaryColor.withOpacity(0.2),
+                color: AppTheme.secondaryColor.withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
@@ -278,7 +278,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: AppTheme.spacingXL),
 
           // Title
-          Text(
+          const Text(
             'Organized by Topics',
             style: AppTheme.headlineLarge,
             textAlign: TextAlign.center,
@@ -290,7 +290,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             'Browse content organized by categories like DeFi, Ethereum, Macro Economics, Daily News, and Startup insights. Find exactly what interests you.',
             style: AppTheme.bodyLarge.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.8),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.8),
             ),
             textAlign: TextAlign.center,
           ),
@@ -315,15 +315,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppTheme.warningColor.withOpacity(0.1),
-                  AppTheme.primaryColor.withOpacity(0.1),
+                  AppTheme.warningColor.withValues(alpha: 0.1),
+                  AppTheme.primaryColor.withValues(alpha: 0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(AppTheme.radiusXL),
               border: Border.all(
-                color: AppTheme.warningColor.withOpacity(0.2),
+                color: AppTheme.warningColor.withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
@@ -339,7 +339,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: AppTheme.spacingXL),
 
           // Title
-          Text(
+          const Text(
             'Track Your Progress',
             style: AppTheme.headlineLarge,
             textAlign: TextAlign.center,
@@ -351,7 +351,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             'Keep track of your listening progress, create playlists, and resume where you left off. Your learning journey, organized and accessible.',
             style: AppTheme.bodyLarge.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.8),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.8),
             ),
             textAlign: TextAlign.center,
           ),
@@ -402,7 +402,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppTheme.primaryColor.withOpacity(0.1),
+            color: AppTheme.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppTheme.radiusM),
           ),
           child: Icon(

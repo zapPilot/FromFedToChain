@@ -112,11 +112,17 @@ void main() {
 
     test('should handle duration formatting for different lengths', () {
       final testCases = [
-        {'duration': Duration(seconds: 30), 'expected': '0:30'},
-        {'duration': Duration(minutes: 1, seconds: 5), 'expected': '1:05'},
-        {'duration': Duration(minutes: 15, seconds: 0), 'expected': '15:00'},
+        {'duration': const Duration(seconds: 30), 'expected': '0:30'},
         {
-          'duration': Duration(hours: 1, minutes: 23, seconds: 45),
+          'duration': const Duration(minutes: 1, seconds: 5),
+          'expected': '1:05'
+        },
+        {
+          'duration': const Duration(minutes: 15, seconds: 0),
+          'expected': '15:00'
+        },
+        {
+          'duration': const Duration(hours: 1, minutes: 23, seconds: 45),
           'expected': '1:23:45'
         },
       ];

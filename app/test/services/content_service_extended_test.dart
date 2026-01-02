@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'dart:convert';
 
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
@@ -129,7 +128,7 @@ STREAM_TIMEOUT_SECONDS=30
           date: DateTime(2025, 1, 15),
           status: 'published',
           description: 'Test description',
-          references: ['Source 1'],
+          references: const ['Source 1'],
           socialHook: 'Test hook',
           updatedAt: DateTime(2025, 1, 15),
         );
@@ -172,7 +171,7 @@ STREAM_TIMEOUT_SECONDS=30
           date: DateTime(2025, 1, 15),
           status: 'published',
           description: 'Cached description',
-          references: ['Source 1'],
+          references: const ['Source 1'],
           socialHook: 'Cached hook',
           updatedAt: DateTime(2025, 1, 15),
         );
@@ -307,7 +306,7 @@ STREAM_TIMEOUT_SECONDS=30
           date: DateTime(2025, 1, 15),
           status: 'published',
           description: 'Test description',
-          references: ['Source 1'],
+          references: const ['Source 1'],
           socialHook: 'Test hook',
           updatedAt: DateTime(2025, 1, 15),
         );
@@ -455,7 +454,7 @@ STREAM_TIMEOUT_SECONDS=30
           date: DateTime(2025, 1, 15),
           status: 'published',
           description: 'Static test description',
-          references: ['Source 1'],
+          references: const ['Source 1'],
           socialHook: 'Static hook',
           updatedAt: DateTime(2025, 1, 15),
         );
@@ -818,32 +817,6 @@ STREAM_TIMEOUT_SECONDS=30
           ),
         ];
 
-        final mockContent1 = {
-          'id': 'prefetch-1',
-          'title': 'Prefetch Episode 1',
-          'language': 'en-US',
-          'category': 'daily-news',
-          'date': '2025-01-15T00:00:00.000Z',
-          'status': 'published',
-          'description': 'Prefetch description 1',
-          'references': ['Source 1'],
-          'social_hook': 'Prefetch hook 1',
-          'updated_at': '2025-01-15T00:00:00.000Z',
-        };
-
-        final mockContent2 = {
-          'id': 'prefetch-2',
-          'title': 'Prefetch Episode 2',
-          'language': 'en-US',
-          'category': 'daily-news',
-          'date': '2025-01-16T00:00:00.000Z',
-          'status': 'published',
-          'description': 'Prefetch description 2',
-          'references': ['Source 2'],
-          'social_hook': 'Prefetch hook 2',
-          'updated_at': '2025-01-16T00:00:00.000Z',
-        };
-
         // Mock content repository to return the mock content
         final expectedContent1 = AudioContent(
           id: 'prefetch-1',
@@ -853,7 +826,7 @@ STREAM_TIMEOUT_SECONDS=30
           date: DateTime(2025, 1, 15),
           status: 'published',
           description: 'Prefetch description 1',
-          references: ['Source 1'],
+          references: const ['Source 1'],
           socialHook: 'Prefetch hook 1',
           updatedAt: DateTime(2025, 1, 15),
         );
@@ -866,7 +839,7 @@ STREAM_TIMEOUT_SECONDS=30
           date: DateTime(2025, 1, 16),
           status: 'published',
           description: 'Prefetch description 2',
-          references: ['Source 2'],
+          references: const ['Source 2'],
           socialHook: 'Prefetch hook 2',
           updatedAt: DateTime(2025, 1, 16),
         );

@@ -79,7 +79,7 @@ class AppTheme {
   static TextStyle get bodySmall => TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.normal,
-        color: onSurfaceColor.withOpacity(0.7),
+        color: onSurfaceColor.withValues(alpha: 0.7),
       );
 
   // Spacing
@@ -116,11 +116,9 @@ class AppTheme {
         primaryContainer: primaryVariant,
         secondary: secondaryColor,
         surface: surfaceColor,
-        background: backgroundColor,
         onPrimary: onPrimaryColor,
         onSecondary: Colors.white,
         onSurface: onSurfaceColor,
-        onBackground: onSurfaceColor,
         error: errorColor,
       ),
 
@@ -222,7 +220,7 @@ class AppTheme {
         activeTrackColor: primaryColor,
         inactiveTrackColor: cardColor,
         thumbColor: primaryColor,
-        overlayColor: primaryColor.withOpacity(0.2),
+        overlayColor: primaryColor.withValues(alpha: 0.2),
         trackHeight: 4.0,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
       ),
@@ -266,13 +264,13 @@ class AppTheme {
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         hintStyle: bodyMedium.copyWith(
-          color: onSurfaceColor.withOpacity(0.6),
+          color: onSurfaceColor.withValues(alpha: 0.6),
         ),
       ),
 
       // Divider
       dividerTheme: DividerThemeData(
-        color: onSurfaceColor.withOpacity(0.1),
+        color: onSurfaceColor.withValues(alpha: 0.1),
         thickness: 1,
         space: 1,
       ),
@@ -296,15 +294,15 @@ class AppTheme {
   // Custom widgets styles
   static BoxDecoration get glassMorphismDecoration {
     return BoxDecoration(
-      color: surfaceColor.withOpacity(0.8),
+      color: surfaceColor.withValues(alpha: 0.8),
       borderRadius: BorderRadius.circular(radiusM),
       border: Border.all(
-        color: onSurfaceColor.withOpacity(0.1),
+        color: onSurfaceColor.withValues(alpha: 0.1),
         width: 1,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           blurRadius: 10,
           offset: const Offset(0, 4),
         ),
@@ -318,7 +316,7 @@ class AppTheme {
       borderRadius: BorderRadius.circular(radiusM),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 0.1),
           blurRadius: 8,
           offset: const Offset(0, 2),
         ),
@@ -332,7 +330,7 @@ class AppTheme {
       borderRadius: BorderRadius.circular(radiusM),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),

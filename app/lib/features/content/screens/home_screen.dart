@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ? '$totalEpisodes episodes'
                           : '$filteredEpisodes of $totalEpisodes episodes',
                       style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                        color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                       ),
                     );
                   },
@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen>
               color: AppTheme.onSurfaceColor,
             ),
             style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
@@ -238,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen>
                   )
                 : const Icon(Icons.refresh),
             style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
@@ -319,7 +319,8 @@ class _HomeScreenState extends State<HomeScreen>
               Tab(text: 'Unfinished'),
             ],
             labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.onSurfaceColor.withOpacity(0.6),
+            unselectedLabelColor:
+                AppTheme.onSurfaceColor.withValues(alpha: 0.6),
             indicatorColor: AppTheme.primaryColor,
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
@@ -384,20 +385,20 @@ class _HomeScreenState extends State<HomeScreen>
             Icon(
               Icons.pending_actions,
               size: 80,
-              color: AppTheme.onSurfaceColor.withOpacity(0.3),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
             ),
             const SizedBox(height: AppTheme.spacingL),
             Text(
               'No Unfinished Episodes',
               style: AppTheme.headlineSmall.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: AppTheme.spacingS),
             Text(
               'Episodes you\'ve started listening to will appear here',
               style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.5),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
               ),
               textAlign: TextAlign.center,
             ),
@@ -463,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen>
             Text(
               contentService.errorMessage ?? 'Unknown error occurred',
               style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -489,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen>
             Icon(
               Icons.headphones_outlined,
               size: 80,
-              color: AppTheme.onSurfaceColor.withOpacity(0.3),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
             ),
             const SizedBox(height: AppTheme.spacingL),
             const Text(
@@ -503,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ? 'Try different search terms or filters'
                   : 'Check your internet connection and try again',
               style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -608,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen>
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.onSurfaceColor.withOpacity(0.3),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -696,13 +697,13 @@ class _HomeScreenState extends State<HomeScreen>
           Icon(
             Icons.sort,
             size: 16,
-            color: AppTheme.onSurfaceColor.withOpacity(0.6),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
           ),
           const SizedBox(width: AppTheme.spacingS),
           Text(
             'Sort by:',
             style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.6),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -720,7 +721,7 @@ class _HomeScreenState extends State<HomeScreen>
                 icon: Icon(
                   Icons.keyboard_arrow_down,
                   size: 16,
-                  color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                 ),
                 items: const [
                   DropdownMenuItem(

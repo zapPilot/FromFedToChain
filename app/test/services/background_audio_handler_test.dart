@@ -72,11 +72,11 @@ void main() {
 
       // Setup default mock responses
       when(mockAudioPlayer.playbackEventStream)
-          .thenAnswer((_) => Stream<PlaybackEvent>.empty());
+          .thenAnswer((_) => const Stream<PlaybackEvent>.empty());
       when(mockAudioPlayer.playerStateStream)
-          .thenAnswer((_) => Stream<PlayerState>.empty());
+          .thenAnswer((_) => const Stream<PlayerState>.empty());
       when(mockAudioPlayer.durationStream)
-          .thenAnswer((_) => Stream<Duration?>.empty());
+          .thenAnswer((_) => const Stream<Duration?>.empty());
       when(mockAudioPlayer.position).thenReturn(Duration.zero);
       when(mockAudioPlayer.duration).thenReturn(const Duration(minutes: 5));
       when(mockAudioPlayer.bufferedPosition).thenReturn(Duration.zero);
@@ -93,7 +93,7 @@ void main() {
       when(mockAudioSession.configure(any)).thenAnswer((_) async => true);
       when(mockAudioSession.setActive(any)).thenAnswer((_) async => true);
       when(mockAudioSession.interruptionEventStream)
-          .thenAnswer((_) => Stream<AudioInterruptionEvent>.empty());
+          .thenAnswer((_) => const Stream<AudioInterruptionEvent>.empty());
 
       handler = BackgroundAudioHandler(
         audioPlayer: mockAudioPlayer,
@@ -514,9 +514,9 @@ void main() {
         when(testMockPlayer.playbackEventStream)
             .thenAnswer((_) => streamController.stream);
         when(testMockPlayer.playerStateStream)
-            .thenAnswer((_) => Stream<PlayerState>.empty());
+            .thenAnswer((_) => const Stream<PlayerState>.empty());
         when(testMockPlayer.durationStream)
-            .thenAnswer((_) => Stream<Duration?>.empty());
+            .thenAnswer((_) => const Stream<Duration?>.empty());
         when(testMockPlayer.playing).thenReturn(true);
         when(testMockPlayer.position).thenReturn(const Duration(seconds: 30));
         when(testMockPlayer.bufferedPosition)
@@ -560,9 +560,9 @@ void main() {
         when(testMockPlayer2.playerStateStream)
             .thenAnswer((_) => streamController.stream);
         when(testMockPlayer2.playbackEventStream)
-            .thenAnswer((_) => Stream<PlaybackEvent>.empty());
+            .thenAnswer((_) => const Stream<PlaybackEvent>.empty());
         when(testMockPlayer2.durationStream)
-            .thenAnswer((_) => Stream<Duration?>.empty());
+            .thenAnswer((_) => const Stream<Duration?>.empty());
         when(testMockPlayer2.dispose()).thenAnswer((_) async {});
 
         final testHandler = BackgroundAudioHandler(
@@ -591,9 +591,9 @@ void main() {
         when(testMockPlayer3.durationStream)
             .thenAnswer((_) => streamController.stream);
         when(testMockPlayer3.playbackEventStream)
-            .thenAnswer((_) => Stream<PlaybackEvent>.empty());
+            .thenAnswer((_) => const Stream<PlaybackEvent>.empty());
         when(testMockPlayer3.playerStateStream)
-            .thenAnswer((_) => Stream<PlayerState>.empty());
+            .thenAnswer((_) => const Stream<PlayerState>.empty());
         when(testMockPlayer3.dispose()).thenAnswer((_) async {});
 
         final testHandler = BackgroundAudioHandler(
@@ -619,11 +619,11 @@ void main() {
 
         final testMockPlayer4 = MockAudioPlayer();
         when(testMockPlayer4.playbackEventStream)
-            .thenAnswer((_) => Stream<PlaybackEvent>.empty());
+            .thenAnswer((_) => const Stream<PlaybackEvent>.empty());
         when(testMockPlayer4.playerStateStream)
-            .thenAnswer((_) => Stream<PlayerState>.empty());
+            .thenAnswer((_) => const Stream<PlayerState>.empty());
         when(testMockPlayer4.durationStream)
-            .thenAnswer((_) => Stream<Duration?>.empty());
+            .thenAnswer((_) => const Stream<Duration?>.empty());
         when(testMockPlayer4.dispose()).thenAnswer((_) async {});
 
         final testMockAudioSession = MockAudioSession();
@@ -658,11 +658,11 @@ void main() {
 
         final testMockPlayer5 = MockAudioPlayer();
         when(testMockPlayer5.playbackEventStream)
-            .thenAnswer((_) => Stream<PlaybackEvent>.empty());
+            .thenAnswer((_) => const Stream<PlaybackEvent>.empty());
         when(testMockPlayer5.playerStateStream)
-            .thenAnswer((_) => Stream<PlayerState>.empty());
+            .thenAnswer((_) => const Stream<PlayerState>.empty());
         when(testMockPlayer5.durationStream)
-            .thenAnswer((_) => Stream<Duration?>.empty());
+            .thenAnswer((_) => const Stream<Duration?>.empty());
         when(testMockPlayer5.dispose()).thenAnswer((_) async {});
 
         final testMockAudioSession2 = MockAudioSession();

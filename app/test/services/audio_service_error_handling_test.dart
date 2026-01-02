@@ -329,10 +329,10 @@ void main() {
       test('should handle media item updates from background handler',
           () async {
         // Trigger media item update (lines 149-152)
-        final mediaItem = audio_service_pkg.MediaItem(
+        const mediaItem = audio_service_pkg.MediaItem(
           id: 'test-media',
           title: 'Test Media',
-          duration: const Duration(minutes: 3),
+          duration: Duration(minutes: 3),
         );
 
         mediaItemStream.add(mediaItem);

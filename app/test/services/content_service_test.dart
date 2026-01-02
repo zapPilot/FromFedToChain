@@ -25,9 +25,9 @@ class ContentServiceTestUtils {
       date: DateTime(2025, 1, 15),
       status: 'published',
       description: 'Test content description',
-      references: ['Source 1', 'Source 2'],
+      references: const ['Source 1', 'Source 2'],
       socialHook: 'Test social hook',
-      duration: Duration(minutes: 10),
+      duration: const Duration(minutes: 10),
       updatedAt: DateTime(2025, 1, 15),
     );
   }
@@ -48,9 +48,9 @@ void main() {
       date: DateTime(2025, 1, 15),
       status: 'published',
       description: 'Test content description',
-      references: ['Source 1', 'Source 2'],
+      references: const ['Source 1', 'Source 2'],
       socialHook: 'Test social hook',
-      duration: Duration(minutes: 10),
+      duration: const Duration(minutes: 10),
       updatedAt: DateTime(2025, 1, 15),
     );
 
@@ -96,7 +96,7 @@ STREAM_TIMEOUT_SECONDS=10
           streamingUrl: 'https://test.com/episode1.m3u8',
           path: 'audio/zh-TW/daily-news/episode1.m3u8',
           lastModified: DateTime(2025, 1, 15),
-          duration: Duration(minutes: 10),
+          duration: const Duration(minutes: 10),
         ),
         AudioFile(
           id: 'episode-2-en-US',
@@ -106,7 +106,7 @@ STREAM_TIMEOUT_SECONDS=10
           streamingUrl: 'https://test.com/episode2.m3u8',
           path: 'audio/en-US/ethereum/episode2.m3u8',
           lastModified: DateTime(2025, 1, 14),
-          duration: Duration(minutes: 15),
+          duration: const Duration(minutes: 15),
         ),
         AudioFile(
           id: 'episode-3-ja-JP',
@@ -116,7 +116,7 @@ STREAM_TIMEOUT_SECONDS=10
           streamingUrl: 'https://test.com/episode3.m3u8',
           path: 'audio/ja-JP/macro/episode3.m3u8',
           lastModified: DateTime(2025, 1, 13),
-          duration: Duration(minutes: 8),
+          duration: const Duration(minutes: 8),
         ),
       ];
 
@@ -124,7 +124,7 @@ STREAM_TIMEOUT_SECONDS=10
       contentService = ContentService();
 
       // Allow async initialization to complete
-      await Future.delayed(Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 10));
 
       // Reset ContentService to testing state
       contentService.setEpisodesForTesting([]);
@@ -137,7 +137,7 @@ STREAM_TIMEOUT_SECONDS=10
       contentService.setSearchQuery('');
 
       // Ensure state is fully propagated
-      await Future.delayed(Duration(milliseconds: 5));
+      await Future.delayed(const Duration(milliseconds: 5));
     });
 
     tearDown(() async {
@@ -147,7 +147,7 @@ STREAM_TIMEOUT_SECONDS=10
       StreamingApiService.dispose();
 
       // Allow cleanup to complete
-      await Future.delayed(Duration(milliseconds: 5));
+      await Future.delayed(const Duration(milliseconds: 5));
     });
 
     group('Initialization', () {
@@ -158,7 +158,7 @@ STREAM_TIMEOUT_SECONDS=10
         });
 
         final service = ContentService();
-        await Future.delayed(Duration(milliseconds: 50));
+        await Future.delayed(const Duration(milliseconds: 50));
 
         expect(service.selectedLanguage, 'en-US');
         expect(service.selectedCategory, 'ethereum');
@@ -290,7 +290,7 @@ STREAM_TIMEOUT_SECONDS=10
         contentService = ContentService();
 
         // Allow async initialization to complete
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         // Reset to clean state
         contentService.setEpisodesForTesting(sampleEpisodes);
@@ -301,7 +301,7 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSearchQuery('');
 
         // Ensure state is fully propagated
-        await Future.delayed(Duration(milliseconds: 5));
+        await Future.delayed(const Duration(milliseconds: 5));
       });
 
       test('filters episodes by language', () {
@@ -320,12 +320,12 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSelectedLanguage('zh-TW');
 
         // Wait for language setting to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         contentService.setSearchQuery('bitcoin');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.isNotEmpty, true);
         expect(contentService.filteredEpisodes.first.title.toLowerCase(),
@@ -343,12 +343,12 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSelectedLanguage('zh-TW');
 
         // Wait for language setting to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         contentService.setSearchQuery('Bitcoin');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.length, 1);
         expect(
@@ -360,12 +360,12 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSelectedLanguage('zh-TW');
 
         // Wait for language setting to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         contentService.setSearchQuery('episode-1-zh-TW');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.length, 1);
         expect(contentService.filteredEpisodes.first.id, 'episode-1-zh-TW');
@@ -376,12 +376,12 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSelectedLanguage('zh-TW');
 
         // Wait for language setting to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         contentService.setSearchQuery('daily');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.length, 1);
         expect(
@@ -405,12 +405,12 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSelectedLanguage('zh-TW');
 
         // Wait for language setting to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         contentService.setSearchQuery('BITCOIN');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.length, 1);
         expect(contentService.filteredEpisodes.first.title.toLowerCase(),
@@ -443,7 +443,7 @@ STREAM_TIMEOUT_SECONDS=10
         contentService = ContentService();
 
         // Allow async initialization to complete
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         // Reset to clean state
         contentService.setLoadingForTesting(false);
@@ -453,7 +453,7 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSearchQuery('');
 
         // Ensure state is fully propagated
-        await Future.delayed(Duration(milliseconds: 5));
+        await Future.delayed(const Duration(milliseconds: 5));
       });
 
       test('sorts episodes alphabetically', () async {
@@ -483,7 +483,7 @@ STREAM_TIMEOUT_SECONDS=10
         await contentService.setSortOrder('alphabetical');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.isNotEmpty, true);
         expect(contentService.filteredEpisodes[0].title, 'Apple Episode');
@@ -516,7 +516,7 @@ STREAM_TIMEOUT_SECONDS=10
         await contentService.setSortOrder('newest');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.isNotEmpty, true);
         expect(contentService.filteredEpisodes[0].title, 'New Episode');
@@ -549,7 +549,7 @@ STREAM_TIMEOUT_SECONDS=10
         await contentService.setSortOrder('oldest');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         expect(contentService.filteredEpisodes.isNotEmpty, true);
         expect(contentService.filteredEpisodes[0].title, 'Old Episode');
@@ -587,7 +587,7 @@ STREAM_TIMEOUT_SECONDS=10
         contentService.setSelectedCategory('all');
 
         // Wait for filters to be applied
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
 
         // Test that _applySorting is called when setting episodes
         expect(contentService.filteredEpisodes.isNotEmpty, true);
@@ -661,7 +661,7 @@ STREAM_TIMEOUT_SECONDS=10
             streamingUrl: 'https://test.com/episode1.m3u8',
             path: 'audio/zh-TW/daily-news/episode1.m3u8',
             lastModified: DateTime(2025, 1, 15),
-            duration: Duration(minutes: 10),
+            duration: const Duration(minutes: 10),
           ),
           AudioFile(
             id: 'test-episode-2',
@@ -671,7 +671,7 @@ STREAM_TIMEOUT_SECONDS=10
             streamingUrl: 'https://test.com/episode2.m3u8',
             path: 'audio/zh-TW/daily-news/episode2.m3u8',
             lastModified: DateTime(2025, 1, 14),
-            duration: Duration(minutes: 15),
+            duration: const Duration(minutes: 15),
           ),
           AudioFile(
             id: 'test-episode-3',
@@ -681,7 +681,7 @@ STREAM_TIMEOUT_SECONDS=10
             streamingUrl: 'https://test.com/episode3.m3u8',
             path: 'audio/zh-TW/daily-news/episode3.m3u8',
             lastModified: DateTime(2025, 1, 13),
-            duration: Duration(minutes: 8),
+            duration: const Duration(minutes: 8),
           ),
         ];
 
@@ -713,9 +713,9 @@ STREAM_TIMEOUT_SECONDS=10
 
         // Add episodes to history with different timestamps
         await contentService.addToListenHistory(sampleEpisodes[0],
-            at: now.subtract(Duration(hours: 2)));
+            at: now.subtract(const Duration(hours: 2)));
         await contentService.addToListenHistory(sampleEpisodes[1],
-            at: now.subtract(Duration(hours: 1)));
+            at: now.subtract(const Duration(hours: 1)));
         await contentService.addToListenHistory(sampleEpisodes[2], at: now);
 
         final historyEpisodes = contentService.getListenHistoryEpisodes();
@@ -832,9 +832,9 @@ STREAM_TIMEOUT_SECONDS=10
         // Mock listen history with different timestamps
         final now = DateTime.now();
         await contentService.addToListenHistory(sampleEpisodes[0],
-            at: now.subtract(Duration(hours: 1)));
+            at: now.subtract(const Duration(hours: 1)));
         await contentService.addToListenHistory(sampleEpisodes[1],
-            at: now.subtract(Duration(hours: 2)));
+            at: now.subtract(const Duration(hours: 2)));
         await contentService.addToListenHistory(sampleEpisodes[2], at: now);
 
         final historyEpisodes =

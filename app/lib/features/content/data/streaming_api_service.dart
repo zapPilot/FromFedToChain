@@ -320,8 +320,9 @@ class StreamingApiService {
   /// Validate streaming URL accessibility
   static Future<bool> validateStreamingUrl(String url) async {
     try {
-      final response =
-          await _client.head(Uri.parse(url)).timeout(Duration(seconds: 10));
+      final response = await _client
+          .head(Uri.parse(url))
+          .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (e) {
       if (kDebugMode) {

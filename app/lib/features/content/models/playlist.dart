@@ -29,7 +29,7 @@ class Playlist extends Equatable {
     return Playlist(
       id: 'playlist_${now.millisecondsSinceEpoch}',
       name: name,
-      episodes: [],
+      episodes: const [],
       createdAt: now,
       updatedAt: now,
     );

@@ -41,7 +41,7 @@ class FilterBar extends StatelessWidget {
         Text(
           'Language',
           style: AppTheme.bodySmall.copyWith(
-            color: AppTheme.onSurfaceColor.withOpacity(0.7),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -78,7 +78,7 @@ class FilterBar extends StatelessWidget {
         Text(
           'Category',
           style: AppTheme.bodySmall.copyWith(
-            color: AppTheme.onSurfaceColor.withOpacity(0.7),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -93,7 +93,7 @@ class FilterBar extends StatelessWidget {
                 value: 'all',
                 isSelected: selectedCategory == 'all',
                 onTap: () => onCategoryChanged('all'),
-                color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
               ),
 
               const SizedBox(width: AppTheme.spacingS),
@@ -138,17 +138,19 @@ class FilterBar extends StatelessWidget {
             vertical: AppTheme.spacingS,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? color : AppTheme.cardColor.withOpacity(0.5),
+            color:
+                isSelected ? color : AppTheme.cardColor.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(AppTheme.radiusL),
             border: Border.all(
-              color:
-                  isSelected ? color : AppTheme.onSurfaceColor.withOpacity(0.2),
+              color: isSelected
+                  ? color
+                  : AppTheme.onSurfaceColor.withValues(alpha: 0.2),
               width: 1,
             ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

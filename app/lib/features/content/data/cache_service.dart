@@ -174,6 +174,7 @@ class CacheService implements ContentRepository {
   }
 
   /// Cache content manually (for testing or offline scenarios)
+  @override
   void cacheContent(
       String id, String language, String category, AudioContent content) {
     final cacheKey = '$language/$category/$id';
@@ -198,6 +199,7 @@ class CacheService implements ContentRepository {
   }
 
   /// Clear content cache
+  @override
   void clearContentCache() {
     final previousSize = _contentCache.length;
     _contentCache.clear();

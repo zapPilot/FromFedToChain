@@ -146,7 +146,7 @@ class _PlayerScreenState extends State<PlayerScreen>
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.keyboard_arrow_down),
             style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
               foregroundColor: AppTheme.onSurfaceColor,
             ),
           ),
@@ -158,7 +158,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                 Text(
                   'NOW PLAYING',
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -179,7 +179,7 @@ class _PlayerScreenState extends State<PlayerScreen>
             onPressed: () => _showPlayerOptions(context, currentAudio),
             icon: const Icon(Icons.more_vert),
             style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
               foregroundColor: AppTheme.onSurfaceColor,
             ),
           ),
@@ -218,7 +218,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                     gradient: AppTheme.primaryGradient,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primaryColor.withOpacity(0.3),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.3),
                         blurRadius: maxSize * 0.1, // Scale shadow with size
                         offset: Offset(
                             0, maxSize * 0.035), // Scale offset with size
@@ -275,7 +275,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         break;
       default:
         stateText = 'Stopped';
-        stateColor = AppTheme.onSurfaceColor.withOpacity(0.6);
+        stateColor = AppTheme.onSurfaceColor.withValues(alpha: 0.6);
         stateIcon = Icons.stop;
     }
 
@@ -285,10 +285,10 @@ class _PlayerScreenState extends State<PlayerScreen>
         vertical: AppTheme.spacingS,
       ),
       decoration: BoxDecoration(
-        color: stateColor.withOpacity(0.2),
+        color: stateColor.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppTheme.radiusL),
         border: Border.all(
-          color: stateColor.withOpacity(0.3),
+          color: stateColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -405,13 +405,13 @@ class _PlayerScreenState extends State<PlayerScreen>
               Text(
                 audioService.formattedCurrentPosition,
                 style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
                 ),
               ),
               Text(
                 audioService.formattedTotalDuration,
                 style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -475,8 +475,8 @@ class _PlayerScreenState extends State<PlayerScreen>
                 icon: const Icon(Icons.article),
                 style: IconButton.styleFrom(
                   backgroundColor: _showContentScript
-                      ? AppTheme.primaryColor.withOpacity(0.2)
-                      : AppTheme.cardColor.withOpacity(0.5),
+                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                      : AppTheme.cardColor.withValues(alpha: 0.5),
                   foregroundColor: _showContentScript
                       ? AppTheme.primaryColor
                       : AppTheme.onSurfaceColor,
@@ -505,8 +505,8 @@ class _PlayerScreenState extends State<PlayerScreen>
                 ),
                 style: IconButton.styleFrom(
                   backgroundColor: _showSpeedSelector
-                      ? AppTheme.primaryColor.withOpacity(0.2)
-                      : AppTheme.cardColor.withOpacity(0.5),
+                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                      : AppTheme.cardColor.withValues(alpha: 0.5),
                   foregroundColor: _showSpeedSelector
                       ? AppTheme.primaryColor
                       : AppTheme.onSurfaceColor,
@@ -523,8 +523,8 @@ class _PlayerScreenState extends State<PlayerScreen>
                 ),
                 style: IconButton.styleFrom(
                   backgroundColor: audioService.repeatEnabled
-                      ? AppTheme.primaryColor.withOpacity(0.2)
-                      : AppTheme.cardColor.withOpacity(0.5),
+                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                      : AppTheme.cardColor.withValues(alpha: 0.5),
                   foregroundColor: audioService.repeatEnabled
                       ? AppTheme.primaryColor
                       : AppTheme.onSurfaceColor,
@@ -544,8 +544,8 @@ class _PlayerScreenState extends State<PlayerScreen>
                 ),
                 style: IconButton.styleFrom(
                   backgroundColor: audioService.autoplayEnabled
-                      ? AppTheme.primaryColor.withOpacity(0.2)
-                      : AppTheme.cardColor.withOpacity(0.5),
+                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                      : AppTheme.cardColor.withValues(alpha: 0.5),
                   foregroundColor: audioService.autoplayEnabled
                       ? AppTheme.primaryColor
                       : AppTheme.onSurfaceColor,
@@ -558,7 +558,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                     _shareCurrentContent(context, audioService, contentService),
                 icon: const Icon(Icons.share),
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+                  backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
                   foregroundColor: AppTheme.onSurfaceColor,
                 ),
               ),
@@ -582,7 +582,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                 },
                 icon: const Icon(Icons.playlist_add),
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.cardColor.withOpacity(0.5),
+                  backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
                   foregroundColor: AppTheme.onSurfaceColor,
                 ),
               ),
@@ -663,7 +663,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                     gradient: AppTheme.primaryGradient,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primaryColor.withOpacity(0.3),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 5),
                       ),
@@ -731,7 +731,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           Icon(
             Icons.music_off,
             size: 80,
-            color: AppTheme.onSurfaceColor.withOpacity(0.3),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
           ),
           const SizedBox(height: AppTheme.spacingL),
           const Text(
@@ -742,7 +742,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           Text(
             'Select an episode to start listening',
             style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withOpacity(0.7),
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: AppTheme.spacingXL),
@@ -865,7 +865,7 @@ class _PlayerScreenState extends State<PlayerScreen>
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SelectableText(
@@ -929,7 +929,7 @@ class _PlayerScreenState extends State<PlayerScreen>
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.onSurfaceColor.withOpacity(0.3),
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

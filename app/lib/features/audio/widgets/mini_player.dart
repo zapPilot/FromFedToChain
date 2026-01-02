@@ -81,7 +81,7 @@ class MiniPlayer extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withOpacity(0.3),
+            color: AppTheme.primaryColor.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -137,7 +137,7 @@ class MiniPlayer extends StatelessWidget {
                   Text(
                     '•',
                     style: AppTheme.bodySmall.copyWith(
-                      color: AppTheme.onSurfaceColor.withOpacity(0.5),
+                      color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
                     ),
                   ),
 
@@ -185,7 +185,7 @@ class MiniPlayer extends StatelessWidget {
       indicatorColor = AppTheme.pausedColor;
       indicatorIcon = Icons.pause_circle_outline;
     } else {
-      indicatorColor = AppTheme.onSurfaceColor.withOpacity(0.5);
+      indicatorColor = AppTheme.onSurfaceColor.withValues(alpha: 0.5);
       indicatorIcon = Icons.stop_circle;
     }
 
@@ -299,7 +299,7 @@ class MiniPlayer extends StatelessWidget {
         style: IconButton.styleFrom(
           backgroundColor: isPrimary
               ? AppTheme.primaryColor
-              : AppTheme.cardColor.withOpacity(0.5),
+              : AppTheme.cardColor.withValues(alpha: 0.5),
           foregroundColor:
               isPrimary ? AppTheme.onPrimaryColor : AppTheme.onSurfaceColor,
           padding: EdgeInsets.zero,

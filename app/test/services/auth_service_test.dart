@@ -1,4 +1,5 @@
 @Tags(['sequential']) // Avoids channel collisions with other suites.
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -12,6 +13,14 @@ void main() {
   group('AuthService Comprehensive Tests', () {
     late AuthService authService;
     late AppUser testUser;
+
+    setUpAll(() {
+      AuthService.debugLoggingEnabled = false;
+    });
+
+    tearDownAll(() {
+      AuthService.debugLoggingEnabled = kDebugMode;
+    });
 
     setUp(() async {
       // Reset SharedPreferences before each test with explicit cleanup
@@ -91,11 +100,6 @@ void main() {
         final testAuthService = AuthService();
 
         await testAuthService.initialize();
-
-        // Debug output to understand what's happening
-        print('DEBUG: authState = ${testAuthService.authState}');
-        print('DEBUG: errorMessage = "${testAuthService.errorMessage}"');
-        print('DEBUG: isAuthenticated = ${testAuthService.isAuthenticated}');
 
         expect(testAuthService.authState, AuthState.error);
         expect(testAuthService.errorMessage, contains('Failed to initialize'));
@@ -329,7 +333,7 @@ void main() {
         final originalLastLogin = authService.currentUser?.lastLoginAt;
 
         // Wait a bit then update
-        await Future.delayed(Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 10));
         await authService.updateProfile(name: 'Updated Name');
 
         expect(authService.currentUser?.lastLoginAt.isAfter(originalLastLogin!),

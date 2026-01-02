@@ -16,7 +16,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -48,7 +48,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.5,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -64,7 +64,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -86,7 +86,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -109,7 +109,7 @@ void main() {
 
           await tester.pumpWidget(
             WidgetTestUtils.createTestWrapper(
-              PlaybackSpeedSelector(
+              const PlaybackSpeedSelector(
                 currentSpeed: 1.0,
                 onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
               ),
@@ -129,7 +129,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -199,7 +199,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.25,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -228,7 +228,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -250,7 +250,8 @@ void main() {
         final decoration = container.decoration as BoxDecoration;
 
         // Verify unselected styling
-        expect(decoration.color, equals(AppTheme.cardColor.withOpacity(0.5)));
+        expect(decoration.color,
+            equals(AppTheme.cardColor.withValues(alpha: 0.5)));
         expect(decoration.border, isNotNull);
       });
 
@@ -258,7 +259,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 2.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -289,7 +290,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -313,7 +314,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.33,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -337,7 +338,8 @@ void main() {
           final container = tester.widget<Container>(containerFinder.at(i));
           final decoration = container.decoration as BoxDecoration?;
 
-          if (decoration?.color == AppTheme.primaryColor.withOpacity(0.1)) {
+          if (decoration?.color ==
+              AppTheme.primaryColor.withValues(alpha: 0.1)) {
             foundCorrectStyling = true;
             expect(decoration!.border, isNotNull);
             break;
@@ -354,7 +356,7 @@ void main() {
         // Test with precise floating point value
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.007, // Close to 1.0 but not exactly
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -380,7 +382,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.234567, // Many decimal places
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -420,7 +422,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -442,7 +444,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -500,7 +502,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -513,7 +515,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -541,7 +543,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.0,
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -584,7 +586,7 @@ void main() {
         // Test with speed outside normal range
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 3.0, // Outside normal range
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),
@@ -606,7 +608,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          PlaybackSpeedSelector(
+          const PlaybackSpeedSelector(
             currentSpeed: 1.007, // Small increment within tolerance
             onSpeedChanged: WidgetTestUtils.mockSpeedChanged,
           ),

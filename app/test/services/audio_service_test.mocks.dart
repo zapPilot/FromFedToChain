@@ -7,12 +7,12 @@ import 'dart:async' as _i6;
 import 'dart:ui' as _i10;
 
 import 'package:audio_service/audio_service.dart' as _i5;
+import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart'
+    as _i3;
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart'
     as _i9;
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart'
     as _i4;
-import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart'
-    as _i3;
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart'
     as _i7;
 import 'package:mockito/mockito.dart' as _i1;
@@ -1376,6 +1376,37 @@ class MockContentService extends _i1.Mock implements _i7.ContentService {
         ),
         returnValueForMissingStub: null,
       ) as _i4.AudioFile?);
+
+  @override
+  List<_i4.AudioFile> advancedSearch(
+    List<_i4.AudioFile>? episodes, {
+    String? query,
+    List<String>? languages,
+    List<String>? categories,
+    DateTime? dateFrom,
+    DateTime? dateTo,
+    Duration? minDuration,
+    Duration? maxDuration,
+    String? sortOrder = 'newest',
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #advancedSearch,
+          [episodes],
+          {
+            #query: query,
+            #languages: languages,
+            #categories: categories,
+            #dateFrom: dateFrom,
+            #dateTo: dateTo,
+            #minDuration: minDuration,
+            #maxDuration: maxDuration,
+            #sortOrder: sortOrder,
+          },
+        ),
+        returnValue: <_i4.AudioFile>[],
+        returnValueForMissingStub: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
 
   @override
   void setEpisodesForTesting(List<_i4.AudioFile>? episodes) =>

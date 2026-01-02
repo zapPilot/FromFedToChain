@@ -15,7 +15,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: false,
           hasError: false,
@@ -44,7 +44,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: false,
           hasError: false,
@@ -64,7 +64,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: true,
           isLoading: false,
           hasError: false,
@@ -84,7 +84,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: true,
           hasError: false,
@@ -105,7 +105,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: false,
           hasError: true,
@@ -126,7 +126,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: false,
           hasError: false,
@@ -151,7 +151,7 @@ void main() {
 
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: false,
           hasError: false,
@@ -178,7 +178,7 @@ void main() {
         (WidgetTester tester) async {
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: true,
           hasError: false,
@@ -206,7 +206,7 @@ void main() {
 
       await WidgetTestUtils.pumpWidgetWithTheme(
         tester,
-        AudioControls(
+        const AudioControls(
           isPlaying: false,
           isLoading: false,
           hasError: true,
@@ -230,7 +230,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -261,7 +261,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -283,7 +283,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -307,7 +307,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -332,7 +332,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -351,7 +351,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -392,7 +392,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -424,7 +424,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -455,7 +455,7 @@ void main() {
           (WidgetTester tester) async {
         await WidgetTestUtils.pumpWidgetWithTheme(
           tester,
-          AudioControls(
+          const AudioControls(
             isPlaying: false,
             isLoading: false,
             hasError: false,
@@ -473,7 +473,7 @@ void main() {
         // Check loading indicator color
         await tester.pumpWidget(
           WidgetTestUtils.createTestWrapper(
-            AudioControls(
+            const AudioControls(
               isPlaying: false,
               isLoading: true,
               hasError: false,

@@ -101,7 +101,8 @@ class _AuthScreenState extends State<AuthScreen>
                         child: Text(
                           'Skip for now',
                           style: AppTheme.bodyMedium.copyWith(
-                            color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                            color:
+                                AppTheme.onSurfaceColor.withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -162,15 +163,15 @@ class _AuthScreenState extends State<AuthScreen>
       width: 100,
       height: 100,
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.1),
+        color: AppTheme.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusXL),
         border: Border.all(
-          color: AppTheme.primaryColor.withOpacity(0.3),
+          color: AppTheme.primaryColor.withValues(alpha: 0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withOpacity(0.1),
+            color: AppTheme.primaryColor.withValues(alpha: 0.1),
             blurRadius: 20,
             spreadRadius: 5,
           ),
@@ -192,7 +193,7 @@ class _AuthScreenState extends State<AuthScreen>
         Text(
           'Welcome to',
           style: AppTheme.headlineMedium.copyWith(
-            color: AppTheme.onSurfaceColor.withOpacity(0.8),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.8),
             fontWeight: FontWeight.normal,
           ),
           textAlign: TextAlign.center,
@@ -210,7 +211,7 @@ class _AuthScreenState extends State<AuthScreen>
         Text(
           'Sign in to sync your progress across devices and access personalized features.',
           style: AppTheme.bodyLarge.copyWith(
-            color: AppTheme.onSurfaceColor.withOpacity(0.7),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -315,7 +316,7 @@ class _AuthScreenState extends State<AuthScreen>
       child: Text(
         'By continuing, you agree to our Terms of Service and Privacy Policy.',
         style: AppTheme.bodySmall.copyWith(
-          color: AppTheme.onSurfaceColor.withOpacity(0.6),
+          color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
         ),
         textAlign: TextAlign.center,
       ),
@@ -327,16 +328,16 @@ class _AuthScreenState extends State<AuthScreen>
       margin: const EdgeInsets.only(top: AppTheme.spacingM),
       padding: const EdgeInsets.all(AppTheme.spacingM),
       decoration: BoxDecoration(
-        color: AppTheme.errorColor.withOpacity(0.1),
+        color: AppTheme.errorColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusM),
         border: Border.all(
-          color: AppTheme.errorColor.withOpacity(0.3),
+          color: AppTheme.errorColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline_rounded,
             size: 20,
             color: AppTheme.errorColor,

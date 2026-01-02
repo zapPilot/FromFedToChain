@@ -45,7 +45,7 @@ class AudioItemCard extends StatelessWidget {
                 ? BoxDecoration(
                     borderRadius: BorderRadius.circular(AppTheme.radiusM),
                     border: Border.all(
-                      color: AppTheme.primaryColor.withOpacity(0.5),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.5),
                       width: 2,
                     ),
                   )
@@ -84,7 +84,8 @@ class AudioItemCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppTheme.getCategoryColor(audioFile.category),
-            AppTheme.getCategoryColor(audioFile.category).withOpacity(0.7),
+            AppTheme.getCategoryColor(audioFile.category)
+                .withValues(alpha: 0.7),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -92,8 +93,8 @@ class AudioItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
         boxShadow: [
           BoxShadow(
-            color:
-                AppTheme.getCategoryColor(audioFile.category).withOpacity(0.3),
+            color: AppTheme.getCategoryColor(audioFile.category)
+                .withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -157,7 +158,7 @@ class AudioItemCard extends StatelessWidget {
               Text(
                 _formatDate(audioFile.publishDate),
                 style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -165,13 +166,13 @@ class AudioItemCard extends StatelessWidget {
                 Text(
                   ' • ',
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor.withOpacity(0.4),
+                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.4),
                   ),
                 ),
                 Text(
                   audioFile.formattedDuration,
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -180,13 +181,13 @@ class AudioItemCard extends StatelessWidget {
                 Text(
                   ' • ',
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor.withOpacity(0.4),
+                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.4),
                   ),
                 ),
                 Text(
                   audioFile.formattedFileSize,
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -199,7 +200,7 @@ class AudioItemCard extends StatelessWidget {
           const SizedBox(height: AppTheme.spacingXS),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.graphic_eq,
                 size: 16,
                 color: AppTheme.primaryColor,
@@ -230,10 +231,10 @@ class AudioItemCard extends StatelessWidget {
         vertical: AppTheme.spacingXS,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -263,10 +264,10 @@ class AudioItemCard extends StatelessWidget {
             width: 48, // Minimum accessibility tap target size
             height: 48, // Minimum accessibility tap target size
             decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withOpacity(0.1),
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusS),
               border: Border.all(
-                color: AppTheme.primaryColor.withOpacity(0.3),
+                color: AppTheme.primaryColor.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -295,7 +296,7 @@ class AudioItemCard extends StatelessWidget {
         Text(
           audioFile.formattedDuration,
           style: AppTheme.bodyMedium.copyWith(
-            color: AppTheme.onSurfaceColor.withOpacity(0.7),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -307,7 +308,7 @@ class AudioItemCard extends StatelessWidget {
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: AppTheme.successColor.withOpacity(0.15),
+              color: AppTheme.successColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppTheme.radiusS),
             ),
             child: Text(

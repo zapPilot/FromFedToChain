@@ -586,7 +586,7 @@ class ContentService extends ChangeNotifier {
     if (dateTo != null) {
       results = results
           .where((episode) =>
-              episode.publishDate.isBefore(dateTo.add(Duration(days: 1))))
+              episode.publishDate.isBefore(dateTo.add(const Duration(days: 1))))
           .toList();
     }
 

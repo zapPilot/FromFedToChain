@@ -229,7 +229,8 @@ ENVIRONMENT=test
 
       test('should throw TimeoutException for timeout', () async {
         when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenThrow(
-            async.TimeoutException('Request timed out', Duration(seconds: 30)));
+            async.TimeoutException(
+                'Request timed out', const Duration(seconds: 30)));
 
         expect(
           () => StreamingApiService.getEpisodeList('zh-TW', 'startup'),

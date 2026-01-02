@@ -8,7 +8,6 @@ import 'package:from_fed_to_chain_app/features/audio/widgets/mini_player.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';
 import 'package:from_fed_to_chain_app/features/audio/widgets/audio_controls.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import '../widgets/widget_test_utils.dart';
 
 /// Performance benchmark tests for critical widgets

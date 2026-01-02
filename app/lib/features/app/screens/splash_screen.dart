@@ -228,16 +228,17 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryColor.withOpacity(0.1),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
                           borderRadius:
                               BorderRadius.circular(AppTheme.radiusXL),
                           border: Border.all(
-                            color: AppTheme.primaryColor.withOpacity(0.3),
+                            color: AppTheme.primaryColor.withValues(alpha: 0.3),
                             width: 2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTheme.primaryColor.withOpacity(0.2),
+                              color:
+                                  AppTheme.primaryColor.withValues(alpha: 0.2),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),
@@ -277,7 +278,8 @@ class _SplashScreenState extends State<SplashScreen>
                         Text(
                           'Chinese Crypto & Economics Explained',
                           style: AppTheme.bodyMedium.copyWith(
-                            color: AppTheme.onSurfaceColor.withOpacity(0.7),
+                            color:
+                                AppTheme.onSurfaceColor.withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -312,7 +314,7 @@ class _SplashScreenState extends State<SplashScreen>
               Text(
                 _loadingText,
                 style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.onSurfaceColor.withOpacity(0.8),
+                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.8),
                 ),
                 textAlign: TextAlign.center,
               ),

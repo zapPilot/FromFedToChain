@@ -60,11 +60,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: AppTheme.bodyMedium.copyWith(
-            color: AppTheme.onSurfaceColor.withOpacity(0.5),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
           ),
           prefixIcon: Icon(
             Icons.search,
-            color: AppTheme.onSurfaceColor.withOpacity(0.6),
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
           ),
           suffixIcon: _controller.text.isNotEmpty
               ? Semantics(
@@ -84,7 +84,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                         alignment: Alignment.center,
                         child: Icon(
                           Icons.clear,
-                          color: AppTheme.onSurfaceColor.withOpacity(0.6),
+                          color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                           size:
                               32.0, // Increased size for accessibility compliance
                         ),
@@ -109,7 +109,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             vertical: AppTheme.spacingM,
           ),
           filled: true,
-          fillColor: AppTheme.cardColor.withOpacity(0.5),
+          fillColor: AppTheme.cardColor.withValues(alpha: 0.5),
         ),
         textInputAction: TextInputAction.search,
         onSubmitted: (value) {

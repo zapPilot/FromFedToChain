@@ -11,7 +11,7 @@ class ApiRepository {
   static ApiRepository? _instance;
   static ApiRepository get instance => _instance ??= ApiRepository._internal();
 
-  late final Dio _dio;
+  late Dio _dio;
   final Map<String, CancelToken> _activeCalls = {};
 
   ApiRepository._internal() {

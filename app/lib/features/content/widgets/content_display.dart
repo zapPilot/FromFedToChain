@@ -129,7 +129,7 @@ class _ContentDisplayState extends State<ContentDisplay> {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.6),
+                              .withValues(alpha: 0.6),
                         ),
                   ),
                 ],
@@ -144,7 +144,10 @@ class _ContentDisplayState extends State<ContentDisplay> {
             else
               Icon(
                 widget.isExpanded ? Icons.expand_less : Icons.expand_more,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6),
               ),
           ],
         ),
@@ -228,7 +231,10 @@ class _ContentDisplayState extends State<ContentDisplay> {
             Icon(
               Icons.article_outlined,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
@@ -237,7 +243,7 @@ class _ContentDisplayState extends State<ContentDisplay> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.6),
+                        .withValues(alpha: 0.6),
                   ),
             ),
           ],
@@ -258,7 +264,10 @@ class _ContentDisplayState extends State<ContentDisplay> {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Theme.of(context)
+                    .colorScheme
+                    .outline
+                    .withValues(alpha: 0.2),
               ),
             ),
             child: SelectableText(
@@ -277,7 +286,10 @@ class _ContentDisplayState extends State<ContentDisplay> {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: Theme.of(context)
+                    .colorScheme
+                    .outline
+                    .withValues(alpha: 0.2),
               ),
             ),
             child: Text(
@@ -286,7 +298,7 @@ class _ContentDisplayState extends State<ContentDisplay> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.6),
+                        .withValues(alpha: 0.6),
                     fontStyle: FontStyle.italic,
                   ),
               textAlign: TextAlign.center,
@@ -320,7 +332,7 @@ class _ContentDisplayState extends State<ContentDisplay> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -352,11 +364,11 @@ class _ContentDisplayState extends State<ContentDisplay> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.link),
-            const SizedBox(width: 8),
-            const Text('References'),
+            Icon(Icons.link),
+            SizedBox(width: 8),
+            Text('References'),
           ],
         ),
         content: SizedBox(
