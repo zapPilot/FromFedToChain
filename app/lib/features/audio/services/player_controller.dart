@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_adapter.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 
 /// Stateless playback controller that delegates to an IPlayerAdapter
 ///
@@ -12,6 +12,7 @@ import 'package:from_fed_to_chain_app/features/audio/services/player_state_notif
 /// It coordinates between the player adapter and state notifier,
 /// ensuring state changes are properly propagated.
 class PlayerController {
+  static final _log = LoggerService.getLogger('PlayerController');
   final IPlayerAdapter _player;
   final PlayerStateNotifier _stateNotifier;
 
@@ -61,21 +62,15 @@ class PlayerController {
   /// Play an audio file
   Future<void> play(AudioFile audioFile, {Duration? initialPosition}) async {
     try {
-      if (kDebugMode) {
-        print('🎮 PlayerController: Playing audio: ${audioFile.title}');
-      }
+      _log.info('Playing audio: ${audioFile.title}');
 
       _stateNotifier.clearError();
       await _setupAudioSource(audioFile, initialPosition);
       await _player.play();
 
-      if (kDebugMode) {
-        print('✅ PlayerController: Successfully started playback');
-      }
+      _log.fine('Successfully started playback');
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to play audio: $e');
-      }
+      _log.severe('Failed to play audio: $e');
       _stateNotifier.setError('Failed to play audio: $e');
       rethrow;
     }
@@ -84,14 +79,10 @@ class PlayerController {
   /// Pause playback
   Future<void> pause() async {
     try {
-      if (kDebugMode) {
-        print('⏸️ PlayerController: Pausing playback');
-      }
+      _log.info('Pausing playback');
       await _player.pause();
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to pause: $e');
-      }
+      _log.severe('Failed to pause: $e');
       _stateNotifier.setError('Failed to pause playback: $e');
       rethrow;
     }
@@ -100,14 +91,10 @@ class PlayerController {
   /// Resume playback
   Future<void> resume() async {
     try {
-      if (kDebugMode) {
-        print('▶️ PlayerController: Resuming playback');
-      }
+      _log.info('Resuming playback');
       await _player.play();
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to resume: $e');
-      }
+      _log.severe('Failed to resume: $e');
       _stateNotifier.setError('Failed to resume playback: $e');
       rethrow;
     }
@@ -116,14 +103,10 @@ class PlayerController {
   /// Stop playback
   Future<void> stop() async {
     try {
-      if (kDebugMode) {
-        print('⏹️ PlayerController: Stopping playback');
-      }
+      _log.info('Stopping playback');
       await _player.stop();
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to stop: $e');
-      }
+      _log.severe('Failed to stop: $e');
       _stateNotifier.setError('Failed to stop playback: $e');
       rethrow;
     }
@@ -132,14 +115,10 @@ class PlayerController {
   /// Seek to a specific position
   Future<void> seek(Duration position) async {
     try {
-      if (kDebugMode) {
-        print('⏩ PlayerController: Seeking to ${position.inSeconds}s');
-      }
+      _log.fine('Seeking to ${position.inSeconds}s');
       await _player.seek(position);
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to seek: $e');
-      }
+      _log.severe('Failed to seek: $e');
       _stateNotifier.setError('Failed to seek: $e');
       rethrow;
     }
@@ -148,14 +127,10 @@ class PlayerController {
   /// Set playback speed
   Future<void> setSpeed(double speed) async {
     try {
-      if (kDebugMode) {
-        print('🔧 PlayerController: Setting speed to ${speed}x');
-      }
+      _log.fine('Setting speed to ${speed}x');
       await _player.setSpeed(speed);
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to set speed: $e');
-      }
+      _log.warning('Failed to set speed: $e');
       // Don't set error state for speed failures - it's not critical
       // Just log and continue
     }
@@ -165,14 +140,10 @@ class PlayerController {
   Future<void> skipForward(
       [Duration duration = const Duration(seconds: 30)]) async {
     try {
-      if (kDebugMode) {
-        print('⏭️ PlayerController: Skipping forward ${duration.inSeconds}s');
-      }
+      _log.info('Skipping forward ${duration.inSeconds}s');
       await _player.skipForward(duration);
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to skip forward: $e');
-      }
+      _log.severe('Failed to skip forward: $e');
       _stateNotifier.setError('Failed to skip forward: $e');
       rethrow;
     }
@@ -182,14 +153,10 @@ class PlayerController {
   Future<void> skipBackward(
       [Duration duration = const Duration(seconds: 10)]) async {
     try {
-      if (kDebugMode) {
-        print('⏮️ PlayerController: Skipping backward ${duration.inSeconds}s');
-      }
+      _log.info('Skipping backward ${duration.inSeconds}s');
       await _player.skipBackward(duration);
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to skip backward: $e');
-      }
+      _log.severe('Failed to skip backward: $e');
       _stateNotifier.setError('Failed to skip backward: $e');
       rethrow;
     }
@@ -201,18 +168,13 @@ class PlayerController {
     Duration? initialPosition,
   ) async {
     try {
-      if (kDebugMode) {
-        print(
-            '🔧 PlayerController: Setting up audio source: ${audioFile.streamingUrl}');
-      }
+      _log.fine('Setting up audio source: ${audioFile.streamingUrl}');
       await _player.setAudioSource(
         audioFile,
         initialPosition: initialPosition,
       );
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ PlayerController: Failed to set up audio source: $e');
-      }
+      _log.severe('Failed to set up audio source: $e');
       throw PlayerAdapterException('Failed to set up audio source', e);
     }
   }
@@ -240,9 +202,7 @@ class PlayerController {
     if (_disposed) return;
     _disposed = true;
 
-    if (kDebugMode) {
-      print('🗑️ PlayerController: Disposing...');
-    }
+    _log.info('Disposing...');
 
     // Cancel all subscriptions
     await _stateSubscription?.cancel();
