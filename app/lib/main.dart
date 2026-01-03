@@ -5,6 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:audio_service/audio_service.dart';
 
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
+
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
@@ -23,18 +25,16 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 /// Main application entry point
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  LoggerService.initialize(enableLogging: kDebugMode);
+  final log = LoggerService.getLogger('Main');
 
   // Load environment variables
   try {
     await dotenv.load(fileName: '.env');
-    if (kDebugMode) {
-      print('✅ Environment variables loaded successfully');
-    }
+    log.info('✅ Environment variables loaded successfully');
   } catch (e) {
-    if (kDebugMode) {
-      print('⚠️ Warning: Could not load .env file: $e');
-      print('📋 App will use default configuration');
-    }
+    log.warning('⚠️ Warning: Could not load .env file: $e');
+    log.info('📋 App will use default configuration');
   }
 
   // Configure system UI
@@ -43,14 +43,10 @@ void main() async {
   // Initialize deep linking service
   try {
     await DeepLinkService.initialize(navigatorKey);
-    if (kDebugMode) {
-      print('✅ Deep linking service initialized successfully');
-    }
+    log.info('✅ Deep linking service initialized successfully');
   } catch (e) {
-    if (kDebugMode) {
-      print('⚠️ Warning: Failed to initialize deep linking: $e');
-      print('📱 App will continue without deep linking support');
-    }
+    log.warning('⚠️ Warning: Failed to initialize deep linking: $e');
+    log.info('📱 App will continue without deep linking support');
   }
 
   // Initialize audio service
@@ -70,14 +66,10 @@ void main() async {
         rewindInterval: Duration(seconds: 10),
       ),
     );
-    if (kDebugMode) {
-      print('✅ Background audio service initialized successfully');
-    }
+    log.info('✅ Background audio service initialized successfully');
   } catch (e) {
-    if (kDebugMode) {
-      print('❌ Failed to initialize background audio service: $e');
-      print('📱 App will use local audio player without background support');
-    }
+    log.severe('❌ Failed to initialize background audio service: $e');
+    log.info('📱 App will use local audio player without background support');
     audioHandler = null;
   }
 
@@ -104,9 +96,8 @@ Future<void> _configureSystemUI() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  if (kDebugMode) {
-    print('✅ System UI configured for dark theme');
-  }
+  final log = LoggerService.getLogger('SystemUI');
+  log.info('✅ System UI configured for dark theme');
 }
 
 /// Main application widget with provider setup

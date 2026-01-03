@@ -1,14 +1,16 @@
 import 'dart:async' as dart_async;
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
+import 'package:from_fed_to_chain_app/core/exceptions/app_exceptions.dart';
 
 /// Service for interacting with the Cloudflare R2 streaming API
 /// Handles episode discovery and streaming URL generation
 class StreamingApiService {
   static http.Client? _staticClient;
+  static final _log = LoggerService.getLogger('StreamingApiService');
   static http.Client get _client => _staticClient ??= http.Client();
 
   /// Set HTTP client for dependency injection (mainly for testing)
@@ -35,6 +37,8 @@ class StreamingApiService {
     final url = Uri.parse(ApiConfig.getListUrl(language, category));
 
     try {
+      _log.fine('Fetching episodes for $language/$category at $url');
+
       final response = await _client.get(
         url,
         headers: {
@@ -44,56 +48,37 @@ class StreamingApiService {
         },
       ).timeout(ApiConfig.apiTimeout);
 
-      if (kDebugMode) {
-        print('StreamingApiService: Response status: ${response.statusCode}');
-        print('StreamingApiService: Response headers: ${response.headers}');
-      }
+      _log.fine('Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final dynamic responseData = json.decode(response.body);
         return _parseEpisodesResponse(responseData, language, category);
       } else {
         throw ApiException(
-            'Failed to load episodes: ${response.statusCode} - ${response.reasonPhrase}');
+            'Failed to load episodes: ${response.statusCode} - ${response.reasonPhrase}',
+            statusCode: response.statusCode);
       }
     } on http.ClientException catch (e) {
-      if (kDebugMode) {
-        print('StreamingApiService: ClientException: ${e.message}');
-        print(
-            'StreamingApiService: This usually indicates CORS or network issues');
-      }
-      throw NetworkException('Network connection error: ${e.message}');
+      _log.warning('ClientException: ${e.message} (likely network/CORS issue)');
+      throw NetworkException('Network connection error: ${e.message}',
+          originalError: e);
     } on dart_async.TimeoutException catch (e) {
-      if (kDebugMode) {
-        print(
-            'StreamingApiService: Request timed out after ${ApiConfig.apiTimeout.inSeconds} seconds');
-      }
+      _log.warning(
+          'Request timed out after ${ApiConfig.apiTimeout.inSeconds}s');
       throw TimeoutException('Request timed out: ${e.message}');
     } on FormatException catch (e) {
-      // Let FormatException pass through for JSON parsing errors
-      if (kDebugMode) {
-        print('StreamingApiService: FormatException: $e');
-      }
+      _log.severe('FormatException parsing response: $e');
       rethrow;
     } on StateError catch (e) {
-      // Let StateError pass through for collection operations (.first, .single on empty)
-      if (kDebugMode) {
-        print('StreamingApiService: StateError: $e');
-      }
+      _log.severe('StateError: $e');
       rethrow;
     } on RangeError catch (e) {
-      // Let RangeError pass through for string manipulation issues
-      if (kDebugMode) {
-        print('StreamingApiService: RangeError: $e');
-      }
+      _log.severe('RangeError: $e');
       rethrow;
     } catch (e) {
-      if (kDebugMode) {
-        print('StreamingApiService: Unexpected error: $e');
-        print('StreamingApiService: Error type: ${e.runtimeType}');
-      }
-      if (e is StreamingApiException) rethrow;
-      throw UnknownException('Unexpected error: $e');
+      _log.severe('Unexpected error: $e');
+      if (e is AppException) rethrow;
+      throw UnknownException('Unexpected error: $e', originalError: e);
     }
   }
 
@@ -128,9 +113,7 @@ class StreamingApiService {
         // Ensure required fields are present
         final path = episodeJson['path'] as String?;
         if (path == null || path.isEmpty) {
-          if (kDebugMode) {
-            print('Warning: Skipping episode with missing path: $episodeJson');
-          }
+          _log.warning('Skipping episode with missing path: $episodeJson');
           continue;
         }
 
@@ -147,21 +130,15 @@ class StreamingApiService {
         final audioFile = AudioFile.fromApiResponse(enhancedEpisodeData);
         audioFiles.add(audioFile);
 
-        if (kDebugMode && audioFiles.length == 1) {
-          print(
-              'StreamingApiService: Sample AudioFile created: ${audioFile.toString()}');
+        if (audioFiles.length == 1) {
+          _log.finer('Sample AudioFile created: ${audioFile.toString()}');
         }
       } catch (e) {
-        if (kDebugMode) {
-          print('Warning: Failed to parse episode: $episodeJson, error: $e');
-        }
+        _log.warning('Failed to parse episode: $episodeJson, error: $e');
       }
     }
 
-    if (kDebugMode) {
-      print(
-          'StreamingApiService: Parsed ${audioFiles.length} episodes for $language/$category');
-    }
+    _log.info('Parsed ${audioFiles.length} episodes for $language/$category');
 
     return audioFiles;
   }
@@ -194,9 +171,9 @@ class StreamingApiService {
       allEpisodes.addAll(episodeList);
     }
 
-    if (errors.isNotEmpty && kDebugMode) {
-      print(
-          'StreamingApiService: Some categories failed for $language: ${errors.join(', ')}');
+    if (errors.isNotEmpty) {
+      _log.warning(
+          'Some categories failed for $language: ${errors.join(', ')}');
     }
 
     // Sort by date (newest first)
@@ -207,10 +184,7 @@ class StreamingApiService {
 
   /// Get all episodes across all languages and categories (parallel loading)
   static Future<List<AudioFile>> getAllEpisodes() async {
-    if (kDebugMode) {
-      print(
-          'StreamingApiService: Starting parallel loading of all episodes...');
-    }
+    _log.info('Starting parallel loading of all episodes...');
 
     final allEpisodes = <AudioFile>[];
     final errors = <String>[];
@@ -228,9 +202,7 @@ class StreamingApiService {
       }
     }
 
-    if (kDebugMode) {
-      print('StreamingApiService: Created ${futures.length} parallel requests');
-    }
+    _log.fine('Created ${futures.length} parallel requests');
 
     // Wait for all requests to complete (parallel execution)
     final results = await Future.wait(futures);
@@ -240,17 +212,15 @@ class StreamingApiService {
       allEpisodes.addAll(episodeList);
     }
 
-    if (errors.isNotEmpty && kDebugMode) {
-      print('StreamingApiService: Some requests failed: ${errors.join(', ')}');
+    if (errors.isNotEmpty) {
+      _log.warning('Some requests failed: ${errors.join(', ')}');
     }
 
     // Sort by date (newest first)
     allEpisodes.sort((a, b) => b.lastModified.compareTo(a.lastModified));
 
-    if (kDebugMode) {
-      print(
-          'StreamingApiService: Parallel loading completed, got ${allEpisodes.length} total episodes');
-    }
+    _log.info(
+        'Parallel loading completed, got ${allEpisodes.length} total episodes');
     return allEpisodes;
   }
 
@@ -297,9 +267,7 @@ class StreamingApiService {
       final episodes = await getEpisodeList('zh-TW', 'startup');
       return episodes.isNotEmpty;
     } catch (e) {
-      if (kDebugMode) {
-        print('API connectivity test failed: $e');
-      }
+      _log.severe('API connectivity test failed: $e');
       return false;
     }
   }
@@ -325,9 +293,7 @@ class StreamingApiService {
           .timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (e) {
-      if (kDebugMode) {
-        print('StreamingApiService: URL validation failed for $url: $e');
-      }
+      _log.warning('URL validation failed for $url: $e');
       return false;
     }
   }
@@ -337,47 +303,4 @@ class StreamingApiService {
     _staticClient?.close();
     _staticClient = null;
   }
-}
-
-/// Base exception class for streaming API errors
-abstract class StreamingApiException implements Exception {
-  final String message;
-  const StreamingApiException(this.message);
-
-  @override
-  String toString() => 'StreamingApiException: $message';
-}
-
-/// Network-related errors (connectivity, timeouts, etc.)
-class NetworkException extends StreamingApiException {
-  const NetworkException(super.message);
-
-  @override
-  String toString() => 'NetworkException: $message';
-}
-
-/// API-related errors (HTTP status codes, invalid responses)
-class ApiException extends StreamingApiException {
-  final int? statusCode;
-  const ApiException(super.message, [this.statusCode]);
-
-  @override
-  String toString() =>
-      'ApiException: $message${statusCode != null ? ' (Status: $statusCode)' : ''}';
-}
-
-/// Timeout-specific errors
-class TimeoutException extends StreamingApiException {
-  const TimeoutException(super.message);
-
-  @override
-  String toString() => 'TimeoutException: $message';
-}
-
-/// Unknown or unexpected errors
-class UnknownException extends StreamingApiException {
-  const UnknownException(super.message);
-
-  @override
-  String toString() => 'UnknownException: $message';
 }

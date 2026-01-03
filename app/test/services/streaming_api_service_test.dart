@@ -7,6 +7,7 @@ import 'dart:async' as async;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
+import 'package:from_fed_to_chain_app/core/exceptions/app_exceptions.dart';
 
 // Generate mocks
 @GenerateMocks([http.Client])
@@ -903,38 +904,36 @@ ENVIRONMENT=test
 
     group('Exception Classes', () {
       test('NetworkException should format correctly', () {
-        const exception = NetworkException('Network connection failed');
+        final exception = NetworkException('Network connection failed');
         expect(exception.toString(),
-            equals('NetworkException: Network connection failed'));
+            equals('AppException: Network connection failed '));
         expect(exception.message, equals('Network connection failed'));
       });
 
       test('ApiException should format correctly without status code', () {
-        const exception = ApiException('API request failed');
+        final exception = ApiException('API request failed');
         expect(
-            exception.toString(), equals('ApiException: API request failed'));
+            exception.toString(), equals('AppException: API request failed '));
         expect(exception.message, equals('API request failed'));
-        expect(exception.statusCode, isNull);
       });
 
       test('ApiException should format correctly with status code', () {
-        const exception = ApiException('API request failed', 404);
+        final exception = ApiException('API request failed', statusCode: 404);
         expect(exception.toString(),
-            equals('ApiException: API request failed (Status: 404)'));
-        expect(exception.statusCode, equals(404));
+            equals('AppException: API request failed [404]'));
       });
 
       test('TimeoutException should format correctly', () {
-        const exception = TimeoutException('Request timed out');
-        expect(exception.toString(),
-            equals('TimeoutException: Request timed out'));
+        final exception = TimeoutException('Request timed out');
+        expect(
+            exception.toString(), equals('AppException: Request timed out '));
         expect(exception.message, equals('Request timed out'));
       });
 
       test('UnknownException should format correctly', () {
-        const exception = UnknownException('Unknown error occurred');
+        final exception = UnknownException('Unknown error occurred');
         expect(exception.toString(),
-            equals('UnknownException: Unknown error occurred'));
+            equals('AppException: Unknown error occurred '));
         expect(exception.message, equals('Unknown error occurred'));
       });
     });

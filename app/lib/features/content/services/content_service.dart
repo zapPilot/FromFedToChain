@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 import 'package:from_fed_to_chain_app/features/content/data/cache_service.dart';
@@ -24,6 +25,7 @@ class ContentService extends ChangeNotifier {
   final ContentRepository _contentRepository;
   final ProgressRepository _progressRepository;
   final PreferencesRepository _preferencesRepository;
+  static final _log = LoggerService.getLogger('ContentService');
 
   // State
   List<AudioFile> _allEpisodes = [];
@@ -53,10 +55,7 @@ class ContentService extends ChangeNotifier {
   void _initializeServices() {
     _progressRepository.initialize();
     _preferencesRepository.initialize();
-
-    if (kDebugMode) {
-      print('ContentService: Initialized content dependencies');
-    }
+    _log.info('Initialized content dependencies');
   }
 
   // Getters
@@ -193,14 +192,10 @@ class ContentService extends ChangeNotifier {
       _allEpisodes = episodes;
       _applyCurrentFilters();
 
-      if (kDebugMode) {
-        print('ContentService: Loaded ${episodes.length} episodes');
-      }
+      _log.info('Loaded ${episodes.length} episodes');
     } catch (e) {
       _setError('Failed to load episodes: $e');
-      if (kDebugMode) {
-        print('ContentService: Error loading episodes: $e');
-      }
+      _log.severe('Error loading episodes: $e');
     } finally {
       _setLoading(false);
     }
@@ -216,15 +211,10 @@ class ContentService extends ChangeNotifier {
       _allEpisodes = episodes;
       _applyCurrentFilters();
 
-      if (kDebugMode) {
-        print(
-            'ContentService: Loaded ${episodes.length} episodes for $language');
-      }
+      _log.info('Loaded ${episodes.length} episodes for $language');
     } catch (e) {
       _setError('Failed to load episodes for $language: $e');
-      if (kDebugMode) {
-        print('ContentService: Error loading episodes for $language: $e');
-      }
+      _log.severe('Error loading episodes for $language: $e');
     } finally {
       _setLoading(false);
     }
@@ -510,9 +500,7 @@ class ContentService extends ChangeNotifier {
 
     final cacheKey = query.toLowerCase().trim();
     if (_searchCache.containsKey(cacheKey)) {
-      if (kDebugMode) {
-        print('ContentService: Returning cached results for "$query"');
-      }
+      _log.fine('Returning cached results for "$query"');
       return _searchCache[cacheKey]!;
     }
 
@@ -524,17 +512,13 @@ class ContentService extends ChangeNotifier {
         return localResults;
       }
 
-      if (kDebugMode) {
-        print('ContentService: Searching API for "$query"');
-      }
+      _log.fine('Searching API for "$query"');
       final apiResults = await StreamingApiService.searchEpisodes(query);
       _cacheSearchResult(cacheKey, apiResults);
 
       return apiResults;
     } catch (e) {
-      if (kDebugMode) {
-        print('ContentService: Search failed for "$query": $e');
-      }
+      _log.warning('Search failed for "$query": $e');
       return [];
     }
   }
