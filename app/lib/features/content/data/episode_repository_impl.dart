@@ -4,10 +4,12 @@ import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
 import 'package:from_fed_to_chain_app/features/content/data/episode_repository.dart';
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 
 /// Concrete implementation of EpisodeRepository
 /// Handles all episode data access operations
 class EpisodeRepositoryImpl implements EpisodeRepository {
+  static final _log = LoggerService.getLogger('EpisodeRepositoryImpl');
   List<AudioFile> _allEpisodes = [];
   bool _isLoading = false;
   String? _errorMessage;
@@ -27,22 +29,16 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
     _clearError();
 
     try {
-      if (kDebugMode) {
-        print('EpisodeRepository: Loading all episodes...');
-      }
+      _log.info('Loading all episodes...');
       _allEpisodes = await StreamingApiService.getAllEpisodes();
 
       if (_allEpisodes.isEmpty) {
         _setError('No episodes found. Please check your internet connection.');
       } else {
-        if (kDebugMode) {
-          print('EpisodeRepository: Loaded ${_allEpisodes.length} episodes');
-        }
+        _log.info('Loaded ${_allEpisodes.length} episodes');
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('EpisodeRepository: Failed to load episodes: $e');
-      }
+      _log.severe('Failed to load episodes: $e');
       _setError('Failed to load episodes: $e');
     } finally {
       _setLoading(false);
@@ -64,25 +60,18 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
     _clearError();
 
     try {
-      if (kDebugMode) {
-        print('EpisodeRepository: Loading episodes for language: $language');
-      }
+      _log.info('Loading episodes for language: $language');
       final episodes =
           await StreamingApiService.getAllEpisodesForLanguage(language);
 
       // Update or merge with existing episodes
       _updateEpisodesForLanguage(language, episodes);
 
-      if (kDebugMode) {
-        print(
-            'EpisodeRepository: Loaded ${episodes.length} episodes for $language');
-      }
+      _log.info('Loaded ${episodes.length} episodes for $language');
 
       return episodes;
     } catch (e) {
-      if (kDebugMode) {
-        print('EpisodeRepository: Failed to load episodes for $language: $e');
-      }
+      _log.severe('Failed to load episodes for $language: $e');
       _setError('Failed to load episodes for $language: $e');
       return [];
     } finally {
@@ -108,9 +97,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
       // Otherwise, search via API
       return await StreamingApiService.searchEpisodes(query);
     } catch (e) {
-      if (kDebugMode) {
-        print('EpisodeRepository: Search failed: $e');
-      }
+      _log.severe('Search failed: $e');
       return [];
     }
   }

@@ -1,5 +1,4 @@
 @Tags(['sequential']) // Avoids channel collisions with other suites.
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -13,14 +12,6 @@ void main() {
   group('AuthService Comprehensive Tests', () {
     late AuthService authService;
     late AppUser testUser;
-
-    setUpAll(() {
-      AuthService.debugLoggingEnabled = false;
-    });
-
-    tearDownAll(() {
-      AuthService.debugLoggingEnabled = kDebugMode;
-    });
 
     setUp(() async {
       // Reset SharedPreferences before each test with explicit cleanup

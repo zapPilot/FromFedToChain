@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:from_fed_to_chain_app/features/auth/models/user.dart';
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 
 /// Authentication states
 enum AuthState {
@@ -17,8 +18,7 @@ enum AuthState {
 
 /// Authentication service for handling Apple and Google sign-in
 class AuthService extends ChangeNotifier {
-  @visibleForTesting
-  static bool debugLoggingEnabled = kDebugMode;
+  static final _log = LoggerService.getLogger('AuthService');
   static const String _userKey = 'app_user';
   static const String _authTokenKey = 'auth_token';
 
@@ -48,13 +48,13 @@ class AuthService extends ChangeNotifier {
         _currentUser = AppUser.fromJson(userMap);
         _setAuthState(AuthState.authenticated);
 
-        _debugLog('✅ User session restored: ${_currentUser?.email}');
+        _log.info('User session restored: ${_currentUser?.email}');
       } else {
         _setAuthState(AuthState.unauthenticated);
-        _debugLog('ℹ️ No existing user session found');
+        _log.info('No existing user session found');
       }
     } catch (e) {
-      _debugLog('❌ Auth initialization error: $e');
+      _log.severe('Auth initialization error: $e');
       _setError('Failed to initialize authentication');
     }
   }
@@ -65,7 +65,7 @@ class AuthService extends ChangeNotifier {
       _setAuthState(AuthState.authenticating);
       _clearError();
 
-      _debugLog('🍎 Starting Apple Sign In...');
+      _log.info('Starting Apple Sign In...');
 
       // For now, simulate Apple Sign In since we don't have the actual implementation
       // In a real app, you would use sign_in_with_apple package here
@@ -73,7 +73,7 @@ class AuthService extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _debugLog('❌ Apple Sign In error: $e');
+      _log.severe('Apple Sign In error: $e');
 
       if (e is PlatformException) {
         if (e.code == 'SignInWithAppleNotSupported') {
@@ -98,7 +98,7 @@ class AuthService extends ChangeNotifier {
       _setAuthState(AuthState.authenticating);
       _clearError();
 
-      _debugLog('🔍 Starting Google Sign In...');
+      _log.info('Starting Google Sign In...');
 
       // For now, simulate Google Sign In since we don't have the actual implementation
       // In a real app, you would use google_sign_in package here
@@ -106,7 +106,7 @@ class AuthService extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _debugLog('❌ Google Sign In error: $e');
+      _log.severe('Google Sign In error: $e');
 
       if (e is PlatformException) {
         _setError('Google Sign In failed: ${e.message}');
@@ -122,7 +122,7 @@ class AuthService extends ChangeNotifier {
   /// Sign out the current user
   Future<void> signOut() async {
     try {
-      _debugLog('👋 Signing out user: ${_currentUser?.email}');
+      _log.info('Signing out user: ${_currentUser?.email}');
 
       // Clear local storage
       final prefs = await SharedPreferences.getInstance();
@@ -134,9 +134,9 @@ class AuthService extends ChangeNotifier {
       _clearError();
       _setAuthState(AuthState.unauthenticated);
 
-      _debugLog('✅ User signed out successfully');
+      _log.info('User signed out successfully');
     } catch (e) {
-      _debugLog('❌ Sign out error: $e');
+      _log.severe('Sign out error: $e');
       _setError('Failed to sign out');
     }
   }
@@ -149,7 +149,7 @@ class AuthService extends ChangeNotifier {
         return false;
       }
 
-      _debugLog('🗑️ Deleting account for: ${_currentUser?.email}');
+      _log.info('Deleting account for: ${_currentUser?.email}');
 
       // In a real app, you would call your backend API to delete the account
       await Future.delayed(const Duration(seconds: 1)); // Simulate API call
@@ -157,11 +157,11 @@ class AuthService extends ChangeNotifier {
       // Sign out after account deletion
       await signOut();
 
-      _debugLog('✅ Account deleted successfully');
+      _log.info('Account deleted successfully');
 
       return true;
     } catch (e) {
-      _debugLog('❌ Account deletion error: $e');
+      _log.severe('Account deletion error: $e');
       _setError('Failed to delete account');
       return false;
     }
@@ -189,11 +189,11 @@ class AuthService extends ChangeNotifier {
 
       notifyListeners();
 
-      _debugLog('✅ User profile updated');
+      _log.info('User profile updated');
 
       return true;
     } catch (e) {
-      _debugLog('❌ Profile update error: $e');
+      _log.severe('Profile update error: $e');
       _setError('Failed to update profile');
       return false;
     }
@@ -247,7 +247,7 @@ class AuthService extends ChangeNotifier {
 
     _setAuthState(AuthState.authenticated);
 
-    _debugLog('✅ Sign in completed for: ${user.email}');
+    _log.info('Sign in completed for: ${user.email}');
   }
 
   /// Save user to local storage
@@ -278,12 +278,5 @@ class AuthService extends ChangeNotifier {
   /// Clear error message
   void _clearError() {
     _errorMessage = null;
-  }
-
-  void _debugLog(String message) {
-    if (debugLoggingEnabled) {
-      // ignore: avoid_print
-      print(message);
-    }
   }
 }

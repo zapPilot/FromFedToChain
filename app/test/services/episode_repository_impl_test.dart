@@ -281,6 +281,28 @@ void main() {
       final result = await repository.getEpisodeById('non-existent-episode');
       expect(result, isNull);
     });
+
+    test('should find episode using fuzzy date matching', () async {
+      // Setup: Episode has complex ID but contains date
+      final fuzzyEpisode = TestUtils.createSampleAudioFile(
+        id: 'real-prefix-2025-02-15-topic-en-US',
+        title: 'Fuzzy Title',
+        language: 'en-US',
+      );
+      repository
+          .setEpisodesForTesting([...repository.allEpisodes, fuzzyEpisode]);
+
+      // Request with different prefix but same date
+      // "user-input-2025-02-15-something" -> extracts 2025-02-15
+      // Finds "real-prefix-2025-02-15-topic-en-US"
+      final result = await repository.getEpisodeById(
+        'user-input-2025-02-15-something',
+        preferredLanguage: 'en-US',
+      );
+
+      expect(result, isNotNull);
+      expect(result!.id, 'real-prefix-2025-02-15-topic-en-US');
+    });
   });
 
   group('EpisodeRepositoryImpl - searchEpisodes', () {

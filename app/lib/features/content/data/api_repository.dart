@@ -4,11 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
+import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 
 /// Centralized repository for all HTTP API operations
 /// Provides consistent error handling, retry logic, and request management
 class ApiRepository {
   static ApiRepository? _instance;
+  static final _log = LoggerService.getLogger('ApiRepository');
   static ApiRepository get instance => _instance ??= ApiRepository._internal();
 
   late Dio _dio;
@@ -32,13 +34,11 @@ class ApiRepository {
     ));
 
     // Add interceptors for logging and error handling
-    if (kDebugMode) {
-      _dio.interceptors.add(LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        logPrint: (object) => print('ApiRepository: $object'),
-      ));
-    }
+    _dio.interceptors.add(LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+      logPrint: (object) => _log.fine(object.toString()),
+    ));
 
     // Add retry interceptor
     _dio.interceptors.add(RetryInterceptor());
@@ -56,9 +56,7 @@ class ApiRepository {
       final cancelToken = CancelToken();
       _activeCalls[callId] = cancelToken;
 
-      if (kDebugMode) {
-        print('ApiRepository: Fetching all episodes...');
-      }
+      _log.info('Fetching all episodes...');
 
       final allEpisodes = <AudioFile>[];
       final errors = <String>[];
@@ -76,23 +74,18 @@ class ApiRepository {
         }
       }
 
-      if (errors.isNotEmpty && kDebugMode) {
-        print('ApiRepository: Some requests failed: ${errors.join(', ')}');
+      if (errors.isNotEmpty) {
+        _log.warning('Some requests failed: ${errors.join(', ')}');
       }
 
       // Sort by date (newest first)
       allEpisodes.sort((a, b) => b.lastModified.compareTo(a.lastModified));
 
-      if (kDebugMode) {
-        print(
-            'ApiRepository: Successfully fetched ${allEpisodes.length} episodes');
-      }
+      _log.info('Successfully fetched ${allEpisodes.length} episodes');
 
       return allEpisodes;
     } catch (e) {
-      if (kDebugMode) {
-        print('ApiRepository: Failed to fetch all episodes: $e');
-      }
+      _log.severe('Failed to fetch all episodes: $e');
       rethrow;
     } finally {
       _activeCalls.remove(callId);
@@ -106,9 +99,7 @@ class ApiRepository {
     try {
       _cancelPreviousCall(callId);
 
-      if (kDebugMode) {
-        print('ApiRepository: Fetching episodes for language: $language');
-      }
+      _log.info('Fetching episodes for language: $language');
 
       final allEpisodes = <AudioFile>[];
       final errors = <String>[];
@@ -124,24 +115,20 @@ class ApiRepository {
         }
       }
 
-      if (errors.isNotEmpty && kDebugMode) {
-        print(
-            'ApiRepository: Some categories failed for $language: ${errors.join(', ')}');
+      if (errors.isNotEmpty) {
+        _log.warning(
+            'Some categories failed for $language: ${errors.join(', ')}');
       }
 
       // Sort by date (newest first)
       allEpisodes.sort((a, b) => b.lastModified.compareTo(a.lastModified));
 
-      if (kDebugMode) {
-        print(
-            'ApiRepository: Successfully fetched ${allEpisodes.length} episodes for $language');
-      }
+      _log.info(
+          'Successfully fetched ${allEpisodes.length} episodes for $language');
 
       return allEpisodes;
     } catch (e) {
-      if (kDebugMode) {
-        print('ApiRepository: Failed to fetch episodes for $language: $e');
-      }
+      _log.severe('Failed to fetch episodes for $language: $e');
       rethrow;
     } finally {
       _activeCalls.remove(callId);
@@ -158,9 +145,7 @@ class ApiRepository {
       final cancelToken = CancelToken();
       _activeCalls[callId] = cancelToken;
 
-      if (kDebugMode) {
-        print('ApiRepository: Fetching episodes for $language/$category');
-      }
+      _log.info('Fetching episodes for $language/$category');
 
       final response = await _dio.get(
         ApiConfig.getListUrl(language, category),
@@ -184,25 +169,18 @@ class ApiRepository {
 
               audioFiles.add(AudioFile.fromApiResponse(enhancedItem));
             } catch (e) {
-              if (kDebugMode) {
-                print('ApiRepository: Failed to parse episode: $e');
-              }
+              _log.warning('Failed to parse episode: $e');
             }
           }
         }
       }
 
-      if (kDebugMode) {
-        print(
-            'ApiRepository: Successfully fetched ${audioFiles.length} episodes for $language/$category');
-      }
+      _log.info(
+          'Successfully fetched ${audioFiles.length} episodes for $language/$category');
 
       return audioFiles;
     } catch (e) {
-      if (kDebugMode) {
-        print(
-            'ApiRepository: Failed to fetch episodes for $language/$category: $e');
-      }
+      _log.severe('Failed to fetch episodes for $language/$category: $e');
       rethrow;
     } finally {
       _activeCalls.remove(callId);
@@ -211,9 +189,7 @@ class ApiRepository {
 
   /// Search episodes by query (client-side filtering)
   Future<List<AudioFile>> searchEpisodes(String query) async {
-    if (kDebugMode) {
-      print('ApiRepository: Searching episodes for: $query');
-    }
+    _log.info('Searching episodes for: $query');
 
     // Get all episodes and filter them client-side
     final allEpisodes = await getAllEpisodes();
@@ -227,10 +203,7 @@ class ApiRepository {
           episode.category.toLowerCase().contains(lowerQuery);
     }).toList();
 
-    if (kDebugMode) {
-      print(
-          'ApiRepository: Found ${filteredEpisodes.length} episodes for query: $query');
-    }
+    _log.info('Found ${filteredEpisodes.length} episodes for query: $query');
 
     return filteredEpisodes;
   }
@@ -245,9 +218,7 @@ class ApiRepository {
       final cancelToken = CancelToken();
       _activeCalls[callId] = cancelToken;
 
-      if (kDebugMode) {
-        print('ApiRepository: Fetching content for $language/$category/$id');
-      }
+      _log.info('Fetching content for $language/$category/$id');
 
       final response = await _dio.get(
         ApiConfig.getContentUrl(language, category, id),
@@ -270,9 +241,7 @@ class ApiRepository {
         return null;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('ApiRepository: Failed to fetch content for $id: $e');
-      }
+      _log.severe('Failed to fetch content for $id: $e');
       return null;
     } finally {
       _activeCalls.remove(callId);
@@ -286,9 +255,7 @@ class ApiRepository {
       cancelToken.cancel('Cancelled by user');
       _activeCalls.remove(callId);
 
-      if (kDebugMode) {
-        print('ApiRepository: Cancelled call: $callId');
-      }
+      _log.info('Cancelled call: $callId');
     }
   }
 
@@ -301,9 +268,7 @@ class ApiRepository {
     }
     _activeCalls.clear();
 
-    if (kDebugMode) {
-      print('ApiRepository: Cancelled all active calls');
-    }
+    _log.info('Cancelled all active calls');
   }
 
   /// Cancel previous call with the same ID
@@ -332,9 +297,7 @@ class ApiRepository {
     cancelAllCalls();
     _dio.close();
 
-    if (kDebugMode) {
-      print('ApiRepository: Disposed');
-    }
+    _log.info('Disposed');
   }
 
   /// Reset instance (for testing)
@@ -352,8 +315,12 @@ class ApiRepository {
 
 /// Retry interceptor for handling temporary failures
 class RetryInterceptor extends Interceptor {
+  static final _log = LoggerService.getLogger('RetryInterceptor');
   static const int maxRetries = 3;
   static const Duration retryDelay = Duration(seconds: 1);
+  final Dio? _client;
+
+  RetryInterceptor({Dio? client}) : _client = client;
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
@@ -362,15 +329,13 @@ class RetryInterceptor extends Interceptor {
       final retryCount = (err.requestOptions.extra['retryCount'] ?? 0) + 1;
       err.requestOptions.extra['retryCount'] = retryCount;
 
-      if (kDebugMode) {
-        print(
-            'ApiRepository: Retrying request (attempt $retryCount/$maxRetries)');
-      }
+      _log.warning('Retrying request (attempt $retryCount/$maxRetries)');
 
       await Future.delayed(retryDelay * retryCount);
 
       try {
-        final response = await Dio().fetch(err.requestOptions);
+        final client = _client ?? Dio();
+        final response = await client.fetch(err.requestOptions);
         handler.resolve(response);
         return;
       } catch (e) {
@@ -393,6 +358,8 @@ class RetryInterceptor extends Interceptor {
 
 /// Error handling interceptor for consistent error responses
 class ErrorHandlingInterceptor extends Interceptor {
+  static final _log = LoggerService.getLogger('ErrorHandlingInterceptor');
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     String errorMessage;
@@ -420,9 +387,7 @@ class ErrorHandlingInterceptor extends Interceptor {
         break;
     }
 
-    if (kDebugMode) {
-      print('ApiRepository Error: $errorMessage');
-    }
+    _log.severe(errorMessage);
 
     // Create a new DioException with user-friendly message
     final newError = DioException(
