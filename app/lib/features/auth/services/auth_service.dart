@@ -149,6 +149,8 @@ class AuthService extends ChangeNotifier {
         return false;
       }
 
+      if (_simulateError) throw Exception('Simulated delete failure');
+
       _log.info('Deleting account for: ${_currentUser?.email}');
 
       // In a real app, you would call your backend API to delete the account
@@ -178,6 +180,8 @@ class AuthService extends ChangeNotifier {
         return false;
       }
 
+      if (_simulateError) throw Exception('Simulated update failure');
+
       _currentUser = _currentUser!.copyWith(
         name: name ?? _currentUser!.name,
         photoUrl: photoUrl ?? _currentUser!.photoUrl,
@@ -201,8 +205,22 @@ class AuthService extends ChangeNotifier {
 
   // Private methods
 
+  // Test helpers
+  bool _simulateError = false;
+
+  @visibleForTesting
+  void setSimulateErrorForTesting(bool value) {
+    _simulateError = value;
+  }
+
   /// Simulate Apple Sign In (replace with real implementation)
   Future<void> _simulateAppleSignIn() async {
+    if (_simulateError) {
+      throw PlatformException(
+        code: 'SignInWithAppleNotSupported',
+        message: 'Simulated error',
+      );
+    }
     await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
 
     final now = DateTime.now();
@@ -221,6 +239,12 @@ class AuthService extends ChangeNotifier {
 
   /// Simulate Google Sign In (replace with real implementation)
   Future<void> _simulateGoogleSignIn() async {
+    if (_simulateError) {
+      throw PlatformException(
+        code: 'GoogleSignInFailed',
+        message: 'Simulated error',
+      );
+    }
     await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
 
     final now = DateTime.now();

@@ -86,6 +86,11 @@ void main() {
         DeepLinkService.dispose();
         DeepLinkService.dispose();
       });
+
+      test('dispose should be idempotent', () {
+        DeepLinkService.dispose();
+        expect(() => DeepLinkService.dispose(), returnsNormally);
+      });
     });
 
     group('Edge Cases', () {
@@ -127,6 +132,52 @@ void main() {
             DeepLinkService.generateContentLink('test-zh-TW-episode-en-US');
         // Should match the last valid language pattern
         expect(link, 'fromfedtochain://audio/test-zh-TW-episode/en-US');
+      });
+    });
+
+    group('Link Generation - Additional Cases', () {
+      test('should generate link with all supported languages', () {
+        final linkZhTW =
+            DeepLinkService.generateContentLink('ep', language: 'zh-TW');
+        final linkEnUS =
+            DeepLinkService.generateContentLink('ep', language: 'en-US');
+        final linkJaJP =
+            DeepLinkService.generateContentLink('ep', language: 'ja-JP');
+
+        expect(linkZhTW, 'fromfedtochain://audio/ep/zh-TW');
+        expect(linkEnUS, 'fromfedtochain://audio/ep/en-US');
+        expect(linkJaJP, 'fromfedtochain://audio/ep/ja-JP');
+      });
+
+      test('should handle date-like content IDs', () {
+        final link =
+            DeepLinkService.generateContentLink('2025-01-15-bitcoin-news');
+        expect(link, 'fromfedtochain://audio/2025-01-15-bitcoin-news');
+      });
+
+      test('should handle content ID with language in middle', () {
+        final link =
+            DeepLinkService.generateContentLink('2025-01-15-en-US-bitcoin');
+        expect(link, contains('2025-01-15-en-US-bitcoin'));
+      });
+
+      test('universal link with existing language suffix', () {
+        final link = DeepLinkService.generateContentLink('ep-ja-JP',
+            useCustomScheme: false);
+        expect(link, 'https://fromfedtochain.com/audio/ep/ja-JP');
+      });
+
+      test('should not extract language from partial match at start', () {
+        final link =
+            DeepLinkService.generateContentLink('en-US-prefix-episode');
+        // en-US is at start, not end - should not be extracted
+        expect(link, 'fromfedtochain://audio/en-US-prefix-episode');
+      });
+
+      test('universal link without language', () {
+        final link = DeepLinkService.generateContentLink('simple-ep',
+            useCustomScheme: false, language: null);
+        expect(link, 'https://fromfedtochain.com/audio/simple-ep');
       });
     });
   });

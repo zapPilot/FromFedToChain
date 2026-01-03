@@ -199,4 +199,43 @@ void main() {
       expect(find.byType(PlayerScreen), findsOneWidget);
     });
   });
+
+  group('DeepLinkService - generateContentLink', () {
+    test('generates custom scheme link', () {
+      final link = DeepLinkService.generateContentLink('2025-01-01-btc');
+      expect(link, 'fromfedtochain://audio/2025-01-01-btc');
+    });
+
+    test('generates web link when useCustomScheme is false', () {
+      final link = DeepLinkService.generateContentLink('2025-01-01-btc',
+          useCustomScheme: false);
+      expect(link, 'https://fromfedtochain.com/audio/2025-01-01-btc');
+    });
+
+    test('includes language parameter in link', () {
+      final link = DeepLinkService.generateContentLink('2025-01-01-btc',
+          language: 'en-US');
+      expect(link, 'fromfedtochain://audio/2025-01-01-btc/en-US');
+    });
+
+    test('extracts language from content ID suffix', () {
+      final link = DeepLinkService.generateContentLink('2025-01-01-btc-zh-TW');
+      expect(link, 'fromfedtochain://audio/2025-01-01-btc/zh-TW');
+    });
+
+    test('generates web link with language from suffix', () {
+      final link = DeepLinkService.generateContentLink('2025-01-01-btc-ja-JP',
+          useCustomScheme: false);
+      expect(link, 'https://fromfedtochain.com/audio/2025-01-01-btc/ja-JP');
+    });
+  });
+
+  group('DeepLinkService - dispose', () {
+    test('disposes resources without error', () {
+      // Just ensure dispose runs without crashing
+      DeepLinkService.dispose();
+      // After dispose, can still dispose again (no-op)
+      DeepLinkService.dispose();
+    });
+  });
 }

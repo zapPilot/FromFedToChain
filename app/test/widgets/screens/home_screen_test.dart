@@ -425,5 +425,175 @@ void main() {
             .called(1);
       });
     });
+
+    group('Search Toggle', () {
+      testWidgets('should toggle search bar visibility', (tester) async {
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find search toggle button (initially shows search icon)
+        final searchButton = find.byIcon(Icons.search);
+        expect(searchButton, findsOneWidget);
+
+        // Tap to show search bar
+        await tester.tap(searchButton);
+        await tester.pumpAndSettle();
+
+        // Now should show close icon
+        expect(find.byIcon(Icons.close), findsOneWidget);
+      });
+    });
+
+    group('Refresh Button', () {
+      testWidgets('should call refresh when tapped', (tester) async {
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find refresh button
+        final refreshButton = find.byIcon(Icons.refresh);
+        expect(refreshButton, findsOneWidget);
+
+        await tester.tap(refreshButton);
+        await tester.pump();
+
+        verify(mockContentService.refresh()).called(1);
+      });
+
+      testWidgets('should show loading indicator when loading', (tester) async {
+        when(mockContentService.isLoading).thenReturn(true);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Refresh button should be disabled and show loading spinner
+        expect(find.byType(CircularProgressIndicator), findsWidgets);
+      });
+    });
+
+    group('Recent Tab', () {
+      testWidgets('should display recent episodes in Recent tab',
+          (tester) async {
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Recent tab is default; should display AudioList
+        expect(find.byType(AudioList), findsWidgets);
+      });
+    });
+
+    group('Empty State Variations', () {
+      testWidgets('should show clear filters button when search is active',
+          (tester) async {
+        when(mockContentService.searchQuery).thenReturn('nonexistent query');
+        when(mockContentService.filteredEpisodes).thenReturn([]);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Should show "Clear filters" button
+        expect(find.text('Clear filters'), findsOneWidget);
+      });
+
+      testWidgets('should show refresh button when no search is active',
+          (tester) async {
+        when(mockContentService.searchQuery).thenReturn('');
+        when(mockContentService.filteredEpisodes).thenReturn([]);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Should show "Refresh" button instead
+        expect(find.widgetWithText(ElevatedButton, 'Refresh'), findsOneWidget);
+      });
+    });
+
+    group('MiniPlayer State Text', () {
+      testWidgets('should show Loading state text', (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
+        when(mockAudioService.isLoading).thenReturn(true);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.text('Loading'), findsOneWidget);
+      });
+
+      testWidgets('should show Error state text', (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
+        when(mockAudioService.hasError).thenReturn(true);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.text('Error'), findsOneWidget);
+      });
+
+      testWidgets('should show Paused state text', (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
+        when(mockAudioService.isPaused).thenReturn(true);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.text('Paused'), findsOneWidget);
+      });
+    });
+
+    group('Unfinished Tab with Episodes', () {
+      testWidgets('should display unfinished episodes', (tester) async {
+        when(mockContentService.getUnfinishedEpisodes())
+            .thenReturn([testAudioFile]);
+
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Go to unfinished tab
+        await tester.tap(find.widgetWithText(Tab, 'Unfinished'));
+        await tester.pumpAndSettle();
+
+        // Should show episode instead of empty state
+        expect(find.text(testAudioFile.title), findsAtLeastNWidgets(1));
+      });
+    });
   });
 }

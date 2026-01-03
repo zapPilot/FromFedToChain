@@ -364,5 +364,208 @@ void main() {
         verify(mockAudioService.setAutoplayEnabled(true)).called(1);
       });
     });
+
+    group('Player Options Sheet', () {
+      testWidgets('should open player options when more button tapped',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find the more options button (vertical dots)
+        final moreButton = find.byIcon(Icons.more_vert);
+        await tester.tap(moreButton);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+
+        // Should show bottom sheet with audio details
+        expect(find.text('Audio Details'), findsOneWidget);
+        expect(find.text(testAudioFile.displayTitle), findsAtLeastNWidgets(1));
+      });
+    });
+
+    group('Playback State Indicators', () {
+      testWidgets('should show Playing state', (tester) async {
+        when(mockAudioService.playbackState)
+            .thenReturn(AppPlaybackState.playing);
+        when(mockAudioService.isPlaying).thenReturn(true);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.text('Playing'), findsOneWidget);
+      });
+
+      testWidgets('should show Paused state', (tester) async {
+        when(mockAudioService.playbackState)
+            .thenReturn(AppPlaybackState.paused);
+        when(mockAudioService.isPaused).thenReturn(true);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.text('Paused'), findsOneWidget);
+      });
+
+      testWidgets('should show Loading state', (tester) async {
+        when(mockAudioService.playbackState)
+            .thenReturn(AppPlaybackState.loading);
+        when(mockAudioService.isLoading).thenReturn(true);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.text('Loading...'), findsOneWidget);
+      });
+
+      testWidgets('should show Error state', (tester) async {
+        when(mockAudioService.playbackState).thenReturn(AppPlaybackState.error);
+        when(mockAudioService.hasError).thenReturn(true);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.text('Error'), findsOneWidget);
+      });
+    });
+
+    group('Category Icons', () {
+      testWidgets('should show ethereum icon for ethereum category',
+          (tester) async {
+        final ethAudioFile = AudioFile(
+          id: 'eth-episode',
+          title: 'Ethereum Episode',
+          language: 'en-US',
+          category: 'ethereum',
+          streamingUrl: 'https://example.com/eth.m3u8',
+          path: 'eth.m3u8',
+          duration: const Duration(minutes: 5),
+          lastModified: DateTime.now(),
+        );
+        when(mockAudioService.currentAudioFile).thenReturn(ethAudioFile);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.byIcon(Icons.currency_bitcoin), findsOneWidget);
+      });
+
+      testWidgets('should show macro icon for macro category', (tester) async {
+        final macroAudioFile = AudioFile(
+          id: 'macro-episode',
+          title: 'Macro Episode',
+          language: 'en-US',
+          category: 'macro',
+          streamingUrl: 'https://example.com/macro.m3u8',
+          path: 'macro.m3u8',
+          duration: const Duration(minutes: 5),
+          lastModified: DateTime.now(),
+        );
+        when(mockAudioService.currentAudioFile).thenReturn(macroAudioFile);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.byIcon(Icons.trending_up), findsOneWidget);
+      });
+
+      testWidgets('should show startup icon for startup category',
+          (tester) async {
+        final startupAudioFile = AudioFile(
+          id: 'startup-episode',
+          title: 'Startup Episode',
+          language: 'en-US',
+          category: 'startup',
+          streamingUrl: 'https://example.com/startup.m3u8',
+          path: 'startup.m3u8',
+          duration: const Duration(minutes: 5),
+          lastModified: DateTime.now(),
+        );
+        when(mockAudioService.currentAudioFile).thenReturn(startupAudioFile);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.byIcon(Icons.rocket_launch), findsOneWidget);
+      });
+
+      testWidgets('should show AI icon for ai category', (tester) async {
+        final aiAudioFile = AudioFile(
+          id: 'ai-episode',
+          title: 'AI Episode',
+          language: 'en-US',
+          category: 'ai',
+          streamingUrl: 'https://example.com/ai.m3u8',
+          path: 'ai.m3u8',
+          duration: const Duration(minutes: 5),
+          lastModified: DateTime.now(),
+        );
+        when(mockAudioService.currentAudioFile).thenReturn(aiAudioFile);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.byIcon(Icons.smart_toy), findsOneWidget);
+      });
+
+      testWidgets('should show DeFi icon for defi category', (tester) async {
+        final defiAudioFile = AudioFile(
+          id: 'defi-episode',
+          title: 'DeFi Episode',
+          language: 'en-US',
+          category: 'defi',
+          streamingUrl: 'https://example.com/defi.m3u8',
+          path: 'defi.m3u8',
+          duration: const Duration(minutes: 5),
+          lastModified: DateTime.now(),
+        );
+        when(mockAudioService.currentAudioFile).thenReturn(defiAudioFile);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(find.byIcon(Icons.account_balance), findsOneWidget);
+      });
+    });
+
+    group('No Audio State', () {
+      testWidgets('should show no audio state when no audio is playing',
+          (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(null);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.text('No audio playing'), findsOneWidget);
+        expect(
+            find.text('Select an episode to start listening'), findsOneWidget);
+        expect(find.byIcon(Icons.music_off), findsOneWidget);
+      });
+
+      testWidgets('should have browse episodes button', (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(null);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.widgetWithText(ElevatedButton, 'Browse Episodes'),
+            findsOneWidget);
+      });
+    });
+
+    group('Content Script Toggle', () {
+      testWidgets('should toggle content script display', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find the article icon button (content script toggle)
+        final articleButton = find.byIcon(Icons.article);
+        await tester.tap(articleButton);
+        await tester.pump(const Duration(seconds: 1));
+
+        // View should have changed (expanded layout now)
+        // Since we can't easily verify layout change, we verify no crash
+        expect(find.byType(PlayerScreen), findsOneWidget);
+      });
+    });
   });
 }
