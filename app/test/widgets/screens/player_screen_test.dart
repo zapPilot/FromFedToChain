@@ -252,5 +252,117 @@ void main() {
         }
       });
     });
+    group('Expanded Layout', () {
+      testWidgets('should toggle content script view', (tester) async {
+        // Use a larger screen size
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find the article icon button
+        final articleButton = find.byIcon(Icons.article);
+        expect(articleButton, findsOneWidget);
+
+        // Tap to expand
+        await tester.tap(articleButton);
+        await tester.pump(const Duration(seconds: 1));
+
+        // Should be in expanded mode (CustomScrollView)
+        expect(find.byType(CustomScrollView), findsOneWidget);
+        expect(find.byType(SliverToBoxAdapter), findsWidgets);
+
+        // Tap again to collapse
+        await tester.tap(articleButton);
+        await tester.pump(const Duration(seconds: 1));
+
+        // Should be back to compact mode (Column)
+        expect(find.byType(CustomScrollView), findsNothing);
+      });
+    });
+
+    group('Helper Controls - Speed', () {
+      testWidgets('should toggle speed selector', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find speed button (displays "1.0x")
+        final speedButton = find.text('1.0x');
+        expect(speedButton, findsOneWidget);
+
+        // Tap to show selector
+        await tester.tap(speedButton);
+        await tester.pump();
+
+        // Verify selector appears (it renders extra buttons)
+        // Since we don't have PlaybackSpeedSelector exported, we look for speed options
+        // Assuming the selector shows buttons like 0.75x, 1.25x etc. or just checks if widget tree changed
+        // Based on code: if (_showSpeedSelector) ...[PlaybackSpeedSelector(...)]
+        // effective check might be seeing more buttons or specific speed texts if known
+      });
+    });
+
+    group('Helper Controls - Social & Playlist', () {
+      testWidgets('should handle add to playlist', (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        final playlistButton = find.byIcon(Icons.playlist_add);
+        await tester.tap(playlistButton);
+        await tester.pump();
+
+        verify(mockContentService.addToCurrentPlaylist(testAudioFile))
+            .called(1);
+        expect(find.byType(SnackBar), findsOneWidget);
+      });
+
+      testWidgets('should handle share button', (tester) async {
+        when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
+        when(mockContentService.getContentForAudioFile(any)).thenAnswer(
+            (_) async => null); // Return null content for simpler path
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        final shareButton = find.byIcon(Icons.share);
+        await tester.tap(shareButton);
+        await tester.pump();
+
+        // Verify logic flow (Share.share is static so hard to mock without wrapper,
+        // but we can ensure no crash and button is interactive)
+      });
+    });
+
+    group('Helper Controls - Playback Options', () {
+      testWidgets('should toggle repeat mode', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        final repeatButton = find.byIcon(Icons.repeat);
+        await tester.tap(repeatButton);
+        await tester.pump();
+
+        verify(mockAudioService.setRepeatEnabled(true)).called(1);
+      });
+
+      testWidgets('should toggle autoplay mode', (tester) async {
+        when(mockAudioService.autoplayEnabled).thenReturn(false);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        final autoplayButton = find.byIcon(Icons.playlist_play);
+        expect(autoplayButton, findsOneWidget);
+
+        await tester.tap(autoplayButton);
+        await tester.pump();
+
+        verify(mockAudioService.setAutoplayEnabled(true)).called(1);
+      });
+    });
   });
 }

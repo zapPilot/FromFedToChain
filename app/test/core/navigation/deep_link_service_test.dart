@@ -64,6 +64,8 @@ void main() {
 
       // Setup default mock responses for services used by PlayerScreen
       when(mockAudioService.currentAudioFile).thenReturn(null);
+      when(mockContentService.getAudioFileById(any))
+          .thenAnswer((_) async => null);
     });
 
     tearDown(() {
@@ -89,8 +91,6 @@ void main() {
     testWidgets('initialize handles initial link', (tester) async {
       when(mockAppLinks.getInitialLink())
           .thenAnswer((_) async => Uri.parse('fromfedtochain://audio/ep-1'));
-      when(mockContentService.getAudioFileById(any))
-          .thenAnswer((_) async => null); // Prevent loading error
 
       await pumpApp(tester);
 
@@ -98,7 +98,7 @@ void main() {
 
       // Allow navigation and build
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(PlayerScreen), findsOneWidget);
     });
@@ -106,9 +106,6 @@ void main() {
     testWidgets('handles universal initial link', (tester) async {
       when(mockAppLinks.getInitialLink()).thenAnswer(
           (_) async => Uri.parse('https://fromfedtochain.com/audio/ep-uni'));
-      // getInitialLinkString might be used by AppLinks internals or custom logic, mocking just in case if needed, but not used in DeepLinkService
-      when(mockContentService.getAudioFileById(any))
-          .thenAnswer((_) async => null);
 
       await pumpApp(tester);
 
@@ -116,7 +113,7 @@ void main() {
 
       // Allow navigation and build
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(PlayerScreen), findsOneWidget);
     });
@@ -130,10 +127,76 @@ void main() {
 
       await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
 
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);
       expect(find.byType(PlayerScreen), findsNothing);
+    });
+
+    testWidgets('handles deep link from stream', (tester) async {
+      await pumpApp(tester);
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      // Add a listener to ensure stream is active
+      await tester.pump();
+
+      // Emit a new URI
+      uriController.add(Uri.parse('fromfedtochain://audio/stream-ep'));
+
+      // Pump to process the stream event
+      await tester.pump();
+      // Pump again to ensure any async operations (Futures) complete
+      await tester.pump();
+      // Pump with duration to allow navigation animation to proceed
+      await tester.pump(const Duration(seconds: 1));
+      // One final pump to settle the frame
+      await tester.pump();
+
+      expect(find.byType(PlayerScreen), findsOneWidget);
+    });
+
+    testWidgets('handles home route', (tester) async {
+      await pumpApp(tester);
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      // Navigate to player first to verify we pop back home
+      navigatorKey.currentState?.push(MaterialPageRoute(
+          builder: (_) => const Scaffold(body: Text('Player'))));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.text('Player'), findsOneWidget);
+
+      // Emit home URI
+      uriController.add(Uri.parse('fromfedtochain://home'));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home'), findsOneWidget);
+    });
+
+    testWidgets('handles missing content ID gracefully', (tester) async {
+      await pumpApp(tester);
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      // Emit URI without ID
+      uriController.add(Uri.parse('fromfedtochain://audio/'));
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home'), findsOneWidget);
+    });
+
+    testWidgets('handles universal link stream', (tester) async {
+      await pumpApp(tester);
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      uriController
+          .add(Uri.parse('https://fromfedtochain.com/audio/uni-stream'));
+
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byType(PlayerScreen), findsOneWidget);
     });
   });
 }

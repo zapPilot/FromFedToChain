@@ -9,6 +9,7 @@ import 'package:from_fed_to_chain_app/features/content/services/content_service.
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/audio_list.dart';
 
 // Generate mocks for dependencies
 @GenerateMocks([ContentService, AudioPlayerService])
@@ -323,6 +324,105 @@ void main() {
           await tester.pump();
           // Navigation would be handled by Navigator
         }
+      });
+    });
+    group('Sort Functionality', () {
+      testWidgets('should handle sort selection', (tester) async {
+        // Use a larger screen size
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find sort dropdown
+        final sortIcon = find.byIcon(Icons.sort);
+        expect(sortIcon, findsOneWidget);
+
+        // Find dropdown button
+        final dropdownFinder = find.byType(DropdownButton<String>);
+        expect(dropdownFinder, findsOneWidget);
+
+        // Tap to open
+        await tester.tap(dropdownFinder);
+        await tester.pumpAndSettle();
+
+        // Find and tap a menu item (e.g. "Oldest First")
+        final oldestOption = find.text('Oldest First').last;
+        await tester.tap(oldestOption);
+        await tester.pumpAndSettle();
+
+        // Verify service called
+        verify(mockContentService.setSortOrder('oldest')).called(1);
+      });
+    });
+
+    group('Tab Navigation', () {
+      testWidgets('should switch tabs', (tester) async {
+        // Use a larger screen size
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Find "All" tab
+        final allTab = find.widgetWithText(Tab, 'All');
+        await tester.tap(allTab);
+        await tester.pumpAndSettle();
+
+        // Should show list in All tab
+        expect(find.byType(AudioList), findsWidgets);
+      });
+
+      testWidgets('should show empty state for Unfinished tab', (tester) async {
+        // Use a larger screen size
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        // Mock empty unfinished list
+        when(mockContentService.getUnfinishedEpisodes()).thenReturn([]);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Go to unfinished tab
+        await tester.tap(find.widgetWithText(Tab, 'Unfinished'));
+        await tester.pumpAndSettle();
+
+        // Expect empty state message
+        expect(find.text('No Unfinished Episodes'), findsOneWidget);
+      });
+    });
+
+    group('Episode Options', () {
+      testWidgets('should show options on long press', (tester) async {
+        // Use a larger screen size
+        tester.view.physicalSize = const Size(1200, 2400);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Long press an episode
+        final episodeTile = find.text(testAudioFile.title);
+        await tester.longPress(episodeTile);
+        await tester.pumpAndSettle();
+
+        // Verify bottom sheet appears
+        expect(find.text('Add to Playlist'), findsOneWidget);
+        expect(find.text('Share'), findsOneWidget);
+
+        // Tap an option (e.g., Add to Playlist)
+        await tester.tap(find.text('Add to Playlist'));
+        await tester.pumpAndSettle();
+
+        verify(mockContentService.addToCurrentPlaylist(testAudioFile))
+            .called(1);
       });
     });
   });
