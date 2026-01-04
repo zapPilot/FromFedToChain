@@ -1,3 +1,4 @@
+/// User model representing an authenticated user.
 class AppUser {
   final String id;
   final String name;
@@ -17,6 +18,7 @@ class AppUser {
     required this.lastLoginAt,
   });
 
+  /// Convert user to JSON map.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -29,6 +31,7 @@ class AppUser {
     };
   }
 
+  /// Create [AppUser] from JSON map.
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
       id: json['id'],
@@ -41,6 +44,7 @@ class AppUser {
     );
   }
 
+  /// Create a copy of [AppUser] with updated fields.
   AppUser copyWith({
     String? id,
     String? name,

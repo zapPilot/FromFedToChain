@@ -34,7 +34,11 @@ class AuthService extends ChangeNotifier {
       _authState == AuthState.authenticated && _currentUser != null;
   bool get isLoading => _authState == AuthState.authenticating;
 
-  /// Initialize the auth service and check for existing session
+  /// Initialize the auth service and check for existing session.
+  ///
+  /// Checks SharedPreferences for stored user data and token.
+  /// If found, restores the session and sets state to [AuthState.authenticated].
+  /// Otherwise, sets state to [AuthState.unauthenticated].
   Future<void> initialize() async {
     try {
       _setAuthState(AuthState.authenticating);
@@ -59,7 +63,9 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Sign in with Apple
+  /// Sign in with Apple.
+  ///
+  /// Returns `true` if sign in is successful, `false` otherwise.
   Future<bool> signInWithApple() async {
     try {
       _setAuthState(AuthState.authenticating);
@@ -92,7 +98,9 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Sign in with Google
+  /// Sign in with Google.
+  ///
+  /// Returns `true` if sign in is successful, `false` otherwise.
   Future<bool> signInWithGoogle() async {
     try {
       _setAuthState(AuthState.authenticating);
@@ -119,7 +127,9 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Sign out the current user
+  /// Sign out the current user.
+  ///
+  /// Clears local storage and resets state to [AuthState.unauthenticated].
   Future<void> signOut() async {
     try {
       _log.info('Signing out user: ${_currentUser?.email}');
@@ -141,7 +151,9 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Delete user account (placeholder for future implementation)
+  /// Delete user account (placeholder for future implementation).
+  ///
+  /// Returns `true` if account deletion is successful.
   Future<bool> deleteAccount() async {
     try {
       if (_currentUser == null) {
@@ -169,7 +181,10 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Update user profile
+  /// Update user profile.
+  ///
+  /// Updates local user state and persists changes.
+  /// Returns `true` if update is successful.
   Future<bool> updateProfile({
     String? name,
     String? photoUrl,
