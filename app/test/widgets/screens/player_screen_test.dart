@@ -9,20 +9,23 @@ import 'package:from_fed_to_chain_app/features/audio/services/audio_player_servi
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 
 // Generate mocks for dependencies
-@GenerateMocks([AudioPlayerService, ContentService])
+@GenerateMocks([AudioPlayerService, ContentService, PlaylistService])
 import 'player_screen_test.mocks.dart';
 
 void main() {
   group('PlayerScreen - Basic Tests', () {
     late MockAudioPlayerService mockAudioService;
     late MockContentService mockContentService;
+    late MockPlaylistService mockPlaylistService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioService = MockAudioPlayerService();
       mockContentService = MockContentService();
+      mockPlaylistService = MockPlaylistService();
 
       testAudioFile = AudioFile(
         id: 'test-episode',
@@ -58,8 +61,9 @@ void main() {
           .thenAnswer((_) async => null);
       when(mockContentService.addToListenHistory(any))
           .thenAnswer((_) async => {});
-      when(mockContentService.addToCurrentPlaylist(any))
-          .thenAnswer((_) async => {});
+
+      // Basic PlaylistService setup
+      when(mockPlaylistService.addToPlaylist(any)).thenAnswer((_) async => {});
 
       // Async method stubs
       when(mockAudioService.playAudio(any)).thenAnswer((_) async => {});
@@ -91,6 +95,8 @@ void main() {
                   value: mockAudioService),
               ChangeNotifierProvider<ContentService>.value(
                   value: mockContentService),
+              ChangeNotifierProvider<PlaylistService>.value(
+                  value: mockPlaylistService),
             ],
             child: PlayerScreen(contentId: contentId),
           ),
@@ -315,8 +321,7 @@ void main() {
         await tester.tap(playlistButton);
         await tester.pump();
 
-        verify(mockContentService.addToCurrentPlaylist(testAudioFile))
-            .called(1);
+        verify(mockPlaylistService.addToPlaylist(testAudioFile)).called(1);
         expect(find.byType(SnackBar), findsOneWidget);
       });
 

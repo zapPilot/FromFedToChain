@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
@@ -19,6 +20,7 @@ import 'package:from_fed_to_chain_app/features/audio/services/player_state_notif
 @GenerateNiceMocks([
   MockSpec<BackgroundAudioHandler>(),
   MockSpec<ContentService>(),
+  MockSpec<PlaylistService>(),
   MockSpec<AudioPlayer>()
 ])
 import 'audio_service_error_handling_test.mocks.dart';
@@ -71,12 +73,14 @@ void main() {
     late AudioPlayerService audioService;
     late MockBackgroundAudioHandler mockAudioHandler;
     late MockContentService mockContentService;
+    late MockPlaylistService mockPlaylistService;
     late MockAudioPlayer mockAudioPlayer;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioHandler = MockBackgroundAudioHandler();
       mockContentService = MockContentService();
+      mockPlaylistService = MockPlaylistService();
       mockAudioPlayer = MockAudioPlayer();
 
       when(mockContentService.addToListenHistory(any)).thenAnswer((_) async {});
@@ -133,8 +137,8 @@ void main() {
     group('Fallback to Local Player (No Audio Handler)', () {
       setUp(() {
         // Test with null audio handler to trigger local player fallback
-        audioService =
-            AudioPlayerService(null, mockContentService, mockAudioPlayer);
+        audioService = AudioPlayerService(
+            null, mockContentService, mockPlaylistService, mockAudioPlayer);
       });
 
       test('should initialize local audio player when no background handler',
@@ -207,7 +211,8 @@ void main() {
           onPrevious: anyNamed('onPrevious'),
         )).thenReturn(null);
 
-        audioService = AudioPlayerService(mockAudioHandler, mockContentService);
+        audioService = AudioPlayerService(
+            mockAudioHandler, mockContentService, mockPlaylistService);
       });
 
       tearDown(() {
@@ -367,7 +372,8 @@ void main() {
           onPrevious: anyNamed('onPrevious'),
         )).thenReturn(null);
 
-        audioService = AudioPlayerService(mockAudioHandler, mockContentService);
+        audioService = AudioPlayerService(
+            mockAudioHandler, mockContentService, mockPlaylistService);
       });
 
       test('should handle next episode navigation callback', () async {
@@ -401,7 +407,7 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         // Mock ContentService to throw exception
-        when(mockContentService.getNextEpisode(testAudioFile))
+        when(mockPlaylistService.getNextEpisode(testAudioFile))
             .thenThrow(Exception('Failed to get next episode'));
 
         await audioService.skipToNextEpisode();
@@ -416,7 +422,7 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         // Mock ContentService to throw exception
-        when(mockContentService.getPreviousEpisode(testAudioFile))
+        when(mockPlaylistService.getPreviousEpisode(testAudioFile))
             .thenThrow(Exception('Failed to get previous episode'));
 
         await audioService.skipToPreviousEpisode();
@@ -430,7 +436,8 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         // Mock ContentService to return null (no next episode)
-        when(mockContentService.getNextEpisode(testAudioFile)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testAudioFile))
+            .thenReturn(null);
 
         await audioService.skipToNextEpisode();
 
@@ -443,7 +450,7 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         // Mock ContentService to return null (no previous episode)
-        when(mockContentService.getPreviousEpisode(testAudioFile))
+        when(mockPlaylistService.getPreviousEpisode(testAudioFile))
             .thenReturn(null);
 
         await audioService.skipToPreviousEpisode();
@@ -455,7 +462,7 @@ void main() {
       test('should handle skip to next when no content service', () async {
         // Create AudioPlayerService without content service
         final audioServiceNoContent =
-            AudioPlayerService(mockAudioHandler, null);
+            AudioPlayerService(mockAudioHandler, null, mockPlaylistService);
 
         await audioServiceNoContent.skipToNextEpisode();
 
@@ -466,7 +473,7 @@ void main() {
       test('should handle skip to previous when no content service', () async {
         // Create AudioPlayerService without content service
         final audioServiceNoContent =
-            AudioPlayerService(mockAudioHandler, null);
+            AudioPlayerService(mockAudioHandler, null, mockPlaylistService);
 
         await audioServiceNoContent.skipToPreviousEpisode();
 
@@ -500,7 +507,8 @@ void main() {
           onPrevious: anyNamed('onPrevious'),
         )).thenReturn(null);
 
-        audioService = AudioPlayerService(mockAudioHandler, mockContentService);
+        audioService = AudioPlayerService(
+            mockAudioHandler, mockContentService, mockPlaylistService);
       });
 
       test('should handle repeat mode with error during repeat', () async {
@@ -527,7 +535,7 @@ void main() {
           () async {
         // Create service without content service but with autoplay enabled
         final audioServiceNoContent =
-            AudioPlayerService(mockAudioHandler, null);
+            AudioPlayerService(mockAudioHandler, null, mockPlaylistService);
 
         expect(audioServiceNoContent.autoplayEnabled, true);
         // Should handle gracefully when trying to autoplay without content service
@@ -551,7 +559,7 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         // Mock ContentService to throw exception during autoplay
-        when(mockContentService.getNextEpisode(testAudioFile))
+        when(mockPlaylistService.getNextEpisode(testAudioFile))
             .thenThrow(Exception('Autoplay failed to get next'));
 
         // This would trigger autoplay error path (lines 442-449)
@@ -566,7 +574,8 @@ void main() {
         await audioService.playAudio(testAudioFile);
 
         // Mock ContentService to return null (no next episode)
-        when(mockContentService.getNextEpisode(testAudioFile)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testAudioFile))
+            .thenReturn(null);
 
         expect(audioService.autoplayEnabled, true);
         expect(audioService.currentAudioFile, testAudioFile);
@@ -610,7 +619,8 @@ void main() {
           onPrevious: anyNamed('onPrevious'),
         )).thenReturn(null);
 
-        audioService = AudioPlayerService(mockAudioHandler, mockContentService);
+        audioService = AudioPlayerService(
+            mockAudioHandler, mockContentService, mockPlaylistService);
       });
 
       test('should handle setPlaybackSpeed error gracefully', () async {
@@ -685,7 +695,8 @@ void main() {
           onPrevious: anyNamed('onPrevious'),
         )).thenReturn(null);
 
-        audioService = AudioPlayerService(mockAudioHandler, mockContentService);
+        audioService = AudioPlayerService(
+            mockAudioHandler, mockContentService, mockPlaylistService);
       });
 
       test('should call skipToNext alias method', () async {

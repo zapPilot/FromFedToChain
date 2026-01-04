@@ -123,30 +123,6 @@ void main() {
       });
     });
 
-    group('Playlist Management', () {
-      test('should create playlist from episodes', () {
-        final episodes = [
-          TestDataFactory.createMockAudioFile(id: 'episode-1'),
-          TestDataFactory.createMockAudioFile(id: 'episode-2'),
-        ];
-
-        contentService.createPlaylist('Test Playlist', episodes);
-
-        expect(contentService.currentPlaylist, isNotNull);
-        expect(contentService.currentPlaylist!.name, equals('Test Playlist'));
-        expect(contentService.currentPlaylist!.episodes, equals(episodes));
-      });
-
-      test('should clear current playlist', () {
-        final episodes = [TestDataFactory.createMockAudioFile()];
-        contentService.createPlaylist('Test Playlist', episodes);
-
-        contentService.clearCurrentPlaylist();
-
-        expect(contentService.currentPlaylist, isNull);
-      });
-    });
-
     group('Basic State Management', () {
       test('should handle search query updates', () async {
         const query = 'bitcoin';

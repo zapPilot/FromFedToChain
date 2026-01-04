@@ -14,7 +14,6 @@ import 'package:from_fed_to_chain_app/features/content/data/streaming_api_servic
 import 'package:from_fed_to_chain_app/features/content/data/user_preferences_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/features/content/models/playlist.dart';
 
 /// Primary content domain service for episodes, filters, and playlists.
 ///
@@ -30,7 +29,7 @@ class ContentService extends ChangeNotifier {
   // State
   List<AudioFile> _allEpisodes = [];
   List<AudioFile> _filteredEpisodes = [];
-  Playlist? _currentPlaylist;
+
   bool _isLoading = false;
   String? _errorMessage;
   bool _disposed = false;
@@ -61,7 +60,7 @@ class ContentService extends ChangeNotifier {
   // Getters
   List<AudioFile> get allEpisodes => _allEpisodes;
   List<AudioFile> get filteredEpisodes => _filteredEpisodes;
-  Playlist? get currentPlaylist => _currentPlaylist;
+
   String get selectedLanguage => _preferencesRepository.selectedLanguage;
   String get selectedCategory => _preferencesRepository.selectedCategory;
   String get searchQuery => _preferencesRepository.searchQuery;
@@ -254,39 +253,6 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Playlist methods
-  void createPlaylistFromFiltered(String? name) {
-    final playlistName = name ?? 'Filtered Episodes';
-    _currentPlaylist = Playlist.fromEpisodes(playlistName, filteredEpisodes);
-    notifyListeners();
-  }
-
-  void createPlaylist(String name, List<AudioFile> episodes) {
-    _currentPlaylist = Playlist.fromEpisodes(name, episodes);
-    notifyListeners();
-  }
-
-  void addToCurrentPlaylist(AudioFile episode) {
-    if (_currentPlaylist == null) {
-      createPlaylist('My Playlist', [episode]);
-    } else {
-      _currentPlaylist = _currentPlaylist!.addEpisode(episode);
-      notifyListeners();
-    }
-  }
-
-  void removeFromCurrentPlaylist(AudioFile episode) {
-    if (_currentPlaylist != null) {
-      _currentPlaylist = _currentPlaylist!.removeEpisode(episode);
-      notifyListeners();
-    }
-  }
-
-  void clearCurrentPlaylist() {
-    _currentPlaylist = null;
-    notifyListeners();
-  }
-
   // Data access methods
   List<AudioFile> getEpisodesByLanguage(String language) {
     return _filterByLanguage(_allEpisodes, language);
@@ -313,7 +279,6 @@ class ContentService extends ChangeNotifier {
       'selectedLanguage': selectedLanguage,
       'selectedCategory': selectedCategory,
       'searchQuery': searchQuery,
-      'currentPlaylist': _currentPlaylist?.toJson(),
       'listeningStats': _progressRepository.getListeningStatistics(allEpisodes),
       'cacheStats': _contentRepository.getCacheStatistics(),
     };
@@ -327,7 +292,7 @@ class ContentService extends ChangeNotifier {
     _allEpisodes.clear();
     _filteredEpisodes.clear();
     _searchCache.clear();
-    _currentPlaylist = null;
+
     _contentRepository.clearContentCache();
     _clearError();
     notifyListeners();
@@ -357,7 +322,6 @@ class ContentService extends ChangeNotifier {
       'content_service': 'ContentService',
       'episode_count': allEpisodes.length,
       'filtered_count': filteredEpisodes.length,
-      'current_playlist': _currentPlaylist?.name,
       'search_query': searchQuery,
       'error_message': errorMessage,
       'audio_file': audioFile.toJson(),
@@ -378,24 +342,6 @@ class ContentService extends ChangeNotifier {
   }
 
   List<AudioFile> getFilteredEpisodes() => filteredEpisodes;
-
-  AudioFile? getNextEpisode(AudioFile currentEpisode) {
-    final currentIndex =
-        filteredEpisodes.indexWhere((e) => e.id == currentEpisode.id);
-    if (currentIndex >= 0 && currentIndex < filteredEpisodes.length - 1) {
-      return filteredEpisodes[currentIndex + 1];
-    }
-    return null;
-  }
-
-  AudioFile? getPreviousEpisode(AudioFile currentEpisode) {
-    final currentIndex =
-        filteredEpisodes.indexWhere((e) => e.id == currentEpisode.id);
-    if (currentIndex > 0) {
-      return filteredEpisodes[currentIndex - 1];
-    }
-    return null;
-  }
 
   // Private helper methods
   void _setLoading(bool loading) {

@@ -113,35 +113,6 @@ ENVIRONMENT=test
       expect(contentService.selectedCategory, 'all');
     });
 
-    test('creates playlists from episodes', () {
-      final testEpisodes = [
-        AudioFile(
-          id: 'episode-1',
-          title: 'Episode 1',
-          language: 'en-US',
-          category: 'daily-news',
-          streamingUrl: 'https://example.com/episode1.m3u8',
-          path: 'episode1.m3u8',
-          lastModified: DateTime.now(),
-        ),
-        AudioFile(
-          id: 'episode-2',
-          title: 'Episode 2',
-          language: 'en-US',
-          category: 'daily-news',
-          streamingUrl: 'https://example.com/episode2.m3u8',
-          path: 'episode2.m3u8',
-          lastModified: DateTime.now(),
-        ),
-      ];
-
-      contentService.createPlaylist('Test Playlist', testEpisodes);
-
-      expect(contentService.currentPlaylist, isNotNull);
-      expect(contentService.currentPlaylist!.name, 'Test Playlist');
-      expect(contentService.currentPlaylist!.episodes.length, 2);
-    });
-
     test('handles sort order changes', () {
       // Test sort order without triggering side effects
       expect(contentService.sortOrder, 'newest'); // Default value

@@ -871,52 +871,6 @@ STREAM_TIMEOUT_SECONDS=10
       });
     });
 
-    group('Playlist Management', () {
-      setUp(() {
-        contentService.setEpisodesForTesting(sampleEpisodes);
-      });
-
-      test('creates playlist with episodes', () {
-        contentService.createPlaylist('Test Playlist', [sampleEpisodes.first]);
-        expect(contentService.currentPlaylist?.name, 'Test Playlist');
-      });
-    });
-
-    group('Episode Navigation', () {
-      test('gets next episode', () {
-        contentService.setEpisodesForTesting([
-          AudioFile(
-            id: 'episode-1',
-            title: 'Episode 1',
-            language: 'zh-TW',
-            category: 'daily-news',
-            streamingUrl: 'https://test.com/episode1.m3u8',
-            path: 'audio/zh-TW/daily-news/episode1.m3u8',
-            lastModified: DateTime(2025, 1, 15),
-          ),
-          AudioFile(
-            id: 'episode-2',
-            title: 'Episode 2',
-            language: 'zh-TW',
-            category: 'macro',
-            streamingUrl: 'https://test.com/episode2.m3u8',
-            path: 'audio/zh-TW/macro/episode2.m3u8',
-            lastModified: DateTime(2025, 1, 14),
-          ),
-        ]);
-
-        // Ensure proper language and category filters
-        contentService.setSelectedLanguage('zh-TW');
-        contentService.setSelectedCategory('all');
-
-        expect(contentService.filteredEpisodes,
-            hasLength(greaterThanOrEqualTo(2)));
-        final currentEpisode = contentService.filteredEpisodes[0];
-        final nextEpisode = contentService.getNextEpisode(currentEpisode);
-        expect(nextEpisode?.id, contentService.filteredEpisodes[1].id);
-      });
-    });
-
     group('Additional Coverage Tests', () {
       test('hasEpisodes returns correct boolean', () {
         expect(contentService.hasEpisodes, false);
@@ -969,18 +923,15 @@ STREAM_TIMEOUT_SECONDS=10
 
       test('clear removes all content and resets state', () {
         contentService.setEpisodesForTesting(sampleEpisodes);
-        contentService.createPlaylist('Test Playlist', sampleEpisodes);
         contentService.setErrorForTesting('Test error');
 
         expect(contentService.allEpisodes.length, 3);
-        expect(contentService.currentPlaylist, isNotNull);
         expect(contentService.hasError, true);
 
         contentService.clear();
 
         expect(contentService.allEpisodes.length, 0);
         expect(contentService.filteredEpisodes.length, 0);
-        expect(contentService.currentPlaylist, isNull);
         expect(contentService.hasError, false);
       });
     });

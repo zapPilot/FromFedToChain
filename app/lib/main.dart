@@ -11,6 +11,7 @@ import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
 import 'package:from_fed_to_chain_app/features/app/screens/main_navigation_screen.dart';
 import 'package:from_fed_to_chain_app/features/app/screens/splash_screen.dart';
@@ -118,16 +119,23 @@ class FromFedToChainApp extends StatelessWidget {
           create: (_) => AuthService()..initialize(),
         ),
 
-        // Content service (manages episodes and playlists) - using new modular architecture
+        // Content service (manages episodes and filters)
         ChangeNotifierProvider(
           create: (_) => ContentService(),
+        ),
+
+        // Playlist service (manages active queue)
+        ChangeNotifierProvider(
+          create: (_) => PlaylistService(),
         ),
 
         // Audio service (manages playbook)
         ChangeNotifierProvider(
           create: (context) {
             final contentService = context.read<ContentService>();
-            return AudioPlayerService(audioHandler, contentService);
+            final playlistService = context.read<PlaylistService>();
+            return AudioPlayerService(
+                audioHandler, contentService, playlistService);
           },
         ),
       ],

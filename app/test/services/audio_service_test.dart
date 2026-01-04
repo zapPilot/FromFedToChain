@@ -10,12 +10,16 @@ import 'package:rxdart/rxdart.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 // Generate nice mocks for dependencies (returns sensible defaults instead of throwing errors)
-@GenerateNiceMocks(
-    [MockSpec<BackgroundAudioHandler>(), MockSpec<ContentService>()])
+@GenerateNiceMocks([
+  MockSpec<BackgroundAudioHandler>(),
+  MockSpec<ContentService>(),
+  MockSpec<PlaylistService>()
+])
 import 'audio_service_test.mocks.dart';
 
 // Serial execution avoids shared BackgroundAudioHandler mocks colliding across isolates.
@@ -26,11 +30,13 @@ void main() {
     late AudioPlayerService audioService;
     late MockBackgroundAudioHandler mockAudioHandler;
     late MockContentService mockContentService;
+    late MockPlaylistService mockPlaylistService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockAudioHandler = MockBackgroundAudioHandler();
       mockContentService = MockContentService();
+      mockPlaylistService = MockPlaylistService();
 
       // Simple stream setup
       final playbackStateStream =
@@ -88,7 +94,8 @@ void main() {
           .thenAnswer((_) async {});
       when(mockContentService.getEpisodeCompletion(any)).thenReturn(0.0);
 
-      audioService = AudioPlayerService(mockAudioHandler, mockContentService);
+      audioService = AudioPlayerService(
+          mockAudioHandler, mockContentService, mockPlaylistService);
     });
 
     tearDown(() {
@@ -182,7 +189,7 @@ void main() {
 
     group('Navigation - Basic Tests', () {
       test('should attempt to skip to next episode', () async {
-        when(mockContentService.getNextEpisode(any)).thenReturn(testAudioFile);
+        when(mockPlaylistService.getNextEpisode(any)).thenReturn(testAudioFile);
         when(mockAudioHandler.setEpisodeNavigationCallbacks(
                 onNext: anyNamed('onNext'), onPrevious: anyNamed('onPrevious')))
             .thenReturn(null);
@@ -191,27 +198,27 @@ void main() {
         await audioService.skipToNext();
 
         // Verify that we attempted to get next episode
-        verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
+        verify(mockPlaylistService.getNextEpisode(testAudioFile)).called(1);
       });
 
       test('should attempt to skip to previous episode', () async {
-        when(mockContentService.getPreviousEpisode(any))
+        when(mockPlaylistService.getPreviousEpisode(any))
             .thenReturn(testAudioFile);
 
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         await audioService.skipToPrevious();
 
         // Verify that we attempted to get previous episode
-        verify(mockContentService.getPreviousEpisode(testAudioFile)).called(1);
+        verify(mockPlaylistService.getPreviousEpisode(testAudioFile)).called(1);
       });
 
       test('should handle no next episode available', () async {
-        when(mockContentService.getNextEpisode(any)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(any)).thenReturn(null);
 
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         await audioService.skipToNext();
 
-        verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
+        verify(mockPlaylistService.getNextEpisode(testAudioFile)).called(1);
         // Should not crash when no next episode available
       });
     });
@@ -405,14 +412,14 @@ void main() {
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         expect(audioService.autoplayEnabled, isTrue);
 
-        when(mockContentService.getNextEpisode(testAudioFile))
+        when(mockPlaylistService.getNextEpisode(testAudioFile))
             .thenReturn(nextEpisode);
 
         // Simulate completion and autoplay
         audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
         await audioService.skipToNext();
 
-        verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
+        verify(mockPlaylistService.getNextEpisode(testAudioFile)).called(1);
       });
 
       test('should handle completion with no next episode and autoplay enabled',
@@ -420,13 +427,14 @@ void main() {
         audioService.setCurrentAudioFileForTesting(testAudioFile);
         expect(audioService.autoplayEnabled, isTrue);
 
-        when(mockContentService.getNextEpisode(testAudioFile)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testAudioFile))
+            .thenReturn(null);
 
         // Simulate completion with no next episode
         audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
         await audioService.skipToNext();
 
-        verify(mockContentService.getNextEpisode(testAudioFile)).called(1);
+        verify(mockPlaylistService.getNextEpisode(testAudioFile)).called(1);
         // Should not crash when no next episode available
       });
 
@@ -439,7 +447,7 @@ void main() {
         audioService.setPlaybackStateForTesting(AppPlaybackState.stopped);
 
         // With autoplay disabled, should not automatically play next
-        verifyNever(mockContentService.getNextEpisode(any));
+        verifyNever(mockPlaylistService.getNextEpisode(any));
       });
     });
 

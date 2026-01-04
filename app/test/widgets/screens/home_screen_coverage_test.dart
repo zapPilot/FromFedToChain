@@ -8,19 +8,22 @@ import 'package:from_fed_to_chain_app/features/content/services/content_service.
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 
-@GenerateMocks([ContentService, AudioPlayerService])
+@GenerateMocks([ContentService, AudioPlayerService, PlaylistService])
 import 'home_screen_coverage_test.mocks.dart';
 
 void main() {
   group('HomeScreen Coverage Tests', () {
     late MockContentService mockContentService;
     late MockAudioPlayerService mockAudioService;
+    late MockPlaylistService mockPlaylistService;
     late AudioFile testAudioFile;
 
     setUp(() {
       mockContentService = MockContentService();
       mockAudioService = MockAudioPlayerService();
+      mockPlaylistService = MockPlaylistService();
 
       testAudioFile = AudioFile(
         id: 'test-1',
@@ -48,7 +51,6 @@ void main() {
       when(mockContentService.getStatistics())
           .thenReturn({'totalEpisodes': 1, 'filteredEpisodes': 1});
       when(mockContentService.getUnfinishedEpisodes()).thenReturn([]);
-      when(mockContentService.currentPlaylist).thenReturn(null);
 
       when(mockAudioService.currentAudioFile).thenReturn(null);
       when(mockAudioService.playbackState).thenReturn(AppPlaybackState.stopped);
@@ -65,6 +67,8 @@ void main() {
               value: mockContentService),
           ChangeNotifierProvider<AudioPlayerService>.value(
               value: mockAudioService),
+          ChangeNotifierProvider<PlaylistService>.value(
+              value: mockPlaylistService),
         ],
         child: const MaterialApp(
           home: HomeScreen(),

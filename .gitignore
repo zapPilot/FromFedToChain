@@ -200,3 +200,4 @@ app.*.map.json
 
 # app
 app/.env
+*.txt

@@ -110,26 +110,6 @@ void main() {
       expect(results.first.id, testAudioFile2.id);
     });
 
-    test('navigation finds next/previous episodes', () {
-      when(mockPreferencesRepository.selectedLanguage).thenReturn('all');
-      contentService.setEpisodesForTesting([testAudioFile, testAudioFile2]);
-
-      // filteredEpisodes should contain both
-      expect(contentService.filteredEpisodes.length, 2);
-
-      // Default sort is Newest -> Oldest
-      // List order: [testAudioFile2 (Jan 2), testAudioFile (Jan 1)]
-
-      final next = contentService.getNextEpisode(testAudioFile2);
-      expect(next, testAudioFile);
-
-      final prev = contentService.getPreviousEpisode(testAudioFile);
-      expect(prev, testAudioFile2);
-
-      expect(contentService.getNextEpisode(testAudioFile), isNull);
-      expect(contentService.getPreviousEpisode(testAudioFile2), isNull);
-    });
-
     test('loadAllEpisodes handles errors', () async {
       when(mockEpisodeRepository.loadAllEpisodes())
           .thenThrow(Exception('Network Error'));

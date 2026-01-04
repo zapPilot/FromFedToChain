@@ -5,14 +5,14 @@ import 'package:mockito/annotations.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/playback_navigation_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_progress_tracker.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_controller.dart';
-import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 
-@GenerateMocks([ContentService, PlayerController, AudioProgressTracker])
+@GenerateMocks([PlaylistService, PlayerController, AudioProgressTracker])
 import 'playback_navigation_service_test.mocks.dart';
 
 void main() {
-  late MockContentService mockContentService;
+  late MockPlaylistService mockPlaylistService;
   late MockPlayerController mockPlayerController;
   late MockAudioProgressTracker mockProgressTracker;
   late PlaybackNavigationService service;
@@ -21,11 +21,11 @@ void main() {
   late AudioFile prevEpisode;
 
   setUp(() {
-    mockContentService = MockContentService();
+    mockPlaylistService = MockPlaylistService();
     mockPlayerController = MockPlayerController();
     mockProgressTracker = MockAudioProgressTracker();
     service = PlaybackNavigationService(
-      mockContentService,
+      mockPlaylistService,
       mockPlayerController,
       mockProgressTracker,
     );
@@ -134,7 +134,7 @@ void main() {
 
     group('skipToNext', () {
       test('should skip to next episode when available', () async {
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(Duration.zero);
@@ -150,7 +150,7 @@ void main() {
       });
 
       test('should skip to next with resume position', () async {
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(const Duration(minutes: 5));
@@ -168,7 +168,7 @@ void main() {
       });
 
       test('should return null when no next episode available', () async {
-        when(mockContentService.getNextEpisode(testEpisode)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testEpisode)).thenReturn(null);
 
         final result = await service.skipToNext(testEpisode);
 
@@ -179,7 +179,7 @@ void main() {
 
       test('should return null and not crash when player controller throws',
           () async {
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(Duration.zero);
@@ -195,7 +195,7 @@ void main() {
 
     group('skipToPrevious', () {
       test('should skip to previous episode when available', () async {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(prevEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(Duration.zero);
@@ -211,7 +211,7 @@ void main() {
       });
 
       test('should return null when no previous episode available', () async {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(null);
 
         final result = await service.skipToPrevious(testEpisode);
@@ -223,7 +223,7 @@ void main() {
 
       test('should return null and not crash when player controller throws',
           () async {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(prevEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(Duration.zero);
@@ -264,7 +264,7 @@ void main() {
 
       test('should autoplay next episode when autoplay is enabled', () async {
         service.setAutoplayEnabled(true);
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(Duration.zero);
@@ -282,7 +282,7 @@ void main() {
       test('should return null when no next episode available for autoplay',
           () async {
         service.setAutoplayEnabled(true);
-        when(mockContentService.getNextEpisode(testEpisode)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testEpisode)).thenReturn(null);
 
         final result = await service.handleEpisodeCompletion(testEpisode);
 
@@ -302,7 +302,7 @@ void main() {
         verify(mockPlayerController.play(testEpisode,
                 initialPosition: Duration.zero))
             .called(1);
-        verifyNever(mockContentService.getNextEpisode(any));
+        verifyNever(mockPlaylistService.getNextEpisode(any));
       });
 
       test('should return null when repeat fails', () async {
@@ -318,7 +318,7 @@ void main() {
 
       test('should return null when autoplay fails', () async {
         service.setAutoplayEnabled(true);
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
         when(mockProgressTracker.calculateResumePosition(any, any))
             .thenReturn(Duration.zero);
@@ -334,14 +334,14 @@ void main() {
 
     group('hasNextEpisode', () {
       test('should return true when next episode exists', () {
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
 
         expect(service.hasNextEpisode(testEpisode), isTrue);
       });
 
       test('should return false when no next episode', () {
-        when(mockContentService.getNextEpisode(testEpisode)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testEpisode)).thenReturn(null);
 
         expect(service.hasNextEpisode(testEpisode), isFalse);
       });
@@ -349,14 +349,14 @@ void main() {
 
     group('hasPreviousEpisode', () {
       test('should return true when previous episode exists', () {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(prevEpisode);
 
         expect(service.hasPreviousEpisode(testEpisode), isTrue);
       });
 
       test('should return false when no previous episode', () {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(null);
 
         expect(service.hasPreviousEpisode(testEpisode), isFalse);
@@ -365,14 +365,14 @@ void main() {
 
     group('getNextEpisode', () {
       test('should return next episode when available', () {
-        when(mockContentService.getNextEpisode(testEpisode))
+        when(mockPlaylistService.getNextEpisode(testEpisode))
             .thenReturn(nextEpisode);
 
         expect(service.getNextEpisode(testEpisode), equals(nextEpisode));
       });
 
       test('should return null when no next episode', () {
-        when(mockContentService.getNextEpisode(testEpisode)).thenReturn(null);
+        when(mockPlaylistService.getNextEpisode(testEpisode)).thenReturn(null);
 
         expect(service.getNextEpisode(testEpisode), isNull);
       });
@@ -380,14 +380,14 @@ void main() {
 
     group('getPreviousEpisode', () {
       test('should return previous episode when available', () {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(prevEpisode);
 
         expect(service.getPreviousEpisode(testEpisode), equals(prevEpisode));
       });
 
       test('should return null when no previous episode', () {
-        when(mockContentService.getPreviousEpisode(testEpisode))
+        when(mockPlaylistService.getPreviousEpisode(testEpisode))
             .thenReturn(null);
 
         expect(service.getPreviousEpisode(testEpisode), isNull);

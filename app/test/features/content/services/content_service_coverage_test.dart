@@ -126,35 +126,6 @@ void main() {
       expect(info['error'], 'No audio file provided');
     });
 
-    test('Playlist Management - create, remove, clear', () {
-      // Create
-      contentService.createPlaylist('Test Playlist', [testAudioFile]);
-      expect(contentService.currentPlaylist, isNotNull);
-      expect(contentService.currentPlaylist!.name, 'Test Playlist');
-      expect(contentService.currentPlaylist!.episodes.length, 1);
-
-      // Create from filtered (null name default)
-      contentService.setEpisodesForTesting([testAudioFile]);
-      contentService.createPlaylistFromFiltered(null);
-      expect(contentService.currentPlaylist!.name, 'Filtered Episodes');
-
-      // Remove
-      contentService.removeFromCurrentPlaylist(testAudioFile);
-      expect(contentService.currentPlaylist!.episodes, isEmpty);
-
-      // Clear
-      contentService.addToCurrentPlaylist(testAudioFile);
-      expect(contentService.currentPlaylist, isNotNull);
-      contentService.clearCurrentPlaylist();
-      expect(contentService.currentPlaylist, isNull);
-    });
-
-    test('Playlist Management - safe remove when null', () {
-      // Ensure no crash if playlist is null
-      contentService.removeFromCurrentPlaylist(testAudioFile);
-      expect(contentService.currentPlaylist, isNull);
-    });
-
     test('Listen History Wrappers', () async {
       await contentService.removeFromListenHistory('episode-id');
       verify(mockProgressRepository.removeFromListenHistory('episode-id'))

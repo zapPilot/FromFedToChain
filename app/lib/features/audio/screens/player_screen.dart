@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
 
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
@@ -174,7 +175,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           onAddToPlaylist: () {
             final currentAudio = audioService.currentAudioFile;
             if (currentAudio != null) {
-              context.read<ContentService>().addToCurrentPlaylist(currentAudio);
+              context.read<PlaylistService>().addToPlaylist(currentAudio);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content:
@@ -264,9 +265,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                 onAddToPlaylist: () {
                   final currentAudio = audioService.currentAudioFile;
                   if (currentAudio != null) {
-                    context
-                        .read<ContentService>()
-                        .addToCurrentPlaylist(currentAudio);
+                    context.read<PlaylistService>().addToPlaylist(currentAudio);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

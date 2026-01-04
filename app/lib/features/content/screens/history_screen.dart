@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 
@@ -343,7 +344,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             title: const Text('Add to Playlist'),
             onTap: () {
               Navigator.pop(context);
-              context.read<ContentService>().addToCurrentPlaylist(episode);
+              context.read<PlaylistService>().addToPlaylist(episode);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added "${episode.displayTitle}" to playlist'),

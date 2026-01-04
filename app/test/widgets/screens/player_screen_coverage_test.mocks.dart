@@ -832,58 +832,6 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
       );
 
   @override
-  void createPlaylistFromFiltered(String? name) => super.noSuchMethod(
-        Invocation.method(
-          #createPlaylistFromFiltered,
-          [name],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void createPlaylist(
-    String? name,
-    List<_i6.AudioFile>? episodes,
-  ) =>
-      super.noSuchMethod(
-        Invocation.method(
-          #createPlaylist,
-          [
-            name,
-            episodes,
-          ],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void addToCurrentPlaylist(_i6.AudioFile? episode) => super.noSuchMethod(
-        Invocation.method(
-          #addToCurrentPlaylist,
-          [episode],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void removeFromCurrentPlaylist(_i6.AudioFile? episode) => super.noSuchMethod(
-        Invocation.method(
-          #removeFromCurrentPlaylist,
-          [episode],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void clearCurrentPlaylist() => super.noSuchMethod(
-        Invocation.method(
-          #clearCurrentPlaylist,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
   List<_i6.AudioFile> getEpisodesByLanguage(String? language) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1027,20 +975,6 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
         ),
         returnValue: <_i6.AudioFile>[],
       ) as List<_i6.AudioFile>);
-
-  @override
-  _i6.AudioFile? getNextEpisode(_i6.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(Invocation.method(
-        #getNextEpisode,
-        [currentEpisode],
-      )) as _i6.AudioFile?);
-
-  @override
-  _i6.AudioFile? getPreviousEpisode(_i6.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(Invocation.method(
-        #getPreviousEpisode,
-        [currentEpisode],
-      )) as _i6.AudioFile?);
 
   @override
   List<_i6.AudioFile> advancedSearch(

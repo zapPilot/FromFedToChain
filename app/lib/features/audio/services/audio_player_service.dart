@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_progress_tracker.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_player_adapter.dart';
@@ -27,8 +28,10 @@ class AudioPlayerService extends ChangeNotifier {
   late final PlaybackNavigationService _navigationService;
 
   // Dependencies
+  // Dependencies
   final BackgroundAudioHandler? _audioHandler;
   final ContentService? _contentService;
+  final PlaylistService? _playlistService;
   final AudioPlayer? _providedAudioPlayer;
 
   // Current state
@@ -38,7 +41,8 @@ class AudioPlayerService extends ChangeNotifier {
 
   AudioPlayerService(
     this._audioHandler,
-    this._contentService, [
+    this._contentService,
+    this._playlistService, [
     AudioPlayer? localAudioPlayer,
   ]) : _providedAudioPlayer = localAudioPlayer {
     if (kDebugMode) {
@@ -83,7 +87,7 @@ class AudioPlayerService extends ChangeNotifier {
 
     // Create navigation service
     _navigationService = PlaybackNavigationService(
-      _contentService,
+      _playlistService,
       _playerController,
       _progressTracker,
     );

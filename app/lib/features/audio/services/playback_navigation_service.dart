@@ -2,17 +2,17 @@ import 'package:flutter/foundation.dart';
 
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_progress_tracker.dart';
-import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_controller.dart';
 
 /// Handles episode navigation logic and autoplay/repeat functionality
 ///
 /// This service manages the business logic for moving between episodes,
 /// including autoplay when episodes complete and repeat functionality.
-/// It coordinates between the PlayerController and ContentService
+/// It coordinates between the PlayerController and PlaylistService
 /// to provide seamless episode navigation.
 class PlaybackNavigationService {
-  final ContentService? _contentService;
+  final PlaylistService? _playlistService;
   final PlayerController _playerController;
   final AudioProgressTracker _progressTracker;
 
@@ -21,7 +21,7 @@ class PlaybackNavigationService {
   bool _repeatEnabled = false;
 
   PlaybackNavigationService(
-    this._contentService,
+    this._playlistService,
     this._playerController,
     this._progressTracker,
   );
@@ -64,16 +64,16 @@ class PlaybackNavigationService {
 
   /// Skip to the next episode and return the episode that started playing
   Future<AudioFile?> skipToNext(AudioFile currentEpisode) async {
-    if (_contentService == null) {
+    if (_playlistService == null) {
       if (kDebugMode) {
         print(
-            '❌ PlaybackNavigationService: Cannot skip to next - no content service');
+            '❌ PlaybackNavigationService: Cannot skip to next - no playlist service');
       }
       return null;
     }
 
     try {
-      final nextEpisode = _contentService!.getNextEpisode(currentEpisode);
+      final nextEpisode = _playlistService!.getNextEpisode(currentEpisode);
       if (nextEpisode != null) {
         if (kDebugMode) {
           print(
@@ -107,17 +107,17 @@ class PlaybackNavigationService {
 
   /// Skip to the previous episode and return the episode that started playing
   Future<AudioFile?> skipToPrevious(AudioFile currentEpisode) async {
-    if (_contentService == null) {
+    if (_playlistService == null) {
       if (kDebugMode) {
         print(
-            '❌ PlaybackNavigationService: Cannot skip to previous - no content service');
+            '❌ PlaybackNavigationService: Cannot skip to previous - no playlist service');
       }
       return null;
     }
 
     try {
       final previousEpisode =
-          _contentService!.getPreviousEpisode(currentEpisode);
+          _playlistService!.getPreviousEpisode(currentEpisode);
       if (previousEpisode != null) {
         if (kDebugMode) {
           print(
@@ -194,17 +194,17 @@ class PlaybackNavigationService {
     }
 
     // Check if content service is available for autoplay
-    if (_contentService == null) {
+    if (_playlistService == null) {
       if (kDebugMode) {
         print(
-            '❌ PlaybackNavigationService: ContentService not available for autoplay');
+            '❌ PlaybackNavigationService: PlaylistService not available for autoplay');
       }
       return null;
     }
 
     // Try to play the next episode
     try {
-      final nextEpisode = _contentService!.getNextEpisode(completedEpisode);
+      final nextEpisode = _playlistService!.getNextEpisode(completedEpisode);
       if (nextEpisode != null) {
         if (kDebugMode) {
           print(
@@ -246,26 +246,26 @@ class PlaybackNavigationService {
 
   /// Check if there is a next episode available
   bool hasNextEpisode(AudioFile currentEpisode) {
-    if (_contentService == null) return false;
-    return _contentService!.getNextEpisode(currentEpisode) != null;
+    if (_playlistService == null) return false;
+    return _playlistService!.getNextEpisode(currentEpisode) != null;
   }
 
   /// Check if there is a previous episode available
   bool hasPreviousEpisode(AudioFile currentEpisode) {
-    if (_contentService == null) return false;
-    return _contentService!.getPreviousEpisode(currentEpisode) != null;
+    if (_playlistService == null) return false;
+    return _playlistService!.getPreviousEpisode(currentEpisode) != null;
   }
 
   /// Get the next episode without playing it
   AudioFile? getNextEpisode(AudioFile currentEpisode) {
-    if (_contentService == null) return null;
-    return _contentService!.getNextEpisode(currentEpisode);
+    if (_playlistService == null) return null;
+    return _playlistService!.getNextEpisode(currentEpisode);
   }
 
   /// Get the previous episode without playing it
   AudioFile? getPreviousEpisode(AudioFile currentEpisode) {
-    if (_contentService == null) return null;
-    return _contentService!.getPreviousEpisode(currentEpisode);
+    if (_playlistService == null) return null;
+    return _playlistService!.getPreviousEpisode(currentEpisode);
   }
 
   /// Enable autoplay (alias for setAutoplayEnabled)

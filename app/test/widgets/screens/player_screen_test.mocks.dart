@@ -16,6 +16,8 @@ import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart'
     as _i6;
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart'
     as _i8;
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart'
+    as _i10;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
 
@@ -832,58 +834,6 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
       );
 
   @override
-  void createPlaylistFromFiltered(String? name) => super.noSuchMethod(
-        Invocation.method(
-          #createPlaylistFromFiltered,
-          [name],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void createPlaylist(
-    String? name,
-    List<_i6.AudioFile>? episodes,
-  ) =>
-      super.noSuchMethod(
-        Invocation.method(
-          #createPlaylist,
-          [
-            name,
-            episodes,
-          ],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void addToCurrentPlaylist(_i6.AudioFile? episode) => super.noSuchMethod(
-        Invocation.method(
-          #addToCurrentPlaylist,
-          [episode],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void removeFromCurrentPlaylist(_i6.AudioFile? episode) => super.noSuchMethod(
-        Invocation.method(
-          #removeFromCurrentPlaylist,
-          [episode],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void clearCurrentPlaylist() => super.noSuchMethod(
-        Invocation.method(
-          #clearCurrentPlaylist,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
   List<_i6.AudioFile> getEpisodesByLanguage(String? language) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1029,20 +979,6 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
       ) as List<_i6.AudioFile>);
 
   @override
-  _i6.AudioFile? getNextEpisode(_i6.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(Invocation.method(
-        #getNextEpisode,
-        [currentEpisode],
-      )) as _i6.AudioFile?);
-
-  @override
-  _i6.AudioFile? getPreviousEpisode(_i6.AudioFile? currentEpisode) =>
-      (super.noSuchMethod(Invocation.method(
-        #getPreviousEpisode,
-        [currentEpisode],
-      )) as _i6.AudioFile?);
-
-  @override
   List<_i6.AudioFile> advancedSearch(
     List<_i6.AudioFile>? episodes, {
     String? query,
@@ -1141,6 +1077,170 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
         Invocation.method(
           #removeListener,
           [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [PlaylistService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPlaylistService extends _i1.Mock implements _i10.PlaylistService {
+  MockPlaylistService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  List<_i6.AudioFile> get queue => (super.noSuchMethod(
+        Invocation.getter(#queue),
+        returnValue: <_i6.AudioFile>[],
+      ) as List<_i6.AudioFile>);
+
+  @override
+  bool get hasPlaylist => (super.noSuchMethod(
+        Invocation.getter(#hasPlaylist),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get hasQueue => (super.noSuchMethod(
+        Invocation.getter(#hasQueue),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get isShuffleEnabled => (super.noSuchMethod(
+        Invocation.getter(#isShuffleEnabled),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get hasListeners => (super.noSuchMethod(
+        Invocation.getter(#hasListeners),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  void setQueue(
+    List<_i6.AudioFile>? episodes, {
+    String? name,
+  }) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #setQueue,
+          [episodes],
+          {#name: name},
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void createPlaylist(
+    String? name,
+    List<_i6.AudioFile>? episodes,
+  ) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #createPlaylist,
+          [
+            name,
+            episodes,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void addToPlaylist(_i6.AudioFile? episode) => super.noSuchMethod(
+        Invocation.method(
+          #addToPlaylist,
+          [episode],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeFromPlaylist(_i6.AudioFile? episode) => super.noSuchMethod(
+        Invocation.method(
+          #removeFromPlaylist,
+          [episode],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void clearPlaylist() => super.noSuchMethod(
+        Invocation.method(
+          #clearPlaylist,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void toggleShuffle() => super.noSuchMethod(
+        Invocation.method(
+          #toggleShuffle,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i6.AudioFile? getNextEpisode(_i6.AudioFile? currentEpisode) =>
+      (super.noSuchMethod(Invocation.method(
+        #getNextEpisode,
+        [currentEpisode],
+      )) as _i6.AudioFile?);
+
+  @override
+  _i6.AudioFile? getPreviousEpisode(_i6.AudioFile? currentEpisode) =>
+      (super.noSuchMethod(Invocation.method(
+        #getPreviousEpisode,
+        [currentEpisode],
+      )) as _i6.AudioFile?);
+
+  @override
+  Map<String, dynamic> getDebugInfo() => (super.noSuchMethod(
+        Invocation.method(
+          #getDebugInfo,
+          [],
+        ),
+        returnValue: <String, dynamic>{},
+      ) as Map<String, dynamic>);
+
+  @override
+  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #addListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #removeListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
         ),
         returnValueForMissingStub: null,
       );
