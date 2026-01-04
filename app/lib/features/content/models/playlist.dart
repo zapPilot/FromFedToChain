@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/core/utils/duration_utils.dart';
 
 /// Represents a playlist of audio files with playback management
 class Playlist extends Equatable {
@@ -162,15 +163,7 @@ class Playlist extends Equatable {
 
   /// Get formatted total duration
   String get formattedTotalDuration {
-    final duration = totalDuration;
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-
-    if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else {
-      return '${minutes}m';
-    }
+    return DurationUtils.formatDurationText(totalDuration);
   }
 
   /// Get episode count

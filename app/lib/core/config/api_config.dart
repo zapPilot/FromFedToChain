@@ -110,6 +110,23 @@ class ApiConfig {
     'defi': 'DeFi',
   };
 
+  // Language flags
+  static const Map<String, String> languageFlags = {
+    'zh-TW': '🇹🇼',
+    'en-US': '🇺🇸',
+    'ja-JP': '🇯🇵',
+  };
+
+  // Category emojis
+  static const Map<String, String> categoryEmojis = {
+    'daily-news': '📰',
+    'ethereum': '⚡',
+    'macro': '📊',
+    'startup': '🚀',
+    'ai': '🤖',
+    'defi': '💎',
+  };
+
   // Helper methods for validation
   static bool isValidLanguage(String language) =>
       supportedLanguages.contains(language);
@@ -121,6 +138,12 @@ class ApiConfig {
 
   static String getCategoryDisplayName(String category) =>
       categoryNames[category] ?? category;
+
+  static String getLanguageFlag(String language) =>
+      languageFlags[language] ?? '🌐';
+
+  static String getCategoryEmoji(String category) =>
+      categoryEmojis[category] ?? '🎧';
 
   // Debug information
   static String get currentEnvironment => environment;

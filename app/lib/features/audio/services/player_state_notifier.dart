@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:from_fed_to_chain_app/core/utils/duration_utils.dart';
 
 /// Canonical playback states for the audio player
 enum AppPlaybackState {
@@ -48,12 +49,12 @@ class PlayerStateNotifier extends ChangeNotifier {
 
   /// Formatted current position for display (e.g., "1:23" or "1:23:45")
   String get formattedCurrentPosition {
-    return _formatDuration(_currentPosition);
+    return DurationUtils.formatDuration(_currentPosition);
   }
 
   /// Formatted total duration for display (e.g., "5:42" or "1:05:30")
   String get formattedTotalDuration {
-    return _formatDuration(_totalDuration);
+    return DurationUtils.formatDuration(_totalDuration);
   }
 
   // State update methods (called by PlayerController)
@@ -127,20 +128,6 @@ class PlayerStateNotifier extends ChangeNotifier {
     _playbackSpeed = 1.0;
     _errorMessage = null;
     notifyListeners();
-  }
-
-  /// Format duration for display
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-
-    if (hours > 0) {
-      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
-    } else {
-      return '$minutes:${twoDigits(seconds)}';
-    }
   }
 
   // Testing methods - only available in debug builds

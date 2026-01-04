@@ -6,10 +6,15 @@ import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/features/audio/widgets/audio_controls.dart';
-import 'package:from_fed_to_chain_app/features/audio/widgets/playback_speed_selector.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_artwork.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_header.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_track_info.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_progress_bar.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_main_controls.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_additional_controls.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_empty_state.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/content_display.dart';
 
 /// Full-screen audio player with enhanced controls
@@ -24,30 +29,11 @@ class PlayerScreen extends StatefulWidget {
 
 class _PlayerScreenState extends State<PlayerScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _albumArtAnimation;
-  bool _showSpeedSelector = false;
   bool _showContentScript = false;
 
   @override
   void initState() {
     super.initState();
-
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 20),
-      vsync: this,
-    );
-
-    _albumArtAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.linear,
-    ));
-
-    // Start rotation animation
-    _animationController.repeat();
 
     // Auto-load and play content if contentId is provided (for deep linking)
     if (widget.contentId != null) {
@@ -55,12 +41,6 @@ class _PlayerScreenState extends State<PlayerScreen>
         _loadAndPlayContent(widget.contentId!);
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 
   /// Load and automatically play content by ID (for deep linking)
@@ -120,7 +100,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           final currentAudio = audioService.currentAudioFile;
 
           if (currentAudio == null) {
-            return _buildNoAudioState(context);
+            return const PlayerEmptyState();
           }
 
           return SafeArea(
@@ -135,480 +115,29 @@ class _PlayerScreenState extends State<PlayerScreen>
     );
   }
 
-  /// Build header with navigation and options
-  Widget _buildHeader(BuildContext context, AudioFile currentAudio) {
-    return Padding(
-      padding: AppTheme.safeHorizontalPadding,
-      child: Row(
-        children: [
-          // Back button
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.keyboard_arrow_down),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
-              foregroundColor: AppTheme.onSurfaceColor,
-            ),
-          ),
-
-          // Track source info
-          Expanded(
-            child: Column(
-              children: [
-                Text(
-                  'NOW PLAYING',
-                  style: AppTheme.bodySmall.copyWith(
-                    color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacingXS),
-                Text(
-                  'From Fed to Chain',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.primaryColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // More options button
-          IconButton(
-            onPressed: () => _showPlayerOptions(context, currentAudio),
-            icon: const Icon(Icons.more_vert),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
-              foregroundColor: AppTheme.onSurfaceColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build album art section with animation
-  Widget _buildAlbumArtSection(
-      AudioFile currentAudio, AudioPlayerService audioService) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Make album art responsive to available space
-        final maxSize = constraints.maxHeight > 0
-            ? (constraints.maxHeight * 0.6).clamp(120.0,
-                280.0) // 60% of available height, clamped between 120-280px
-            : 200.0; // Fallback size
-        final iconSize = maxSize * 0.43; // Scale icon proportionally
-
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Animated album art
-              RotationTransition(
-                turns: audioService.isPlaying
-                    ? _albumArtAnimation
-                    : const AlwaysStoppedAnimation(0.0),
-                child: Container(
-                  width: maxSize,
-                  height: maxSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: AppTheme.primaryGradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                        blurRadius: maxSize * 0.1, // Scale shadow with size
-                        offset: Offset(
-                            0, maxSize * 0.035), // Scale offset with size
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    _getAudioIcon(currentAudio),
-                    size: iconSize,
-                    color: AppTheme.onPrimaryColor,
-                  ),
-                ),
-              ),
-
-              SizedBox(
-                  height: (maxSize * 0.06)
-                      .clamp(8.0, AppTheme.spacingL)), // Scale spacing
-
-              // Playback state indicator
-              _buildAppPlaybackStateIndicator(audioService),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  /// Build playback state indicator
-  Widget _buildAppPlaybackStateIndicator(AudioPlayerService audioService) {
-    String stateText;
-    Color stateColor;
-    IconData stateIcon;
-
-    switch (audioService.playbackState) {
-      case AppPlaybackState.playing:
-        stateText = 'Playing';
-        stateColor = AppTheme.playingColor;
-        stateIcon = Icons.play_arrow;
-        break;
-      case AppPlaybackState.paused:
-        stateText = 'Paused';
-        stateColor = AppTheme.pausedColor;
-        stateIcon = Icons.pause;
-        break;
-      case AppPlaybackState.loading:
-        stateText = 'Loading...';
-        stateColor = AppTheme.loadingColor;
-        stateIcon = Icons.hourglass_empty;
-        break;
-      case AppPlaybackState.error:
-        stateText = 'Error';
-        stateColor = AppTheme.errorStateColor;
-        stateIcon = Icons.error;
-        break;
-      default:
-        stateText = 'Stopped';
-        stateColor = AppTheme.onSurfaceColor.withValues(alpha: 0.6);
-        stateIcon = Icons.stop;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacingM,
-        vertical: AppTheme.spacingS,
-      ),
-      decoration: BoxDecoration(
-        color: stateColor.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(AppTheme.radiusL),
-        border: Border.all(
-          color: stateColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            stateIcon,
-            size: 16,
-            color: stateColor,
-          ),
-          const SizedBox(width: AppTheme.spacingS),
-          Text(
-            stateText,
-            style: AppTheme.bodySmall.copyWith(
-              color: stateColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build track information
-  Widget _buildTrackInfo(AudioFile currentAudio) {
-    return Padding(
-      padding: AppTheme.safeHorizontalPadding,
-      child: Column(
-        children: [
-          // Track title
-          Text(
-            currentAudio.displayTitle,
-            style: AppTheme.headlineMedium,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          const SizedBox(height: AppTheme.spacingS),
-
-          // Track details
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                currentAudio.categoryEmoji,
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(width: AppTheme.spacingS),
-              Text(
-                AppTheme.getCategoryDisplayName(currentAudio.category),
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.getCategoryColor(currentAudio.category),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: AppTheme.spacingM),
-              Text(
-                currentAudio.languageFlag,
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(width: AppTheme.spacingS),
-              Text(
-                AppTheme.getLanguageDisplayName(currentAudio.language),
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.getLanguageColor(currentAudio.language),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build progress section with seek bar
-  Widget _buildProgressSection(AudioPlayerService audioService) {
-    return Padding(
-      padding: AppTheme.safeHorizontalPadding,
-      child: Column(
-        children: [
-          // Progress slider
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 4.0,
-              thumbShape: const RoundSliderThumbShape(
-                enabledThumbRadius: 8.0,
-              ),
-              overlayShape: const RoundSliderOverlayShape(
-                overlayRadius: 16.0,
-              ),
-            ),
-            child: Slider(
-              value: audioService.progress,
-              onChanged: (value) {
-                final position = Duration(
-                  milliseconds:
-                      (value * audioService.totalDuration.inMilliseconds)
-                          .round(),
-                );
-                audioService.seekTo(position);
-              },
-              activeColor: AppTheme.primaryColor,
-              inactiveColor: AppTheme.cardColor,
-            ),
-          ),
-
-          // Time labels
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                audioService.formattedCurrentPosition,
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-                ),
-              ),
-              Text(
-                audioService.formattedTotalDuration,
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build main playback controls
-  Widget _buildMainControls(
-      AudioPlayerService audioService, ContentService contentService) {
-    return Padding(
-      padding: AppTheme.safeHorizontalPadding,
-      child: AudioControls(
-        isPlaying: audioService.isPlaying,
-        isLoading: audioService.isLoading,
-        hasError: audioService.hasError,
-        onPlayPause: () => audioService.togglePlayPause(),
-        onNext: () => audioService.skipToNextEpisode(),
-        onPrevious: () => audioService.skipToPreviousEpisode(),
-        onSkipForward: () => audioService.skipForward(),
-        onSkipBackward: () => audioService.skipBackward(),
-        size: AudioControlsSize.large,
-      ),
-    );
-  }
-
-  /// Build additional controls
-  Widget _buildAdditionalControls(
-      AudioPlayerService audioService, ContentService contentService) {
-    return Padding(
-      padding: AppTheme.safeHorizontalPadding,
-      child: Column(
-        children: [
-          // Speed selector (show when toggled)
-          if (_showSpeedSelector) ...[
-            PlaybackSpeedSelector(
-              currentSpeed: audioService.playbackSpeed,
-              onSpeedChanged: (speed) {
-                audioService.setPlaybackSpeed(speed);
-                setState(() {
-                  _showSpeedSelector = false;
-                });
-              },
-            ),
-            const SizedBox(height: AppTheme.spacingM),
-          ],
-
-          // Control buttons row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Content script toggle
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _showContentScript = !_showContentScript;
-                  });
-                },
-                icon: const Icon(Icons.article),
-                style: IconButton.styleFrom(
-                  backgroundColor: _showContentScript
-                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
-                      : AppTheme.cardColor.withValues(alpha: 0.5),
-                  foregroundColor: _showContentScript
-                      ? AppTheme.primaryColor
-                      : AppTheme.onSurfaceColor,
-                ),
-              ),
-
-              // Playback speed
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _showSpeedSelector = !_showSpeedSelector;
-                  });
-                },
-                icon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.speed),
-                    const SizedBox(width: AppTheme.spacingXS),
-                    Text(
-                      '${audioService.playbackSpeed}x',
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.onSurfaceColor,
-                      ),
-                    ),
-                  ],
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: _showSpeedSelector
-                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
-                      : AppTheme.cardColor.withValues(alpha: 0.5),
-                  foregroundColor: _showSpeedSelector
-                      ? AppTheme.primaryColor
-                      : AppTheme.onSurfaceColor,
-                ),
-              ),
-
-              // Repeat toggle
-              IconButton(
-                onPressed: () {
-                  audioService.setRepeatEnabled(!audioService.repeatEnabled);
-                },
-                icon: Icon(
-                  audioService.repeatEnabled ? Icons.repeat_one : Icons.repeat,
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: audioService.repeatEnabled
-                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
-                      : AppTheme.cardColor.withValues(alpha: 0.5),
-                  foregroundColor: audioService.repeatEnabled
-                      ? AppTheme.primaryColor
-                      : AppTheme.onSurfaceColor,
-                ),
-              ),
-
-              // Autoplay toggle
-              IconButton(
-                onPressed: () {
-                  audioService
-                      .setAutoplayEnabled(!audioService.autoplayEnabled);
-                },
-                icon: Icon(
-                  audioService.autoplayEnabled
-                      ? Icons.skip_next
-                      : Icons.playlist_play,
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: audioService.autoplayEnabled
-                      ? AppTheme.primaryColor.withValues(alpha: 0.2)
-                      : AppTheme.cardColor.withValues(alpha: 0.5),
-                  foregroundColor: audioService.autoplayEnabled
-                      ? AppTheme.primaryColor
-                      : AppTheme.onSurfaceColor,
-                ),
-              ),
-
-              // Share
-              IconButton(
-                onPressed: () =>
-                    _shareCurrentContent(context, audioService, contentService),
-                icon: const Icon(Icons.share),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
-                  foregroundColor: AppTheme.onSurfaceColor,
-                ),
-              ),
-
-              // Add to playlist
-              IconButton(
-                onPressed: () {
-                  final currentAudio = audioService.currentAudioFile;
-                  if (currentAudio != null) {
-                    context
-                        .read<ContentService>()
-                        .addToCurrentPlaylist(currentAudio);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Added "${currentAudio.displayTitle}" to playlist'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.playlist_add),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
-                  foregroundColor: AppTheme.onSurfaceColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   /// Build compact layout (without content script)
   Widget _buildCompactLayout(BuildContext context, AudioFile currentAudio,
       AudioPlayerService audioService, ContentService contentService) {
     return Column(
       children: [
         // Header with back button and options
-        _buildHeader(context, currentAudio),
+        PlayerHeader(
+          currentAudio: currentAudio,
+          onOptionsPressed: () => _showPlayerOptions(context, currentAudio),
+        ),
 
         // Album art and visualizer
         Expanded(
           flex: 3,
-          child: _buildAlbumArtSection(currentAudio, audioService),
+          child: PlayerArtwork(
+            audioFile: currentAudio,
+            isPlaying: audioService.isPlaying,
+            playbackState: audioService.playbackState,
+          ),
         ),
 
         // Track info
-        _buildTrackInfo(currentAudio),
+        PlayerTrackInfo(currentAudio: currentAudio),
 
         // Content script display (collapsed)
         ContentDisplay(
@@ -623,13 +152,39 @@ class _PlayerScreenState extends State<PlayerScreen>
         ),
 
         // Progress bar
-        _buildProgressSection(audioService),
+        PlayerProgressBar(
+          audioService: audioService,
+          onSeek: (position) => audioService.seekTo(position),
+        ),
 
         // Main controls
-        _buildMainControls(audioService, contentService),
+        PlayerMainControls(audioService: audioService),
 
         // Additional controls
-        _buildAdditionalControls(audioService, contentService),
+        PlayerAdditionalControls(
+          audioService: audioService,
+          showContentScript: _showContentScript,
+          onToggleContentScript: (value) {
+            setState(() {
+              _showContentScript = value;
+            });
+          },
+          onShare: () =>
+              _shareCurrentContent(context, audioService, contentService),
+          onAddToPlaylist: () {
+            final currentAudio = audioService.currentAudioFile;
+            if (currentAudio != null) {
+              context.read<ContentService>().addToCurrentPlaylist(currentAudio);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('Added "${currentAudio.displayTitle}" to playlist'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+        ),
 
         const SizedBox(height: AppTheme.spacingL),
       ],
@@ -643,46 +198,27 @@ class _PlayerScreenState extends State<PlayerScreen>
       slivers: [
         // Fixed header
         SliverToBoxAdapter(
-          child: _buildHeader(context, currentAudio),
+          child: PlayerHeader(
+            currentAudio: currentAudio,
+            onOptionsPressed: () => _showPlayerOptions(context, currentAudio),
+          ),
         ),
 
         // Compact album art
         SliverToBoxAdapter(
           child: SizedBox(
             height: 200,
-            child: Center(
-              child: RotationTransition(
-                turns: audioService.isPlaying
-                    ? _albumArtAnimation
-                    : const AlwaysStoppedAnimation(0.0),
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: AppTheme.primaryGradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    _getAudioIcon(currentAudio),
-                    size: 60,
-                    color: AppTheme.onPrimaryColor,
-                  ),
-                ),
-              ),
+            child: PlayerArtwork(
+              audioFile: currentAudio,
+              isPlaying: audioService.isPlaying,
+              playbackState: audioService.playbackState,
             ),
           ),
         ),
 
         // Track info
         SliverToBoxAdapter(
-          child: _buildTrackInfo(currentAudio),
+          child: PlayerTrackInfo(currentAudio: currentAudio),
         ),
 
         // Content script display (expanded)
@@ -706,13 +242,41 @@ class _PlayerScreenState extends State<PlayerScreen>
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               // Progress bar
-              _buildProgressSection(audioService),
+              PlayerProgressBar(
+                audioService: audioService,
+                onSeek: (position) => audioService.seekTo(position),
+              ),
 
               // Main controls
-              _buildMainControls(audioService, contentService),
+              PlayerMainControls(audioService: audioService),
 
               // Additional controls
-              _buildAdditionalControls(audioService, contentService),
+              PlayerAdditionalControls(
+                audioService: audioService,
+                showContentScript: _showContentScript,
+                onToggleContentScript: (value) {
+                  setState(() {
+                    _showContentScript = value;
+                  });
+                },
+                onShare: () =>
+                    _shareCurrentContent(context, audioService, contentService),
+                onAddToPlaylist: () {
+                  final currentAudio = audioService.currentAudioFile;
+                  if (currentAudio != null) {
+                    context
+                        .read<ContentService>()
+                        .addToCurrentPlaylist(currentAudio);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Added "${currentAudio.displayTitle}" to playlist'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+              ),
 
               const SizedBox(height: AppTheme.spacingL),
             ],
@@ -720,59 +284,6 @@ class _PlayerScreenState extends State<PlayerScreen>
         ),
       ],
     );
-  }
-
-  /// Build no audio state
-  Widget _buildNoAudioState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.music_off,
-            size: 80,
-            color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: AppTheme.spacingL),
-          const Text(
-            'No audio playing',
-            style: AppTheme.headlineMedium,
-          ),
-          const SizedBox(height: AppTheme.spacingM),
-          Text(
-            'Select an episode to start listening',
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingXL),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Browse Episodes'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Get appropriate icon for audio content
-  IconData _getAudioIcon(AudioFile audioFile) {
-    switch (audioFile.category) {
-      case 'daily-news':
-        return Icons.newspaper;
-      case 'ethereum':
-        return Icons.currency_bitcoin;
-      case 'macro':
-        return Icons.trending_up;
-      case 'startup':
-        return Icons.rocket_launch;
-      case 'ai':
-        return Icons.smart_toy;
-      case 'defi':
-        return Icons.account_balance;
-      default:
-        return Icons.headphones;
-    }
   }
 
   /// Share current content using social hook and deep linking

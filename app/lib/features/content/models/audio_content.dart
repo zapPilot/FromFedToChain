@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 
 /// Represents audio content metadata from the content management system
 class AudioContent extends Equatable {
@@ -126,38 +127,10 @@ class AudioContent extends Equatable {
   }
 
   /// Get category emoji
-  String get categoryEmoji {
-    switch (category) {
-      case 'daily-news':
-        return '📰';
-      case 'ethereum':
-        return '⚡';
-      case 'macro':
-        return '📊';
-      case 'startup':
-        return '🚀';
-      case 'ai':
-        return '🤖';
-      case 'defi':
-        return '💎';
-      default:
-        return '🎧';
-    }
-  }
+  String get categoryEmoji => ApiConfig.getCategoryEmoji(category);
 
   /// Get language flag emoji
-  String get languageFlag {
-    switch (language) {
-      case 'zh-TW':
-        return '🇹🇼';
-      case 'en-US':
-        return '🇺🇸';
-      case 'ja-JP':
-        return '🇯🇵';
-      default:
-        return '🌐';
-    }
-  }
+  String get languageFlag => ApiConfig.getLanguageFlag(language);
 
   @override
   List<Object?> get props => [

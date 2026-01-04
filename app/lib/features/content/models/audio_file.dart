@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:from_fed_to_chain_app/core/config/api_config.dart';
+import 'package:from_fed_to_chain_app/core/utils/duration_utils.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 
 /// Represents a streamable audio file with metadata and URL information
@@ -169,51 +171,14 @@ class AudioFile extends Equatable {
   /// Formatted duration
   String get formattedDuration {
     if (duration == null) return '--:--';
-
-    final hours = duration!.inHours;
-    final minutes = duration!.inMinutes.remainder(60);
-    final seconds = duration!.inSeconds.remainder(60);
-
-    if (hours > 0) {
-      return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-    } else {
-      return '$minutes:${seconds.toString().padLeft(2, '0')}';
-    }
+    return DurationUtils.formatDuration(duration!);
   }
 
   /// Get category emoji
-  String get categoryEmoji {
-    switch (category) {
-      case 'daily-news':
-        return '📰';
-      case 'ethereum':
-        return '⚡';
-      case 'macro':
-        return '📊';
-      case 'startup':
-        return '🚀';
-      case 'ai':
-        return '🤖';
-      case 'defi':
-        return '💎';
-      default:
-        return '🎧';
-    }
-  }
+  String get categoryEmoji => ApiConfig.getCategoryEmoji(category);
 
   /// Get language flag emoji
-  String get languageFlag {
-    switch (language) {
-      case 'zh-TW':
-        return '🇹🇼';
-      case 'en-US':
-        return '🇺🇸';
-      case 'ja-JP':
-        return '🇯🇵';
-      default:
-        return '🌐';
-    }
-  }
+  String get languageFlag => ApiConfig.getLanguageFlag(language);
 
   /// Parse publish date from ID (format: YYYY-MM-DD-title)
   /// Returns the publish date if parseable, otherwise falls back to lastModified

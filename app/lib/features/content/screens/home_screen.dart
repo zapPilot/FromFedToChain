@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/audio_list.dart';
-import 'package:from_fed_to_chain_app/features/audio/widgets/mini_player.dart';
+
 import 'package:from_fed_to_chain_app/features/content/widgets/search_bar.dart';
-import 'package:from_fed_to_chain_app/features/audio/screens/player_screen.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/home/home_header.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/home/home_mini_player.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/episode_options_sheet.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/home/audio_tab_content.dart';
 
 /// State class for content service to enable granular rebuilds
 class ContentServiceState {
@@ -165,87 +165,13 @@ class _HomeScreenState extends State<HomeScreen>
 
   /// Build app header with title and search toggle
   Widget _buildAppHeader(BuildContext context, ContentService contentService) {
-    return Container(
-      padding: AppTheme.safeHorizontalPadding,
-      child: Row(
-        children: [
-          // App title
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'From Fed to Chain',
-                  style: AppTheme.headlineMedium,
-                ),
-                const SizedBox(height: AppTheme.spacingXS),
-                Consumer<ContentService>(
-                  builder: (context, service, child) {
-                    final stats = service.getStatistics();
-                    final totalEpisodes = stats['totalEpisodes'] as int;
-                    final filteredEpisodes = stats['filteredEpisodes'] as int;
-
-                    return Text(
-                      filteredEpisodes == totalEpisodes
-                          ? '$totalEpisodes episodes'
-                          : '$filteredEpisodes of $totalEpisodes episodes',
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Search toggle button
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showSearchBar = !_showSearchBar;
-              });
-            },
-            icon: Icon(
-              _showSearchBar ? Icons.close : Icons.search,
-              color: AppTheme.onSurfaceColor,
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: AppTheme.spacingS),
-
-          // Refresh button
-          IconButton(
-            onPressed: contentService.isLoading
-                ? null
-                : () => contentService.refresh(),
-            icon: contentService.isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppTheme.primaryColor,
-                      ),
-                    ),
-                  )
-                : const Icon(Icons.refresh),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.cardColor.withValues(alpha: 0.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return HomeHeader(
+      onSearchToggle: () {
+        setState(() {
+          _showSearchBar = !_showSearchBar;
+        });
+      },
+      isSearchVisible: _showSearchBar,
     );
   }
 
@@ -349,26 +275,22 @@ class _HomeScreenState extends State<HomeScreen>
       ContentService contentService, AudioPlayerService audioService) {
     final recentEpisodes = contentService.filteredEpisodes.take(20).toList();
 
-    return AnimationLimiter(
-      child: AudioList(
-        episodes: recentEpisodes,
-        onEpisodeTap: (episode) => _playEpisode(episode, audioService),
-        onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
-        scrollController: _scrollController,
-      ),
+    return AudioTabContent(
+      episodes: recentEpisodes,
+      scrollController: _scrollController,
+      onPlay: (episode) => _playEpisode(episode, audioService),
+      onOptions: (episode) => _showEpisodeOptions(episode),
     );
   }
 
   /// Build all episodes tab
   Widget _buildAllTab(
       ContentService contentService, AudioPlayerService audioService) {
-    return AnimationLimiter(
-      child: AudioList(
-        episodes: contentService.filteredEpisodes,
-        onEpisodeTap: (episode) => _playEpisode(episode, audioService),
-        onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
-        scrollController: _scrollController,
-      ),
+    return AudioTabContent(
+      episodes: contentService.filteredEpisodes,
+      scrollController: _scrollController,
+      onPlay: (episode) => _playEpisode(episode, audioService),
+      onOptions: (episode) => _showEpisodeOptions(episode),
     );
   }
 
@@ -377,8 +299,12 @@ class _HomeScreenState extends State<HomeScreen>
       ContentService contentService, AudioPlayerService audioService) {
     final unfinishedEpisodes = contentService.getUnfinishedEpisodes();
 
-    if (unfinishedEpisodes.isEmpty) {
-      return Center(
+    return AudioTabContent(
+      episodes: unfinishedEpisodes,
+      scrollController: _scrollController,
+      onPlay: (episode) => _playEpisode(episode, audioService),
+      onOptions: (episode) => _showEpisodeOptions(episode),
+      emptyState: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -404,15 +330,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-      );
-    }
-
-    return AnimationLimiter(
-      child: AudioList(
-        episodes: unfinishedEpisodes,
-        onEpisodeTap: (episode) => _playEpisode(episode, audioService),
-        onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
-        scrollController: _scrollController,
       ),
     );
   }
@@ -528,33 +445,7 @@ class _HomeScreenState extends State<HomeScreen>
   /// Build mini player
   Widget _buildMiniPlayer(
       BuildContext context, AudioPlayerService audioService) {
-    return MiniPlayer(
-      audioFile: audioService.currentAudioFile!,
-      isPlaying: audioService.isPlaying,
-      isPaused: audioService.isPaused,
-      isLoading: audioService.isLoading,
-      hasError: audioService.hasError,
-      stateText: _getStateText(audioService),
-      onTap: () => _navigateToPlayer(context),
-      onPlayPause: () => audioService.togglePlayPause(),
-      onNext: () => audioService.skipToNextEpisode(),
-      onPrevious: () => audioService.skipToPreviousEpisode(),
-    );
-  }
-
-  /// Helper method to get state text from AudioPlayerService
-  String _getStateText(AudioPlayerService audioService) {
-    if (audioService.hasError) {
-      return 'Error';
-    } else if (audioService.isLoading) {
-      return 'Loading';
-    } else if (audioService.isPlaying) {
-      return 'Playing';
-    } else if (audioService.isPaused) {
-      return 'Paused';
-    } else {
-      return 'Stopped';
-    }
+    return const HomeMiniPlayer();
   }
 
   /// Play episode
@@ -591,95 +482,7 @@ class _HomeScreenState extends State<HomeScreen>
           top: Radius.circular(AppTheme.radiusL),
         ),
       ),
-      builder: (context) => _buildEpisodeOptionsSheet(episode),
-    );
-  }
-
-  /// Build episode options bottom sheet
-  Widget _buildEpisodeOptionsSheet(AudioFile episode) {
-    return Padding(
-      padding: AppTheme.safePadding,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Handle
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppTheme.spacingL),
-
-          // Episode info
-          Text(
-            episode.displayTitle,
-            style: AppTheme.titleLarge,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          const SizedBox(height: AppTheme.spacingS),
-
-          Text(
-            '${episode.categoryEmoji} ${episode.category} • ${episode.languageFlag} ${episode.language}',
-            style: AppTheme.bodySmall,
-          ),
-
-          const SizedBox(height: AppTheme.spacingL),
-
-          // Actions
-          ListTile(
-            leading: const Icon(Icons.play_arrow),
-            title: const Text('Play'),
-            onTap: () {
-              Navigator.pop(context);
-              _playEpisode(episode, context.read<AudioPlayerService>());
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.favorite_border),
-            title: const Text('Add to Favorites'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: Implement favorites
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.playlist_add),
-            title: const Text('Add to Playlist'),
-            onTap: () {
-              Navigator.pop(context);
-              context.read<ContentService>().addToCurrentPlaylist(episode);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Added "${episode.displayTitle}" to playlist'),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.share),
-            title: const Text('Share'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: Implement sharing
-            },
-          ),
-
-          const SizedBox(height: AppTheme.spacingM),
-        ],
-      ),
+      builder: (context) => EpisodeOptionsSheet(episode: episode),
     );
   }
 
@@ -746,15 +549,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Navigate to full player screen
-  void _navigateToPlayer(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const PlayerScreen(),
       ),
     );
   }

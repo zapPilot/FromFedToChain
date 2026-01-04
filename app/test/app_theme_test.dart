@@ -73,18 +73,19 @@ void main() {
       expect(
           AppTheme.getCategoryDisplayName('daily-news'), equals('Daily News'));
       expect(AppTheme.getCategoryDisplayName('ethereum'), equals('Ethereum'));
-      expect(AppTheme.getCategoryDisplayName('macro'), equals('Macro'));
+      expect(
+          AppTheme.getCategoryDisplayName('macro'), equals('Macro Economics'));
       expect(AppTheme.getCategoryDisplayName('startup'), equals('Startup'));
-      expect(AppTheme.getCategoryDisplayName('ai'), equals('AI'));
+      expect(AppTheme.getCategoryDisplayName('ai'), equals('AI & Technology'));
       expect(AppTheme.getCategoryDisplayName('defi'), equals('DeFi'));
-      expect(AppTheme.getCategoryDisplayName('unknown'), equals('UNKNOWN'));
+      expect(AppTheme.getCategoryDisplayName('unknown'), equals('unknown'));
     });
 
     test('Language display names are correct', () {
       expect(AppTheme.getLanguageDisplayName('zh-TW'), equals('繁體中文'));
       expect(AppTheme.getLanguageDisplayName('en-US'), equals('English'));
       expect(AppTheme.getLanguageDisplayName('ja-JP'), equals('日本語'));
-      expect(AppTheme.getLanguageDisplayName('unknown'), equals('UNKNOWN'));
+      expect(AppTheme.getLanguageDisplayName('unknown'), equals('unknown'));
     });
 
     test('Glass morphism decoration is properly configured', () {

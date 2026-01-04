@@ -59,15 +59,15 @@ void main() {
     });
 
     Widget createTestWidget() {
-      return MaterialApp(
-        home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider<ContentService>.value(
-                value: mockContentService),
-            ChangeNotifierProvider<AudioPlayerService>.value(
-                value: mockAudioService),
-          ],
-          child: const HomeScreen(),
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ContentService>.value(
+              value: mockContentService),
+          ChangeNotifierProvider<AudioPlayerService>.value(
+              value: mockAudioService),
+        ],
+        child: const MaterialApp(
+          home: HomeScreen(),
         ),
       );
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 
 /// Modern dark theme configuration for the From Fed to Chain audio app
 class AppTheme {
@@ -375,34 +376,30 @@ class AppTheme {
   }
 
   static String getCategoryDisplayName(String category) {
-    switch (category) {
-      case 'daily-news':
-        return 'Daily News';
-      case 'ethereum':
-        return 'Ethereum';
-      case 'macro':
-        return 'Macro';
-      case 'startup':
-        return 'Startup';
-      case 'ai':
-        return 'AI';
-      case 'defi':
-        return 'DeFi';
-      default:
-        return category.toUpperCase();
-    }
+    return ApiConfig.getCategoryDisplayName(category);
   }
 
   static String getLanguageDisplayName(String language) {
-    switch (language) {
-      case 'zh-TW':
-        return '繁體中文';
-      case 'en-US':
-        return 'English';
-      case 'ja-JP':
-        return '日本語';
+    return ApiConfig.getLanguageDisplayName(language);
+  }
+
+  /// Get category icon
+  static IconData getCategoryIcon(String category) {
+    switch (category) {
+      case 'daily-news':
+        return Icons.newspaper;
+      case 'ethereum':
+        return Icons.currency_bitcoin;
+      case 'macro':
+        return Icons.trending_up;
+      case 'startup':
+        return Icons.rocket_launch;
+      case 'ai':
+        return Icons.smart_toy;
+      case 'defi':
+        return Icons.account_balance;
       default:
-        return language.toUpperCase();
+        return Icons.headphones;
     }
   }
 
