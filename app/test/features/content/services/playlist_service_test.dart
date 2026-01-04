@@ -70,6 +70,68 @@ void main() {
       });
     });
 
+    group('Queue Manipulation', () {
+      test('removeFromPlaylist removes episode', () {
+        playlistService.setQueue(sampleEpisodes, name: 'Test Playlist');
+        playlistService.removeFromPlaylist(sampleEpisodes[1]);
+
+        expect(playlistService.queue.length, 2);
+        expect(playlistService.queue.any((e) => e.id == sampleEpisodes[1].id),
+            isFalse);
+        expect(playlistService.currentPlaylist?.episodes.length, 2);
+      });
+
+      test('clearPlaylist resets everything', () {
+        playlistService.setQueue(sampleEpisodes, name: 'Test');
+        playlistService.clearPlaylist();
+
+        expect(playlistService.queue, isEmpty);
+        expect(playlistService.currentPlaylist, isNull);
+        expect(playlistService.hasPlaylist, isFalse);
+        expect(playlistService.hasQueue, isFalse);
+      });
+
+      test('addToPlaylist creates new playlist if none exists', () {
+        playlistService.addToPlaylist(sampleEpisodes.first);
+        expect(playlistService.currentPlaylist?.name, 'My Playlist');
+        expect(playlistService.queue.length, 1);
+      });
+
+      test('setQueue without name results in null currentPlaylist', () {
+        playlistService.setQueue(sampleEpisodes);
+        expect(playlistService.currentPlaylist, isNull);
+        expect(playlistService.playlistName, isNull);
+      });
+    });
+
+    group('Shuffle Logic', () {
+      test('toggleShuffle shuffles the queue', () {
+        playlistService.setQueue(sampleEpisodes);
+        expect(playlistService.isShuffleEnabled, isFalse);
+
+        playlistService.toggleShuffle();
+        expect(playlistService.isShuffleEnabled, isTrue);
+        // Note: shuffle might produce same order but unlikely for many items.
+        // We can't easily assert shuffle random output but we can assert call happened.
+      });
+
+      test('toggleShuffle off restores original order', () {
+        playlistService.setQueue(sampleEpisodes);
+        playlistService.toggleShuffle(); // Shuffled
+        playlistService.toggleShuffle(); // Un-shuffled
+
+        expect(playlistService.queue, equals(sampleEpisodes));
+      });
+
+      test('setQueue respects existing shuffle state', () {
+        playlistService.toggleShuffle(); // Enabled
+        playlistService.setQueue(sampleEpisodes);
+
+        expect(playlistService.isShuffleEnabled, isTrue);
+        // Queue should be shuffled immediately
+      });
+    });
+
     group('Episode Navigation', () {
       test('gets next episode', () {
         playlistService.setQueue(sampleEpisodes);
@@ -108,6 +170,24 @@ void main() {
 
         expect(previousEpisode, isNull);
       });
+
+      test('returns null for navigation when episode not in queue', () {
+        playlistService.setQueue([sampleEpisodes.first]);
+        final other = sampleEpisodes.last;
+
+        expect(playlistService.getNextEpisode(other), isNull);
+        expect(playlistService.getPreviousEpisode(other), isNull);
+      });
+    });
+
+    test('getDebugInfo provides correct data', () {
+      playlistService.setQueue(sampleEpisodes, name: 'Debug List');
+      final info = playlistService.getDebugInfo();
+
+      expect(info['hasPlaylist'], isTrue);
+      expect(info['playlistName'], 'Debug List');
+      expect(info['queueSize'], sampleEpisodes.length);
+      expect(info['shuffleEnabled'], isFalse);
     });
   });
 }

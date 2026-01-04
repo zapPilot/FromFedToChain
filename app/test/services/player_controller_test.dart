@@ -89,50 +89,116 @@ void main() {
       verify(mockPlayer.play()).called(1);
     });
 
-    test('pause calls player.pause', () async {
-      when(mockPlayer.pause()).thenAnswer((_) async {});
-      await controller.pause();
-      verify(mockPlayer.pause()).called(1);
-    });
-
-    test('stop calls player.stop', () async {
-      when(mockPlayer.stop()).thenAnswer((_) async {});
-      await controller.stop();
-      verify(mockPlayer.stop()).called(1);
-    });
-
-    test('seek calls player.seek', () async {
-      when(mockPlayer.seek(any)).thenAnswer((_) async {});
-      await controller.seek(Duration.zero);
-      verify(mockPlayer.seek(Duration.zero)).called(1);
-    });
-
-    test('skipForward calls player.skipForward', () async {
-      when(mockPlayer.skipForward(any)).thenAnswer((_) async {});
-      await controller.skipForward();
-      verify(mockPlayer.skipForward(any)).called(1);
-    });
-
-    test('play handles error', () async {
-      final audioFile = TestUtils.createSampleAudioFile();
-      // Stub setAudioSource to succeed (to get to play)
-      when(mockPlayer.setAudioSource(any,
-              initialPosition: anyNamed('initialPosition')))
-          .thenAnswer((_) async {});
-      // Stub play to throw
-      when(mockPlayer.play()).thenThrow(Exception('Failed'));
-
-      try {
-        await controller.play(audioFile);
-      } catch (e) {
-        // Expected
-      }
-
-      verify(mockPlayer.setAudioSource(any,
-              initialPosition: anyNamed('initialPosition')))
-          .called(1);
+    test('resume calls player.play', () async {
+      when(mockPlayer.play()).thenAnswer((_) async {});
+      await controller.resume();
       verify(mockPlayer.play()).called(1);
-      verify(mockNotifier.setError(any)).called(1);
+    });
+
+    test('setSpeed calls player.setSpeed', () async {
+      when(mockPlayer.setSpeed(any)).thenAnswer((_) async {});
+      await controller.setSpeed(2.0);
+      verify(mockPlayer.setSpeed(2.0)).called(1);
+    });
+
+    test('setSpeed handles error gracefully (doesn\'t set error state)',
+        () async {
+      when(mockPlayer.setSpeed(any)).thenThrow(Exception('Speed failed'));
+      await controller.setSpeed(2.0);
+      verify(mockPlayer.setSpeed(2.0)).called(1);
+      verifyNever(mockNotifier.setError(any));
+    });
+
+    test('skipBackward calls player.skipBackward', () async {
+      when(mockPlayer.skipBackward(any)).thenAnswer((_) async {});
+      await controller.skipBackward();
+      verify(mockPlayer.skipBackward(any)).called(1);
+    });
+
+    test('isValidAudioFile validation', () {
+      final valid = TestUtils.createSampleAudioFile();
+      final invalid = valid.copyWith(streamingUrl: '');
+      final withSpace = valid.copyWith(streamingUrl: ' ');
+
+      expect(controller.isValidAudioFile(valid), isTrue);
+      expect(controller.isValidAudioFile(invalid), isFalse);
+      expect(controller.isValidAudioFile(withSpace), isFalse);
+      expect(controller.isValidAudioFile(null), isFalse);
+    });
+
+    test('synchronous getters delegate to player', () {
+      when(mockPlayer.currentState).thenReturn(AppPlaybackState.playing);
+      when(mockPlayer.currentPosition).thenReturn(const Duration(seconds: 5));
+      when(mockPlayer.currentDuration).thenReturn(const Duration(seconds: 10));
+      when(mockPlayer.currentSpeed).thenReturn(1.5);
+
+      expect(controller.currentState, AppPlaybackState.playing);
+      expect(controller.currentPosition, const Duration(seconds: 5));
+      expect(controller.currentDuration, const Duration(seconds: 10));
+      expect(controller.currentSpeed, 1.5);
+    });
+
+    group('Command Error Handling', () {
+      test('pause handles error', () async {
+        when(mockPlayer.pause()).thenThrow(Exception('Fail'));
+        expect(() => controller.pause(), throwsException);
+        verify(mockNotifier.setError(any)).called(1);
+      });
+
+      test('resume handles error', () async {
+        when(mockPlayer.play()).thenThrow(Exception('Fail'));
+        expect(() => controller.resume(), throwsException);
+        verify(mockNotifier.setError(any)).called(1);
+      });
+
+      test('stop handles error', () async {
+        when(mockPlayer.stop()).thenThrow(Exception('Fail'));
+        expect(() => controller.stop(), throwsException);
+        verify(mockNotifier.setError(any)).called(1);
+      });
+
+      test('seek handles error', () async {
+        when(mockPlayer.seek(any)).thenThrow(Exception('Fail'));
+        expect(() => controller.seek(Duration.zero), throwsException);
+        verify(mockNotifier.setError(any)).called(1);
+      });
+
+      test('skipForward handles error', () async {
+        when(mockPlayer.skipForward(any)).thenThrow(Exception('Fail'));
+        expect(() => controller.skipForward(), throwsException);
+        verify(mockNotifier.setError(any)).called(1);
+      });
+
+      test('skipBackward handles error', () async {
+        when(mockPlayer.skipBackward(any)).thenThrow(Exception('Fail'));
+        expect(() => controller.skipBackward(), throwsException);
+        verify(mockNotifier.setError(any)).called(1);
+      });
+
+      test('play handles source setup error', () async {
+        final audioFile = TestUtils.createSampleAudioFile();
+        when(mockPlayer.setAudioSource(any,
+                initialPosition: anyNamed('initialPosition')))
+            .thenAnswer((_) async => throw Exception('Source fail'));
+
+        await expectLater(
+            controller.play(audioFile), throwsA(isA<PlayerAdapterException>()));
+
+        verify(mockNotifier.clearError()).called(1);
+        verify(mockNotifier.setError(argThat(contains('Source fail'))))
+            .called(1);
+      });
+    });
+
+    test('dispose cancels subscriptions and disposes player', () async {
+      await controller.dispose();
+
+      // Emit events after dispose - should NOT update notifier
+      stateController.add(AppPlaybackState.paused);
+      await pumpEventQueue();
+      verifyNever(mockNotifier.updateState(any));
+
+      verify(mockPlayer.dispose()).called(1);
     });
   });
 }

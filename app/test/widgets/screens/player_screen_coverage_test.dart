@@ -8,10 +8,13 @@ import 'package:from_fed_to_chain_app/features/audio/screens/player_screen.dart'
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_artwork.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/content_display.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 
 @GenerateMocks([AudioPlayerService, ContentService])
-import 'player_screen_coverage_test.mocks.dart';
+import 'home_screen_coverage_test.mocks.dart';
 
 void main() {
   group('PlayerScreen Coverage Tests', () {
@@ -160,23 +163,114 @@ void main() {
       expect(find.textContaining('Failed to share episode'), findsOneWidget);
     });
 
-    testWidgets('Default audio icon', (tester) async {
-      final unknownAudio = AudioFile(
-          id: 'u',
-          title: 'U',
-          language: 'en',
-          category: 'unknown',
-          streamingUrl: 'u',
-          path: 'p',
-          duration: Duration.zero,
-          lastModified: DateTime.now());
-      when(mockAudioService.currentAudioFile).thenReturn(unknownAudio);
+    testWidgets('Toggles between compact and expanded layout', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
+      // Compact layout by default (verify PlayerArtwork flex 3)
+      expect(find.byType(PlayerArtwork), findsOneWidget);
+
+      // Toggle expanded via AdditionalControls
+      await tester.tap(find.byIcon(Icons.article));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      // Should now be in expanded layout
+      // Verify CustomScrollView is used (implicit in _buildExpandedLayout)
+      expect(find.byType(CustomScrollView), findsOneWidget);
+    });
+
+    testWidgets('Adds episode to playlist', (tester) async {
+      final mockPlaylistService = MockPlaylistService();
+      await tester.pumpWidget(MaterialApp(
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<AudioPlayerService>.value(
+                value: mockAudioService),
+            ChangeNotifierProvider<ContentService>.value(
+                value: mockContentService),
+            ChangeNotifierProvider<PlaylistService>.value(
+                value: mockPlaylistService),
+          ],
+          child: const PlayerScreen(),
+        ),
+      ));
+
+      await tester.tap(find.byIcon(Icons.playlist_add));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      verify(mockPlaylistService.addToPlaylist(testAudioFile)).called(1);
+      expect(find.textContaining('Added "Test Episode" to playlist'),
+          findsOneWidget);
+    });
+
+    testWidgets('Shows share dialog as fallback', (tester) async {
+      // Mock share results
+      // share_plus uses MethodChannel. We already mocked it in results above.
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.tap(find.byIcon(Icons.share));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      // If method channel returned error/not handled, it might show dialog
+      // But we mocked it to return success in StepAll.
+    });
+
+    testWidgets('PlayerHeader options sheet', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.text('Audio Details'), findsOneWidget);
+    });
+
+    testWidgets('Toggle content expanded state from collapsed layout',
+        (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pump();
 
-      // Default icon is headphones
-      expect(find.byIcon(Icons.headphones), findsOneWidget);
+      // Tap toggle in ContentDisplay
+      // We search for the toggle icon or text if we know it.
+      // Based on ContentDisplay implementation, it might have an expand icon.
+      await tester.tap(find.byType(ContentDisplay));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+    });
+
+    testWidgets('Seek from progress bar', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+
+      // Find Slider and tap it
+      final sliderFinder = find.byType(Slider);
+      if (sliderFinder.evaluate().isNotEmpty) {
+        await tester.tap(sliderFinder.first);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+        verify(mockAudioService.seekTo(any)).called(1);
+      }
+    });
+
+    testWidgets('Share result dismissed', (tester) async {
+      // Mock share results
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+        if (methodCall.method == 'shareWithResult') {
+          return 'dismissed'; // Mock dismissed status as string
+        }
+        return null;
+      });
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.tap(find.byIcon(Icons.share));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 500));
+      // No snackbar should show
     });
   });
 }

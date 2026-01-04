@@ -2,11 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'package:app_links/app_links.dart';
+import 'package:from_fed_to_chain_app/features/audio/screens/player_screen.dart';
 import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:provider/provider.dart';
 
-@GenerateMocks([AppLinks, NavigatorState])
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import '../../widgets/screens/home_screen_coverage_test.mocks.dart';
 import 'deep_link_service_coverage_test.mocks.dart';
 
 // Helper to mock BuildContext
@@ -18,15 +21,30 @@ void main() {
   group('DeepLinkService Coverage Tests', () {
     late MockAppLinks mockAppLinks;
     late GlobalKey<NavigatorState> navigatorKey;
+    late MockAudioPlayerService mockAudioService;
+    late MockContentService mockContentService;
     late StreamController<Uri> uriController;
 
     setUp(() {
       mockAppLinks = MockAppLinks();
+      mockAudioService = MockAudioPlayerService();
+      mockContentService = MockContentService();
       navigatorKey = GlobalKey<NavigatorState>();
-      // We can't easily assign state to a GlobalKey without pumping a widget.
-      // So we might need to rely on partial integration or just test static methods if exposed,
-      // but they are private.
-      // However, we can use a real widget pump to establish context.
+
+      // Basic stubs for AudioPlayerService
+      when(mockAudioService.currentAudioFile).thenReturn(null);
+      when(mockAudioService.playbackState).thenReturn(AppPlaybackState.paused);
+      when(mockAudioService.isPlaying).thenReturn(false);
+      when(mockAudioService.isPaused).thenReturn(false);
+      when(mockAudioService.isLoading).thenReturn(false);
+      when(mockAudioService.hasError).thenReturn(false);
+      when(mockAudioService.playbackSpeed).thenReturn(1.0);
+      when(mockAudioService.repeatEnabled).thenReturn(false);
+      when(mockAudioService.autoplayEnabled).thenReturn(false);
+      when(mockAudioService.currentPosition).thenReturn(Duration.zero);
+      when(mockAudioService.totalDuration).thenReturn(Duration.zero);
+      when(mockAudioService.addListener(any)).thenReturn(null);
+      when(mockAudioService.removeListener(any)).thenReturn(null);
 
       uriController = StreamController<Uri>();
       when(mockAppLinks.uriLinkStream).thenAnswer((_) => uriController.stream);
@@ -107,17 +125,114 @@ void main() {
     // This is hard with real widgets.
     // But we can test `generateContentLink` thoroughly.
 
-    test('generateContentLink edge cases', () {
-      // Suffix already present
-      expect(DeepLinkService.generateContentLink('id-zh-TW'),
-          contains('audio/id/zh-TW'));
+    testWidgets('Full navigation flow to Audio with language', (tester) async {
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AudioPlayerService>.value(
+              value: mockAudioService),
+          ChangeNotifierProvider<ContentService>.value(
+              value: mockContentService),
+        ],
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          onGenerateRoute: (settings) {
+            if (settings.name == '/') {
+              return MaterialPageRoute(builder: (_) => Container());
+            }
+            return null;
+          },
+        ),
+      ));
 
-      // No suffix, no language
-      expect(DeepLinkService.generateContentLink('id'), contains('audio/id'));
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
 
-      // Custom scheme false
+      uriController.add(Uri.parse('fromfedtochain://audio/ep-1/en-US'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(PlayerScreen), findsOneWidget);
+    });
+
+    testWidgets('Navigation to Home', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        navigatorKey: navigatorKey,
+        routes: {
+          '/': (_) => const Text('Home Page'),
+        },
+      ));
+
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      uriController.add(Uri.parse('fromfedtochain://home'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('Handles universal link transformation', (tester) async {
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AudioPlayerService>.value(
+              value: mockAudioService),
+          ChangeNotifierProvider<ContentService>.value(
+              value: mockContentService),
+        ],
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          home: Container(),
+        ),
+      ));
+
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      uriController.add(Uri.parse('https://fromfedtochain.com/audio/ep-123'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(PlayerScreen), findsOneWidget);
+    });
+
+    testWidgets('Handles unknown route by navigating to home', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        navigatorKey: navigatorKey,
+        routes: {
+          '/': (_) => const Text('Home Page'),
+        },
+      ));
+
+      await DeepLinkService.initialize(navigatorKey, appLinks: mockAppLinks);
+
+      uriController.add(Uri.parse('fromfedtochain://unknown-route'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    test('generateContentLink variations', () {
+      // Universal link
       expect(DeepLinkService.generateContentLink('id', useCustomScheme: false),
-          contains('https://fromfedtochain.com/audio/id'));
+          'https://fromfedtochain.com/audio/id');
+
+      // With existing suffix matches link generation
+      expect(DeepLinkService.generateContentLink('my-ep-en-US'),
+          'fromfedtochain://audio/my-ep/en-US');
+
+      // Universal with suffix
+      expect(
+          DeepLinkService.generateContentLink('id-zh-TW',
+              useCustomScheme: false),
+          'https://fromfedtochain.com/audio/id/zh-TW');
+    });
+
+    test('generateContentLink variations additional coverage', () {
+      // Language as parameter
+      expect(DeepLinkService.generateContentLink('ep1', language: 'ja-JP'),
+          'fromfedtochain://audio/ep1/ja-JP');
+
+      // Mismatched language in ID suffix vs parameter (suffix in ID takes precedence)
+      expect(
+          DeepLinkService.generateContentLink('ep1-en-US', language: 'zh-TW'),
+          'fromfedtochain://audio/ep1/en-US');
     });
   });
 }

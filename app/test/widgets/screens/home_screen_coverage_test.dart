@@ -11,6 +11,7 @@ import 'package:from_fed_to_chain_app/features/audio/services/player_state_notif
 import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 
 @GenerateMocks([ContentService, AudioPlayerService, PlaylistService])
+import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';
 import 'home_screen_coverage_test.mocks.dart';
 
 void main() {
@@ -195,6 +196,97 @@ void main() {
       await tester.pump();
 
       expect(find.text('Stopped'), findsOneWidget);
+    });
+
+    testWidgets('Tab switching interactions', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+
+      // Tap 'All' tab (using label text, searching for the last one which is usually the intended one in BottomNavBar)
+      await tester.tap(find.text('All').last);
+      await tester.pumpAndSettle();
+
+      // Tap 'Unfinished' tab
+      await tester.tap(find.text('Unfinished').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('No Unfinished Episodes'), findsOneWidget);
+    });
+
+    testWidgets('Search query updates', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+
+      // Toggle search bar
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+
+      // Enter search text
+      await tester.enterText(find.byType(TextField), 'bitcoin');
+      await tester.pump();
+
+      verify(mockContentService.setSearchQuery('bitcoin')).called(1);
+    });
+
+    testWidgets('Filter changes', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+
+      // In FilterBar, trigger callbacks
+      // We can find the FilterBar and trigger its onLanguageChanged/onCategoryChanged
+      final filterBar = tester.widget<FilterBar>(find.byType(FilterBar));
+      filterBar.onLanguageChanged('en-US');
+      filterBar.onCategoryChanged('ethereum');
+
+      verify(mockContentService.setLanguage('en-US')).called(1);
+      verify(mockContentService.setCategory('ethereum')).called(1);
+    });
+
+    testWidgets('Error state retry', (tester) async {
+      when(mockContentService.hasError).thenReturn(true);
+      when(mockContentService.errorMessage).thenReturn('Network error');
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+
+      await tester.tap(find.text('Retry'));
+      await tester.pump();
+
+      verify(mockContentService.refresh()).called(1);
+    });
+
+    testWidgets('Empty state clear filters', (tester) async {
+      when(mockContentService.allEpisodes).thenReturn([]);
+      when(mockContentService.filteredEpisodes).thenReturn([]);
+      when(mockContentService.hasEpisodes).thenReturn(false);
+      when(mockContentService.hasFilteredResults).thenReturn(false);
+      when(mockContentService.searchQuery).thenReturn('nonexistent');
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.tap(find.text('Clear filters'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      verify(mockContentService.setSearchQuery('')).called(1);
+    });
+
+    testWidgets('Empty state refresh', (tester) async {
+      when(mockContentService.allEpisodes).thenReturn([]);
+      when(mockContentService.filteredEpisodes).thenReturn([]);
+      when(mockContentService.hasEpisodes).thenReturn(false);
+      when(mockContentService.hasFilteredResults).thenReturn(false);
+      when(mockContentService.searchQuery).thenReturn('');
+      when(mockContentService.isLoading).thenReturn(false);
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.tap(find.text('Refresh'));
+      await tester.pump();
+      verify(mockContentService.refresh()).called(1);
     });
   });
 }
