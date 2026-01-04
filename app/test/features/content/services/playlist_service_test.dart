@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/features/content/models/playlist.dart';
 
 void main() {
   group('PlaylistService Tests', () {
