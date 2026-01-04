@@ -138,17 +138,25 @@ class AudioFile extends Equatable {
     return title;
   }
 
-  /// Source URL for audio playback (alias for streamingUrl)
+  /// Source URL for audio playback (alias for [streamingUrl]).
+  ///
+  /// This is the primary URL used by the player to stream content.
   String get sourceUrl => streamingUrl;
 
-  /// Check if this is an HLS/M3U8 stream
+  /// Check if this is an HLS/M3U8 stream.
+  ///
+  /// Returns `true` if the path ends with `.m3u8`.
   bool get isHlsStream => path.endsWith('.m3u8');
 
-  /// Check if this is a direct audio file
+  /// Check if this is a direct audio file (wav, mp3, m4a).
+  ///
+  /// Returns `true` if the path ends with a supported audio extension.
   bool get isDirectAudio =>
       path.endsWith('.wav') || path.endsWith('.mp3') || path.endsWith('.m4a');
 
-  /// Formatted file size
+  /// Formatted file size string (e.g., "1.5 MB").
+  ///
+  /// Returns "Unknown" if [fileSizeBytes] is null.
   String get formattedFileSize {
     if (fileSizeBytes == null) return 'Unknown';
 
@@ -168,20 +176,27 @@ class AudioFile extends Equatable {
     return '$formattedSize ${suffixes[suffixIndex]}';
   }
 
-  /// Formatted duration
+  /// Formatted duration string (e.g., "05:30").
+  ///
+  /// Returns "--:--" if [duration] is null.
   String get formattedDuration {
     if (duration == null) return '--:--';
     return DurationUtils.formatDuration(duration!);
   }
 
-  /// Get category emoji
+  /// Get category emoji icon.
+  ///
+  /// Delegates to [ApiConfig.getCategoryEmoji].
   String get categoryEmoji => ApiConfig.getCategoryEmoji(category);
 
-  /// Get language flag emoji
+  /// Get language flag emoji.
+  ///
+  /// Delegates to [ApiConfig.getLanguageFlag].
   String get languageFlag => ApiConfig.getLanguageFlag(language);
 
-  /// Parse publish date from ID (format: YYYY-MM-DD-title)
-  /// Returns the publish date if parseable, otherwise falls back to lastModified
+  /// Parse publish date from ID (format: YYYY-MM-DD-title).
+  ///
+  /// Returns the publish date if parseable from [id], otherwise falls back to [lastModified].
   DateTime get publishDate {
     try {
       // ID format: "2025-07-05-blockchain-private-equity-tokenization"

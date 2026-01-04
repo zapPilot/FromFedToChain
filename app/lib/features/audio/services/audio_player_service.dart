@@ -54,7 +54,9 @@ class AudioPlayerService extends ChangeNotifier {
     _setupStateListener();
   }
 
-  /// Initialize all components and wire them together
+  /// Initialize all components and wire them together.
+  ///
+  /// This sets up the [PlayerController], [AudioProgressTracker], and [PlaybackNavigationService].
   void _initializeComponents() {
     // Create state notifier (foundation)
     _stateNotifier = PlayerStateNotifier();
@@ -148,7 +150,13 @@ class AudioPlayerService extends ChangeNotifier {
 
   // Public API methods (maintain backward compatibility)
 
-  /// Play audio file (supports both local files and streaming URLs)
+  /// Play audio file (supports both local files and streaming URLs).
+  ///
+  /// This method handles:
+  /// - Setting current audio file
+  /// - Recording listen history
+  /// - Calculating resume position from progress tracking
+  /// - Delegating playback start to [PlayerController]
   Future<void> playAudio(AudioFile audioFile) async {
     try {
       if (kDebugMode) {
@@ -202,7 +210,9 @@ class AudioPlayerService extends ChangeNotifier {
     }
   }
 
-  /// Skip to next episode
+  /// Skip to next episode.
+  ///
+  /// Uses [PlaybackNavigationService] to find and play the next episode in the playlist.
   Future<void> skipToNextEpisode() async {
     if (_currentAudioFile != null) {
       final nextEpisode =
@@ -213,7 +223,9 @@ class AudioPlayerService extends ChangeNotifier {
     }
   }
 
-  /// Skip to previous episode
+  /// Skip to previous episode.
+  ///
+  /// Uses [PlaybackNavigationService] to find and play the previous episode in the playlist.
   Future<void> skipToPreviousEpisode() async {
     if (_currentAudioFile != null) {
       final previousEpisode =
@@ -224,22 +236,24 @@ class AudioPlayerService extends ChangeNotifier {
     }
   }
 
-  /// Seek to specific position
+  /// Seek to specific position.
   Future<void> seekTo(Duration position) async {
     await _playerController.seek(position);
   }
 
-  /// Skip forward by 30 seconds
+  /// Skip forward by 30 seconds.
   Future<void> skipForward() async {
     await _playerController.skipForward();
   }
 
-  /// Skip backward by 10 seconds
+  /// Skip backward by 10 seconds.
   Future<void> skipBackward() async {
     await _playerController.skipBackward();
   }
 
-  /// Set playback speed
+  /// Set playback speed.
+  ///
+  /// Updates both the player and the persisted state.
   Future<void> setPlaybackSpeed(double speed) async {
     await _playerController.setSpeed(speed);
     _suspendProgressUpdates = true;
@@ -248,13 +262,17 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Set autoplay preference
+  /// Set autoplay preference.
+  ///
+  /// Delegated to [PlaybackNavigationService].
   void setAutoplayEnabled(bool enabled) {
     _navigationService.setAutoplayEnabled(enabled);
     notifyListeners();
   }
 
-  /// Set repeat preference
+  /// Set repeat preference.
+  ///
+  /// Delegated to [PlaybackNavigationService].
   void setRepeatEnabled(bool enabled) {
     _navigationService.setRepeatEnabled(enabled);
     notifyListeners();
