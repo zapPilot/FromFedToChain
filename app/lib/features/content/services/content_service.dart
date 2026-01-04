@@ -71,7 +71,9 @@ class ContentService extends ChangeNotifier {
   bool get hasEpisodes => _allEpisodes.isNotEmpty;
   bool get hasFilteredResults => _filteredEpisodes.isNotEmpty;
 
-  // Listen history methods
+  /// Retrieves a list of recently listened episodes.
+  ///
+  /// Returns episodes ordered by listen time, limited to [limit] items.
   List<AudioFile> getListenHistoryEpisodes({int limit = 50}) {
     return _progressRepository.getListenHistoryEpisodes(allEpisodes,
         limit: limit);
@@ -100,7 +102,10 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Content methods
+  /// Fetches detailed content metadata for a specific episode.
+  ///
+  /// [id] - Episode ID; [language] - Language code; [category] - Category slug.
+  /// Returns [AudioContent] or null if not found.
   Future<AudioContent?> fetchContentById(
       String id, String language, String category) async {
     return await _contentRepository.fetchContentById(id, language, category);
@@ -110,6 +115,10 @@ class ContentService extends ChangeNotifier {
     return await _contentRepository.getContentForAudioFile(audioFile);
   }
 
+  /// Finds an [AudioFile] by its ID with fuzzy date matching.
+  ///
+  /// First tries exact ID match, then falls back to date-based matching.
+  /// Returns null if no match is found.
   Future<AudioFile?> getAudioFileById(String contentId) async {
     // Search for the audio file by ID in the loaded episodes
     try {
@@ -181,7 +190,10 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Episode loading methods
+  /// Loads all available episodes from the repository.
+  ///
+  /// Updates [allEpisodes] and applies current filters. Sets loading state
+  /// and error message appropriately.
   Future<void> loadAllEpisodes() async {
     _setLoading(true);
     _clearError();
@@ -219,6 +231,10 @@ class ContentService extends ChangeNotifier {
     }
   }
 
+  /// Sets the active language filter and reloads episodes.
+  ///
+  /// Validates [language] against supported languages. Updates preferences
+  /// and triggers episode reload for the new language.
   Future<void> setLanguage(String language) async {
     if (!ApiConfig.isValidLanguage(language)) {
       _errorMessage = 'Unsupported language: $language';
@@ -284,6 +300,9 @@ class ContentService extends ChangeNotifier {
     };
   }
 
+  /// Refreshes all episodes from the API.
+  ///
+  /// Alias for [loadAllEpisodes], useful for pull-to-refresh patterns.
   Future<void> refresh() async {
     await loadAllEpisodes();
   }
@@ -477,6 +496,10 @@ class ContentService extends ChangeNotifier {
     _searchCache[cacheKey] = results;
   }
 
+  /// Performs an advanced search with multiple filter criteria.
+  ///
+  /// Supports filtering by [query], [languages], [categories], date range,
+  /// and duration constraints. Returns sorted results based on [sortOrder].
   List<AudioFile> advancedSearch(
     List<AudioFile> episodes, {
     String? query,
