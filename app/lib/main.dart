@@ -5,20 +5,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:audio_service/audio_service.dart';
 
-import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
-
-import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
-import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
-import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
-import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
-import 'package:from_fed_to_chain_app/features/app/screens/main_navigation_screen.dart';
-import 'package:from_fed_to_chain_app/features/app/screens/splash_screen.dart';
-import 'package:from_fed_to_chain_app/features/app/screens/onboarding_screen.dart';
-import 'package:from_fed_to_chain_app/features/auth/screens/auth_screen.dart';
-import 'package:from_fed_to_chain_app/features/auth/services/auth_service.dart';
-import 'package:from_fed_to_chain_app/features/auth/screens/login_screen.dart';
+import 'package:from_fed_to_chain_app/core/services/services.dart';
+import 'package:from_fed_to_chain_app/core/theme/theme.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/services.dart';
+import 'package:from_fed_to_chain_app/features/content/services/services.dart';
+import 'package:from_fed_to_chain_app/core/navigation/navigation_export.dart';
+import 'package:from_fed_to_chain_app/features/app/index.dart';
+import 'package:from_fed_to_chain_app/features/auth/index.dart';
 
 /// Global navigator key for deep linking and navigation
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
