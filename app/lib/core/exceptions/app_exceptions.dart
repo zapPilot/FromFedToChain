@@ -11,11 +11,6 @@ abstract class AppException implements Exception {
       'AppException: $message ${code != null ? '[$code]' : ''}';
 }
 
-/// Exception related to streaming API operations
-class StreamingApiException extends AppException {
-  StreamingApiException(super.message, {super.code, super.originalError});
-}
-
 /// Exception related to network issues
 class NetworkException extends AppException {
   NetworkException(super.message, {super.originalError});
@@ -35,9 +30,4 @@ class TimeoutException extends AppException {
 /// Exception for unknown errors
 class UnknownException extends AppException {
   UnknownException(super.message, {super.originalError});
-}
-
-/// Exception for cache related operations
-class CacheException extends AppException {
-  CacheException(super.message, {super.originalError});
 }

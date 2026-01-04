@@ -15,6 +15,7 @@
     "lint": "npm run lint:node && npm run lint:flutter",
     "lint:node": "echo 'Node.js linting completed'",
     "lint:flutter": "cd app && flutter analyze",
+    "deadcode:flutter": "cd app && dart run scripts/deadcode_check.dart",
     "build:flutter": "cd app && flutter build web",
     "install:flutter": "cd app && flutter pub get",
     "prepare": "husky install",
