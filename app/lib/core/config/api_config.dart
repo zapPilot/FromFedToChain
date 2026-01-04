@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// ✅ .env file support
 class ApiConfig {
   // Environment detection with safe fallback
+  /// Current environment (e.g., 'production', 'test').
   static String get environment {
     try {
       return dotenv.get('ENVIRONMENT', fallback: 'production');
@@ -34,6 +35,7 @@ class ApiConfig {
   };
 
   // Dynamic URL resolution with safe fallback
+  /// Base URL for streaming services.
   static String get streamingBaseUrl {
     if (isTest) return _streamingUrls['test']!;
 
@@ -49,15 +51,19 @@ class ApiConfig {
   }
 
   // API endpoints using production format
+  /// Get URL for content list.
   static String getListUrl(String language, String category) =>
       '$streamingBaseUrl?prefix=audio/$language/$category/';
 
+  /// Get URL for streaming a specific path.
   static String getStreamUrl(String path) => '$streamingBaseUrl/proxy/$path';
 
+  /// Get URL for specific content metadata.
   static String getContentUrl(String language, String category, String id) =>
       '$streamingBaseUrl/api/content/$language/$category/$id';
 
   // Configuration constants with safe fallback
+  /// Timeout for API requests.
   static Duration get apiTimeout {
     try {
       return Duration(
@@ -68,6 +74,7 @@ class ApiConfig {
     }
   }
 
+  /// Timeout for stream connection.
   static Duration get streamTimeout {
     try {
       return Duration(

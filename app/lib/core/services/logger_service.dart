@@ -12,7 +12,10 @@ class LoggerService {
   static bool _initialized = false;
   static final Logger _rootLogger = Logger.root;
 
-  /// Initialize the logging service
+  /// Initialize the logging service.
+  ///
+  /// [enableLogging] controls whether logs are output to console.
+  /// Defaults to [kDebugMode].
   static void initialize({bool enableLogging = kDebugMode}) {
     if (_initialized) return;
 
@@ -27,7 +30,7 @@ class LoggerService {
     _initialized = true;
   }
 
-  /// Create a logger for a specific component
+  /// Create a logger for a specific component.
   static Logger getLogger(String componentName) {
     return Logger(componentName);
   }

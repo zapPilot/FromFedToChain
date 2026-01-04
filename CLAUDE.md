@@ -191,6 +191,38 @@ npm run build:flutter
 - **Nested Structure**: Content organized by language/category
 - **Coexisting Dependencies**: Node.js (package.json) for tooling, Flutter (pubspec.yaml) for app
 
+## 🏗️ Project Standards (Vibe Coding)
+
+### 1. File Structure (Barrel Files)
+
+- Use **sub-barrel files** (e.g., `models.dart`, `services.dart`) inside feature directories to group exports.
+- Main feature `index.dart` should only export these sub-barrel files.
+- **Example**:
+  ```dart
+  // features/content/index.dart
+  export 'models/models.dart';
+  export 'services/services.dart';
+  ```
+
+### 2. Documentation (TSDoc Style)
+
+- All public classes and methods must have **TSDoc-style** documentation comments (`///`).
+- Comments should explain the _purpose_, _parameters_, and _return values_.
+- **Example**:
+  ```dart
+  /// Initialize the service.
+  ///
+  /// returns `true` if successful.
+  Future<bool> initialize() async { ... }
+  ```
+
+### 3. Explicit Typing
+
+- Always explicit return types for methods and getters.
+- Avoid implicit `dynamic` or missing return types.
+- **Good**: `Future<void> run() async`
+- **Bad**: `run() async`
+
 ## 🔄 Configuration Constants
 
 **IMPORTANT**: These constants are defined in `app/lib/config/api_config.dart` and must be kept in sync with actual content organization:
@@ -337,4 +369,4 @@ flutter build web --release
 
 ---
 
-_Last updated: 2025-01-01 - Simplified to Flutter-only architecture after CLI deprecation_
+_Last updated: 2025-01-04 - Refactored with Vibe Coding standards (Barrel files, TSDoc, Explicit Types)_
