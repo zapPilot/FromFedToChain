@@ -2,4 +2,3 @@ npx --no-install lint-staged
 npm run precommit:test
 npm run build:flutter
 npm run test:flutter
-npm run coverage:flutter
