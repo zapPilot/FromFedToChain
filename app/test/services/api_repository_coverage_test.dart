@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:from_fed_to_chain_app/features/content/data/api_repository.dart';
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group('ApiRepository Coverage', () {
@@ -23,23 +22,10 @@ void main() {
     });
 
     test('ErrorHandlingInterceptor handles all status codes', () {
+      // Status codes are tested via the DioAdapter in 'ErrorHandlingInterceptor map status codes'
+      // This test verifies the interceptor can be instantiated
       final interceptor = ErrorHandlingInterceptor();
-      final codes = [403, 404, 429, 502, 503, 504, 418]; // 418 is default case
-
-      for (final code in codes) {
-        final err = DioException(
-          requestOptions: RequestOptions(path: '/'),
-          type: DioExceptionType.badResponse,
-          response: Response(
-              requestOptions: RequestOptions(path: '/'), statusCode: code),
-        );
-
-        final handler = ErrorInterceptorHandler();
-        // We can't easily mock handler.next(err) to verify the error content without a real Dio chain
-        // But we can check the private method logic via reflection or just trust the switch case is covered if we trigger it.
-        // Actually to verify the message, we can rely on `onError` calling `handler.next` with a modified exception.
-        // We can mock `ErrorInterceptorHandler`.
-      }
+      expect(interceptor, isNotNull);
     });
 
     // We can use the ApiRepository main tests to drive the interceptor logic by mocking responses
@@ -77,7 +63,7 @@ void main() {
     });
 
     test('getEpisodesForLanguage handles partial failures', () async {
-      final lang = 'en-US';
+      const lang = 'en-US';
       for (final category in ApiConfig.supportedCategories) {
         final url = ApiConfig.getListUrl(lang, category);
         if (category == ApiConfig.supportedCategories[0]) {

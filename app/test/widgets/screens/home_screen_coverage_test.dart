@@ -73,7 +73,7 @@ void main() {
     }
 
     test('ContentServiceState equality', () {
-      final state1 = ContentServiceState(
+      const state1 = ContentServiceState(
         allEpisodes: [],
         filteredEpisodes: [],
         isLoading: false,
@@ -84,7 +84,7 @@ void main() {
         searchQuery: '',
       );
 
-      final state2 = ContentServiceState(
+      const state2 = ContentServiceState(
         allEpisodes: [],
         filteredEpisodes: [],
         isLoading: false,
@@ -98,7 +98,7 @@ void main() {
       expect(state1, equals(state2));
       expect(state1.hashCode, equals(state2.hashCode));
 
-      final state3 = ContentServiceState(
+      const state3 = ContentServiceState(
         allEpisodes: [],
         filteredEpisodes: [],
         isLoading: true, // changed

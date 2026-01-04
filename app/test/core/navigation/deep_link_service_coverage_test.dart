@@ -18,12 +18,10 @@ void main() {
   group('DeepLinkService Coverage Tests', () {
     late MockAppLinks mockAppLinks;
     late GlobalKey<NavigatorState> navigatorKey;
-    late MockNavigatorState mockNavigatorState;
     late StreamController<Uri> uriController;
 
     setUp(() {
       mockAppLinks = MockAppLinks();
-      mockNavigatorState = MockNavigatorState();
       navigatorKey = GlobalKey<NavigatorState>();
       // We can't easily assign state to a GlobalKey without pumping a widget.
       // So we might need to rely on partial integration or just test static methods if exposed,

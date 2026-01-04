@@ -112,18 +112,18 @@ void main() {
 
   group('Exception Inheritance', () {
     test('all exceptions should extend AppException', () {
-      expect(StreamingApiException('test') is AppException, isTrue);
-      expect(NetworkException('test') is AppException, isTrue);
-      expect(ApiException('test') is AppException, isTrue);
-      expect(TimeoutException('test') is AppException, isTrue);
-      expect(UnknownException('test') is AppException, isTrue);
-      expect(CacheException('test') is AppException, isTrue);
+      expect(StreamingApiException('test'), isA<AppException>());
+      expect(NetworkException('test'), isA<AppException>());
+      expect(ApiException('test'), isA<AppException>());
+      expect(TimeoutException('test'), isA<AppException>());
+      expect(UnknownException('test'), isA<AppException>());
+      expect(CacheException('test'), isA<AppException>());
     });
 
     test('all exceptions should implement Exception', () {
-      expect(StreamingApiException('test') is Exception, isTrue);
-      expect(NetworkException('test') is Exception, isTrue);
-      expect(ApiException('test') is Exception, isTrue);
+      expect(StreamingApiException('test'), isA<Exception>());
+      expect(NetworkException('test'), isA<Exception>());
+      expect(ApiException('test'), isA<Exception>());
     });
   });
 }

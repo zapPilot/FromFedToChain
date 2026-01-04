@@ -24,8 +24,8 @@ void main() {
     });
 
     test('getEpisodeList returns parsed episodes on success', () async {
-      final lang = 'zh-TW';
-      final cat = 'daily-news';
+      const lang = 'zh-TW';
+      const cat = 'daily-news';
       final url = Uri.parse(ApiConfig.getListUrl(lang, cat));
 
       when(mockClient.get(url, headers: anyNamed('headers')))
@@ -71,7 +71,7 @@ void main() {
     });
 
     test('validateStreamingUrl success', () async {
-      final url = 'https://example.com/audio.m3u8';
+      const url = 'https://example.com/audio.m3u8';
       when(mockClient.head(Uri.parse(url)))
           .thenAnswer((_) async => http.Response('', 200));
 
@@ -80,7 +80,7 @@ void main() {
     });
 
     test('validateStreamingUrl failure', () async {
-      final url = 'https://example.com/audio.m3u8';
+      const url = 'https://example.com/audio.m3u8';
       when(mockClient.head(Uri.parse(url)))
           .thenAnswer((_) async => http.Response('', 404));
 

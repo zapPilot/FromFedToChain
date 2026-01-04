@@ -1,13 +1,7 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/background_player_adapter.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/player_adapter.dart';
-import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-
 import 'package:rxdart/rxdart.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_audio_handler.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/background_player_adapter.dart';
