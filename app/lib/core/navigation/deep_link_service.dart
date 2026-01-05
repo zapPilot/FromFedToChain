@@ -11,9 +11,13 @@ class DeepLinkService {
   static AppLinks? _appLinks;
   static final _log = LoggerService.getLogger('DeepLinkService');
 
-  /// Initialize deep link handling
-  /// [navigatorKey] should be the global navigator key from MaterialApp
-  /// [appLinks] optional instance for testing
+  /// Initializes the deep link handling service.
+  ///
+  /// Sets up the [navigatorKey] to allow navigation from deep links.
+  /// Checks for any initial link that launched the app and sets up a stream listener
+  /// for subsequent links while the app is running.
+  ///
+  /// [appLinks] can be provided for testing purposes.
   static Future<void> initialize(GlobalKey<NavigatorState> navigatorKey,
       {AppLinks? appLinks}) async {
     _navigatorKey = navigatorKey;
@@ -170,9 +174,11 @@ class DeepLinkService {
     );
   }
 
-  /// Generate deep link for sharing content with language support
-  /// [contentId] can be either full ID (episode-id-language) or base episode ID
-  /// [language] optional explicit language parameter
+  /// Generates a deep link URL for sharing specific content.
+  ///
+  /// [contentId] can be either a full ID (e.g., 'episode-id-en-US') or a base episode ID.
+  /// [language] is an optional explicit language parameter.
+  /// [useCustomScheme] determines if the link uses 'fromfedtochain://' (true) or 'https://' (false).
   static String generateContentLink(String contentId,
       {String? language, bool useCustomScheme = true}) {
     String episodeId;
@@ -208,7 +214,7 @@ class DeepLinkService {
     }
   }
 
-  /// Dispose resources
+  /// Disposes resources used by the service, cancelling any active subscriptions.
   static void dispose() {
     _linkStreamSubscription?.cancel();
     _linkStreamSubscription = null;

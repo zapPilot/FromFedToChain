@@ -58,17 +58,37 @@ class ContentService extends ChangeNotifier {
   }
 
   // Getters
+  /// Returns the complete list of loaded audio files.
   List<AudioFile> get allEpisodes => _allEpisodes;
+
+  /// Returns the list of audio files after applying current filters.
   List<AudioFile> get filteredEpisodes => _filteredEpisodes;
 
+  /// The currently selected language filter code (e.g., 'en-US').
   String get selectedLanguage => _preferencesRepository.selectedLanguage;
+
+  /// The currently selected category slug (e.g., 'daily-news').
   String get selectedCategory => _preferencesRepository.selectedCategory;
+
+  /// The current search query string.
   String get searchQuery => _preferencesRepository.searchQuery;
+
+  /// The current sort order (e.g., 'newest', 'oldest').
   String get sortOrder => _preferencesRepository.sortOrder;
+
+  /// Whether the service is currently loading data.
   bool get isLoading => _isLoading;
+
+  /// The current error message, if any.
   String? get errorMessage => _errorMessage;
+
+  /// Whether an error has occurred.
   bool get hasError => _errorMessage != null;
+
+  /// Whether any episodes have been loaded.
   bool get hasEpisodes => _allEpisodes.isNotEmpty;
+
+  /// Whether the current filters resulted in any matches.
   bool get hasFilteredResults => _filteredEpisodes.isNotEmpty;
 
   /// Retrieves a list of recently listened episodes.
@@ -79,24 +99,32 @@ class ContentService extends ChangeNotifier {
         limit: limit);
   }
 
+  /// Returns a map of episode IDs to their last listen timestamp.
   Map<String, DateTime> get listenHistory => _progressRepository.listenHistory;
 
+  /// Checks if an episode has been marked as finished.
   bool isEpisodeFinished(String episodeId) =>
       _progressRepository.isEpisodeFinished(episodeId);
 
+  /// Checks if an episode has started but is not yet finished.
   bool isEpisodeUnfinished(String episodeId) =>
       _progressRepository.isEpisodeUnfinished(episodeId);
 
+  /// Adds an episode to the listen history.
+  ///
+  /// [at] - Optional timestamp for when the listen occurred. Defaults to now.
   Future<void> addToListenHistory(AudioFile episode, {DateTime? at}) async {
     await _progressRepository.addToListenHistory(episode, at: at);
     notifyListeners();
   }
 
+  /// Removes an episode from the listen history.
   Future<void> removeFromListenHistory(String episodeId) async {
     await _progressRepository.removeFromListenHistory(episodeId);
     notifyListeners();
   }
 
+  /// Clears the entire listen history.
   Future<void> clearListenHistory() async {
     await _progressRepository.clearListenHistory();
     notifyListeners();
@@ -111,6 +139,7 @@ class ContentService extends ChangeNotifier {
     return await _contentRepository.fetchContentById(id, language, category);
   }
 
+  /// Retrieves detailed content metadata for a given [AudioFile].
   Future<AudioContent?> getContentForAudioFile(AudioFile audioFile) async {
     return await _contentRepository.getContentForAudioFile(audioFile);
   }
@@ -155,35 +184,46 @@ class ContentService extends ChangeNotifier {
     }
   }
 
+  /// Prefetches content metadata for a list of audio files to improve performance.
   Future<void> prefetchContent(List<AudioFile> audioFiles) async {
     await _contentRepository.prefetchContent(audioFiles);
   }
 
+  /// Clears the content metadata cache.
   void clearContentCache() {
     _contentRepository.clearContentCache();
   }
 
   // Progress tracking methods
+  /// Updates the playback completion percentage for an episode.
+  ///
+  /// [completion] should be a value between 0.0 and 1.0.
   Future<void> updateEpisodeCompletion(
       String episodeId, double completion) async {
     await _progressRepository.updateEpisodeCompletion(episodeId, completion);
     notifyListeners();
   }
 
+  /// Marks an episode as completely finished.
   Future<void> markEpisodeAsFinished(String episodeId) async {
     await _progressRepository.markEpisodeAsFinished(episodeId);
     notifyListeners();
   }
 
+  /// Retrieves the current completion percentage for an episode.
   double getEpisodeCompletion(String episodeId) {
     return _progressRepository.getEpisodeCompletion(episodeId);
   }
 
+  /// Returns a list of episodes that have been started but not finished.
   List<AudioFile> getUnfinishedEpisodes() {
     return _progressRepository.getUnfinishedEpisodes(allEpisodes);
   }
 
   // Preferences methods
+  /// Sets the sort order for episodes and reapplies filters.
+  ///
+  /// [sortOrder] can be 'newest', 'oldest', or 'alphabetical'.
   Future<void> setSortOrder(String sortOrder) async {
     await _preferencesRepository.setSortOrder(sortOrder);
     _applyCurrentFilters();
@@ -212,6 +252,9 @@ class ContentService extends ChangeNotifier {
     }
   }
 
+  /// Loads episodes for a specific [language].
+  ///
+  /// Updates [allEpisodes] and applies current filters.
   Future<void> loadEpisodesForLanguage(String language) async {
     _setLoading(true);
     _clearError();
@@ -248,6 +291,7 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Sets the active category filter and updates the view.
   Future<void> setCategory(String category) async {
     if (category != 'all' && !ApiConfig.isValidCategory(category)) {
       _errorMessage = 'Unsupported category: $category';
@@ -261,6 +305,7 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates the search query and filters the episode list accordingly.
   void setSearchQuery(String query) {
     if (_disposed) return;
 
@@ -270,14 +315,17 @@ class ContentService extends ChangeNotifier {
   }
 
   // Data access methods
+  /// Filters current episodes by [language].
   List<AudioFile> getEpisodesByLanguage(String language) {
     return _filterByLanguage(_allEpisodes, language);
   }
 
+  /// Filters current episodes by [category].
   List<AudioFile> getEpisodesByCategory(String category) {
     return _filterByCategory(_allEpisodes, category);
   }
 
+  /// Filters current episodes by both [language] and [category].
   List<AudioFile> getEpisodesByLanguageAndCategory(
       String language, String category) {
     return advancedSearch(
@@ -288,6 +336,7 @@ class ContentService extends ChangeNotifier {
   }
 
   // Statistics and utility methods
+  /// Returns a map of statistics about the current content and usage.
   Map<String, dynamic> getStatistics() {
     return {
       'totalEpisodes': allEpisodes.length,
@@ -307,6 +356,7 @@ class ContentService extends ChangeNotifier {
     await loadAllEpisodes();
   }
 
+  /// Clears all loaded episodes and caches.
   void clear() {
     _allEpisodes.clear();
     _filteredEpisodes.clear();
@@ -317,10 +367,12 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Searches for episodes using the streaming API if not found locally.
   Future<List<AudioFile>> searchEpisodes(String query) async {
     return _searchEpisodes(query, _allEpisodes);
   }
 
+  /// Returns debug information for a specific [AudioFile], including service state.
   Map<String, dynamic> getDebugInfo(AudioFile? audioFile) {
     if (audioFile == null) {
       return {'error': 'No audio file provided'};
@@ -347,19 +399,23 @@ class ContentService extends ChangeNotifier {
     };
   }
 
+  /// Sets the completion status for an episode. Alias for [updateEpisodeCompletion].
   Future<void> setEpisodeCompletion(String episodeId, double completion) async {
     await updateEpisodeCompletion(episodeId, completion);
   }
 
+  /// Caches the [content] object for a specific ID, language, and category.
   void cacheContent(
       String id, String language, String category, AudioContent content) {
     _contentRepository.cacheContent(id, language, category, content);
   }
 
+  /// Retrieves cached content if available.
   AudioContent? getCachedContent(String id, String language, String category) {
     return _contentRepository.getCachedContent(id, language, category);
   }
 
+  /// Returns the current list of filtered episodes.
   List<AudioFile> getFilteredEpisodes() => filteredEpisodes;
 
   // Private helper methods

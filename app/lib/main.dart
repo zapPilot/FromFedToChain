@@ -150,7 +150,7 @@ class FromFedToChainApp extends StatelessWidget {
                 if (authService.isAuthenticated) {
                   return const MainNavigationScreen();
                 } else {
-                  return const LoginScreen();
+                  return const AuthScreen();
                 }
               },
             ),
@@ -186,7 +186,7 @@ class FromFedToChainApp extends StatelessWidget {
                   );
                 case '/login':
                   return MaterialPageRoute(
-                    builder: (_) => const LoginScreen(),
+                    builder: (_) => const AuthScreen(),
                   );
                 case '/home':
                   return MaterialPageRoute(

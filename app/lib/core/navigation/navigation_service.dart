@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:from_fed_to_chain_app/features/content/screens/home_screen.dart';
 import 'package:from_fed_to_chain_app/features/app/screens/onboarding_screen.dart';
-import 'package:from_fed_to_chain_app/features/auth/screens/login_screen.dart';
+import 'package:from_fed_to_chain_app/features/auth/screens/auth_screen.dart';
 import 'package:from_fed_to_chain_app/features/auth/services/auth_service.dart';
 
 /// Service to handle app navigation logic and routing decisions
@@ -27,7 +27,7 @@ class NavigationService {
       }
 
       // Show login screen if user is not authenticated
-      return const LoginScreen();
+      return const AuthScreen();
     } catch (e) {
       // On error, default to onboarding
       return const OnboardingScreen();
@@ -96,7 +96,7 @@ class NavigationService {
     await prefs.setBool('onboarding_completed', true);
 
     // Navigate to login screen after onboarding
-    navigateAndClearStack(context, const LoginScreen());
+    navigateAndClearStack(context, const AuthScreen());
   }
 
   /// Handle successful authentication

@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
+import 'package:from_fed_to_chain_app/core/utils/date_formatter.dart';
 
-/// Card widget for displaying individual audio episode information
+/// A card widget that displays information about a single [AudioFile].
+///
+/// Shows artwork, title, metadata (category, language, date, duration),
+/// and an optional play button. Handles tap and long-press interactions.
 class AudioItemCard extends StatelessWidget {
+  /// The audio file data to display.
   final AudioFile audioFile;
+
+  /// Callback when the card is tapped.
   final VoidCallback onTap;
+
+  /// Callback when the card is long-pressed.
   final VoidCallback? onLongPress;
+
+  /// Whether to show the play/pause button on the right side.
+  /// Defaults to true.
   final bool showPlayButton;
+
+  /// Whether this episode is currently playing.
+  /// Affects styling (e.g., adds a border or highlight).
   final bool isCurrentlyPlaying;
 
+  /// Creates an [AudioItemCard].
   const AudioItemCard({
     super.key,
     required this.audioFile,
@@ -156,7 +172,7 @@ class AudioItemCard extends StatelessWidget {
             children: [
               // Date
               Text(
-                _formatDate(audioFile.publishDate),
+                DateFormatter.formatFriendlyDate(audioFile.publishDate),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                 ),
@@ -342,26 +358,6 @@ class AudioItemCard extends StatelessWidget {
         return Icons.account_balance;
       default:
         return Icons.headphones;
-    }
-  }
-
-  /// Format date for display with localization
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '$weeks week${weeks > 1 ? 's' : ''} ago';
-    } else {
-      // Use localized date format for older dates (without time)
-      return DateFormat.yMMMd().format(date);
     }
   }
 }

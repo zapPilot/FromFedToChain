@@ -2,20 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:from_fed_to_chain_app/core/theme/app_theme.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 
-/// Compact audio player widget shown at bottom of home screen
-/// Now decoupled from AudioService for better reusability
+/// A compact audio player widget typically displayed at the bottom of the screen.
+///
+/// Shows the current [audioFile] info and playback controls.
+/// This widget is stateless and relies on callbacks for interaction,
+/// making it decoupled from specific state management (like AudioService).
 class MiniPlayer extends StatelessWidget {
+  /// The currently playing audio file.
   final AudioFile audioFile;
+
+  /// Whether audio is currently playing.
   final bool isPlaying;
+
+  /// Whether playback is paused.
   final bool isPaused;
+
+  /// Whether the player is in a loading state.
   final bool isLoading;
+
+  /// Whether an error state exists.
   final bool hasError;
+
+  /// Text to display describing the current state (e.g., 'Playing', 'Paused').
   final String stateText;
+
+  /// Callback when the player area is tapped (e.g., to open full player).
   final VoidCallback onTap;
+
+  /// Callback for the play/pause button.
   final VoidCallback onPlayPause;
+
+  /// Callback for the next track button.
   final VoidCallback onNext;
+
+  /// Callback for the previous track button.
   final VoidCallback onPrevious;
 
+  /// Creates a [MiniPlayer].
   const MiniPlayer({
     super.key,
     required this.audioFile,

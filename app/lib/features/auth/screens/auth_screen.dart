@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -249,6 +250,9 @@ class _AuthScreenState extends State<AuthScreen>
 
         // Terms and privacy
         _buildTermsText(),
+
+        // Dev Mode Indicator
+        _buildDevModeIndicator(),
       ],
     );
   }
@@ -352,6 +356,29 @@ class _AuthScreenState extends State<AuthScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDevModeIndicator() {
+    if (!kDebugMode) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(top: AppTheme.spacingL),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.orange.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+      ),
+      child: const Text(
+        '🚧 Development Mode\nDemo login available for simulator testing',
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.orange,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
