@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 npx --no-install lint-staged
 npm run precommit:test
 npm run deadcode:flutter
