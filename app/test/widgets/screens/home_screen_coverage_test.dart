@@ -9,6 +9,7 @@ import 'package:from_fed_to_chain_app/features/audio/services/audio_player_servi
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/content_service_state.dart';
 
 @GenerateMocks([ContentService, AudioPlayerService, PlaylistService])
 import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';

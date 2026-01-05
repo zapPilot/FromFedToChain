@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:from_fed_to_chain_app/features/content/data/api_repository.dart';
+import 'package:from_fed_to_chain_app/features/content/data/interceptors/interceptors.dart';
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 
 void main() {

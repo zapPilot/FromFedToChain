@@ -12,54 +12,9 @@ import 'package:from_fed_to_chain_app/features/content/widgets/home/home_header.
 import 'package:from_fed_to_chain_app/features/content/widgets/home/home_mini_player.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/episode_options_sheet.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/home/audio_tab_content.dart';
-
-/// State class for content service to enable granular rebuilds
-class ContentServiceState {
-  final List<AudioFile> allEpisodes;
-  final List<AudioFile> filteredEpisodes;
-  final bool isLoading;
-  final bool hasError;
-  final String? errorMessage;
-  final String selectedLanguage;
-  final String selectedCategory;
-  final String searchQuery;
-
-  const ContentServiceState({
-    required this.allEpisodes,
-    required this.filteredEpisodes,
-    required this.isLoading,
-    required this.hasError,
-    required this.errorMessage,
-    required this.selectedLanguage,
-    required this.selectedCategory,
-    required this.searchQuery,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ContentServiceState &&
-          runtimeType == other.runtimeType &&
-          allEpisodes.length == other.allEpisodes.length &&
-          filteredEpisodes.length == other.filteredEpisodes.length &&
-          isLoading == other.isLoading &&
-          hasError == other.hasError &&
-          errorMessage == other.errorMessage &&
-          selectedLanguage == other.selectedLanguage &&
-          selectedCategory == other.selectedCategory &&
-          searchQuery == other.searchQuery;
-
-  @override
-  int get hashCode =>
-      allEpisodes.length.hashCode ^
-      filteredEpisodes.length.hashCode ^
-      isLoading.hashCode ^
-      hasError.hashCode ^
-      errorMessage.hashCode ^
-      selectedLanguage.hashCode ^
-      selectedCategory.hashCode ^
-      searchQuery.hashCode;
-}
+import 'package:from_fed_to_chain_app/features/content/models/content_service_state.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/home/sort_selector.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/home/content_states.dart';
 
 /// Main home screen displaying episodes with filtering and search
 class HomeScreen extends StatefulWidget {
@@ -126,7 +81,13 @@ class _HomeScreenState extends State<HomeScreen>
                     _buildFilterBar(context, contentService),
 
                     // Sort selector
-                    _buildSortSelector(context, contentService),
+                    // Sort selector
+                    SortSelector(
+                      sortOrder: contentService.sortOrder,
+                      onSortChanged: (newValue) {
+                        contentService.setSortOrder(newValue);
+                      },
+                    ),
                   ],
                 );
               },
@@ -220,15 +181,22 @@ class _HomeScreenState extends State<HomeScreen>
     AudioPlayerService audioService,
   ) {
     if (contentService.isLoading && contentService.allEpisodes.isEmpty) {
-      return _buildLoadingState();
+      return const ContentLoadingState();
     }
 
     if (contentService.hasError) {
-      return _buildErrorState(contentService);
+      return ContentErrorState(
+        errorMessage: contentService.errorMessage ?? 'Unknown error occurred',
+        onRetry: () => contentService.refresh(),
+      );
     }
 
     if (contentService.filteredEpisodes.isEmpty) {
-      return _buildEmptyState(contentService);
+      return ContentEmptyState(
+        searchQuery: contentService.searchQuery,
+        onClearFilters: () => contentService.setSearchQuery(''),
+        onRefresh: () => contentService.refresh(),
+      );
     }
 
     return Column(
@@ -334,114 +302,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  /// Build loading state
-  Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
-          ),
-          const SizedBox(height: AppTheme.spacingL),
-          const Text(
-            'Loading episodes...',
-            style: AppTheme.titleMedium,
-          ),
-          const SizedBox(height: AppTheme.spacingS),
-          Text(
-            'This may take a few moments',
-            style: AppTheme.bodySmall,
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Build error state
-  Widget _buildErrorState(ContentService contentService) {
-    return Center(
-      child: Padding(
-        padding: AppTheme.safePadding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 80,
-              color: AppTheme.errorColor,
-            ),
-            const SizedBox(height: AppTheme.spacingL),
-            const Text(
-              'Something went wrong',
-              style: AppTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppTheme.spacingM),
-            Text(
-              contentService.errorMessage ?? 'Unknown error occurred',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppTheme.spacingXL),
-            ElevatedButton(
-              onPressed: () => contentService.refresh(),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build empty state
-  Widget _buildEmptyState(ContentService contentService) {
-    return Center(
-      child: Padding(
-        padding: AppTheme.safePadding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.headphones_outlined,
-              size: 80,
-              color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: AppTheme.spacingL),
-            const Text(
-              'No episodes found',
-              style: AppTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppTheme.spacingM),
-            Text(
-              contentService.searchQuery.isNotEmpty
-                  ? 'Try different search terms or filters'
-                  : 'Check your internet connection and try again',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppTheme.spacingXL),
-            if (contentService.searchQuery.isNotEmpty)
-              TextButton(
-                onPressed: () => contentService.setSearchQuery(''),
-                child: const Text('Clear filters'),
-              )
-            else
-              ElevatedButton(
-                onPressed: () => contentService.refresh(),
-                child: const Text('Refresh'),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   /// Build mini player
   Widget _buildMiniPlayer(
       BuildContext context, AudioPlayerService audioService) {
@@ -483,73 +343,6 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       ),
       builder: (context) => EpisodeOptionsSheet(episode: episode),
-    );
-  }
-
-  /// Build sort selector dropdown
-  Widget _buildSortSelector(
-      BuildContext context, ContentService contentService) {
-    return Container(
-      margin: AppTheme.safeHorizontalPadding,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacingM,
-        vertical: AppTheme.spacingS,
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.sort,
-            size: 16,
-            color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-          ),
-          const SizedBox(width: AppTheme.spacingS),
-          Text(
-            'Sort by:',
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: AppTheme.spacingS),
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: contentService.sortOrder,
-                isDense: true,
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.onSurfaceColor,
-                  fontWeight: FontWeight.w500,
-                ),
-                dropdownColor: AppTheme.surfaceColor,
-                icon: Icon(
-                  Icons.keyboard_arrow_down,
-                  size: 16,
-                  color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-                ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'newest',
-                    child: Text('Newest First'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'oldest',
-                    child: Text('Oldest First'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'alphabetical',
-                    child: Text('A-Z'),
-                  ),
-                ],
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    contentService.setSortOrder(newValue);
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

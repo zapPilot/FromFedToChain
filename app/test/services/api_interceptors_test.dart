@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:fake_async/fake_async.dart';
-import 'package:from_fed_to_chain_app/features/content/data/api_repository.dart';
+import 'package:from_fed_to_chain_app/features/content/data/interceptors/interceptors.dart';
 
 @GenerateMocks([ErrorInterceptorHandler, Dio])
 import 'api_interceptors_test.mocks.dart';

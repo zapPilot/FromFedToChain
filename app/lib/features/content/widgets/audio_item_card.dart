@@ -117,7 +117,7 @@ class AudioItemCard extends StatelessWidget {
         ],
       ),
       child: Icon(
-        _getCategoryIcon(audioFile.category),
+        AppTheme.getCategoryIcon(audioFile.category),
         color: Colors.white,
         size: 28,
       ),
@@ -339,25 +339,5 @@ class AudioItemCard extends StatelessWidget {
         ],
       ],
     );
-  }
-
-  /// Get category icon
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'daily-news':
-        return Icons.newspaper;
-      case 'ethereum':
-        return Icons.currency_bitcoin;
-      case 'macro':
-        return Icons.trending_up;
-      case 'startup':
-        return Icons.rocket_launch;
-      case 'ai':
-        return Icons.smart_toy;
-      case 'defi':
-        return Icons.account_balance;
-      default:
-        return Icons.headphones;
-    }
   }
 }

@@ -31,3 +31,18 @@ class TimeoutException extends AppException {
 class UnknownException extends AppException {
   UnknownException(super.message, {super.originalError});
 }
+
+/// Exception related to audio playback issues
+class AudioPlaybackException extends AppException {
+  AudioPlaybackException(super.message, {super.originalError});
+}
+
+/// Exception related to content loading issues
+class ContentLoadException extends AppException {
+  ContentLoadException(super.message, {super.originalError});
+}
+
+/// Exception related to authentication issues
+class AuthenticationException extends AppException {
+  AuthenticationException(super.message, {super.code});
+}
