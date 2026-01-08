@@ -2,14 +2,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
 import 'package:from_fed_to_chain_app/features/audio/screens/player_screen.dart';
 import 'package:from_fed_to_chain_app/core/navigation/deep_link_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
 import 'package:provider/provider.dart';
 
+import 'package:app_links/app_links.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 import '../../widgets/screens/home_screen_coverage_test.mocks.dart';
+
+@GenerateMocks([AppLinks])
 import 'deep_link_service_coverage_test.mocks.dart';
 
 // Helper to mock BuildContext

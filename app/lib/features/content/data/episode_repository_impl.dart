@@ -10,9 +10,20 @@ import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 /// Handles all episode data access operations
 class EpisodeRepositoryImpl implements EpisodeRepository {
   static final _log = LoggerService.getLogger('EpisodeRepositoryImpl');
+
+  /// StreamingApiService instance for API calls (injected)
+  final StreamingApiService _apiService;
+
   List<AudioFile> _allEpisodes = [];
   bool _isLoading = false;
   String? _errorMessage;
+
+  /// Create an EpisodeRepositoryImpl with optional StreamingApiService injection.
+  ///
+  /// [apiService] - Optional StreamingApiService instance. If not provided,
+  ///                uses the singleton instance for backward compatibility.
+  EpisodeRepositoryImpl({StreamingApiService? apiService})
+      : _apiService = apiService ?? StreamingApiService.instance;
 
   // Getters for current state
   List<AudioFile> get allEpisodes => List.unmodifiable(_allEpisodes);
@@ -30,7 +41,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
 
     try {
       _log.info('Loading all episodes...');
-      _allEpisodes = await StreamingApiService.getAllEpisodes();
+      _allEpisodes = await _apiService.fetchAllEpisodes();
 
       if (_allEpisodes.isEmpty) {
         _setError('No episodes found. Please check your internet connection.');
@@ -61,8 +72,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
 
     try {
       _log.info('Loading episodes for language: $language');
-      final episodes =
-          await StreamingApiService.getAllEpisodesForLanguage(language);
+      final episodes = await _apiService.fetchAllEpisodesForLanguage(language);
 
       // Update or merge with existing episodes
       _updateEpisodesForLanguage(language, episodes);
@@ -95,7 +105,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
       }
 
       // Otherwise, search via API
-      return await StreamingApiService.searchEpisodes(query);
+      return await _apiService.fetchSearchEpisodes(query);
     } catch (e) {
       _log.severe('Search failed: $e');
       return [];

@@ -5,25 +5,28 @@ import 'package:from_fed_to_chain_app/core/services/logger_service.dart';
 import 'package:from_fed_to_chain_app/core/config/api_config.dart';
 import 'package:from_fed_to_chain_app/features/content/data/cache_service.dart';
 import 'package:from_fed_to_chain_app/features/content/data/content_repository.dart';
-import 'package:from_fed_to_chain_app/features/content/data/episode_repository.dart';
-import 'package:from_fed_to_chain_app/features/content/data/episode_repository_impl.dart';
 import 'package:from_fed_to_chain_app/features/content/data/preferences_repository.dart';
 import 'package:from_fed_to_chain_app/features/content/data/progress_repository.dart';
 import 'package:from_fed_to_chain_app/features/content/data/progress_tracking_service.dart';
-import 'package:from_fed_to_chain_app/features/content/data/streaming_api_service.dart';
 import 'package:from_fed_to_chain_app/features/content/data/user_preferences_service.dart';
+import 'package:from_fed_to_chain_app/core/di/service_locator.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/use_cases.dart';
 
 /// Primary content domain service for episodes, filters, and playlists.
 ///
 /// This replaces the previous facade + factory layering and keeps
 /// state, filtering, and playlist management in one place.
 class ContentService extends ChangeNotifier {
-  final EpisodeRepository _episodeRepository;
+  final LoadEpisodesUseCase _loadEpisodesUseCase;
+  final FilterEpisodesUseCase _filterEpisodesUseCase;
+  final SearchEpisodesUseCase _searchEpisodesUseCase;
+
   final ContentRepository _contentRepository;
   final ProgressRepository _progressRepository;
   final PreferencesRepository _preferencesRepository;
+
   static final _log = LoggerService.getLogger('ContentService');
 
   // State
@@ -34,16 +37,18 @@ class ContentService extends ChangeNotifier {
   String? _errorMessage;
   bool _disposed = false;
 
-  // Search cache
-  final Map<String, List<AudioFile>> _searchCache = {};
-  final int _maxSearchCacheSize = 20;
-
   ContentService({
-    EpisodeRepository? episodeRepository,
+    LoadEpisodesUseCase? loadEpisodesUseCase,
+    FilterEpisodesUseCase? filterEpisodesUseCase,
+    SearchEpisodesUseCase? searchEpisodesUseCase,
     ContentRepository? contentRepository,
     ProgressRepository? progressRepository,
     PreferencesRepository? preferencesRepository,
-  })  : _episodeRepository = episodeRepository ?? EpisodeRepositoryImpl(),
+  })  : _loadEpisodesUseCase = loadEpisodesUseCase ?? sl<LoadEpisodesUseCase>(),
+        _filterEpisodesUseCase =
+            filterEpisodesUseCase ?? sl<FilterEpisodesUseCase>(),
+        _searchEpisodesUseCase =
+            searchEpisodesUseCase ?? sl<SearchEpisodesUseCase>(),
         _contentRepository = contentRepository ?? CacheService(),
         _progressRepository = progressRepository ?? ProgressTrackingService(),
         _preferencesRepository =
@@ -239,7 +244,7 @@ class ContentService extends ChangeNotifier {
     _clearError();
 
     try {
-      final episodes = await _episodeRepository.loadAllEpisodes();
+      final episodes = await _loadEpisodesUseCase.loadAll();
       _allEpisodes = episodes;
       _applyCurrentFilters();
 
@@ -260,8 +265,7 @@ class ContentService extends ChangeNotifier {
     _clearError();
 
     try {
-      final episodes =
-          await _episodeRepository.loadEpisodesForLanguage(language);
+      final episodes = await _loadEpisodesUseCase.loadForLanguage(language);
       _allEpisodes = episodes;
       _applyCurrentFilters();
 
@@ -317,12 +321,12 @@ class ContentService extends ChangeNotifier {
   // Data access methods
   /// Filters current episodes by [language].
   List<AudioFile> getEpisodesByLanguage(String language) {
-    return _filterByLanguage(_allEpisodes, language);
+    return _filterEpisodesUseCase.filterByLanguage(_allEpisodes, language);
   }
 
   /// Filters current episodes by [category].
   List<AudioFile> getEpisodesByCategory(String category) {
-    return _filterByCategory(_allEpisodes, category);
+    return _filterEpisodesUseCase.filterByCategory(_allEpisodes, category);
   }
 
   /// Filters current episodes by both [language] and [category].
@@ -345,7 +349,8 @@ class ContentService extends ChangeNotifier {
       'selectedCategory': selectedCategory,
       'searchQuery': searchQuery,
       'listeningStats': _progressRepository.getListeningStatistics(allEpisodes),
-      'cacheStats': _contentRepository.getCacheStatistics(),
+      'cacheStats': {'searchCache': _searchEpisodesUseCase.cacheSize},
+      'contentCacheStats': _contentRepository.getCacheStatistics(),
     };
   }
 
@@ -360,7 +365,7 @@ class ContentService extends ChangeNotifier {
   void clear() {
     _allEpisodes.clear();
     _filteredEpisodes.clear();
-    _searchCache.clear();
+    _searchEpisodesUseCase.clearCache();
 
     _contentRepository.clearContentCache();
     _clearError();
@@ -369,7 +374,7 @@ class ContentService extends ChangeNotifier {
 
   /// Searches for episodes using the streaming API if not found locally.
   Future<List<AudioFile>> searchEpisodes(String query) async {
-    return _searchEpisodes(query, _allEpisodes);
+    return _searchEpisodesUseCase(query: query, localEpisodes: _allEpisodes);
   }
 
   /// Returns debug information for a specific [AudioFile], including service state.
@@ -452,104 +457,13 @@ class ContentService extends ChangeNotifier {
     required String searchQuery,
     required String sortOrder,
   }) {
-    var filtered = List<AudioFile>.from(allEpisodes);
-
-    filtered = _filterByLanguage(filtered, selectedLanguage);
-
-    if (selectedCategory != 'all') {
-      filtered = _filterByCategory(filtered, selectedCategory);
-    }
-
-    if (searchQuery.trim().isNotEmpty) {
-      filtered = _filterBySearchQuery(filtered, searchQuery);
-    }
-
-    filtered = _applySorting(filtered, sortOrder);
-
-    return filtered;
-  }
-
-  List<AudioFile> _filterByLanguage(List<AudioFile> episodes, String language) {
-    if (language == 'all') {
-      return episodes;
-    }
-    return episodes.where((episode) => episode.language == language).toList();
-  }
-
-  List<AudioFile> _filterByCategory(List<AudioFile> episodes, String category) {
-    return episodes.where((episode) => episode.category == category).toList();
-  }
-
-  List<AudioFile> _filterBySearchQuery(List<AudioFile> episodes, String query) {
-    if (query.trim().isEmpty) return episodes;
-
-    final lowerQuery = query.toLowerCase();
-    return episodes.where((episode) {
-      return episode.title.toLowerCase().contains(lowerQuery) ||
-          episode.id.toLowerCase().contains(lowerQuery) ||
-          episode.category.toLowerCase().contains(lowerQuery);
-    }).toList();
-  }
-
-  List<AudioFile> _applySorting(List<AudioFile> episodes, String sortOrder) {
-    final sortedEpisodes = List<AudioFile>.from(episodes);
-
-    switch (sortOrder) {
-      case 'oldest':
-        sortedEpisodes.sort((a, b) => a.publishDate.compareTo(b.publishDate));
-        break;
-      case 'alphabetical':
-        sortedEpisodes.sort(
-            (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-        break;
-      case 'newest':
-      default:
-        sortedEpisodes.sort((a, b) => b.publishDate.compareTo(a.publishDate));
-        break;
-    }
-
-    return sortedEpisodes;
-  }
-
-  Future<List<AudioFile>> _searchEpisodes(
-    String query,
-    List<AudioFile> localEpisodes,
-  ) async {
-    if (query.trim().isEmpty) {
-      return localEpisodes;
-    }
-
-    final cacheKey = query.toLowerCase().trim();
-    if (_searchCache.containsKey(cacheKey)) {
-      _log.fine('Returning cached results for "$query"');
-      return _searchCache[cacheKey]!;
-    }
-
-    try {
-      final localResults = _filterBySearchQuery(localEpisodes, query);
-
-      if (localResults.isNotEmpty) {
-        _cacheSearchResult(cacheKey, localResults);
-        return localResults;
-      }
-
-      _log.fine('Searching API for "$query"');
-      final apiResults = await StreamingApiService.searchEpisodes(query);
-      _cacheSearchResult(cacheKey, apiResults);
-
-      return apiResults;
-    } catch (e) {
-      _log.warning('Search failed for "$query": $e');
-      return [];
-    }
-  }
-
-  void _cacheSearchResult(String cacheKey, List<AudioFile> results) {
-    if (_searchCache.length >= _maxSearchCacheSize) {
-      final firstKey = _searchCache.keys.first;
-      _searchCache.remove(firstKey);
-    }
-    _searchCache[cacheKey] = results;
+    return _filterEpisodesUseCase(
+      episodes: allEpisodes,
+      language: selectedLanguage,
+      category: selectedCategory,
+      searchQuery: searchQuery,
+      sortOrder: sortOrder,
+    );
   }
 
   /// Performs an advanced search with multiple filter criteria.
@@ -567,54 +481,17 @@ class ContentService extends ChangeNotifier {
     Duration? maxDuration,
     String sortOrder = 'newest',
   }) {
-    var results = List<AudioFile>.from(episodes);
-
-    if (query != null && query.trim().isNotEmpty) {
-      results = _filterBySearchQuery(results, query);
-    }
-
-    if (languages != null && languages.isNotEmpty) {
-      results = results
-          .where((episode) => languages.contains(episode.language))
-          .toList();
-    }
-
-    if (categories != null && categories.isNotEmpty) {
-      results = results
-          .where((episode) => categories.contains(episode.category))
-          .toList();
-    }
-
-    if (dateFrom != null) {
-      results = results
-          .where((episode) =>
-              episode.publishDate.isAfter(dateFrom) ||
-              episode.publishDate.isAtSameMomentAs(dateFrom))
-          .toList();
-    }
-    if (dateTo != null) {
-      results = results
-          .where((episode) =>
-              episode.publishDate.isBefore(dateTo.add(const Duration(days: 1))))
-          .toList();
-    }
-
-    if (minDuration != null) {
-      results = results
-          .where((episode) =>
-              episode.duration != null && episode.duration! >= minDuration)
-          .toList();
-    }
-    if (maxDuration != null) {
-      results = results
-          .where((episode) =>
-              episode.duration != null && episode.duration! <= maxDuration)
-          .toList();
-    }
-
-    results = _applySorting(results, sortOrder);
-
-    return results;
+    return _filterEpisodesUseCase.advancedFilter(
+      episodes,
+      query: query,
+      languages: languages,
+      categories: categories,
+      dateFrom: dateFrom,
+      dateTo: dateTo,
+      minDuration: minDuration,
+      maxDuration: maxDuration,
+      sortOrder: sortOrder,
+    );
   }
 
   // Testing methods

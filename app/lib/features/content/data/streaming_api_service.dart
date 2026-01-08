@@ -8,23 +8,61 @@ import 'package:from_fed_to_chain_app/core/exceptions/app_exceptions.dart';
 
 /// Service for interacting with the Cloudflare R2 streaming API
 /// Handles episode discovery and streaming URL generation
+///
+/// This service supports both static and instance-based usage:
+///
+/// **Static usage (backward compatible):**
+/// ```dart
+/// final episodes = await StreamingApiService.getEpisodeList('zh-TW', 'startup');
+/// ```
+///
+/// **Instance usage (recommended for DI/testing):**
+/// ```dart
+/// final service = StreamingApiService(client: mockHttpClient);
+/// final episodes = await service.fetchEpisodeList('zh-TW', 'startup');
+/// ```
 class StreamingApiService {
+  /// Instance-based HTTP client for dependency injection
+  final http.Client _client;
+
+  /// Logger instance
+  final _log = LoggerService.getLogger('StreamingApiService');
+
+  /// Singleton instance for backward compatibility during migration
+  static StreamingApiService? _instance;
+
+  /// Static HTTP client for backward compatibility
   static http.Client? _staticClient;
-  static final _log = LoggerService.getLogger('StreamingApiService');
-  static http.Client get _client => _staticClient ??= http.Client();
 
-  /// Set HTTP client for dependency injection (mainly for testing)
-  static void setHttpClient(http.Client? client) {
-    _staticClient?.close();
-    _staticClient = client;
-  }
+  /// Default singleton instance (created lazily)
+  static StreamingApiService get instance =>
+      _instance ??= StreamingApiService(client: _staticClient);
 
-  /// Get current HTTP client instance (mainly for testing)
-  static http.Client get httpClient => _client;
+  /// Create a new StreamingApiService instance.
+  ///
+  /// [client] - Optional HTTP client for dependency injection.
+  ///            If not provided, a default http.Client is used.
+  ///
+  /// Example:
+  /// ```dart
+  /// // For production
+  /// final service = StreamingApiService();
+  ///
+  /// // For testing with mock client
+  /// final mockClient = MockClient();
+  /// final service = StreamingApiService(client: mockClient);
+  /// ```
+  StreamingApiService({http.Client? client})
+      : _client = client ?? http.Client();
 
-  /// Get list of episodes for a specific language and category
+  // ============================================================================
+  // INSTANCE METHODS - Use these for DI-based code
+  // Method names prefixed with 'fetch' to distinguish from static methods
+  // ============================================================================
+
+  /// Get list of episodes for a specific language and category (instance method)
   /// Returns list of AudioFile objects with streaming URLs
-  static Future<List<AudioFile>> getEpisodeList(
+  Future<List<AudioFile>> fetchEpisodeList(
       String language, String category) async {
     // Validate input parameters
     if (!ApiConfig.isValidLanguage(language)) {
@@ -83,7 +121,7 @@ class StreamingApiService {
   }
 
   /// Parse episodes response from API into AudioFile objects
-  static List<AudioFile> _parseEpisodesResponse(
+  List<AudioFile> _parseEpisodesResponse(
       dynamic responseData, String language, String category) {
     List<Map<String, dynamic>> episodeData;
 
@@ -143,9 +181,8 @@ class StreamingApiService {
     return audioFiles;
   }
 
-  /// Get all episodes for a specific language across all categories
-  static Future<List<AudioFile>> getAllEpisodesForLanguage(
-      String language) async {
+  /// Get all episodes for a specific language across all categories (instance method)
+  Future<List<AudioFile>> fetchAllEpisodesForLanguage(String language) async {
     if (!ApiConfig.isValidLanguage(language)) {
       throw ArgumentError('Unsupported language: $language');
     }
@@ -156,7 +193,7 @@ class StreamingApiService {
     // Load episodes from all categories in parallel
     final futures = ApiConfig.supportedCategories.map((category) async {
       try {
-        final episodes = await getEpisodeList(language, category);
+        final episodes = await fetchEpisodeList(language, category);
         return episodes;
       } catch (e) {
         errors.add('$category: $e');
@@ -182,8 +219,8 @@ class StreamingApiService {
     return allEpisodes;
   }
 
-  /// Get all episodes across all languages and categories (parallel loading)
-  static Future<List<AudioFile>> getAllEpisodes() async {
+  /// Get all episodes across all languages and categories (instance method)
+  Future<List<AudioFile>> fetchAllEpisodes() async {
     _log.info('Starting parallel loading of all episodes...');
 
     final allEpisodes = <AudioFile>[];
@@ -194,7 +231,7 @@ class StreamingApiService {
 
     for (final language in ApiConfig.supportedLanguages) {
       for (final category in ApiConfig.supportedCategories) {
-        final future = getEpisodeList(language, category).catchError((error) {
+        final future = fetchEpisodeList(language, category).catchError((error) {
           errors.add('$language/$category: $error');
           return <AudioFile>[];
         });
@@ -224,31 +261,31 @@ class StreamingApiService {
     return allEpisodes;
   }
 
-  /// Get episodes filtered by search query
-  static Future<List<AudioFile>> searchEpisodes(
+  /// Get episodes filtered by search query (instance method)
+  Future<List<AudioFile>> fetchSearchEpisodes(
     String query, {
     String? language,
     String? category,
   }) async {
     // If language and category specified, search within that subset
     if (language != null && category != null) {
-      final episodes = await getEpisodeList(language, category);
+      final episodes = await fetchEpisodeList(language, category);
       return _filterEpisodesByQuery(episodes, query);
     }
 
     // If only language specified, search within that language
     if (language != null) {
-      final episodes = await getAllEpisodesForLanguage(language);
+      final episodes = await fetchAllEpisodesForLanguage(language);
       return _filterEpisodesByQuery(episodes, query);
     }
 
     // Search across all episodes
-    final episodes = await getAllEpisodes();
+    final episodes = await fetchAllEpisodes();
     return _filterEpisodesByQuery(episodes, query);
   }
 
   /// Filter episodes by search query
-  static List<AudioFile> _filterEpisodesByQuery(
+  List<AudioFile> _filterEpisodesByQuery(
       List<AudioFile> episodes, String query) {
     if (query.trim().isEmpty) return episodes;
 
@@ -260,11 +297,11 @@ class StreamingApiService {
     }).toList();
   }
 
-  /// Test connectivity to the streaming API
-  static Future<bool> testConnectivity() async {
+  /// Test connectivity to the streaming API (instance method)
+  Future<bool> checkConnectivity() async {
     try {
       // Try to get episodes for a common language/category combination
-      final episodes = await getEpisodeList('zh-TW', 'startup');
+      final episodes = await fetchEpisodeList('zh-TW', 'startup');
       return episodes.isNotEmpty;
     } catch (e) {
       _log.severe('API connectivity test failed: $e');
@@ -272,8 +309,8 @@ class StreamingApiService {
     }
   }
 
-  /// Get API status information
-  static Map<String, dynamic> getApiStatus() {
+  /// Get API status information (instance method)
+  Map<String, dynamic> fetchApiStatus() {
     return {
       'baseUrl': ApiConfig.streamingBaseUrl,
       'environment': ApiConfig.currentEnvironment,
@@ -285,8 +322,8 @@ class StreamingApiService {
     };
   }
 
-  /// Validate streaming URL accessibility
-  static Future<bool> validateStreamingUrl(String url) async {
+  /// Validate streaming URL accessibility (instance method)
+  Future<bool> checkStreamingUrl(String url) async {
     try {
       final response = await _client
           .head(Uri.parse(url))
@@ -298,8 +335,87 @@ class StreamingApiService {
     }
   }
 
+  /// Clean up HTTP client resources (instance method)
+  void close() {
+    _client.close();
+  }
+
+  // ============================================================================
+  // STATIC METHODS - For backward compatibility with existing code
+  // These delegate to the singleton instance
+  // ============================================================================
+
+  /// Set HTTP client for dependency injection (mainly for testing)
+  /// This also updates the singleton instance to use the new client.
+  static void setHttpClient(http.Client? client) {
+    _staticClient?.close();
+    _staticClient = client;
+    // Update singleton to use the new client
+    if (client != null) {
+      _instance?.close();
+      _instance = StreamingApiService(client: client);
+    } else {
+      _instance = null;
+    }
+  }
+
+  /// Get current HTTP client instance (mainly for testing)
+  static http.Client get httpClient => _staticClient ??= http.Client();
+
+  /// Get list of episodes for a specific language and category
+  static Future<List<AudioFile>> getEpisodeList(
+      String language, String category) async {
+    return instance.fetchEpisodeList(language, category);
+  }
+
+  /// Get all episodes for a specific language across all categories
+  static Future<List<AudioFile>> getAllEpisodesForLanguage(
+      String language) async {
+    return instance.fetchAllEpisodesForLanguage(language);
+  }
+
+  /// Get all episodes across all languages and categories (parallel loading)
+  static Future<List<AudioFile>> getAllEpisodes() async {
+    return instance.fetchAllEpisodes();
+  }
+
+  /// Get episodes filtered by search query
+  static Future<List<AudioFile>> searchEpisodes(
+    String query, {
+    String? language,
+    String? category,
+  }) async {
+    return instance.fetchSearchEpisodes(query,
+        language: language, category: category);
+  }
+
+  /// Test connectivity to the streaming API
+  static Future<bool> testConnectivity() async {
+    return instance.checkConnectivity();
+  }
+
+  /// Get API status information
+  static Map<String, dynamic> getApiStatus() {
+    return instance.fetchApiStatus();
+  }
+
+  /// Validate streaming URL accessibility
+  static Future<bool> validateStreamingUrl(String url) async {
+    return instance.checkStreamingUrl(url);
+  }
+
   /// Clean up HTTP client resources
   static void dispose() {
+    _staticClient?.close();
+    _staticClient = null;
+    _instance?.close();
+    _instance = null;
+  }
+
+  /// Reset singleton instance (mainly for testing)
+  static void resetInstance() {
+    _instance?.close();
+    _instance = null;
     _staticClient?.close();
     _staticClient = null;
   }

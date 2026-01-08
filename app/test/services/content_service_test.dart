@@ -10,8 +10,16 @@ import 'package:from_fed_to_chain_app/features/content/data/streaming_api_servic
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/use_cases.dart';
+
 // Generate mocks for dependencies
-@GenerateMocks([http.Client, StreamingApiService])
+@GenerateMocks([
+  http.Client,
+  StreamingApiService,
+  LoadEpisodesUseCase,
+  FilterEpisodesUseCase,
+  SearchEpisodesUseCase
+])
 import 'content_service_test.mocks.dart';
 
 // Simple test helpers
@@ -38,6 +46,9 @@ void main() {
     late ContentService contentService;
     late List<AudioFile> sampleEpisodes;
     late MockClient mockHttpClient;
+    late MockLoadEpisodesUseCase mockLoadEpisodesUseCase;
+    late MockFilterEpisodesUseCase mockFilterEpisodesUseCase;
+    late MockSearchEpisodesUseCase mockSearchEpisodesUseCase;
 
     // Test data
     final sampleAudioContent = AudioContent(
@@ -81,6 +92,82 @@ STREAM_TIMEOUT_SECONDS=10
       // Note: ContentService uses repositories, mock setup may need adjustment
 
       // Set up default mock responses to prevent network calls
+      // Create mocks for use cases
+      mockLoadEpisodesUseCase = MockLoadEpisodesUseCase();
+      mockFilterEpisodesUseCase = MockFilterEpisodesUseCase();
+      mockSearchEpisodesUseCase = MockSearchEpisodesUseCase();
+
+      // Default use case behaviors
+      when(mockLoadEpisodesUseCase.loadAll()).thenAnswer((_) async =>
+          sampleEpisodes); // Will validly return set episodes or sample
+
+      // Filter behavior - implements basic filtering
+      when(mockFilterEpisodesUseCase.call(
+        episodes: anyNamed('episodes'),
+        language: anyNamed('language'),
+        category: anyNamed('category'),
+        searchQuery: anyNamed('searchQuery'),
+        sortOrder: anyNamed('sortOrder'),
+      )).thenAnswer((invocation) {
+        var episodes = invocation.namedArguments[#episodes] as List<AudioFile>;
+        final language = invocation.namedArguments[#language] as String?;
+        final category = invocation.namedArguments[#category] as String?;
+        final searchQuery = invocation.namedArguments[#searchQuery] as String?;
+
+        if (language != null && language != 'all') {
+          episodes = episodes.where((e) => e.language == language).toList();
+        }
+        if (category != null && category != 'all') {
+          episodes = episodes.where((e) => e.category == category).toList();
+        }
+        if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+          episodes = episodes
+              .where((e) =>
+                  e.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                  e.id.contains(searchQuery))
+              .toList();
+        }
+        return episodes;
+      });
+
+      when(mockFilterEpisodesUseCase.advancedFilter(
+        any,
+        query: anyNamed('query'),
+        languages: anyNamed('languages'),
+        categories: anyNamed('categories'),
+        dateFrom: anyNamed('dateFrom'),
+        dateTo: anyNamed('dateTo'),
+        minDuration: anyNamed('minDuration'),
+        maxDuration: anyNamed('maxDuration'),
+        sortOrder: anyNamed('sortOrder'),
+      )).thenAnswer((invocation) {
+        var episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        return episodes;
+      });
+
+      when(mockFilterEpisodesUseCase.filterByLanguage(any, any))
+          .thenAnswer((invocation) {
+        final episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        final language = invocation.positionalArguments[1] as String;
+        return episodes.where((e) => e.language == language).toList();
+      });
+
+      when(mockFilterEpisodesUseCase.filterByCategory(any, any))
+          .thenAnswer((invocation) {
+        final episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        final category = invocation.positionalArguments[1] as String;
+        return episodes.where((e) => e.category == category).toList();
+      });
+
+      when(mockSearchEpisodesUseCase.call(
+              query: anyNamed('query'),
+              localEpisodes: anyNamed('localEpisodes')))
+          .thenAnswer((invocation) async =>
+              invocation.namedArguments[#localEpisodes] as List<AudioFile>);
+
+      when(mockSearchEpisodesUseCase.cacheSize).thenReturn(0);
+      when(mockSearchEpisodesUseCase.clearCache()).thenReturn(null);
+
       when(mockHttpClient.get(any, headers: anyNamed('headers')))
           .thenAnswer((_) async => http.Response('[]', 200));
       when(mockHttpClient.head(any))
@@ -121,7 +208,11 @@ STREAM_TIMEOUT_SECONDS=10
       ];
 
       // Create fresh service instance with clean repositories
-      contentService = ContentService();
+      contentService = ContentService(
+        loadEpisodesUseCase: mockLoadEpisodesUseCase,
+        filterEpisodesUseCase: mockFilterEpisodesUseCase,
+        searchEpisodesUseCase: mockSearchEpisodesUseCase,
+      );
 
       // Allow async initialization to complete
       await Future.delayed(const Duration(milliseconds: 10));
@@ -157,7 +248,11 @@ STREAM_TIMEOUT_SECONDS=10
           'selected_category': 'ethereum',
         });
 
-        final service = ContentService();
+        final service = ContentService(
+          loadEpisodesUseCase: mockLoadEpisodesUseCase,
+          filterEpisodesUseCase: mockFilterEpisodesUseCase,
+          searchEpisodesUseCase: mockSearchEpisodesUseCase,
+        );
         await Future.delayed(const Duration(milliseconds: 50));
 
         expect(service.selectedLanguage, 'en-US');
@@ -287,7 +382,11 @@ STREAM_TIMEOUT_SECONDS=10
       setUp(() async {
         // Create a fresh service instance for this group to avoid state leakage
         contentService.dispose();
-        contentService = ContentService();
+        contentService = ContentService(
+          loadEpisodesUseCase: mockLoadEpisodesUseCase,
+          filterEpisodesUseCase: mockFilterEpisodesUseCase,
+          searchEpisodesUseCase: mockSearchEpisodesUseCase,
+        );
 
         // Allow async initialization to complete
         await Future.delayed(const Duration(milliseconds: 10));
@@ -440,7 +539,11 @@ STREAM_TIMEOUT_SECONDS=10
       setUp(() async {
         // Create a fresh service instance for this group to avoid state leakage
         contentService.dispose();
-        contentService = ContentService();
+        contentService = ContentService(
+          loadEpisodesUseCase: mockLoadEpisodesUseCase,
+          filterEpisodesUseCase: mockFilterEpisodesUseCase,
+          searchEpisodesUseCase: mockSearchEpisodesUseCase,
+        );
 
         // Allow async initialization to complete
         await Future.delayed(const Duration(milliseconds: 10));

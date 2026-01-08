@@ -13,6 +13,12 @@ import 'package:from_fed_to_chain_app/features/content/data/preferences_reposito
     as _i8;
 import 'package:from_fed_to_chain_app/features/content/data/progress_repository.dart'
     as _i7;
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/filter_episodes_use_case.dart'
+    as _i11;
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/load_episodes_use_case.dart'
+    as _i10;
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/search_episodes_use_case.dart'
+    as _i12;
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart'
     as _i6;
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart'
@@ -966,6 +972,251 @@ class MockPreferencesRepository extends _i1.Mock
   void dispose() => super.noSuchMethod(
         Invocation.method(
           #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [LoadEpisodesUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLoadEpisodesUseCase extends _i1.Mock
+    implements _i10.LoadEpisodesUseCase {
+  MockLoadEpisodesUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<List<_i4.AudioFile>> loadAll() => (super.noSuchMethod(
+        Invocation.method(
+          #loadAll,
+          [],
+        ),
+        returnValue: _i3.Future<List<_i4.AudioFile>>.value(<_i4.AudioFile>[]),
+      ) as _i3.Future<List<_i4.AudioFile>>);
+
+  @override
+  _i3.Future<List<_i4.AudioFile>> loadForLanguage(String? language) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #loadForLanguage,
+          [language],
+        ),
+        returnValue: _i3.Future<List<_i4.AudioFile>>.value(<_i4.AudioFile>[]),
+      ) as _i3.Future<List<_i4.AudioFile>>);
+
+  @override
+  _i3.Future<List<_i4.AudioFile>> search(String? query) => (super.noSuchMethod(
+        Invocation.method(
+          #search,
+          [query],
+        ),
+        returnValue: _i3.Future<List<_i4.AudioFile>>.value(<_i4.AudioFile>[]),
+      ) as _i3.Future<List<_i4.AudioFile>>);
+
+  @override
+  _i3.Future<_i4.AudioFile?> getById(
+    String? contentId, {
+    String? preferredLanguage,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getById,
+          [contentId],
+          {#preferredLanguage: preferredLanguage},
+        ),
+        returnValue: _i3.Future<_i4.AudioFile?>.value(),
+      ) as _i3.Future<_i4.AudioFile?>);
+}
+
+/// A class which mocks [FilterEpisodesUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFilterEpisodesUseCase extends _i1.Mock
+    implements _i11.FilterEpisodesUseCase {
+  MockFilterEpisodesUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  List<_i4.AudioFile> call({
+    required List<_i4.AudioFile>? episodes,
+    String? language = 'all',
+    String? category = 'all',
+    String? searchQuery = '',
+    String? sortOrder = 'newest',
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #call,
+          [],
+          {
+            #episodes: episodes,
+            #language: language,
+            #category: category,
+            #searchQuery: searchQuery,
+            #sortOrder: sortOrder,
+          },
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+
+  @override
+  List<_i4.AudioFile> filterByLanguage(
+    List<_i4.AudioFile>? episodes,
+    String? language,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #filterByLanguage,
+          [
+            episodes,
+            language,
+          ],
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+
+  @override
+  List<_i4.AudioFile> filterByCategory(
+    List<_i4.AudioFile>? episodes,
+    String? category,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #filterByCategory,
+          [
+            episodes,
+            category,
+          ],
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+
+  @override
+  List<_i4.AudioFile> filterBySearchQuery(
+    List<_i4.AudioFile>? episodes,
+    String? query,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #filterBySearchQuery,
+          [
+            episodes,
+            query,
+          ],
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+
+  @override
+  List<_i4.AudioFile> sortEpisodes(
+    List<_i4.AudioFile>? episodes,
+    String? sortOrder,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #sortEpisodes,
+          [
+            episodes,
+            sortOrder,
+          ],
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+
+  @override
+  List<_i4.AudioFile> advancedFilter(
+    List<_i4.AudioFile>? episodes, {
+    String? query,
+    List<String>? languages,
+    List<String>? categories,
+    DateTime? dateFrom,
+    DateTime? dateTo,
+    Duration? minDuration,
+    Duration? maxDuration,
+    String? sortOrder = 'newest',
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #advancedFilter,
+          [episodes],
+          {
+            #query: query,
+            #languages: languages,
+            #categories: categories,
+            #dateFrom: dateFrom,
+            #dateTo: dateTo,
+            #minDuration: minDuration,
+            #maxDuration: maxDuration,
+            #sortOrder: sortOrder,
+          },
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+}
+
+/// A class which mocks [SearchEpisodesUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSearchEpisodesUseCase extends _i1.Mock
+    implements _i12.SearchEpisodesUseCase {
+  MockSearchEpisodesUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  int get maxCacheSize => (super.noSuchMethod(
+        Invocation.getter(#maxCacheSize),
+        returnValue: 0,
+      ) as int);
+
+  @override
+  int get cacheSize => (super.noSuchMethod(
+        Invocation.getter(#cacheSize),
+        returnValue: 0,
+      ) as int);
+
+  @override
+  _i3.Future<List<_i4.AudioFile>> call({
+    required String? query,
+    required List<_i4.AudioFile>? localEpisodes,
+    bool? useCache = true,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #call,
+          [],
+          {
+            #query: query,
+            #localEpisodes: localEpisodes,
+            #useCache: useCache,
+          },
+        ),
+        returnValue: _i3.Future<List<_i4.AudioFile>>.value(<_i4.AudioFile>[]),
+      ) as _i3.Future<List<_i4.AudioFile>>);
+
+  @override
+  List<_i4.AudioFile> filterByQuery(
+    List<_i4.AudioFile>? episodes,
+    String? query,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #filterByQuery,
+          [
+            episodes,
+            query,
+          ],
+        ),
+        returnValue: <_i4.AudioFile>[],
+      ) as List<_i4.AudioFile>);
+
+  @override
+  void clearCache() => super.noSuchMethod(
+        Invocation.method(
+          #clearCache,
           [],
         ),
         returnValueForMissingStub: null,

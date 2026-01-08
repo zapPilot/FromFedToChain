@@ -12,6 +12,7 @@ import 'package:from_fed_to_chain_app/features/content/services/services.dart';
 import 'package:from_fed_to_chain_app/core/navigation/navigation_export.dart';
 import 'package:from_fed_to_chain_app/features/app/index.dart';
 import 'package:from_fed_to_chain_app/features/auth/index.dart';
+import 'package:from_fed_to_chain_app/core/di/di.dart' as di;
 
 /// Global navigator key for deep linking and navigation
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -21,6 +22,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LoggerService.initialize(enableLogging: kDebugMode);
   final log = LoggerService.getLogger('Main');
+
+  // Initialize Dependency Injection
+  await di.init();
+  log.info('✅ Dependency injection container initialized');
 
   // Load environment variables
   try {

@@ -27,6 +27,7 @@ dependencies:
 
   # State management
   provider: ^6.1.1
+  get_it: ^7.6.0
 
   # Local storage
   shared_preferences: ^2.2.2

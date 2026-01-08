@@ -9,21 +9,28 @@ import 'package:from_fed_to_chain_app/features/content/data/preferences_reposito
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_content.dart';
 
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/use_cases.dart';
+
 @GenerateMocks([
   EpisodeRepository,
   ContentRepository,
   ProgressRepository,
-  PreferencesRepository
+  PreferencesRepository,
+  LoadEpisodesUseCase,
+  FilterEpisodesUseCase,
+  SearchEpisodesUseCase
 ])
 import 'content_service_coverage_test.mocks.dart';
 
 void main() {
   group('ContentService Coverage Tests', () {
     late ContentService contentService;
-    late MockEpisodeRepository mockEpisodeRepository;
     late MockContentRepository mockContentRepository;
     late MockProgressRepository mockProgressRepository;
     late MockPreferencesRepository mockPreferencesRepository;
+    late MockLoadEpisodesUseCase mockLoadEpisodesUseCase;
+    late MockFilterEpisodesUseCase mockFilterEpisodesUseCase;
+    late MockSearchEpisodesUseCase mockSearchEpisodesUseCase;
 
     final testAudioFile = AudioFile(
       id: 'test-episode',
@@ -48,10 +55,12 @@ void main() {
     );
 
     setUp(() {
-      mockEpisodeRepository = MockEpisodeRepository();
       mockContentRepository = MockContentRepository();
       mockProgressRepository = MockProgressRepository();
       mockPreferencesRepository = MockPreferencesRepository();
+      mockLoadEpisodesUseCase = MockLoadEpisodesUseCase();
+      mockFilterEpisodesUseCase = MockFilterEpisodesUseCase();
+      mockSearchEpisodesUseCase = MockSearchEpisodesUseCase();
 
       // Default stubs to prevent crashes in constructor
       when(mockProgressRepository.initialize()).thenAnswer((_) async {});
@@ -63,11 +72,19 @@ void main() {
       when(mockContentRepository.getCacheStatistics()).thenReturn({});
       when(mockProgressRepository.getListeningStatistics(any)).thenReturn({});
 
+      // Mock filter use cases returning passed list by default
+      when(mockFilterEpisodesUseCase.filterByLanguage(any, any))
+          .thenAnswer((invocation) => invocation.positionalArguments[0]);
+      when(mockFilterEpisodesUseCase.filterByCategory(any, any))
+          .thenAnswer((invocation) => invocation.positionalArguments[0]);
+
       contentService = ContentService(
-        episodeRepository: mockEpisodeRepository,
         contentRepository: mockContentRepository,
         progressRepository: mockProgressRepository,
         preferencesRepository: mockPreferencesRepository,
+        loadEpisodesUseCase: mockLoadEpisodesUseCase,
+        filterEpisodesUseCase: mockFilterEpisodesUseCase,
+        searchEpisodesUseCase: mockSearchEpisodesUseCase,
       );
     });
 

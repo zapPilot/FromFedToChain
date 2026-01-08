@@ -20,16 +20,23 @@ import 'package:from_fed_to_chain_app/features/content/data/preferences_reposito
   MockSpec<EpisodeRepository>(),
   MockSpec<ProgressRepository>(),
   MockSpec<PreferencesRepository>(),
+  MockSpec<LoadEpisodesUseCase>(),
+  MockSpec<FilterEpisodesUseCase>(),
+  MockSpec<SearchEpisodesUseCase>(),
 ])
+import 'package:from_fed_to_chain_app/features/content/domain/use_cases/use_cases.dart';
 import 'content_service_extended_test.mocks.dart';
 
 void main() {
   group('ContentService Extended Coverage Tests', () {
     late ContentService contentService;
     late MockContentRepository mockContentRepository;
-    late MockEpisodeRepository mockEpisodeRepository;
+    // late MockEpisodeRepository mockEpisodeRepository;
     late MockProgressRepository mockProgressRepository;
     late MockPreferencesRepository mockPreferencesRepository;
+    late MockLoadEpisodesUseCase mockLoadEpisodesUseCase;
+    late MockFilterEpisodesUseCase mockFilterEpisodesUseCase;
+    late MockSearchEpisodesUseCase mockSearchEpisodesUseCase;
 
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
@@ -42,9 +49,12 @@ STREAM_TIMEOUT_SECONDS=30
 
       // Create mock repositories
       mockContentRepository = MockContentRepository();
-      mockEpisodeRepository = MockEpisodeRepository();
+      // mockEpisodeRepository = MockEpisodeRepository();
       mockProgressRepository = MockProgressRepository();
       mockPreferencesRepository = MockPreferencesRepository();
+      mockLoadEpisodesUseCase = MockLoadEpisodesUseCase();
+      mockFilterEpisodesUseCase = MockFilterEpisodesUseCase();
+      mockSearchEpisodesUseCase = MockSearchEpisodesUseCase();
 
       // Set up default mock behavior for preferences repository
       when(mockPreferencesRepository.selectedLanguage).thenReturn('all');
@@ -101,15 +111,83 @@ STREAM_TIMEOUT_SECONDS=30
         ),
       ];
 
-      when(mockEpisodeRepository.loadAllEpisodes())
+      when(mockLoadEpisodesUseCase.loadAll())
           .thenAnswer((_) async => mockEpisodes);
-      when(mockEpisodeRepository.dispose()).thenReturn(null);
+
+      // Default behavior for filter use case - just return all episodes or filtered subset
+      // We can use a real instance or simple mock behavior
+      // Mock the 'call' method of the functor
+      when(mockFilterEpisodesUseCase.call(
+        episodes: anyNamed('episodes'),
+        language: anyNamed('language'),
+        category: anyNamed('category'),
+        searchQuery: anyNamed('searchQuery'),
+        sortOrder: anyNamed('sortOrder'),
+      )).thenAnswer((invocation) {
+        var episodes = invocation.namedArguments[#episodes] as List<AudioFile>;
+        final language = invocation.namedArguments[#language] as String?;
+        final category = invocation.namedArguments[#category] as String?;
+
+        if (language != null && language != 'all') {
+          episodes = episodes.where((e) => e.language == language).toList();
+        }
+        if (category != null && category != 'all') {
+          episodes = episodes.where((e) => e.category == category).toList();
+        }
+        return episodes;
+      });
+
+      // Default behavior for filter use case - just return all episodes or filtered subset
+      // We can use a real instance or simple mock behavior
+      when(mockFilterEpisodesUseCase.advancedFilter(
+        any,
+        query: anyNamed('query'),
+        languages: anyNamed('languages'),
+        categories: anyNamed('categories'),
+        dateFrom: anyNamed('dateFrom'),
+        dateTo: anyNamed('dateTo'),
+        minDuration: anyNamed('minDuration'),
+        maxDuration: anyNamed('maxDuration'),
+        sortOrder: anyNamed('sortOrder'),
+      )).thenAnswer((invocation) {
+        var episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        final languages =
+            invocation.namedArguments[#languages] as List<String>?;
+        final categories =
+            invocation.namedArguments[#categories] as List<String>?;
+
+        if (languages != null && languages.isNotEmpty) {
+          episodes =
+              episodes.where((e) => languages.contains(e.language)).toList();
+        }
+        if (categories != null && categories.isNotEmpty) {
+          episodes =
+              episodes.where((e) => categories.contains(e.category)).toList();
+        }
+        return episodes;
+      });
+
+      when(mockFilterEpisodesUseCase.filterByLanguage(any, any))
+          .thenAnswer((invocation) {
+        final episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        final language = invocation.positionalArguments[1] as String;
+        return episodes.where((e) => e.language == language).toList();
+      });
+
+      when(mockFilterEpisodesUseCase.filterByCategory(any, any))
+          .thenAnswer((invocation) {
+        final episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        final category = invocation.positionalArguments[1] as String;
+        return episodes.where((e) => e.category == category).toList();
+      });
 
       contentService = ContentService(
         contentRepository: mockContentRepository,
-        episodeRepository: mockEpisodeRepository,
         progressRepository: mockProgressRepository,
         preferencesRepository: mockPreferencesRepository,
+        loadEpisodesUseCase: mockLoadEpisodesUseCase,
+        filterEpisodesUseCase: mockFilterEpisodesUseCase,
+        searchEpisodesUseCase: mockSearchEpisodesUseCase,
       );
     });
 
