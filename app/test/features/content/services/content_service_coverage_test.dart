@@ -72,11 +72,26 @@ void main() {
       when(mockContentRepository.getCacheStatistics()).thenReturn({});
       when(mockProgressRepository.getListeningStatistics(any)).thenReturn({});
 
+      // Search stubs
+      when(mockSearchEpisodesUseCase.cacheSize).thenReturn(0);
+      when(mockSearchEpisodesUseCase.clearCache()).thenAnswer((_) async {});
+
       // Mock filter use cases returning passed list by default
       when(mockFilterEpisodesUseCase.filterByLanguage(any, any))
           .thenAnswer((invocation) => invocation.positionalArguments[0]);
       when(mockFilterEpisodesUseCase.filterByCategory(any, any))
           .thenAnswer((invocation) => invocation.positionalArguments[0]);
+
+      // Mock main filter call
+      when(mockFilterEpisodesUseCase.call(
+        episodes: anyNamed('episodes'),
+        language: anyNamed('language'),
+        category: anyNamed('category'),
+        searchQuery: anyNamed('searchQuery'),
+        sortOrder: anyNamed('sortOrder'),
+      )).thenAnswer((invocation) {
+        return invocation.namedArguments[#episodes] as List<AudioFile>;
+      });
 
       contentService = ContentService(
         contentRepository: mockContentRepository,

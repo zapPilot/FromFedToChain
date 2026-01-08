@@ -113,6 +113,7 @@ STREAM_TIMEOUT_SECONDS=10
         final language = invocation.namedArguments[#language] as String?;
         final category = invocation.namedArguments[#category] as String?;
         final searchQuery = invocation.namedArguments[#searchQuery] as String?;
+        final sortOrder = invocation.namedArguments[#sortOrder] as String?;
 
         if (language != null && language != 'all') {
           episodes = episodes.where((e) => e.language == language).toList();
@@ -124,8 +125,22 @@ STREAM_TIMEOUT_SECONDS=10
           episodes = episodes
               .where((e) =>
                   e.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-                  e.id.contains(searchQuery))
+                  e.id.contains(searchQuery) ||
+                  e.category.contains(searchQuery))
               .toList();
+        }
+        if (sortOrder != null) {
+          episodes.sort((a, b) {
+            switch (sortOrder) {
+              case 'oldest':
+                return a.lastModified.compareTo(b.lastModified);
+              case 'alphabetical':
+                return a.title.compareTo(b.title);
+              case 'newest':
+              default:
+                return b.lastModified.compareTo(a.lastModified);
+            }
+          });
         }
         return episodes;
       });
@@ -141,7 +156,51 @@ STREAM_TIMEOUT_SECONDS=10
         maxDuration: anyNamed('maxDuration'),
         sortOrder: anyNamed('sortOrder'),
       )).thenAnswer((invocation) {
-        var episodes = invocation.positionalArguments[0] as List<AudioFile>;
+        var episodes = [
+          ...invocation.positionalArguments[0] as List<AudioFile>
+        ]; // Clone list
+        final query = invocation.namedArguments[#query] as String?;
+        final languages =
+            invocation.namedArguments[#languages] as List<String>?;
+        final categories =
+            invocation.namedArguments[#categories] as List<String>?;
+        final sortOrder = invocation.namedArguments[#sortOrder] as String?;
+
+        if (query != null && query.trim().isNotEmpty) {
+          episodes = episodes
+              .where((e) =>
+                  e.title.toLowerCase().contains(query.toLowerCase()) ||
+                  e.id.contains(query) ||
+                  e.category.contains(query))
+              .toList();
+        }
+
+        if (languages != null && languages.isNotEmpty) {
+          episodes =
+              episodes.where((e) => languages.contains(e.language)).toList();
+        }
+        if (categories != null && categories.isNotEmpty) {
+          episodes =
+              episodes.where((e) => categories.contains(e.category)).toList();
+        }
+
+        if (sortOrder != null) {
+          episodes.sort((a, b) {
+            switch (sortOrder) {
+              case 'oldest':
+                // Use lastModified as proxy for date if date is missing, but AudioFile usually has date/lastModified
+                // In test, lastModified is set. AudioFile might not have 'date'?
+                // Test helper sets lastModified.
+                return a.lastModified.compareTo(b.lastModified);
+              case 'alphabetical':
+                return a.title.compareTo(b.title);
+              case 'newest':
+              default:
+                return b.lastModified.compareTo(a.lastModified);
+            }
+          });
+        }
+
         return episodes;
       });
 
