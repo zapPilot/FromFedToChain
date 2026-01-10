@@ -5,3 +5,4 @@ npm run precommit:test
 npm run deadcode:flutter
 npm run build:flutter
 npm run test:flutter
+cd web && npm run test:coverage

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import Footer from "@/components/Footer";
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <div className="flex min-h-screen">
           {/* Left Sidebar (Desktop) */}
-          <Sidebar />
+          <Suspense fallback={null}>
+            <Sidebar />
+          </Suspense>
 
           {/* Main Content Area */}
           {/* md:ml-64 shifts content to right of fixed sidebar on desktop */}
@@ -42,7 +45,7 @@ export default function RootLayout({
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm mr-3">
                 F
               </div>
-              <span className="font-bold text-sm">FedToChain</span>
+              <span className="font-bold text-sm">From Fed to Chain</span>
             </div>
 
             {/* Content Scroll Container */}

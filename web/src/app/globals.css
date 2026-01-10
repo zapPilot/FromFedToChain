@@ -1,23 +1,31 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   /* Base - Deepest Grey/Black for "OLED" feel but warmer */
   --background: #050505;
   --foreground: #ededed;
-  
+
   /* Surface colors (Cards, Sidebars) */
   --surface-1: #0a0a0a;
   --surface-2: #121212;
   --surface-3: #1e1e1e;
-  
+
   /* Category Accents (Sophisticated Financial/Tech Palette) */
-  --accent-primary: #3b82f6;   /* Default Blue */
-  --accent-macro: #10b981;     /* Emerald (Money/Economy) */
-  --accent-ethereum: #8b5cf6;  /* Violet */
-  --accent-startup: #0ea5e9;   /* Sky Blue */
-  --accent-ai: #d946ef;        /* Fuchsia/Magenta */
-  --accent-defi: #f59e0b;      /* Amber/Gold */
-  --accent-news: #f43f5e;      /* Rose */
+  --accent-primary: #3b82f6;
+  /* Default Blue */
+  --accent-macro: #10b981;
+  /* Emerald (Money/Economy) */
+  --accent-ethereum: #8b5cf6;
+  /* Violet */
+  --accent-startup: #0ea5e9;
+  /* Sky Blue */
+  --accent-ai: #d946ef;
+  /* Fuchsia/Magenta */
+  --accent-defi: #f59e0b;
+  /* Amber/Gold */
+  --accent-news: #f43f5e;
+  /* Rose */
 }
 
 @theme inline {
@@ -26,7 +34,7 @@
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
-  
+
   --color-accent-primary: var(--accent-primary);
   --color-accent-macro: var(--accent-macro);
   --color-accent-ethereum: var(--accent-ethereum);
@@ -34,10 +42,10 @@
   --color-accent-ai: var(--accent-ai);
   --color-accent-defi: var(--accent-defi);
   --color-accent-news: var(--accent-news);
-  
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+
   /* Glassmorphism Utilities */
   --backdrop-blur-md: blur(12px);
   --backdrop-blur-lg: blur(16px);

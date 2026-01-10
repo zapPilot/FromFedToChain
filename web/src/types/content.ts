@@ -56,3 +56,12 @@ export const LANGUAGE_FLAGS: Record<Language, string> = {
   "en-US": "🇺🇸",
   "ja-JP": "🇯🇵",
 };
+
+export const CATEGORY_COLORS: Record<Category, string> = {
+  "daily-news": "#f43f5e",      // Rose
+  "ethereum": "#8b5cf6",        // Violet
+  "macro": "#10b981",           // Emerald
+  "startup": "#0ea5e9",         // Sky Blue
+  "ai": "#d946ef",              // Fuchsia
+  "defi": "#f59e0b",            // Amber
+};

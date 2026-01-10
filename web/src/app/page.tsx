@@ -6,7 +6,9 @@ import { EpisodeList } from "@/components/EpisodeList";
 import { MiniPlayer } from "@/components/MiniPlayer";
 import { HeroSection } from "@/components/HeroSection";
 
-export default function Home() {
+import { Suspense } from "react";
+
+function HomeContent() {
   const { filteredEpisodes, isLoading, error, refreshEpisodes, hasFilters } =
     useEpisodes(true); // Auto-load episodes on mount
 
@@ -49,5 +51,13 @@ export default function Home() {
       {/* Mini Player (sticky bottom) */}
       <MiniPlayer />
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-zinc-500">Loading feed...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

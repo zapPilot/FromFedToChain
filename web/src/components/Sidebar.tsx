@@ -55,10 +55,9 @@ export function Sidebar() {
               onClick={clearFilters}
               className={`
                 w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
-                ${
-                  !selectedCategory
-                    ? "bg-white/10 text-white font-medium"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                ${!selectedCategory
+                  ? "bg-white/10 text-white font-medium"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
                 }
               `}
             >
@@ -97,10 +96,9 @@ export function Sidebar() {
                   onClick={() => setCategory(cat)}
                   className={`
                     w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all group
-                    ${
-                      isSelected
-                        ? "bg-white/10 text-white font-medium shadow-[0_0_15px_rgba(0,0,0,0.3)]"
-                        : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    ${isSelected
+                      ? "bg-white/10 text-white font-medium shadow-[0_0_15px_rgba(0,0,0,0.3)]"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                     }
                   `}
                 >
@@ -137,10 +135,9 @@ export function Sidebar() {
                 onClick={() => setLanguage(lang)}
                 className={`
                   flex flex-col items-center justify-center p-2 rounded-lg border border-transparent transition-all
-                  ${
-                    selectedLanguage === lang
-                      ? "bg-white/10 border-white/10 text-white"
-                      : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                  ${selectedLanguage === lang
+                    ? "bg-white/10 border-white/10 text-white"
+                    : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
                   }
                 `}
                 title={LANGUAGE_NAMES[lang]}
@@ -160,7 +157,7 @@ export function Sidebar() {
       {/* Footer Info */}
       <div className="p-6 border-t border-white/5">
         <div className="text-xs text-zinc-600 leading-relaxed">
-          <p>© 2026 FedToChain.</p>
+          <p>© 2026 From Fed to Chain.</p>
           <p>Ad-free specialized content.</p>
         </div>
       </div>

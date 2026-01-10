@@ -105,6 +105,7 @@ export function MiniPlayer() {
               onClick={() => (isPlaying ? pause() : play())}
               disabled={isLoading}
               className="w-12 h-12 flex items-center justify-center bg-white text-black hover:bg-zinc-200 rounded-full transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+              aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isLoading ? (
                 <svg

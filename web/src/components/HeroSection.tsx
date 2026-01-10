@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { Episode, CATEGORY_NAMES } from "@/types/content";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { formatDurationWithUnits } from "@/lib/utils/format-duration";
@@ -46,9 +46,11 @@ export function HeroSection({ episode, isLoading }: HeroSectionProps) {
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight max-w-2xl">
-            {episode.title}
-          </h1>
+          <Link href={`/episode/${episode.id}`} className="block group/title">
+            <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight max-w-2xl group-hover/title:text-indigo-400 group-hover/title:underline transition-colors">
+              {episode.title}
+            </h1>
+          </Link>
 
           <p className="text-zinc-300 text-base md:text-lg max-w-xl line-clamp-2 leading-relaxed">
             {episode.description ||

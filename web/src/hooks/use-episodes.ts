@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEpisodesStore } from "@/stores/episodes-store";
 import type { Language, Category } from "@/types/content";
 
@@ -18,6 +19,70 @@ export function useEpisodes(autoLoad: boolean = true) {
       store.loadEpisodes();
     }
   }, [autoLoad, store]);
+
+  // URL Synchronization
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // 1. Initialize Store from URL on mount
+  useEffect(() => {
+    const langParam = searchParams.get("lang");
+    const catParam = searchParams.get("category");
+
+    if (langParam && langParam !== store.selectedLanguage) {
+      // Validate language
+      if (["en-US", "zh-TW", "ja-JP"].includes(langParam)) {
+        store.setLanguage(langParam as Language);
+      }
+    }
+
+    if (catParam && catParam !== store.selectedCategory) {
+      // Validate category (simple check or import categories)
+      // We can just set it, and if it's invalid the UI handles it gracefully or we validate strict
+      // Importing SUPPORTED_CATEGORIES requires circular dependency care or just hardcode check
+      const validCategories = ["daily-news", "ethereum", "macro", "startup", "ai", "defi"];
+      if (validCategories.includes(catParam)) {
+        store.setCategory(catParam as Category);
+      }
+    }
+  }, []); // Run once on mount (or when searchParams change? No, only init. Two-way binding loop risk)
+
+  // 2. Update URL when Store changes
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    let hasChanges = false;
+
+    // Sync Language
+    if (store.selectedLanguage) {
+      if (params.get("lang") !== store.selectedLanguage) {
+        params.set("lang", store.selectedLanguage);
+        hasChanges = true;
+      }
+    } else {
+      if (params.has("lang")) {
+        params.delete("lang");
+        hasChanges = true;
+      }
+    }
+
+    // Sync Category
+    if (store.selectedCategory) {
+      if (params.get("category") !== store.selectedCategory) {
+        params.set("category", store.selectedCategory);
+        hasChanges = true;
+      }
+    } else {
+      if (params.has("category")) {
+        params.delete("category");
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      router.replace(`${pathname}?${params.toString()}`);
+    }
+  }, [store.selectedLanguage, store.selectedCategory, router, pathname, searchParams]);
 
   return {
     // Data
