@@ -1,3 +1,5 @@
+"use client";
+
 import { useEpisodes } from "@/hooks/use-episodes";
 import {
   CATEGORY_NAMES,

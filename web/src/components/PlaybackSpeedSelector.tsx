@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { PLAYBACK_SPEEDS } from "@/stores/audio-player-store";

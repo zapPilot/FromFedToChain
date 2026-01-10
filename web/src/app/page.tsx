@@ -4,64 +4,43 @@ import { useEpisodes } from "@/hooks/use-episodes";
 import { FilterBar } from "@/components/FilterBar";
 import { EpisodeList } from "@/components/EpisodeList";
 import { MiniPlayer } from "@/components/MiniPlayer";
+import { HeroSection } from "@/components/HeroSection";
 
 export default function Home() {
-  const {
-    filteredEpisodes,
-    isLoading,
-    error,
-    refreshEpisodes,
-    episodeCount,
-    hasFilters,
-  } = useEpisodes(true); // Auto-load episodes on mount
+  const { filteredEpisodes, isLoading, error, refreshEpisodes, hasFilters } =
+    useEpisodes(true); // Auto-load episodes on mount
+
+  // Feature the first episode as the Hero
+  const featuredEpisode = filteredEpisodes[0];
+  const remainingEpisodes = filteredEpisodes.slice(1);
 
   return (
     <>
-      <div className="container mx-auto px-4 py-8 pb-32">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Latest Episodes</h1>
-          <p className="text-zinc-400 text-lg">
-            Stay updated with the latest insights on crypto, macro economics,
-            and blockchain technology.
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="mb-8">
+      <div className="px-4 md:px-8 py-8 md:py-10 pb-32">
+        {/* Mobile Filter Bar (Hidden on Desktop because Sidebar exists) */}
+        <div className="mb-6 md:hidden">
           <FilterBar />
         </div>
 
-        {/* Results count */}
-        {!isLoading && !error && (
-          <div className="mb-4">
-            <p className="text-sm text-zinc-500">
-              {hasFilters ? (
-                <>
-                  Showing{" "}
-                  <span className="font-medium text-zinc-400">
-                    {episodeCount}
-                  </span>{" "}
-                  filtered
-                  {episodeCount === 1 ? " episode" : " episodes"}
-                </>
-              ) : (
-                <>
-                  <span className="font-medium text-zinc-400">
-                    {episodeCount}
-                  </span>{" "}
-                  total
-                  {episodeCount === 1 ? " episode" : " episodes"}
-                </>
-              )}
-            </p>
+        {/* Hero Section (Featured Episode) */}
+        <HeroSection episode={featuredEpisode} isLoading={isLoading} />
+
+        {/* Section Header */}
+        {!isLoading && !error && remainingEpisodes.length > 0 && (
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white">
+              {hasFilters ? "Filtered Results" : "Latest Episodes"}
+            </h2>
+            <span className="text-sm text-zinc-500">
+              {remainingEpisodes.length} more
+            </span>
           </div>
         )}
 
-        {/* Episode List */}
+        {/* Episode List (skipping the first one) */}
         <EpisodeList
-          episodes={filteredEpisodes}
-          isLoading={isLoading}
+          episodes={remainingEpisodes}
+          isLoading={isLoading && !featuredEpisode}
           error={error}
           onRetry={refreshEpisodes}
         />

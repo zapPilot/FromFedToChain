@@ -1,19 +1,18 @@
+"use client";
+
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { PlaybackSpeedSelector } from "./PlaybackSpeedSelector";
 import { CATEGORY_EMOJIS } from "@/types/content";
 
 /**
- * Mini player component - sticky bottom audio player
+ * Mini player component - Floating "Dynamic Island" style dock
  * Shows current episode with playback controls
- * Only visible when an episode is loaded
  */
 export function MiniPlayer() {
   const {
     currentEpisode,
     isPlaying,
-    isPaused,
     isLoading,
-    currentPosition,
     totalDuration,
     progress,
     formattedCurrentPosition,
@@ -39,55 +38,59 @@ export function MiniPlayer() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 shadow-2xl z-50">
-      {/* Progress bar */}
-      <div
-        className="h-1 bg-zinc-800 cursor-pointer group"
-        onClick={handleProgressBarClick}
-      >
+    <div className="fixed bottom-6 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-3xl z-50">
+      <div className="bg-surface-1/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-white/5">
+        {/* Progress bar (Top Edge) */}
         <div
-          className="h-full bg-zinc-400 group-hover:bg-zinc-300 transition-all relative"
-          style={{ width: `${progress * 100}%` }}
+          className="h-1 bg-white/5 cursor-pointer group relative"
+          onClick={handleProgressBarClick}
         >
-          {/* Progress handle */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-zinc-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
+          <div
+            className="h-full bg-indigo-500 group-hover:bg-indigo-400 transition-all relative"
+            style={{ width: `${progress * 100}%` }}
+          >
+            {/* Glow at the tip */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_currentColor] opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+          {/* Hover area helper */}
+          <div className="absolute -top-2 -bottom-2 inset-x-0" />
         </div>
-      </div>
 
-      {/* Player controls */}
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center gap-4">
-          {/* Episode info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">
-                {CATEGORY_EMOJIS[currentEpisode.category]}
-              </span>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-medium text-zinc-100 truncate">
-                  {currentEpisode.title}
-                </h4>
-                <p className="text-xs text-zinc-500 truncate">
-                  {currentEpisode.category} • {currentEpisode.language}
-                </p>
-              </div>
+        <div className="px-5 py-4 flex items-center justify-between gap-4">
+          {/* Track Info */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            <div className="w-10 h-10 rounded-lg bg-surface-3 flex items-center justify-center text-xl shadow-inner border border-white/5">
+              {CATEGORY_EMOJIS[currentEpisode.category]}
+            </div>
+            <div className="min-w-0">
+              <h4 className="text-sm font-semibold text-white truncate pr-2">
+                {currentEpisode.title}
+              </h4>
+              <p className="text-xs text-zinc-400 truncate">
+                {currentEpisode.category}
+              </p>
             </div>
           </div>
 
-          {/* Playback controls */}
-          <div className="flex items-center gap-3">
-            {/* Skip backward 15s */}
+          {/* Controls */}
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Time (Desktop only) */}
+            <div className="hidden md:flex items-center gap-2 text-xs font-mono text-zinc-500 mr-2">
+              <span className="text-zinc-300">{formattedCurrentPosition}</span>
+              <span>/</span>
+              <span>{formattedTotalDuration}</span>
+            </div>
+
             <button
               onClick={() => skipBackward(15)}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-              aria-label="Skip backward 15 seconds"
-              title="Skip backward 15s"
+              className="hidden sm:flex p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
+              title="Rewind 15s"
             >
               <svg
-                className="w-5 h-5 text-zinc-300"
+                className="w-5 h-5"
                 fill="none"
-                stroke="currentColor"
                 viewBox="0 0 24 24"
+                stroke="currentColor"
               >
                 <path
                   strokeLinecap="round"
@@ -98,16 +101,14 @@ export function MiniPlayer() {
               </svg>
             </button>
 
-            {/* Play/Pause button */}
             <button
               onClick={() => (isPlaying ? pause() : play())}
               disabled={isLoading}
-              className="p-3 bg-zinc-700 hover:bg-zinc-600 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label={isPlaying ? "Pause" : "Play"}
+              className="w-12 h-12 flex items-center justify-center bg-white text-black hover:bg-zinc-200 rounded-full transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
             >
               {isLoading ? (
                 <svg
-                  className="w-6 h-6 text-zinc-100 animate-spin"
+                  className="w-5 h-5 animate-spin text-zinc-500"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -127,7 +128,7 @@ export function MiniPlayer() {
                 </svg>
               ) : isPlaying ? (
                 <svg
-                  className="w-6 h-6 text-zinc-100"
+                  className="w-5 h-5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -135,7 +136,7 @@ export function MiniPlayer() {
                 </svg>
               ) : (
                 <svg
-                  className="w-6 h-6 text-zinc-100 ml-0.5"
+                  className="w-5 h-5 ml-0.5"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -144,18 +145,16 @@ export function MiniPlayer() {
               )}
             </button>
 
-            {/* Skip forward 30s */}
             <button
               onClick={() => skipForward(30)}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-              aria-label="Skip forward 30 seconds"
-              title="Skip forward 30s"
+              className="hidden sm:flex p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
+              title="Skip 30s"
             >
               <svg
-                className="w-5 h-5 text-zinc-300"
+                className="w-5 h-5"
                 fill="none"
-                stroke="currentColor"
                 viewBox="0 0 24 24"
+                stroke="currentColor"
               >
                 <path
                   strokeLinecap="round"
@@ -165,18 +164,12 @@ export function MiniPlayer() {
                 />
               </svg>
             </button>
-          </div>
 
-          {/* Time display */}
-          <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-400 font-mono">
-            <span>{formattedCurrentPosition}</span>
-            <span>/</span>
-            <span>{formattedTotalDuration}</span>
-          </div>
+            <div className="w-px h-8 bg-white/10 mx-2 hidden md:block" />
 
-          {/* Playback speed selector */}
-          <div className="hidden md:block">
-            <PlaybackSpeedSelector />
+            <div className="hidden md:block">
+              <PlaybackSpeedSelector />
+            </div>
           </div>
         </div>
       </div>
