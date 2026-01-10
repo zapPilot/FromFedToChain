@@ -1,20 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { Category } from "@/types/content";
-import { mockEpisodes, getEpisodesByCategory } from "@/data/mock-content";
-import EpisodeCard from "@/components/EpisodeCard";
-import CategoryFilter from "@/components/CategoryFilter";
+import { useEpisodes } from "@/hooks/use-episodes";
+import { FilterBar } from "@/components/FilterBar";
+import { EpisodeList } from "@/components/EpisodeList";
+import { MiniPlayer } from "@/components/MiniPlayer";
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  );
-  const episodes = getEpisodesByCategory(selectedCategory || undefined);
+  const {
+    filteredEpisodes,
+    isLoading,
+    error,
+    refreshEpisodes,
+    episodeCount,
+    hasFilters,
+  } = useEpisodes(true); // Auto-load episodes on mount
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <>
+      <div className="container mx-auto px-4 py-8 pb-32">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">Latest Episodes</h1>
           <p className="text-zinc-400 text-lg">
@@ -23,25 +27,48 @@ export default function Home() {
           </p>
         </div>
 
-        <CategoryFilter
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
-
-        <div className="space-y-4">
-          {episodes.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-zinc-400">
-                No episodes found in this category.
-              </p>
-            </div>
-          ) : (
-            episodes.map((episode) => (
-              <EpisodeCard key={episode.id} episode={episode} />
-            ))
-          )}
+        {/* Filters */}
+        <div className="mb-8">
+          <FilterBar />
         </div>
+
+        {/* Results count */}
+        {!isLoading && !error && (
+          <div className="mb-4">
+            <p className="text-sm text-zinc-500">
+              {hasFilters ? (
+                <>
+                  Showing{" "}
+                  <span className="font-medium text-zinc-400">
+                    {episodeCount}
+                  </span>{" "}
+                  filtered
+                  {episodeCount === 1 ? " episode" : " episodes"}
+                </>
+              ) : (
+                <>
+                  <span className="font-medium text-zinc-400">
+                    {episodeCount}
+                  </span>{" "}
+                  total
+                  {episodeCount === 1 ? " episode" : " episodes"}
+                </>
+              )}
+            </p>
+          </div>
+        )}
+
+        {/* Episode List */}
+        <EpisodeList
+          episodes={filteredEpisodes}
+          isLoading={isLoading}
+          error={error}
+          onRetry={refreshEpisodes}
+        />
       </div>
-    </div>
+
+      {/* Mini Player (sticky bottom) */}
+      <MiniPlayer />
+    </>
   );
 }

@@ -23,6 +23,8 @@ export interface Episode {
   };
   social_hook?: string;
   updated_at: string;
+  duration?: number; // Duration in seconds
+  path?: string; // Original R2 path
 }
 
 export const CATEGORY_NAMES: Record<Category, string> = {
@@ -47,4 +49,10 @@ export const LANGUAGE_NAMES: Record<Language, string> = {
   "zh-TW": "繁體中文",
   "en-US": "English",
   "ja-JP": "日本語",
+};
+
+export const LANGUAGE_FLAGS: Record<Language, string> = {
+  "zh-TW": "🇹🇼",
+  "en-US": "🇺🇸",
+  "ja-JP": "🇯🇵",
 };
