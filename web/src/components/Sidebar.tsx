@@ -4,20 +4,12 @@ import { useEpisodes } from "@/hooks/use-episodes";
 import {
   CATEGORY_NAMES,
   CATEGORY_EMOJIS,
+  CATEGORY_COLORS,
   LANGUAGE_NAMES,
   LANGUAGE_FLAGS,
   type Category,
   type Language,
 } from "@/types/content";
-
-const CATEGORY_COLORS: Record<Category, string> = {
-  "daily-news": "var(--accent-news)",
-  ethereum: "var(--accent-ethereum)",
-  macro: "var(--accent-macro)",
-  startup: "var(--accent-startup)",
-  ai: "var(--accent-ai)",
-  defi: "var(--accent-defi)",
-};
 
 export function Sidebar() {
   const {

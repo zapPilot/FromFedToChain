@@ -191,35 +191,40 @@ function EpisodeContent({ id }: { id: string }) {
       </div>
 
       {/* References */}
-      {(fetchedReferences.length > 0 ||
-        (episode.references && episode.references.length > 0)) && (
-        <div className="mt-16 pt-8 border-t border-white/10">
-          <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">
-            References
-          </h3>
-          <ul className="space-y-2">
-            {(fetchedReferences.length > 0
-              ? fetchedReferences
-              : episode.references || []
-            ).map((ref, i) => (
-              <li key={i} className="text-sm text-zinc-400">
-                {ref.startsWith("http") ? (
-                  <a
-                    href={ref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white hover:underline truncate block"
-                  >
-                    {ref}
-                  </a>
-                ) : (
-                  <span>{ref}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {(() => {
+        const references =
+          fetchedReferences.length > 0
+            ? fetchedReferences
+            : episode.references || [];
+
+        if (references.length === 0) return null;
+
+        return (
+          <div className="mt-16 pt-8 border-t border-white/10">
+            <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">
+              References
+            </h3>
+            <ul className="space-y-2">
+              {references.map((ref, i) => (
+                <li key={i} className="text-sm text-zinc-400">
+                  {ref.startsWith("http") ? (
+                    <a
+                      href={ref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white hover:underline truncate block"
+                    >
+                      {ref}
+                    </a>
+                  ) : (
+                    <span>{ref}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
     </article>
   );
 }

@@ -2,6 +2,11 @@ import { useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEpisodesStore } from "@/stores/episodes-store";
 import type { Language, Category } from "@/types/content";
+import { LANGUAGE_NAMES, CATEGORY_NAMES } from "@/types/content";
+
+// Derive supported values from the exported constants
+const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_NAMES) as Language[];
+const SUPPORTED_CATEGORIES = Object.keys(CATEGORY_NAMES) as Category[];
 
 /**
  * Hook for episodes data and filtering
@@ -31,22 +36,17 @@ export function useEpisodes(autoLoad: boolean = true) {
     const catParam = searchParams.get("category");
 
     if (langParam && langParam !== store.selectedLanguage) {
-      // Validate language
-      if (["en-US", "zh-TW", "ja-JP"].includes(langParam)) {
+      if (SUPPORTED_LANGUAGES.includes(langParam as Language)) {
         store.setLanguage(langParam as Language);
       }
     }
 
     if (catParam && catParam !== store.selectedCategory) {
-      // Validate category (simple check or import categories)
-      // We can just set it, and if it's invalid the UI handles it gracefully or we validate strict
-      // Importing SUPPORTED_CATEGORIES requires circular dependency care or just hardcode check
-      const validCategories = ["daily-news", "ethereum", "macro", "startup", "ai", "defi"];
-      if (validCategories.includes(catParam)) {
+      if (SUPPORTED_CATEGORIES.includes(catParam as Category)) {
         store.setCategory(catParam as Category);
       }
     }
-  }, []); // Run once on mount (or when searchParams change? No, only init. Two-way binding loop risk)
+  }, []); // Run once on mount
 
   // 2. Update URL when Store changes
   useEffect(() => {
@@ -82,7 +82,13 @@ export function useEpisodes(autoLoad: boolean = true) {
     if (hasChanges) {
       router.replace(`${pathname}?${params.toString()}`);
     }
-  }, [store.selectedLanguage, store.selectedCategory, router, pathname, searchParams]);
+  }, [
+    store.selectedLanguage,
+    store.selectedCategory,
+    router,
+    pathname,
+    searchParams,
+  ]);
 
   return {
     // Data

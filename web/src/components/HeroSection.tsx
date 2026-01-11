@@ -98,12 +98,12 @@ export function HeroSection({ episode, isLoading }: HeroSectionProps) {
         {/* Visual Decoration (Right side) - Abstract Waveform representation */}
         <div className="hidden md:flex items-center justify-center w-32 h-32 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-end gap-1 h-12">
-            {[...Array(5)].map((_, i) => (
+            {[40, 70, 90, 55, 35].map((height, i) => (
               <div
                 key={i}
                 className={`w-1 bg-white/50 rounded-full ${isPlayingCurrent ? "animate-pulse" : ""}`}
                 style={{
-                  height: `${Math.max(20, Math.random() * 100)}%`,
+                  height: `${height}%`,
                   animationDelay: `${i * 0.1}s`,
                 }}
               />

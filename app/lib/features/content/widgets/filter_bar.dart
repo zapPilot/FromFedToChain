@@ -23,23 +23,50 @@ class FilterBar extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Language filter
-        _buildLanguageFilter(),
+        _buildFilterSection(
+          title: 'Language',
+          items: ApiConfig.supportedLanguages,
+          selectedItem: selectedLanguage,
+          onSelected: onLanguageChanged,
+          labelBuilder: (lang) =>
+              '${ApiConfig.getLanguageFlag(lang)} ${ApiConfig.getLanguageDisplayName(lang)}',
+          colorBuilder: (lang) => AppTheme.getLanguageColor(lang),
+        ),
 
         const SizedBox(height: AppTheme.spacingS),
 
         // Category filter
-        _buildCategoryFilter(),
+        _buildFilterSection(
+          title: 'Category',
+          items: ['all', ...ApiConfig.supportedCategories],
+          selectedItem: selectedCategory,
+          onSelected: onCategoryChanged,
+          labelBuilder: (cat) {
+            if (cat == 'all') return 'All';
+            return '${ApiConfig.getCategoryEmoji(cat)} ${ApiConfig.getCategoryDisplayName(cat)}';
+          },
+          colorBuilder: (cat) => cat == 'all'
+              ? AppTheme.onSurfaceColor.withValues(alpha: 0.6)
+              : AppTheme.getCategoryColor(cat),
+        ),
       ],
     );
   }
 
-  /// Build language filter chips
-  Widget _buildLanguageFilter() {
+  /// Build a generic filter section with a title and horizontal scrollable chips
+  Widget _buildFilterSection({
+    required String title,
+    required List<String> items,
+    required String selectedItem,
+    required ValueChanged<String> onSelected,
+    required String Function(String) labelBuilder,
+    required Color Function(String) colorBuilder,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Language',
+          title,
           style: AppTheme.bodySmall.copyWith(
             color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
@@ -49,69 +76,18 @@ class FilterBar extends StatelessWidget {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: [
-              // Individual language options
-              ...ApiConfig.supportedLanguages.map((language) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: AppTheme.spacingS),
-                  child: _buildFilterChip(
-                    label: _getLanguageDisplay(language),
-                    value: language,
-                    isSelected: selectedLanguage == language,
-                    onTap: () => onLanguageChanged(language),
-                    color: AppTheme.getLanguageColor(language),
-                  ),
-                );
-              }).toList(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Build category filter chips
-  Widget _buildCategoryFilter() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Category',
-          style: AppTheme.bodySmall.copyWith(
-            color: AppTheme.onSurfaceColor.withValues(alpha: 0.7),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: AppTheme.spacingS),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              // All categories option
-              _buildFilterChip(
-                label: 'All',
-                value: 'all',
-                isSelected: selectedCategory == 'all',
-                onTap: () => onCategoryChanged('all'),
-                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-              ),
-
-              const SizedBox(width: AppTheme.spacingS),
-
-              // Individual category options
-              ...ApiConfig.supportedCategories.map((category) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: AppTheme.spacingS),
-                  child: _buildFilterChip(
-                    label: _getCategoryDisplay(category),
-                    value: category,
-                    isSelected: selectedCategory == category,
-                    onTap: () => onCategoryChanged(category),
-                    color: AppTheme.getCategoryColor(category),
-                  ),
-                );
-              }).toList(),
-            ],
+            children: items.map((item) {
+              return Padding(
+                padding: const EdgeInsets.only(right: AppTheme.spacingS),
+                child: _buildFilterChip(
+                  label: labelBuilder(item),
+                  value: item,
+                  isSelected: selectedItem == item,
+                  onTap: () => onSelected(item),
+                  color: colorBuilder(item),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -167,53 +143,5 @@ class FilterBar extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Get language display text with flag
-  String _getLanguageDisplay(String language) {
-    final flag = _getLanguageFlag(language);
-    final name = ApiConfig.getLanguageDisplayName(language);
-    return '$flag $name';
-  }
-
-  /// Get category display text with emoji
-  String _getCategoryDisplay(String category) {
-    final emoji = _getCategoryEmoji(category);
-    final name = ApiConfig.getCategoryDisplayName(category);
-    return '$emoji $name';
-  }
-
-  /// Get language flag emoji
-  String _getLanguageFlag(String language) {
-    switch (language) {
-      case 'zh-TW':
-        return '🇹🇼';
-      case 'en-US':
-        return '🇺🇸';
-      case 'ja-JP':
-        return '🇯🇵';
-      default:
-        return '🌐';
-    }
-  }
-
-  /// Get category emoji
-  String _getCategoryEmoji(String category) {
-    switch (category) {
-      case 'daily-news':
-        return '📰';
-      case 'ethereum':
-        return '⚡';
-      case 'macro':
-        return '📊';
-      case 'startup':
-        return '🚀';
-      case 'ai':
-        return '🤖';
-      case 'defi':
-        return '💎';
-      default:
-        return '🎧';
-    }
   }
 }

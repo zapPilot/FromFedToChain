@@ -8,7 +8,6 @@ import {
   CATEGORY_EMOJIS,
   CATEGORY_NAMES,
   CATEGORY_COLORS,
-  Category,
 } from "@/types/content";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 import { useProgress } from "@/hooks/use-progress";
@@ -70,9 +69,10 @@ export function EpisodeCard({ episode }: EpisodeCardProps) {
           onClick={handlePlayPause}
           className={`
             flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-105
-            ${isCurrentlyPlaying
-              ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-              : "bg-white/10 text-white hover:bg-white hover:text-black"
+            ${
+              isCurrentlyPlaying
+                ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                : "bg-white/10 text-white hover:bg-white hover:text-black"
             }
           `}
           aria-label={isCurrentlyPlaying ? "Pause" : "Play"}

@@ -228,9 +228,19 @@ class _HomeScreenState extends State<HomeScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _buildRecentTab(contentService, audioService),
-              _buildAllTab(contentService, audioService),
-              _buildUnfinishedTab(contentService, audioService),
+              _buildAudioTab(
+                contentService.filteredEpisodes.take(20).toList(),
+                audioService,
+              ),
+              _buildAudioTab(
+                contentService.filteredEpisodes,
+                audioService,
+              ),
+              _buildAudioTab(
+                contentService.getUnfinishedEpisodes(),
+                audioService,
+                emptyState: _buildUnfinishedEmptyState(),
+              ),
             ],
           ),
         ),
@@ -238,66 +248,48 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  /// Build recent episodes tab
-  Widget _buildRecentTab(
-      ContentService contentService, AudioPlayerService audioService) {
-    final recentEpisodes = contentService.filteredEpisodes.take(20).toList();
-
+  /// Helper to build an audio list tab
+  Widget _buildAudioTab(
+    List<AudioFile> episodes,
+    AudioPlayerService audioService, {
+    Widget? emptyState,
+  }) {
     return AudioTabContent(
-      episodes: recentEpisodes,
+      episodes: episodes,
       scrollController: _scrollController,
       onPlay: (episode) => _playEpisode(episode, audioService),
       onOptions: (episode) => _showEpisodeOptions(episode),
+      emptyState: emptyState,
     );
   }
 
-  /// Build all episodes tab
-  Widget _buildAllTab(
-      ContentService contentService, AudioPlayerService audioService) {
-    return AudioTabContent(
-      episodes: contentService.filteredEpisodes,
-      scrollController: _scrollController,
-      onPlay: (episode) => _playEpisode(episode, audioService),
-      onOptions: (episode) => _showEpisodeOptions(episode),
-    );
-  }
-
-  /// Build unfinished episodes tab
-  Widget _buildUnfinishedTab(
-      ContentService contentService, AudioPlayerService audioService) {
-    final unfinishedEpisodes = contentService.getUnfinishedEpisodes();
-
-    return AudioTabContent(
-      episodes: unfinishedEpisodes,
-      scrollController: _scrollController,
-      onPlay: (episode) => _playEpisode(episode, audioService),
-      onOptions: (episode) => _showEpisodeOptions(episode),
-      emptyState: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.pending_actions,
-              size: 80,
-              color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
+  /// Build unfinished episodes empty state
+  Widget _buildUnfinishedEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.pending_actions,
+            size: 80,
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
+          ),
+          const SizedBox(height: AppTheme.spacingL),
+          Text(
+            'No Unfinished Episodes',
+            style: AppTheme.headlineSmall.copyWith(
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
             ),
-            const SizedBox(height: AppTheme.spacingL),
-            Text(
-              'No Unfinished Episodes',
-              style: AppTheme.headlineSmall.copyWith(
-                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-              ),
+          ),
+          const SizedBox(height: AppTheme.spacingS),
+          Text(
+            'Episodes you\'ve started listening to will appear here',
+            style: AppTheme.bodyMedium.copyWith(
+              color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: AppTheme.spacingS),
-            Text(
-              'Episodes you\'ve started listening to will appear here',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

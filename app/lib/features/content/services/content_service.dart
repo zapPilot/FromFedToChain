@@ -154,37 +154,37 @@ class ContentService extends ChangeNotifier {
   /// First tries exact ID match, then falls back to date-based matching.
   /// Returns null if no match is found.
   Future<AudioFile?> getAudioFileById(String contentId) async {
-    // Search for the audio file by ID in the loaded episodes
+    // 1. Try exact ID match first (fastest)
     try {
-      // First try exact match
       return allEpisodes.firstWhere((episode) => episode.id == contentId);
     } catch (_) {
-      // If exact match fails, try date pattern matching
-      try {
-        // Extract date pattern from contentId (YYYY-MM-DD)
-        final dateRegex = RegExp(r'(\d{4}-\d{2}-\d{2})');
-        final match = dateRegex.firstMatch(contentId);
+      // 2. Fall back to fuzzy date matching
+      return _findEpisodeByFuzzyDate(contentId);
+    }
+  }
 
-        if (match != null) {
-          final dateStr = match.group(1)!;
-          final searchDate = DateTime.parse(dateStr);
+  /// Helper to find an episode by extracting a date from the contentId.
+  AudioFile? _findEpisodeByFuzzyDate(String contentId) {
+    try {
+      // Extract date pattern (YYYY-MM-DD)
+      final dateRegex = RegExp(r'(\d{4}-\d{2}-\d{2})');
+      final match = dateRegex.firstMatch(contentId);
 
-          // Find episode with matching date (either in ID or lastModified)
-          return allEpisodes.firstWhere((episode) {
-            if (episode.id.contains(dateStr)) {
-              return true;
-            }
+      if (match == null) return null;
 
-            final episodeDate = episode.publishDate;
-            return episodeDate.year == searchDate.year &&
-                episodeDate.month == searchDate.month &&
-                episodeDate.day == searchDate.day;
-          });
-        }
-      } catch (_) {
-        // Ignore and fall through
-      }
+      final dateStr = match.group(1)!;
+      final searchDate = DateTime.parse(dateStr);
 
+      // Find episode with matching date (either in ID or publishDate)
+      return allEpisodes.firstWhere((episode) {
+        if (episode.id.contains(dateStr)) return true;
+
+        final episodeDate = episode.publishDate;
+        return episodeDate.year == searchDate.year &&
+            episodeDate.month == searchDate.month &&
+            episodeDate.day == searchDate.day;
+      });
+    } catch (_) {
       return null;
     }
   }
