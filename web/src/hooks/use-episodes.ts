@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEpisodesStore } from "@/stores/episodes-store";
 import type { Language, Category } from "@/types/content";
@@ -18,77 +18,100 @@ const SUPPORTED_CATEGORIES = Object.keys(CATEGORY_NAMES) as Category[];
 export function useEpisodes(autoLoad: boolean = true) {
   const store = useEpisodesStore();
 
-  // Auto-load episodes on mount if requested
-  useEffect(() => {
-    if (autoLoad && store.allEpisodes.length === 0 && !store.isLoading) {
-      store.loadEpisodes();
-    }
-  }, [autoLoad, store]);
+  // Track if initial URL sync is done
+  const hasInitializedFromUrl = useRef(false);
+  // Track if we're doing a programmatic URL update
+  const isProgrammaticUrlUpdate = useRef(false);
+  // Track last synced values to prevent loops
+  const lastSyncedParams = useRef({ lang: "", category: "" });
 
   // URL Synchronization
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  // 1. Initialize Store from URL on mount
-  useEffect(() => {
-    const langParam = searchParams.get("lang");
-    const catParam = searchParams.get("category");
+  // Get current URL params
+  const langParam = searchParams.get("lang") ?? "";
+  const catParam = searchParams.get("category") ?? "";
 
-    if (langParam && langParam !== store.selectedLanguage) {
-      if (SUPPORTED_LANGUAGES.includes(langParam as Language)) {
-        store.setLanguage(langParam as Language);
-      }
+  // 1. Sync URL → Store: On mount and when URL changes externally
+  useEffect(() => {
+    // Skip if this URL change was caused by our store→URL sync
+    if (isProgrammaticUrlUpdate.current) {
+      isProgrammaticUrlUpdate.current = false;
+      return;
     }
 
-    if (catParam && catParam !== store.selectedCategory) {
-      if (SUPPORTED_CATEGORIES.includes(catParam as Category)) {
-        store.setCategory(catParam as Category);
-      }
+    // Parse URL params
+    const targetLang =
+      langParam && SUPPORTED_LANGUAGES.includes(langParam as Language)
+        ? (langParam as Language)
+        : null;
+
+    const targetCat =
+      catParam && SUPPORTED_CATEGORIES.includes(catParam as Category)
+        ? (catParam as Category)
+        : null;
+
+    // Get current store state directly from store (avoid stale closure)
+    const currentState = useEpisodesStore.getState();
+
+    // Only update if different
+    if (targetLang !== currentState.selectedLanguage) {
+      currentState.setLanguage(targetLang);
     }
-  }, []); // Run once on mount
+    if (targetCat !== currentState.selectedCategory) {
+      currentState.setCategory(targetCat);
+    }
 
-  // 2. Update URL when Store changes
+    // Update last synced values
+    lastSyncedParams.current = { lang: langParam, category: catParam };
+    hasInitializedFromUrl.current = true;
+  }, [langParam, catParam]); // Only depend on URL param values
+
+  // Auto-load episodes
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    let hasChanges = false;
+    if (autoLoad && store.allEpisodes.length === 0 && !store.isLoading) {
+      store.loadEpisodes();
+    }
+  }, [autoLoad, store]);
 
-    // Sync Language
+  // 2. Sync Store → URL: When user changes filter via UI (store changes)
+  useEffect(() => {
+    // Don't sync until initial URL→Store sync is done
+    if (!hasInitializedFromUrl.current) return;
+
+    const newLang = store.selectedLanguage ?? "";
+    const newCat = store.selectedCategory ?? "";
+
+    // Skip if values match what we last synced from URL
+    if (
+      newLang === lastSyncedParams.current.lang &&
+      newCat === lastSyncedParams.current.category
+    ) {
+      return;
+    }
+
+    // Build new URL
+    const params = new URLSearchParams();
     if (store.selectedLanguage) {
-      if (params.get("lang") !== store.selectedLanguage) {
-        params.set("lang", store.selectedLanguage);
-        hasChanges = true;
-      }
-    } else {
-      if (params.has("lang")) {
-        params.delete("lang");
-        hasChanges = true;
-      }
+      params.set("lang", store.selectedLanguage);
     }
-
-    // Sync Category
     if (store.selectedCategory) {
-      if (params.get("category") !== store.selectedCategory) {
-        params.set("category", store.selectedCategory);
-        hasChanges = true;
-      }
-    } else {
-      if (params.has("category")) {
-        params.delete("category");
-        hasChanges = true;
-      }
+      params.set("category", store.selectedCategory);
     }
 
-    if (hasChanges) {
-      router.replace(`${pathname}?${params.toString()}`);
-    }
-  }, [
-    store.selectedLanguage,
-    store.selectedCategory,
-    router,
-    pathname,
-    searchParams,
-  ]);
+    // Update last synced values
+    lastSyncedParams.current = { lang: newLang, category: newCat };
+
+    // Set flag to skip the URL→Store sync for this update
+    isProgrammaticUrlUpdate.current = true;
+
+    const newUrl = params.toString()
+      ? `${pathname}?${params.toString()}`
+      : pathname;
+    router.replace(newUrl);
+  }, [store.selectedLanguage, store.selectedCategory, router, pathname]);
 
   return {
     // Data

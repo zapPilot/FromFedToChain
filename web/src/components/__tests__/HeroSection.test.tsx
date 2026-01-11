@@ -1,17 +1,24 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { HeroSection } from "../HeroSection";
-// import "@testing-library/jest-dom"; // Already in setup
+import "@testing-library/jest-dom";
 
 // Mock hooks
 const mockPlay = jest.fn();
 const mockPause = jest.fn();
 
+// Default mock values
+const defaultMockValues = {
+  isPlaying: false,
+  currentEpisode: null as any,
+};
+
+let mockValues = { ...defaultMockValues };
+
 jest.mock("@/hooks/use-audio-player", () => ({
   useAudioPlayer: () => ({
     play: mockPlay,
     pause: mockPause,
-    isPlaying: false,
-    currentEpisode: null,
+    ...mockValues,
   }),
 }));
 
@@ -27,6 +34,11 @@ const mockEpisode = {
 } as any;
 
 describe("HeroSection", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockValues = { ...defaultMockValues };
+  });
+
   it("renders nothing if no episode provided", () => {
     const { container } = render(<HeroSection episode={undefined} />);
     expect(container).toBeEmptyDOMElement();
@@ -34,22 +46,63 @@ describe("HeroSection", () => {
 
   it("renders loading skeleton when loading", () => {
     render(<HeroSection episode={mockEpisode} isLoading={true} />);
-    // Using a class based check usually, but here we can check if the title is NOT present yet
-    // or check for the animate-pulse class if possible, but testing library prefers accessible queries.
-    // The skeleton has no text, so we can check that title is NOT there.
     expect(screen.queryByText("Test Episode Title")).not.toBeInTheDocument();
   });
 
-  it("renders episode details when provided", () => {
+  it("renders episode details with description", () => {
     render(<HeroSection episode={mockEpisode} />);
     expect(screen.getByText("Test Episode Title")).toBeInTheDocument();
     expect(screen.getByText("Test description")).toBeInTheDocument();
     expect(screen.getByText("Featured • Daily News")).toBeInTheDocument();
   });
 
+  it("renders fallback description if missing", () => {
+    const episodeWithoutDesc = { ...mockEpisode, description: "" };
+    render(<HeroSection episode={episodeWithoutDesc} />);
+    expect(
+      screen.getByText(
+        "Listen to the latest market intelligence and analysis.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("calls play when play button clicked", () => {
     render(<HeroSection episode={mockEpisode} />);
     const playButton = screen.getByRole("button", { name: /play briefing/i });
+    fireEvent.click(playButton);
+    expect(mockPlay).toHaveBeenCalledWith(mockEpisode);
+  });
+
+  it("calls pause when playing current episode", () => {
+    // Set up mock to simulate playing this episode
+    mockValues = {
+      isPlaying: true,
+      currentEpisode: mockEpisode,
+    };
+
+    render(<HeroSection episode={mockEpisode} />);
+
+    // Button text should change to "Pause Briefing"
+    const pauseButton = screen.getByRole("button", { name: /pause briefing/i });
+    expect(pauseButton).toBeInTheDocument();
+
+    fireEvent.click(pauseButton);
+    expect(mockPause).toHaveBeenCalled();
+  });
+
+  it("calls play when playing DIFFERENT episode", () => {
+    // Playing, but a different episode
+    mockValues = {
+      isPlaying: true,
+      currentEpisode: { ...mockEpisode, id: "other-episode" },
+    };
+
+    render(<HeroSection episode={mockEpisode} />);
+
+    // Should still show "Play" because it asks to switch to this episode
+    const playButton = screen.getByRole("button", { name: /play briefing/i });
+    expect(playButton).toBeInTheDocument();
+
     fireEvent.click(playButton);
     expect(mockPlay).toHaveBeenCalledWith(mockEpisode);
   });
