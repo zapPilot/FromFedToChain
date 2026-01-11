@@ -1,30 +1,34 @@
 "use client";
 
-import { useEffect, use, Suspense } from "react";
+import { use, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Play, Pause, Clock, Calendar, Share2 } from "lucide-react";
 
 import { useEpisode, useEpisodes } from "@/hooks/use-episodes";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
-import { CATEGORY_COLORS, CATEGORY_EMOJIS, CATEGORY_NAMES } from "@/types/content";
+import { useEpisodeContent } from "@/hooks/use-episode-content";
+import {
+  CATEGORY_COLORS,
+  CATEGORY_EMOJIS,
+  CATEGORY_NAMES,
+} from "@/types/content";
 import { formatDuration } from "@/lib/utils/format-duration";
 
 // Helper to resolve params
 function EpisodeContent({ id }: { id: string }) {
-  const router = useRouter();
-
   // Ensure episodes are loaded
   const { isLoading, error } = useEpisodes(true);
   const episode = useEpisode(id);
 
+  const { currentEpisode, isPlaying, play, pause } = useAudioPlayer();
+
+  // Fetch full content (transcript, references) from API
   const {
-    currentEpisode,
-    isPlaying,
-    play,
-    pause
-  } = useAudioPlayer();
+    content: fetchedContent,
+    references: fetchedReferences,
+    isLoading: isContentLoading,
+  } = useEpisodeContent(episode);
 
   const isCurrentEpisode = currentEpisode?.id === episode?.id;
   const isPlayingCurrent = isCurrentEpisode && isPlaying;
@@ -51,14 +55,26 @@ function EpisodeContent({ id }: { id: string }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 text-center">
         <div className="p-4 rounded-full bg-red-500/10 text-red-500">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
           </svg>
         </div>
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-white">Episode Not Found</h2>
           <p className="text-zinc-400 max-w-md">
-            We couldn't find the episode you're looking for. It may have been removed or the URL is incorrect.
+            We couldn't find the episode you're looking for. It may have been
+            removed or the URL is incorrect.
           </p>
         </div>
         <Link
@@ -92,10 +108,11 @@ function EpisodeContent({ id }: { id: string }) {
             style={{
               borderColor: CATEGORY_COLORS[episode.category],
               color: CATEGORY_COLORS[episode.category],
-              backgroundColor: `${CATEGORY_COLORS[episode.category]}15`
+              backgroundColor: `${CATEGORY_COLORS[episode.category]}15`,
             }}
           >
-            {CATEGORY_EMOJIS[episode.category]} {CATEGORY_NAMES[episode.category]}
+            {CATEGORY_EMOJIS[episode.category]}{" "}
+            {CATEGORY_NAMES[episode.category]}
           </span>
           <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-zinc-400 border border-white/5">
             <Calendar className="w-3 h-3 mr-1.5" />
@@ -134,8 +151,12 @@ function EpisodeContent({ id }: { id: string }) {
               </button>
             </div>
             <div>
-              <div className="text-sm font-medium text-zinc-400 mb-0.5">Listen to episode</div>
-              <div className="text-xs text-zinc-500">Audio • {formatDuration(episode.duration || 0)}</div>
+              <div className="text-sm font-medium text-zinc-400 mb-0.5">
+                Listen to episode
+              </div>
+              <div className="text-xs text-zinc-500">
+                Audio • {formatDuration(episode.duration || 0)}
+              </div>
             </div>
           </div>
 
@@ -154,20 +175,41 @@ function EpisodeContent({ id }: { id: string }) {
 
       {/* Content */}
       <div className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-zinc-300 prose-p:leading-relaxed prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-li:text-zinc-300">
-        <ReactMarkdown>
-          {episode.content || episode.description || "_No transcript available for this episode._"}
-        </ReactMarkdown>
+        {isContentLoading ? (
+          <div className="flex items-center gap-3 py-8">
+            <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-zinc-400">Loading transcript...</span>
+          </div>
+        ) : (
+          <ReactMarkdown>
+            {fetchedContent ||
+              episode.content ||
+              episode.description ||
+              "_No transcript available for this episode._"}
+          </ReactMarkdown>
+        )}
       </div>
 
       {/* References */}
-      {episode.references && episode.references.length > 0 && (
+      {(fetchedReferences.length > 0 ||
+        (episode.references && episode.references.length > 0)) && (
         <div className="mt-16 pt-8 border-t border-white/10">
-          <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">References</h3>
+          <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-4">
+            References
+          </h3>
           <ul className="space-y-2">
-            {episode.references.map((ref, i) => (
+            {(fetchedReferences.length > 0
+              ? fetchedReferences
+              : episode.references || []
+            ).map((ref, i) => (
               <li key={i} className="text-sm text-zinc-400">
-                {ref.startsWith('http') ? (
-                  <a href={ref} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline truncate block">
+                {ref.startsWith("http") ? (
+                  <a
+                    href={ref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white hover:underline truncate block"
+                  >
                     {ref}
                   </a>
                 ) : (
@@ -182,7 +224,11 @@ function EpisodeContent({ id }: { id: string }) {
   );
 }
 
-export default function EpisodePage({ params }: { params: Promise<{ id: string }> }) {
+export default function EpisodePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   // Unwrap params using React.use()
   const { id } = use(params);
 

@@ -331,6 +331,51 @@ export class StreamingApiService {
   }
 
   /**
+   * Fetch full content for a specific episode
+   * Makes a call to /api/content/{lang}/{category}/{id} to get transcript and references
+   * This mirrors Flutter's ContentService.getContentForAudioFile() functionality
+   */
+  static async fetchEpisodeContent(
+    language: Language,
+    category: Category,
+    episodeId: string,
+  ): Promise<Partial<Episode> | null> {
+    const url = `${API_CONFIG.baseUrl}/api/content/${language}/${category}/${episodeId}`;
+
+    try {
+      const response = await this.fetchWithTimeout(url);
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn(`Content not found for ${episodeId}`);
+          return null;
+        }
+        throw new ApiError(
+          `Failed to fetch content: ${response.status} - ${response.statusText}`,
+          response.status,
+        );
+      }
+
+      const data = await response.json();
+
+      // Map API response to Episode partial (content fields only)
+      return {
+        content: data.content || "",
+        description: data.content || data.description || "",
+        references: Array.isArray(data.references) ? data.references : [],
+        social_hook: data.social_hook,
+        duration: data.duration,
+      };
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      console.error(`Failed to fetch content for ${episodeId}:`, error);
+      return null;
+    }
+  }
+
+  /**
    * Filter episodes by search query (client-side filtering)
    */
   static filterEpisodesByQuery(episodes: Episode[], query: string): Episode[] {
