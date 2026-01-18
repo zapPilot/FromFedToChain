@@ -27,7 +27,7 @@ void main() {
           WidgetTestUtils.createTestWrapper(
             AudioItemCard(
               audioFile: WidgetTestUtils.createTestAudioFile(),
-              onTap: () {},
+              onTap: (_) {},
             ),
           ),
         );
@@ -51,7 +51,7 @@ void main() {
                 title: 'Performance Test Card $i',
                 id: 'perf-test-$i',
               ),
-              onTap: () {},
+              onTap: (_) {},
             ),
           );
         }
@@ -94,7 +94,7 @@ void main() {
           WidgetTestUtils.createTestWrapper(
             AudioItemCard(
               audioFile: complexAudioFile,
-              onTap: () {},
+              onTap: (_) {},
               isCurrentlyPlaying: true,
             ),
           ),
@@ -460,7 +460,7 @@ void main() {
                             title: 'Memory Test $index',
                             id: 'memory-test-$index',
                           ),
-                          onTap: () {},
+                          onTap: (_) {},
                         )),
               ),
             ),
@@ -518,7 +518,7 @@ void main() {
           tester,
           () => AudioItemCard(
             audioFile: WidgetTestUtils.createTestAudioFile(),
-            onTap: () {},
+            onTap: (_) {},
           ),
         );
 

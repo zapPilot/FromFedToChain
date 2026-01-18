@@ -251,6 +251,15 @@ class StreamingApiService {
 
     if (errors.isNotEmpty) {
       _log.warning('Some requests failed: ${errors.join(', ')}');
+
+      // If ALL requests failed, throw an exception so the caller knows loading failed
+      if (allEpisodes.isEmpty &&
+          errors.length >=
+              (ApiConfig.supportedLanguages.length *
+                  ApiConfig.supportedCategories.length)) {
+        throw ApiException(
+            'Failed to load any episodes. All API requests failed.');
+      }
     }
 
     // Sort by date (newest first)

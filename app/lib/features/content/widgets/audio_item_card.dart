@@ -10,34 +10,23 @@ import 'package:from_fed_to_chain_app/core/utils/date_formatter.dart';
 /// Shows artwork, title, metadata (category, language, date, duration),
 /// and an optional play button. Handles tap and long-press interactions.
 class AudioItemCard extends StatelessWidget {
-  /// The audio file data to display.
   final AudioFile audioFile;
-
-  /// Callback when the card is tapped.
-  final VoidCallback onTap;
-
-  /// Callback when the card is long-pressed.
-  final VoidCallback? onLongPress;
-
-  /// Whether to show the play/pause button on the right side.
-  /// Defaults to true.
+  final ValueChanged<AudioFile> onTap;
+  final ValueChanged<AudioFile>? onPlayTap;
+  final ValueChanged<AudioFile>? onLongPress;
   final bool showPlayButton;
-
-  /// Whether this episode is currently playing.
-  /// Affects styling (e.g., adds a border or highlight).
   final bool isCurrentlyPlaying;
 
-  /// Creates an [AudioItemCard].
   const AudioItemCard({
     super.key,
     required this.audioFile,
     required this.onTap,
+    this.onPlayTap,
     this.onLongPress,
     this.showPlayButton = true,
     this.isCurrentlyPlaying = false,
   });
 
-  // Add unique keys for testing
   static const Key cardKey = Key('audio_item_card_inkwell');
   static const Key playButtonKey = Key('audio_item_card_play_button');
 
@@ -51,9 +40,10 @@ class AudioItemCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          key: cardKey,
-          onTap: onTap,
-          onLongPress: onLongPress,
+          key: AudioItemCard.cardKey,
+          onTap: () => onTap(audioFile),
+          onLongPress:
+              onLongPress != null ? () => onLongPress!(audioFile) : null,
           borderRadius: BorderRadius.circular(AppTheme.radiusM),
           child: Container(
             padding: const EdgeInsets.all(AppTheme.spacingM),
@@ -68,17 +58,11 @@ class AudioItemCard extends StatelessWidget {
                 : null,
             child: Row(
               children: [
-                // Episode artwork/icon
                 _buildEpisodeArtwork(),
-
                 const SizedBox(width: AppTheme.spacingM),
-
-                // Episode information
                 Expanded(
-                  child: _buildEpisodeInfo(),
+                  child: _buildEpisodeInfo(context),
                 ),
-
-                // Play button or duration
                 if (showPlayButton)
                   _buildActionButton()
                 else
@@ -91,7 +75,6 @@ class AudioItemCard extends StatelessWidget {
     );
   }
 
-  /// Build episode artwork or category icon
   Widget _buildEpisodeArtwork() {
     return Container(
       width: 56,
@@ -124,12 +107,10 @@ class AudioItemCard extends StatelessWidget {
     );
   }
 
-  /// Build episode information section
-  Widget _buildEpisodeInfo() {
+  Widget _buildEpisodeInfo(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Episode title
         Text(
           audioFile.displayTitle,
           style: AppTheme.titleMedium.copyWith(
@@ -139,22 +120,17 @@ class AudioItemCard extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-
         const SizedBox(height: AppTheme.spacingXS),
-
-        // Category and language info - wrapped to prevent overflow
         Wrap(
           spacing: AppTheme.spacingS,
           runSpacing: AppTheme.spacingXS,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            // Category chip
             _buildInfoChip(
               text:
                   '${audioFile.categoryEmoji} ${ApiConfig.getCategoryDisplayName(audioFile.category)}',
               color: AppTheme.getCategoryColor(audioFile.category),
             ),
-
-            // Language chip
             _buildInfoChip(
               text:
                   '${audioFile.languageFlag} ${ApiConfig.getLanguageDisplayName(audioFile.language)}',
@@ -162,22 +138,17 @@ class AudioItemCard extends StatelessWidget {
             ),
           ],
         ),
-
         const SizedBox(height: AppTheme.spacingXS),
-
-        // Additional metadata - scrollable to prevent overflow
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              // Date
               Text(
                 DateFormatter.formatFriendlyDate(audioFile.publishDate),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
                 ),
               ),
-
               if (audioFile.duration != null) ...[
                 Text(
                   ' • ',
@@ -192,7 +163,6 @@ class AudioItemCard extends StatelessWidget {
                   ),
                 ),
               ],
-
               if (audioFile.fileSizeBytes != null) ...[
                 Text(
                   ' • ',
@@ -210,8 +180,6 @@ class AudioItemCard extends StatelessWidget {
             ],
           ),
         ),
-
-        // Currently playing indicator
         if (isCurrentlyPlaying) ...[
           const SizedBox(height: AppTheme.spacingXS),
           Row(
@@ -236,7 +204,6 @@ class AudioItemCard extends StatelessWidget {
     );
   }
 
-  /// Build info chip for category/language
   Widget _buildInfoChip({
     required String text,
     required Color color,
@@ -265,20 +232,19 @@ class AudioItemCard extends StatelessWidget {
     );
   }
 
-  /// Build action button (play/options)
   Widget _buildActionButton() {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        key: playButtonKey,
-        onTap: onTap,
+        key: AudioItemCard.playButtonKey,
+        onTap: onPlayTap != null ? () => onPlayTap!(audioFile) : null,
         borderRadius: BorderRadius.circular(AppTheme.radiusS),
         child: Semantics(
           label: isCurrentlyPlaying ? 'Pause' : 'Play',
           button: true,
           child: Container(
-            width: 48, // Minimum accessibility tap target size
-            height: 48, // Minimum accessibility tap target size
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusS),
@@ -291,7 +257,7 @@ class AudioItemCard extends StatelessWidget {
               child: Icon(
                 isCurrentlyPlaying ? Icons.pause : Icons.play_arrow,
                 color: AppTheme.primaryColor,
-                size: 22, // Slightly larger icon for better proportion
+                size: 22,
               ),
             ),
           ),
@@ -300,7 +266,6 @@ class AudioItemCard extends StatelessWidget {
     );
   }
 
-  /// Build duration information
   Widget _buildDurationInfo() {
     if (audioFile.duration == null) {
       return const SizedBox.shrink();

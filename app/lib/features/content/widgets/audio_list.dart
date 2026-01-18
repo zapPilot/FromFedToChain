@@ -9,6 +9,7 @@ class AudioList extends StatelessWidget {
   final List<AudioFile> episodes;
   final Function(AudioFile) onEpisodeTap;
   final Function(AudioFile)? onEpisodeLongPress;
+  final Function(AudioFile)? onPlayTap;
   final ScrollController? scrollController;
   final bool showLoadingMore;
   final VoidCallback? onLoadMore;
@@ -18,6 +19,7 @@ class AudioList extends StatelessWidget {
     required this.episodes,
     required this.onEpisodeTap,
     this.onEpisodeLongPress,
+    this.onPlayTap,
     this.scrollController,
     this.showLoadingMore = false,
     this.onLoadMore,
@@ -54,9 +56,13 @@ class AudioList extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: AppTheme.spacingM),
                 child: AudioItemCard(
                   audioFile: episode,
-                  onTap: () => onEpisodeTap(episode),
+                  onTap: (selectedEpisode) => onEpisodeTap(selectedEpisode),
+                  onPlayTap: onPlayTap != null
+                      ? (selectedEpisode) => onPlayTap!(selectedEpisode)
+                      : null,
                   onLongPress: onEpisodeLongPress != null
-                      ? () => onEpisodeLongPress!(episode)
+                      ? (selectedEpisode) =>
+                          onEpisodeLongPress!(selectedEpisode)
                       : null,
                 ),
               ),

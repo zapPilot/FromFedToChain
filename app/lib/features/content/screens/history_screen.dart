@@ -159,7 +159,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return AnimationLimiter(
       child: AudioList(
         episodes: historyEpisodes,
-        onEpisodeTap: (episode) => _playEpisode(episode, audioService),
+        onEpisodeTap: (episode) => _navigateToEpisode(context, episode),
+        onPlayTap: (episode) => _playEpisode(episode, audioService),
         onEpisodeLongPress: (episode) => _showEpisodeOptions(episode),
         scrollController: _scrollController,
       ),
@@ -260,6 +261,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
     } else {
       return 'Stopped';
     }
+  }
+
+  /// Navigate to full player screen with specific episode
+  void _navigateToEpisode(BuildContext context, AudioFile episode) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PlayerScreen(
+          contentId: episode.id,
+          preferredLanguage: episode.language,
+        ),
+      ),
+    );
   }
 
   /// Play episode

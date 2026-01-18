@@ -6,6 +6,7 @@ import 'package:from_fed_to_chain_app/features/content/widgets/audio_list.dart';
 class AudioTabContent extends StatelessWidget {
   final List<AudioFile> episodes;
   final ScrollController scrollController;
+  final Function(AudioFile) onEpisodeTap;
   final Function(AudioFile) onPlay;
   final Function(AudioFile) onOptions;
   final Widget? emptyState;
@@ -14,6 +15,7 @@ class AudioTabContent extends StatelessWidget {
     super.key,
     required this.episodes,
     required this.scrollController,
+    required this.onEpisodeTap,
     required this.onPlay,
     required this.onOptions,
     this.emptyState,
@@ -28,7 +30,8 @@ class AudioTabContent extends StatelessWidget {
     return AnimationLimiter(
       child: AudioList(
         episodes: episodes,
-        onEpisodeTap: onPlay,
+        onEpisodeTap: onEpisodeTap,
+        onPlayTap: onPlay,
         onEpisodeLongPress: onOptions,
         scrollController: scrollController,
       ),

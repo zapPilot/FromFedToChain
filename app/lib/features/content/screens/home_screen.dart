@@ -5,18 +5,15 @@ import 'package:from_fed_to_chain_app/features/content/services/content_service.
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';
-
-import 'package:from_fed_to_chain_app/features/content/widgets/search_bar.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/home/home_header.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/home/home_mini_player.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/episode_options_sheet.dart';
 import 'package:from_fed_to_chain_app/features/content/widgets/home/audio_tab_content.dart';
-import 'package:from_fed_to_chain_app/features/content/models/content_service_state.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/home/sort_selector.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/home/content_states.dart';
 
-/// Main home screen displaying episodes with filtering and search
+import 'package:from_fed_to_chain_app/features/content/widgets/home/content_states.dart';
+import 'package:from_fed_to_chain_app/features/content/screens/history_screen.dart';
+import 'package:from_fed_to_chain_app/features/audio/screens/player_screen.dart';
+
+/// Main home screen displaying episodes in Focus Mode
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -26,14 +23,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
-  bool _showSearchBar = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
 
     // Load content when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    _tabController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -51,59 +44,24 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Content-related UI (only rebuilds when ContentService changes)
-            Selector<ContentService, ContentServiceState>(
-              selector: (context, service) => ContentServiceState(
-                allEpisodes: service.allEpisodes,
-                filteredEpisodes: service.filteredEpisodes,
-                isLoading: service.isLoading,
-                hasError: service.hasError,
-                errorMessage: service.errorMessage,
-                selectedLanguage: service.selectedLanguage,
-                selectedCategory: service.selectedCategory,
-                searchQuery: service.searchQuery,
-              ),
-              builder: (context, state, child) {
-                final contentService = context.read<ContentService>();
-                return Column(
-                  children: [
-                    // App header with search toggle
-                    _buildAppHeader(context, contentService),
+            // Focus Mode Header
+            _buildFocusHeader(context),
 
-                    // Search bar (animated)
-                    if (_showSearchBar)
-                      _buildSearchBar(context, contentService),
-
-                    // Filter bar
-                    _buildFilterBar(context, contentService),
-
-                    // Sort selector
-                    // Sort selector
-                    SortSelector(
-                      sortOrder: contentService.sortOrder,
-                      onSortChanged: (newValue) {
-                        contentService.setSortOrder(newValue);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            // Main content area (needs both services for episode interaction)
+            // Main content area
             Expanded(
               child: Consumer2<ContentService, AudioPlayerService>(
                 builder: (context, contentService, audioService, child) {
-                  return _buildMainContent(
+                  return _buildFocusContent(
                       context, contentService, audioService);
                 },
               ),
             ),
 
-            // Mini player (only rebuilds when AudioPlayerService changes)
+            // Mini player
             Selector<AudioPlayerService, AudioFile?>(
               selector: (context, service) => service.currentAudioFile,
               builder: (context, currentAudioFile, child) {
@@ -112,8 +70,7 @@ class _HomeScreenState extends State<HomeScreen>
                 return Selector<AudioPlayerService, AppPlaybackState>(
                   selector: (context, service) => service.playbackState,
                   builder: (context, playbackState, child) {
-                    final audioService = context.read<AudioPlayerService>();
-                    return _buildMiniPlayer(context, audioService);
+                    return const HomeMiniPlayer();
                   },
                 );
               },
@@ -124,62 +81,106 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  /// Build app header with title and search toggle
-  Widget _buildAppHeader(BuildContext context, ContentService contentService) {
-    return HomeHeader(
-      onSearchToggle: () {
-        setState(() {
-          _showSearchBar = !_showSearchBar;
-        });
+  /// Build Focus Mode Header with Language Selector and History
+  Widget _buildFocusHeader(BuildContext context) {
+    return Selector<ContentService, String>(
+      selector: (context, service) => service.selectedLanguage,
+      builder: (context, selectedLanguage, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacingM,
+            vertical: AppTheme.spacingS,
+          ),
+          child: Row(
+            children: [
+              const Text(
+                'Queue',
+                style: AppTheme.headlineMedium,
+              ),
+              const Spacer(),
+              // Language Selector
+              _buildLanguageSelector(context, selectedLanguage),
+              const SizedBox(width: AppTheme.spacingM),
+              // History Button
+              IconButton(
+                icon: const Icon(Icons.history),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const HistoryScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
       },
-      isSearchVisible: _showSearchBar,
     );
   }
 
-  /// Build animated search bar
-  Widget _buildSearchBar(BuildContext context, ContentService contentService) {
-    return AnimatedContainer(
-      duration: AppTheme.animationMedium,
-      curve: Curves.easeInOut,
-      height: _showSearchBar ? 60 : 0,
-      child: Padding(
-        padding: AppTheme.safeHorizontalPadding,
-        child: SearchBarWidget(
-          onSearchChanged: (query) {
-            contentService.setSearchQuery(query);
-          },
-          hintText: 'Search episodes...',
+  Widget _buildLanguageSelector(BuildContext context, String currentLanguage) {
+    final contentService = context.read<ContentService>();
+
+    return PopupMenuButton<String>(
+      initialValue: currentLanguage,
+      onSelected: (String language) {
+        contentService.setLanguage(language);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppTheme.onSurfaceColor.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              currentLanguage == 'zh-TW'
+                  ? '🇹🇼'
+                  : currentLanguage == 'en-US'
+                      ? '🇺🇸'
+                      : currentLanguage == 'ja-JP'
+                          ? '🇯🇵'
+                          : '🌐',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.arrow_drop_down, size: 18),
+          ],
         ),
       ),
+      itemBuilder: (BuildContext context) {
+        return [
+          const PopupMenuItem(
+            value: 'zh-TW',
+            child: Text('🇹🇼 繁體中文'),
+          ),
+          const PopupMenuItem(
+            value: 'en-US',
+            child: Text('🇺🇸 English'),
+          ),
+          const PopupMenuItem(
+            value: 'ja-JP',
+            child: Text('🇯🇵 日本語'),
+          ),
+        ];
+      },
     );
   }
 
-  /// Build filter bar with language and category selection
-  Widget _buildFilterBar(BuildContext context, ContentService contentService) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacingM,
-        vertical: AppTheme.spacingS,
-      ),
-      child: FilterBar(
-        selectedLanguage: contentService.selectedLanguage,
-        selectedCategory: contentService.selectedCategory,
-        onLanguageChanged: (language) {
-          contentService.setLanguage(language);
-        },
-        onCategoryChanged: (category) {
-          contentService.setCategory(category);
-        },
-      ),
-    );
-  }
-
-  /// Build main content area with tabs
-  Widget _buildMainContent(
+  /// Build main content area for Focus Mode
+  Widget _buildFocusContent(
     BuildContext context,
     ContentService contentService,
     AudioPlayerService audioService,
   ) {
+    // Show loading state IF:
+    // 1. It's currently loading AND we have NO data yet
+    // 2. OR it's the first load (isLoading and allEpisodes empty)
     if (contentService.isLoading && contentService.allEpisodes.isEmpty) {
       return const ContentLoadingState();
     }
@@ -191,113 +192,57 @@ class _HomeScreenState extends State<HomeScreen>
       );
     }
 
-    if (contentService.filteredEpisodes.isEmpty) {
-      return ContentEmptyState(
-        searchQuery: contentService.searchQuery,
-        onClearFilters: () => contentService.setSearchQuery(''),
-        onRefresh: () => contentService.refresh(),
+    // Get Focus Queue (Unfinished + Unplayed) and sort by date descending
+    final focusEpisodes = List<AudioFile>.from(
+      contentService.getFocusQueue(contentService.selectedLanguage),
+    )..sort((a, b) => b.publishDate.compareTo(a.publishDate));
+
+    if (focusEpisodes.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              size: 80,
+              color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            Text(
+              'All Caught Up!',
+              style: AppTheme.headlineSmall.copyWith(
+                color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            Text(
+              'No new episodes in ${contentService.selectedLanguage}',
+              textAlign: TextAlign.center,
+              style: AppTheme.bodyMedium,
+            ),
+          ],
+        ),
       );
     }
 
-    return Column(
-      children: [
-        // Tab bar
-        Container(
-          margin: AppTheme.safeHorizontalPadding,
-          decoration: AppTheme.cardDecoration,
-          child: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Recent'),
-              Tab(text: 'All'),
-              Tab(text: 'Unfinished'),
-            ],
-            labelColor: AppTheme.primaryColor,
-            unselectedLabelColor:
-                AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-            indicatorColor: AppTheme.primaryColor,
-            indicatorSize: TabBarIndicatorSize.tab,
-            dividerColor: Colors.transparent,
-          ),
-        ),
-
-        const SizedBox(height: AppTheme.spacingS),
-
-        // Tab content
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildAudioTab(
-                contentService.filteredEpisodes.take(20).toList(),
-                audioService,
-              ),
-              _buildAudioTab(
-                contentService.filteredEpisodes,
-                audioService,
-              ),
-              _buildAudioTab(
-                contentService.getUnfinishedEpisodes(),
-                audioService,
-                emptyState: _buildUnfinishedEmptyState(),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Helper to build an audio list tab
-  Widget _buildAudioTab(
-    List<AudioFile> episodes,
-    AudioPlayerService audioService, {
-    Widget? emptyState,
-  }) {
     return AudioTabContent(
-      episodes: episodes,
+      episodes: focusEpisodes,
       scrollController: _scrollController,
+      onEpisodeTap: (episode) => _navigateToEpisode(context, episode),
       onPlay: (episode) => _playEpisode(episode, audioService),
       onOptions: (episode) => _showEpisodeOptions(episode),
-      emptyState: emptyState,
     );
   }
 
-  /// Build unfinished episodes empty state
-  Widget _buildUnfinishedEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.pending_actions,
-            size: 80,
-            color: AppTheme.onSurfaceColor.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: AppTheme.spacingL),
-          Text(
-            'No Unfinished Episodes',
-            style: AppTheme.headlineSmall.copyWith(
-              color: AppTheme.onSurfaceColor.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingS),
-          Text(
-            'Episodes you\'ve started listening to will appear here',
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.onSurfaceColor.withValues(alpha: 0.5),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+  void _navigateToEpisode(BuildContext context, AudioFile episode) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PlayerScreen(
+          contentId: episode.id,
+          preferredLanguage: episode.language,
+        ),
       ),
     );
-  }
-
-  /// Build mini player
-  Widget _buildMiniPlayer(
-      BuildContext context, AudioPlayerService audioService) {
-    return const HomeMiniPlayer();
   }
 
   /// Play episode
@@ -308,17 +253,10 @@ class _HomeScreenState extends State<HomeScreen>
     } catch (e) {
       if (!mounted) return;
 
-      // Show error message to user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Cannot play audio: ${e.toString()}'),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-          action: SnackBarAction(
-            label: 'OK',
-            textColor: Colors.white,
-            onPressed: () {},
-          ),
         ),
       );
     }

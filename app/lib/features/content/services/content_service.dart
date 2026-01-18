@@ -151,20 +151,45 @@ class ContentService extends ChangeNotifier {
 
   /// Finds an [AudioFile] by its ID with fuzzy date matching.
   ///
-  /// First tries exact ID match, then falls back to date-based matching.
+  /// First tries exact ID match, prioritizing [preferredLanguage] if provided.
+  /// then falls back to date-based matching.
   /// Returns null if no match is found.
-  Future<AudioFile?> getAudioFileById(String contentId) async {
+  Future<AudioFile?> getAudioFileById(String contentId,
+      {String? preferredLanguage}) async {
     // 1. Try exact ID match first (fastest)
     try {
-      return allEpisodes.firstWhere((episode) => episode.id == contentId);
-    } catch (_) {
+      final matches = allEpisodes.where((episode) => episode.id == contentId);
+
+      if (matches.isNotEmpty) {
+        if (preferredLanguage != null) {
+          // Try to find match with preferred language
+          return matches.firstWhere(
+            (e) => e.language == preferredLanguage,
+            orElse: () => matches.first,
+          );
+        }
+        return matches.first;
+      }
+
       // 2. Fall back to fuzzy date matching
-      return _findEpisodeByFuzzyDate(contentId);
+      return _findEpisodeByFuzzyDate(contentId,
+          preferredLanguage: preferredLanguage);
+    } catch (_) {
+      return null;
     }
   }
 
+  /// Returns all available language versions for a specific episode ID.
+  ///
+  /// Since distinct language versions share the same ID, this retrieves
+  /// all loaded instances of that ID.
+  List<AudioFile> getEpisodeVersions(String episodeId) {
+    return allEpisodes.where((e) => e.id == episodeId).toList();
+  }
+
   /// Helper to find an episode by extracting a date from the contentId.
-  AudioFile? _findEpisodeByFuzzyDate(String contentId) {
+  AudioFile? _findEpisodeByFuzzyDate(String contentId,
+      {String? preferredLanguage}) {
     try {
       // Extract date pattern (YYYY-MM-DD)
       final dateRegex = RegExp(r'(\d{4}-\d{2}-\d{2})');
@@ -176,7 +201,7 @@ class ContentService extends ChangeNotifier {
       final searchDate = DateTime.parse(dateStr);
 
       // Find episode with matching date (either in ID or publishDate)
-      return allEpisodes.firstWhere((episode) {
+      final matches = allEpisodes.where((episode) {
         if (episode.id.contains(dateStr)) return true;
 
         final episodeDate = episode.publishDate;
@@ -184,6 +209,17 @@ class ContentService extends ChangeNotifier {
             episodeDate.month == searchDate.month &&
             episodeDate.day == searchDate.day;
       });
+
+      if (matches.isEmpty) return null;
+
+      if (preferredLanguage != null) {
+        return matches.firstWhere(
+          (e) => e.language == preferredLanguage,
+          orElse: () => matches.first,
+        );
+      }
+
+      return matches.first;
     } catch (_) {
       return null;
     }
@@ -223,6 +259,45 @@ class ContentService extends ChangeNotifier {
   /// Returns a list of episodes that have been started but not finished.
   List<AudioFile> getUnfinishedEpisodes() {
     return _progressRepository.getUnfinishedEpisodes(allEpisodes);
+  }
+
+  /// Returns a priority queue of episodes for the Focus Mode.
+  ///
+  /// Combines:
+  /// 1. "In Progress" episodes (unfinished) for the [language], sorted by last listen (if available) or date.
+  /// 2. "Unplayed" episodes (new) for the [language], sorted by date descending.
+  List<AudioFile> getFocusQueue(String language) {
+    // 1. Filter by language
+    final langEpisodes =
+        _allEpisodes.where((e) => e.language == language).toList();
+
+    // 2. Get In Progress (Unfinished) - distinct from "Finished"
+    final inProgress = langEpisodes.where((e) {
+      return isEpisodeUnfinished(e.id);
+    }).toList();
+
+    // Sort In Progress: We want the ones listened to most recently at the top.
+    // We can use listenHistory for this.
+    inProgress.sort((a, b) {
+      final dateA = listenHistory[a.id] ?? DateTime(1970);
+      final dateB = listenHistory[b.id] ?? DateTime(1970);
+      return dateB.compareTo(dateA); // Newest listen first
+    });
+
+    // 3. Get Unplayed (Not started AND Not finished)
+    // Note: isEpisodeFinished checks if completion >= 0.9
+    // isEpisodeUnfinished checks if completion > 0.0 && < 0.9
+    // So "Unplayed" is completion == 0.0 (or null) AND not finished.
+    final unplayed = langEpisodes.where((e) {
+      final isStarted = getEpisodeCompletion(e.id) > 0.0;
+      final isFinished = isEpisodeFinished(e.id);
+      return !isStarted && !isFinished;
+    }).toList();
+
+    // Sort unplayed by publish date (newest first)
+    unplayed.sort((a, b) => b.publishDate.compareTo(a.publishDate));
+
+    return [...inProgress, ...unplayed];
   }
 
   // Preferences methods
@@ -266,7 +341,9 @@ class ContentService extends ChangeNotifier {
 
     try {
       final episodes = await _loadEpisodesUseCase.loadForLanguage(language);
-      _allEpisodes = episodes;
+      // Instead of overwriting with ONLY this language, fetch ALL from repository
+      // which should now be updated with this language.
+      _allEpisodes = await _loadEpisodesUseCase.loadAll();
       _applyCurrentFilters();
 
       _log.info('Loaded ${episodes.length} episodes for $language');

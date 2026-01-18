@@ -1035,15 +1035,30 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
       ) as _i7.Future<_i10.AudioContent?>);
 
   @override
-  _i7.Future<_i5.AudioFile?> getAudioFileById(String? contentId) =>
+  _i7.Future<_i5.AudioFile?> getAudioFileById(
+    String? contentId, {
+    String? preferredLanguage,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #getAudioFileById,
           [contentId],
+          {#preferredLanguage: preferredLanguage},
         ),
         returnValue: _i7.Future<_i5.AudioFile?>.value(),
         returnValueForMissingStub: _i7.Future<_i5.AudioFile?>.value(),
       ) as _i7.Future<_i5.AudioFile?>);
+
+  @override
+  List<_i5.AudioFile> getEpisodeVersions(String? episodeId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getEpisodeVersions,
+          [episodeId],
+        ),
+        returnValue: <_i5.AudioFile>[],
+        returnValueForMissingStub: <_i5.AudioFile>[],
+      ) as List<_i5.AudioFile>);
 
   @override
   _i7.Future<void> prefetchContent(List<_i5.AudioFile>? audioFiles) =>
@@ -1108,6 +1123,16 @@ class MockContentService extends _i1.Mock implements _i8.ContentService {
         Invocation.method(
           #getUnfinishedEpisodes,
           [],
+        ),
+        returnValue: <_i5.AudioFile>[],
+        returnValueForMissingStub: <_i5.AudioFile>[],
+      ) as List<_i5.AudioFile>);
+
+  @override
+  List<_i5.AudioFile> getFocusQueue(String? language) => (super.noSuchMethod(
+        Invocation.method(
+          #getFocusQueue,
+          [language],
         ),
         returnValue: <_i5.AudioFile>[],
         returnValueForMissingStub: <_i5.AudioFile>[],

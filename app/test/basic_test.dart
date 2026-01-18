@@ -50,7 +50,7 @@ void main() {
                       itemBuilder: (context, index) {
                         return AudioItemCard(
                           audioFile: testAudioFiles[index],
-                          onTap: WidgetTestUtils.mockTap,
+                          onTap: (_) => WidgetTestUtils.mockTap(),
                           showPlayButton: true,
                           isCurrentlyPlaying: index == 0, // First item playing
                         );
@@ -90,7 +90,7 @@ void main() {
                 itemBuilder: (context, index) {
                   return AudioItemCard(
                     audioFile: testAudioFiles[index],
-                    onTap: WidgetTestUtils.mockTap,
+                    onTap: (_) => WidgetTestUtils.mockTap(),
                     showPlayButton: true,
                     isCurrentlyPlaying: false,
                   );
@@ -270,7 +270,7 @@ void main() {
                   ),
                   AudioItemCard(
                     audioFile: testAudioFiles.first,
-                    onTap: WidgetTestUtils.mockTap,
+                    onTap: (_) => WidgetTestUtils.mockTap(),
                     showPlayButton: true,
                     isCurrentlyPlaying: false,
                   ),
@@ -300,7 +300,7 @@ void main() {
                   ),
                   AudioItemCard(
                     audioFile: testAudioFiles.first,
-                    onTap: WidgetTestUtils.mockTap,
+                    onTap: (_) => WidgetTestUtils.mockTap(),
                     showPlayButton: true,
                     isCurrentlyPlaying: false,
                   ),
@@ -335,7 +335,7 @@ void main() {
             home: Scaffold(
               body: AudioItemCard(
                 audioFile: audioFileWithMissingData,
-                onTap: WidgetTestUtils.mockTap,
+                onTap: (_) => WidgetTestUtils.mockTap(),
                 showPlayButton: true,
                 isCurrentlyPlaying: false,
               ),
@@ -401,7 +401,7 @@ void main() {
                 itemBuilder: (context, index) {
                   return AudioItemCard(
                     audioFile: largeAudioList[index],
-                    onTap: WidgetTestUtils.mockTap,
+                    onTap: (_) => WidgetTestUtils.mockTap(),
                     showPlayButton: true,
                     isCurrentlyPlaying: false,
                   );

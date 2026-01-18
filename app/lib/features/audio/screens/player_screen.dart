@@ -13,8 +13,9 @@ import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_optio
 /// Full-screen audio player with enhanced controls
 class PlayerScreen extends StatefulWidget {
   final String? contentId;
+  final String? preferredLanguage;
 
-  const PlayerScreen({super.key, this.contentId});
+  const PlayerScreen({super.key, this.contentId, this.preferredLanguage});
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -43,7 +44,8 @@ class _PlayerScreenState extends State<PlayerScreen>
       final audioService = context.read<AudioPlayerService>();
 
       // Get the AudioFile by contentId
-      final audioFile = await contentService.getAudioFileById(contentId);
+      final audioFile = await contentService.getAudioFileById(contentId,
+          preferredLanguage: widget.preferredLanguage);
 
       if (audioFile != null) {
         // Add to listen history

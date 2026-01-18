@@ -23,7 +23,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -81,7 +81,7 @@ void main() {
             WidgetTestUtils.createTestWrapper(
               AudioItemCard(
                 audioFile: audioFile,
-                onTap: WidgetTestUtils.mockTap,
+                onTap: (_) => WidgetTestUtils.mockTap(),
                 showPlayButton: true,
                 isCurrentlyPlaying: false,
               ),
@@ -105,7 +105,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: longTitleAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -128,7 +128,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -162,7 +162,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: audioFileWithMetadata,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -197,7 +197,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: audioFileMinimalMetadata,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -218,7 +218,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -235,7 +235,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: true,
           ),
@@ -251,7 +251,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: false,
             isCurrentlyPlaying: false,
           ),
@@ -273,7 +273,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: hlsAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: false,
             isCurrentlyPlaying: false,
           ),
@@ -293,7 +293,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: true,
           ),
@@ -327,7 +327,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -346,7 +346,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -366,8 +366,8 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
-            onLongPress: WidgetTestUtils.mockLongPress,
+            onTap: (_) => WidgetTestUtils.mockTap(),
+            onLongPress: (_) => WidgetTestUtils.mockLongPress(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -386,7 +386,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -406,7 +406,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             // No onLongPress provided
             showPlayButton: true,
             isCurrentlyPlaying: false,
@@ -430,7 +430,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -460,7 +460,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -490,7 +490,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -520,7 +520,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -536,7 +536,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -570,7 +570,7 @@ void main() {
             WidgetTestUtils.createTestWrapper(
               AudioItemCard(
                 audioFile: audioFile,
-                onTap: WidgetTestUtils.mockTap,
+                onTap: (_) => WidgetTestUtils.mockTap(),
                 showPlayButton: true,
                 isCurrentlyPlaying: false,
               ),
@@ -593,7 +593,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: audioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -612,7 +612,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -627,7 +627,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -655,7 +655,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -682,7 +682,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             // onLongPress is null
             showPlayButton: true,
             isCurrentlyPlaying: false,
@@ -704,8 +704,8 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: () {}, // Empty callback
-            onLongPress: () {}, // Empty callback
+            onTap: (_) {}, // Empty callback
+            onLongPress: (_) {}, // Empty callback
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -737,7 +737,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: emptyTitleAudio,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -762,7 +762,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: longTitleAudio,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -790,7 +790,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: extremeDurationAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: false, // Show duration
             isCurrentlyPlaying: false,
           ),
@@ -813,7 +813,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: zeroDurationAudio,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: false, // Show duration instead of play button
             isCurrentlyPlaying: false,
           ),
@@ -835,7 +835,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: largeFileSizeAudio,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -857,7 +857,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: zeroSizeAudio,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -879,7 +879,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: specialCharAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -901,7 +901,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: unknownCategoryAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -928,7 +928,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: invalidUrlAudio,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -951,7 +951,7 @@ void main() {
                 height: 200, // Reasonable minimum height
                 child: AudioItemCard(
                   audioFile: testAudioFile,
-                  onTap: WidgetTestUtils.mockTap,
+                  onTap: (_) => WidgetTestUtils.mockTap(),
                   showPlayButton: true,
                   isCurrentlyPlaying: false,
                 ),
@@ -978,7 +978,7 @@ void main() {
             tester,
             AudioItemCard(
               audioFile: testAudioFile,
-              onTap: WidgetTestUtils.mockTap,
+              onTap: (_) => WidgetTestUtils.mockTap(),
               showPlayButton: true,
               isCurrentlyPlaying: false,
             ),
@@ -1000,7 +1000,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -1022,7 +1022,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: false,
           ),
@@ -1043,7 +1043,7 @@ void main() {
           tester,
           AudioItemCard(
             audioFile: testAudioFile,
-            onTap: WidgetTestUtils.mockTap,
+            onTap: (_) => WidgetTestUtils.mockTap(),
             showPlayButton: true,
             isCurrentlyPlaying: true,
           ),

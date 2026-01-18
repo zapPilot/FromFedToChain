@@ -403,6 +403,26 @@ class AppTheme {
     }
   }
 
+  /// Get category emoji
+  static String getCategoryEmoji(String category) {
+    switch (category) {
+      case 'daily-news':
+        return '📰';
+      case 'ethereum':
+        return '⚡';
+      case 'macro':
+        return '📊';
+      case 'startup':
+        return '🚀';
+      case 'ai':
+        return '🤖';
+      case 'defi':
+        return '💎';
+      default:
+        return '🎧';
+    }
+  }
+
   // Safe area padding
   static EdgeInsets get safePadding {
     return const EdgeInsets.all(spacingM);
