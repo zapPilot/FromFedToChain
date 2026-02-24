@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:mockito/mockito.dart';
-import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_progress_bar.dart';
-import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_main_controls.dart';
+import 'package:provider/provider.dart';
+
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/episode_options_sheet.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_main_controls.dart';
+import 'package:from_fed_to_chain_app/features/audio/widgets/player/player_progress_bar.dart';
 import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/episode_options_sheet.dart';
 
 import '../screens/home_screen_coverage_test.mocks.dart';
 
@@ -77,11 +78,9 @@ void main() {
         onSeek: (pos) => mockAudioService.seekTo(pos),
       )));
 
-      // Verify initial state
       expect(find.text('0:00'), findsOneWidget);
       expect(find.text('5:00'), findsOneWidget);
 
-      // Tap slider (middle)
       final slider = find.byType(Slider);
       await tester.tap(slider);
       await tester.pump();
@@ -94,12 +93,10 @@ void main() {
         audioService: mockAudioService,
       )));
 
-      // Play/Pause toggle
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump();
       verify(mockAudioService.togglePlayPause()).called(1);
 
-      // Next/Previous
       await tester.tap(find.byIcon(Icons.skip_next));
       await tester.pump();
       verify(mockAudioService.skipToNextEpisode()).called(1);
@@ -108,7 +105,6 @@ void main() {
       await tester.pump();
       verify(mockAudioService.skipToPreviousEpisode()).called(1);
 
-      // Forward/Backward
       await tester.tap(find.byIcon(Icons.forward_30));
       await tester.pump();
       verify(mockAudioService.skipForward()).called(1);
@@ -121,17 +117,17 @@ void main() {
     testWidgets('EpisodeOptionsSheet items', (tester) async {
       when(mockContentService.getContentForAudioFile(any))
           .thenAnswer((_) async => null);
+      when(mockContentService.getEpisodeVersions(any))
+          .thenReturn([testAudioFile]);
 
       await tester.pumpWidget(
           createTestWidget(EpisodeOptionsSheet(episode: testAudioFile)));
       await tester.pumpAndSettle();
 
-      // Check common items
       expect(find.text('Play'), findsOneWidget);
       expect(find.text('Share'), findsOneWidget);
       expect(find.text('Add to Favorites'), findsOneWidget);
 
-      // Tap Play
       await tester.tap(find.text('Play'));
       await tester.pumpAndSettle();
       verify(mockAudioService.playAudio(testAudioFile)).called(1);

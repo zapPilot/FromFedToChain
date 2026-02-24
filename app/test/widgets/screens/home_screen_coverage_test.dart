@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:from_fed_to_chain_app/features/content/screens/home_screen.dart';
-import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:provider/provider.dart';
+
 import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
-import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
-import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/models/content_service_state.dart';
+import 'package:from_fed_to_chain_app/features/content/screens/home_screen.dart';
+import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
+import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
+import 'package:from_fed_to_chain_app/features/content/widgets/audio_item_card.dart';
 
 @GenerateMocks([ContentService, AudioPlayerService, PlaylistService])
-import 'package:from_fed_to_chain_app/features/content/widgets/filter_bar.dart';
 import 'home_screen_coverage_test.mocks.dart';
 
 void main() {
@@ -39,7 +40,7 @@ void main() {
       );
 
       // Default mocks
-      when(mockContentService.selectedLanguage).thenReturn('all');
+      when(mockContentService.selectedLanguage).thenReturn('zh-TW');
       when(mockContentService.selectedCategory).thenReturn('all');
       when(mockContentService.searchQuery).thenReturn('');
       when(mockContentService.sortOrder).thenReturn('newest');
@@ -53,6 +54,12 @@ void main() {
       when(mockContentService.getStatistics())
           .thenReturn({'totalEpisodes': 1, 'filteredEpisodes': 1});
       when(mockContentService.getUnfinishedEpisodes()).thenReturn([]);
+      when(mockContentService.getFocusQueue(any)).thenReturn([testAudioFile]);
+      when(mockContentService.getEpisodeVersions(any))
+          .thenReturn([testAudioFile]);
+      when(mockContentService.isEpisodeUnfinished(any)).thenReturn(false);
+      when(mockContentService.isEpisodeFinished(any)).thenReturn(false);
+      when(mockContentService.getEpisodeCompletion(any)).thenReturn(0.0);
 
       when(mockAudioService.currentAudioFile).thenReturn(null);
       when(mockAudioService.playbackState).thenReturn(AppPlaybackState.stopped);
@@ -60,6 +67,7 @@ void main() {
       when(mockAudioService.isPaused).thenReturn(false);
       when(mockAudioService.isLoading).thenReturn(false);
       when(mockAudioService.hasError).thenReturn(false);
+      when(mockAudioService.playAudio(any)).thenAnswer((_) async {});
     });
 
     Widget createTestWidget() {
@@ -76,6 +84,32 @@ void main() {
           home: HomeScreen(),
         ),
       );
+    }
+
+    void configureLargeViewport(
+      WidgetTester tester, {
+      double devicePixelRatio = 2.0,
+    }) {
+      tester.view.physicalSize = const Size(1200, 2400);
+      tester.view.devicePixelRatio = devicePixelRatio;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+    }
+
+    Future<void> pumpHomeScreen(
+      WidgetTester tester, {
+      bool settle = false,
+      double devicePixelRatio = 2.0,
+    }) async {
+      configureLargeViewport(tester, devicePixelRatio: devicePixelRatio);
+      await tester.pumpWidget(createTestWidget());
+      if (settle) {
+        await tester.pumpAndSettle();
+        return;
+      }
+      await tester.pump();
     }
 
     test('ContentServiceState equality', () {
@@ -122,67 +156,36 @@ void main() {
       when(mockAudioService.playAudio(any))
           .thenThrow(Exception('Playback failed'));
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await pumpHomeScreen(tester);
 
-      await tester.tap(find.text('Test Episode'));
-      await tester.pump(); // Trigger play
-      await tester.pump(const Duration(milliseconds: 100)); // Show snackbar
+      await tester.tap(find.byKey(AudioItemCard.playButtonKey).first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.textContaining('Cannot play audio'), findsOneWidget);
     });
 
     testWidgets('Episode Options Sheet actions', (tester) async {
-      // Increase screen size to avoid overflow in bottom sheet
-      tester.view.physicalSize = const Size(1200, 2400);
-      tester.view.devicePixelRatio = 2.0;
-      addTearDown(tester.view.resetPhysicalSize);
-
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await pumpHomeScreen(tester, settle: true);
 
       await tester.longPress(find.text('Test Episode'));
       await tester.pumpAndSettle();
 
-      // Tap Play
       await tester.tap(find.text('Play'));
       await tester.pumpAndSettle();
       verify(mockAudioService.playAudio(testAudioFile)).called(1);
 
-      // Re-open
       await tester.longPress(find.text('Test Episode'));
       await tester.pumpAndSettle();
 
-      // Tap Add to Favorites (TODO placeholder)
       await tester.tap(find.text('Add to Favorites'));
       await tester.pumpAndSettle();
-      // Verify nothing broke
 
-      // Re-open
       await tester.longPress(find.text('Test Episode'));
       await tester.pumpAndSettle();
 
-      // Tap Share (TODO placeholder)
       await tester.tap(find.text('Share'));
       await tester.pumpAndSettle();
-      // Verify nothing broke
-    });
-
-    testWidgets('Sort Selector options', (tester) async {
-      // Use large screen
-      tester.view.physicalSize = const Size(1200, 2400);
-      addTearDown(tester.view.resetPhysicalSize);
-
-      await tester.pumpWidget(createTestWidget());
-
-      // Open dropdown
-      await tester.tap(find.byType(DropdownButton<String>));
-      await tester.pumpAndSettle();
-
-      // Select Alphabetical
-      await tester.tap(find.text('A-Z').last);
-      await tester.pumpAndSettle();
-      verify(mockContentService.setSortOrder('alphabetical')).called(1);
     });
 
     testWidgets('MiniPlayer Stopped state text', (tester) async {
@@ -191,64 +194,17 @@ void main() {
       when(mockAudioService.isPaused).thenReturn(false);
       when(mockAudioService.isLoading).thenReturn(false);
       when(mockAudioService.hasError).thenReturn(false);
-      // This implies Stopped
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await pumpHomeScreen(tester);
 
       expect(find.text('Stopped'), findsOneWidget);
-    });
-
-    testWidgets('Tab switching interactions', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
-
-      // Tap 'All' tab (using label text, searching for the last one which is usually the intended one in BottomNavBar)
-      await tester.tap(find.text('All').last);
-      await tester.pumpAndSettle();
-
-      // Tap 'Unfinished' tab
-      await tester.tap(find.text('Unfinished').last);
-      await tester.pumpAndSettle();
-
-      expect(find.text('No Unfinished Episodes'), findsOneWidget);
-    });
-
-    testWidgets('Search query updates', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
-
-      // Toggle search bar
-      await tester.tap(find.byIcon(Icons.search));
-      await tester.pumpAndSettle();
-
-      // Enter search text
-      await tester.enterText(find.byType(TextField), 'bitcoin');
-      await tester.pump();
-
-      verify(mockContentService.setSearchQuery('bitcoin')).called(1);
-    });
-
-    testWidgets('Filter changes', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
-
-      // In FilterBar, trigger callbacks
-      // We can find the FilterBar and trigger its onLanguageChanged/onCategoryChanged
-      final filterBar = tester.widget<FilterBar>(find.byType(FilterBar));
-      filterBar.onLanguageChanged('en-US');
-      filterBar.onCategoryChanged('ethereum');
-
-      verify(mockContentService.setLanguage('en-US')).called(1);
-      verify(mockContentService.setCategory('ethereum')).called(1);
     });
 
     testWidgets('Error state retry', (tester) async {
       when(mockContentService.hasError).thenReturn(true);
       when(mockContentService.errorMessage).thenReturn('Network error');
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await pumpHomeScreen(tester);
 
       await tester.tap(find.text('Retry'));
       await tester.pump();
@@ -256,38 +212,25 @@ void main() {
       verify(mockContentService.refresh()).called(1);
     });
 
-    testWidgets('Empty state clear filters', (tester) async {
+    testWidgets('shows Queue empty state when focus queue is empty',
+        (tester) async {
       when(mockContentService.allEpisodes).thenReturn([]);
-      when(mockContentService.filteredEpisodes).thenReturn([]);
-      when(mockContentService.hasEpisodes).thenReturn(false);
-      when(mockContentService.hasFilteredResults).thenReturn(false);
-      when(mockContentService.searchQuery).thenReturn('nonexistent');
+      when(mockContentService.getFocusQueue('zh-TW')).thenReturn([]);
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+      await pumpHomeScreen(tester);
 
-      await tester.tap(find.text('Clear filters'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
-      verify(mockContentService.setSearchQuery('')).called(1);
+      expect(find.text('All Caught Up!'), findsOneWidget);
+      expect(find.text('No new episodes in zh-TW'), findsOneWidget);
     });
 
-    testWidgets('Empty state refresh', (tester) async {
+    testWidgets('shows loading indicator during first content load',
+        (tester) async {
+      when(mockContentService.isLoading).thenReturn(true);
       when(mockContentService.allEpisodes).thenReturn([]);
-      when(mockContentService.filteredEpisodes).thenReturn([]);
-      when(mockContentService.hasEpisodes).thenReturn(false);
-      when(mockContentService.hasFilteredResults).thenReturn(false);
-      when(mockContentService.searchQuery).thenReturn('');
-      when(mockContentService.isLoading).thenReturn(false);
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+      await pumpHomeScreen(tester);
 
-      await tester.tap(find.text('Refresh'));
-      await tester.pump();
-      verify(mockContentService.refresh()).called(1);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
   });
 }

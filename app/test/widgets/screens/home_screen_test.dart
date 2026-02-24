@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 
+import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
+import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
+import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
 import 'package:from_fed_to_chain_app/features/content/screens/home_screen.dart';
 import 'package:from_fed_to_chain_app/features/content/services/content_service.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/audio_player_service.dart';
-import 'package:from_fed_to_chain_app/features/content/models/audio_file.dart';
-import 'package:from_fed_to_chain_app/features/audio/services/player_state_notifier.dart';
-import 'package:from_fed_to_chain_app/features/content/widgets/audio_list.dart';
 import 'package:from_fed_to_chain_app/features/content/services/playlist_service.dart';
 
-// Generate mocks for dependencies
-@GenerateMocks([ContentService, AudioPlayerService, PlaylistService])
 import 'home_screen_test.mocks.dart';
 
+@GenerateMocks([ContentService, AudioPlayerService, PlaylistService])
 void main() {
   group('HomeScreen - Basic Tests', () {
     late MockContentService mockContentService;
@@ -40,7 +38,6 @@ void main() {
         fileSizeBytes: 1024000,
       );
 
-      // Basic ContentService setup
       when(mockContentService.selectedLanguage).thenReturn('zh-TW');
       when(mockContentService.selectedCategory).thenReturn('all');
       when(mockContentService.searchQuery).thenReturn('');
@@ -60,10 +57,12 @@ void main() {
       });
       when(mockContentService.getUnfinishedEpisodes()).thenReturn([]);
       when(mockContentService.getEpisodeCompletion(any)).thenReturn(0.0);
+      when(mockContentService.getEpisodeVersions(any))
+          .thenReturn([testAudioFile]);
       when(mockContentService.isEpisodeUnfinished(any)).thenReturn(false);
       when(mockContentService.listenHistory).thenReturn(<String, DateTime>{});
+      when(mockContentService.getFocusQueue(any)).thenReturn([testAudioFile]);
 
-      // Basic AudioService setup
       when(mockAudioService.currentAudioFile).thenReturn(null);
       when(mockAudioService.playbackState).thenReturn(AppPlaybackState.stopped);
       when(mockAudioService.currentPosition).thenReturn(Duration.zero);
@@ -74,11 +73,13 @@ void main() {
       when(mockAudioService.isLoading).thenReturn(false);
       when(mockAudioService.hasError).thenReturn(false);
       when(mockAudioService.errorMessage).thenReturn(null);
+      when(mockAudioService.playAudio(any)).thenAnswer((_) async {});
     });
 
     tearDown(() {
       reset(mockContentService);
       reset(mockAudioService);
+      reset(mockPlaylistService);
     });
 
     Widget createTestWidget() {
@@ -98,105 +99,56 @@ void main() {
       );
     }
 
+    void configureLargeViewport(
+      WidgetTester tester, {
+      double devicePixelRatio = 1.0,
+    }) {
+      tester.view.physicalSize = const Size(1200, 2400);
+      tester.view.devicePixelRatio = devicePixelRatio;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+    }
+
+    Future<void> pumpHomeScreen(
+      WidgetTester tester, {
+      bool settle = false,
+      double devicePixelRatio = 1.0,
+    }) async {
+      configureLargeViewport(tester, devicePixelRatio: devicePixelRatio);
+      await tester.pumpWidget(createTestWidget());
+      if (settle) {
+        await tester.pumpAndSettle();
+        return;
+      }
+      await tester.pump();
+    }
+
     group('Basic Widget Creation', () {
       testWidgets('should render HomeScreen without crashing', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
+        await pumpHomeScreen(tester);
         expect(find.byType(HomeScreen), findsOneWidget);
       });
 
       testWidgets('should display app title', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        expect(find.text('From Fed to Chain'), findsOneWidget);
+        await pumpHomeScreen(tester);
+        expect(find.text('Queue'), findsOneWidget);
       });
 
       testWidgets('should display episode when available', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
+        await pumpHomeScreen(tester);
         expect(find.text(testAudioFile.title), findsOneWidget);
-      });
-    });
-
-    group('Filter Interactions', () {
-      testWidgets('should handle language filter tap', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find language filter buttons
-        final zhButton = find.text('中文');
-        if (zhButton.evaluate().isNotEmpty) {
-          await tester.tap(zhButton);
-          await tester.pump();
-          // Language change should be handled by ContentService
-        }
-      });
-
-      testWidgets('should handle category filter tap', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find category filter buttons
-        final categoryButton = find.text('Daily News');
-        if (categoryButton.evaluate().isNotEmpty) {
-          await tester.tap(categoryButton);
-          await tester.pump();
-          // Category change should be handled by ContentService
-        }
       });
     });
 
     group('Audio Playback', () {
       testWidgets('should handle episode tap for playback', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find episode card and tap it
+        await pumpHomeScreen(tester);
         final episodeCard = find.text(testAudioFile.title);
-        if (episodeCard.evaluate().isNotEmpty) {
-          await tester.tap(episodeCard);
-          await tester.pump();
-          // Should navigate to player screen or start playback
-        }
+        expect(episodeCard, findsOneWidget);
+        await tester.tap(episodeCard);
+        await tester.pumpAndSettle();
       });
 
       testWidgets('should show mini player when audio is playing',
@@ -204,53 +156,18 @@ void main() {
         when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
         when(mockAudioService.isPlaying).thenReturn(true);
 
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+        await pumpHomeScreen(tester);
 
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Should show mini player
         expect(find.text(testAudioFile.title), findsAtLeastNWidgets(1));
-      });
-    });
-
-    group('Search Functionality', () {
-      testWidgets('should handle search input', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find search field
-        final searchField = find.byType(TextField);
-        if (searchField.evaluate().isNotEmpty) {
-          await tester.enterText(searchField.first, 'test search');
-          await tester.pump();
-          // Search should filter episodes
-        }
       });
     });
 
     group('Loading and Error States', () {
       testWidgets('should show loading indicator when loading', (tester) async {
         when(mockContentService.isLoading).thenReturn(true);
+        when(mockContentService.allEpisodes).thenReturn([]);
 
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await pumpHomeScreen(tester);
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
@@ -260,275 +177,43 @@ void main() {
         when(mockContentService.hasError).thenReturn(true);
         when(mockContentService.errorMessage).thenReturn('Network error');
 
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await pumpHomeScreen(tester);
 
         expect(find.text('Network error'), findsOneWidget);
       });
 
       testWidgets('should show empty state when no episodes', (tester) async {
-        when(mockContentService.hasEpisodes).thenReturn(false);
-        when(mockContentService.filteredEpisodes).thenReturn([]);
+        when(mockContentService.getFocusQueue('zh-TW')).thenReturn([]);
 
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+        await pumpHomeScreen(tester);
 
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Should show some kind of empty state message
-        expect(find.byType(HomeScreen), findsOneWidget);
+        expect(find.text('All Caught Up!'), findsOneWidget);
       });
     });
 
     group('Statistics Display', () {
-      testWidgets('should show episode statistics', (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Check if statistics are displayed somewhere
-        expect(find.byType(HomeScreen), findsOneWidget);
-        // Statistics should be accessible through ContentService
-        verify(mockContentService.getStatistics())
-            .called(greaterThanOrEqualTo(0));
-      });
-    });
-
-    group('Navigation', () {
-      testWidgets('should navigate to player on episode selection',
+      testWidgets('should render without statistics dependency',
           (tester) async {
-        // Set a larger screen size to prevent RenderFlex overflow
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+        await pumpHomeScreen(tester);
 
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Tap on episode should trigger navigation
-        final episodeTile = find.text(testAudioFile.title);
-        if (episodeTile.evaluate().isNotEmpty) {
-          await tester.tap(episodeTile);
-          await tester.pump();
-          // Navigation would be handled by Navigator
-        }
-      });
-    });
-    group('Sort Functionality', () {
-      testWidgets('should handle sort selection', (tester) async {
-        // Use a larger screen size
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find sort dropdown
-        final sortIcon = find.byIcon(Icons.sort);
-        expect(sortIcon, findsOneWidget);
-
-        // Find dropdown button
-        final dropdownFinder = find.byType(DropdownButton<String>);
-        expect(dropdownFinder, findsOneWidget);
-
-        // Tap to open
-        await tester.tap(dropdownFinder);
-        await tester.pumpAndSettle();
-
-        // Find and tap a menu item (e.g. "Oldest First")
-        final oldestOption = find.text('Oldest First').last;
-        await tester.tap(oldestOption);
-        await tester.pumpAndSettle();
-
-        // Verify service called
-        verify(mockContentService.setSortOrder('oldest')).called(1);
-      });
-    });
-
-    group('Tab Navigation', () {
-      testWidgets('should switch tabs', (tester) async {
-        // Use a larger screen size
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find "All" tab
-        final allTab = find.widgetWithText(Tab, 'All');
-        await tester.tap(allTab);
-        await tester.pumpAndSettle();
-
-        // Should show list in All tab
-        expect(find.byType(AudioList), findsWidgets);
-      });
-
-      testWidgets('should show empty state for Unfinished tab', (tester) async {
-        // Use a larger screen size
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        // Mock empty unfinished list
-        when(mockContentService.getUnfinishedEpisodes()).thenReturn([]);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Go to unfinished tab
-        await tester.tap(find.widgetWithText(Tab, 'Unfinished'));
-        await tester.pumpAndSettle();
-
-        // Expect empty state message
-        expect(find.text('No Unfinished Episodes'), findsOneWidget);
+        expect(find.byType(HomeScreen), findsOneWidget);
       });
     });
 
     group('Episode Options', () {
       testWidgets('should show options on long press', (tester) async {
-        // Use a larger screen size
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
+        await pumpHomeScreen(tester, devicePixelRatio: 2.0);
 
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Long press an episode
         final episodeTile = find.text(testAudioFile.title);
+        expect(episodeTile, findsOneWidget);
         await tester.longPress(episodeTile);
         await tester.pumpAndSettle();
 
-        // Verify bottom sheet appears
         expect(find.text('Add to Playlist'), findsOneWidget);
         expect(find.text('Share'), findsOneWidget);
 
-        // Tap an option (e.g., Add to Playlist)
         await tester.tap(find.text('Add to Playlist'));
         await tester.pumpAndSettle();
-      });
-    });
-
-    group('Search Toggle', () {
-      testWidgets('should toggle search bar visibility', (tester) async {
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find search toggle button (initially shows search icon)
-        final searchButton = find.byIcon(Icons.search);
-        expect(searchButton, findsOneWidget);
-
-        // Tap to show search bar
-        await tester.tap(searchButton);
-        await tester.pumpAndSettle();
-
-        // Now should show close icon
-        expect(find.byIcon(Icons.close), findsOneWidget);
-      });
-    });
-
-    group('Refresh Button', () {
-      testWidgets('should call refresh when tapped', (tester) async {
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Find refresh button
-        final refreshButton = find.byIcon(Icons.refresh);
-        expect(refreshButton, findsOneWidget);
-
-        await tester.tap(refreshButton);
-        await tester.pump();
-
-        verify(mockContentService.refresh()).called(1);
-      });
-
-      testWidgets('should show loading indicator when loading', (tester) async {
-        when(mockContentService.isLoading).thenReturn(true);
-
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Refresh button should be disabled and show loading spinner
-        expect(find.byType(CircularProgressIndicator), findsWidgets);
-      });
-    });
-
-    group('Recent Tab', () {
-      testWidgets('should display recent episodes in Recent tab',
-          (tester) async {
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Recent tab is default; should display AudioList
-        expect(find.byType(AudioList), findsWidgets);
-      });
-    });
-
-    group('Empty State Variations', () {
-      testWidgets('should show clear filters button when search is active',
-          (tester) async {
-        when(mockContentService.searchQuery).thenReturn('nonexistent query');
-        when(mockContentService.filteredEpisodes).thenReturn([]);
-
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Should show "Clear filters" button
-        expect(find.text('Clear filters'), findsOneWidget);
-      });
-
-      testWidgets('should show refresh button when no search is active',
-          (tester) async {
-        when(mockContentService.searchQuery).thenReturn('');
-        when(mockContentService.filteredEpisodes).thenReturn([]);
-
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Should show "Refresh" button instead
-        expect(find.widgetWithText(ElevatedButton, 'Refresh'), findsOneWidget);
       });
     });
 
@@ -537,12 +222,7 @@ void main() {
         when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
         when(mockAudioService.isLoading).thenReturn(true);
 
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await pumpHomeScreen(tester, devicePixelRatio: 2.0);
 
         expect(find.text('Loading'), findsOneWidget);
       });
@@ -551,12 +231,7 @@ void main() {
         when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
         when(mockAudioService.hasError).thenReturn(true);
 
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await pumpHomeScreen(tester, devicePixelRatio: 2.0);
 
         expect(find.text('Error'), findsOneWidget);
       });
@@ -565,35 +240,9 @@ void main() {
         when(mockAudioService.currentAudioFile).thenReturn(testAudioFile);
         when(mockAudioService.isPaused).thenReturn(true);
 
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await pumpHomeScreen(tester, devicePixelRatio: 2.0);
 
         expect(find.text('Paused'), findsOneWidget);
-      });
-    });
-
-    group('Unfinished Tab with Episodes', () {
-      testWidgets('should display unfinished episodes', (tester) async {
-        when(mockContentService.getUnfinishedEpisodes())
-            .thenReturn([testAudioFile]);
-
-        tester.view.physicalSize = const Size(1200, 2400);
-        tester.view.devicePixelRatio = 2.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
-
-        // Go to unfinished tab
-        await tester.tap(find.widgetWithText(Tab, 'Unfinished'));
-        await tester.pumpAndSettle();
-
-        // Should show episode instead of empty state
-        expect(find.text(testAudioFile.title), findsAtLeastNWidgets(1));
       });
     });
   });
