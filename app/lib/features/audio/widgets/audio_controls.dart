@@ -97,12 +97,10 @@ class AudioControls extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: hasError ? onPlayPause : (isLoading ? null : onPlayPause),
+          onTap: _getMainButtonOnTap(),
           borderRadius: BorderRadius.circular(buttonSize / 2),
           child: Semantics(
-            label: hasError
-                ? 'Retry playback'
-                : (isLoading ? 'Loading' : (isPlaying ? 'Pause' : 'Play')),
+            label: _getMainButtonSemanticLabel(),
             button: true,
             child: Center(
               child: _buildMainButtonContent(buttonSize),
@@ -143,6 +141,34 @@ class AudioControls extends StatelessWidget {
       size: iconSize,
       color: AppTheme.onPrimaryColor,
     );
+  }
+
+  VoidCallback? _getMainButtonOnTap() {
+    if (hasError) {
+      return onPlayPause;
+    }
+
+    if (isLoading) {
+      return null;
+    }
+
+    return onPlayPause;
+  }
+
+  String _getMainButtonSemanticLabel() {
+    if (hasError) {
+      return 'Retry playback';
+    }
+
+    if (isLoading) {
+      return 'Loading';
+    }
+
+    if (isPlaying) {
+      return 'Pause';
+    }
+
+    return 'Play';
   }
 
   /// Build secondary control button

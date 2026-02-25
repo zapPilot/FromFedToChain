@@ -73,8 +73,8 @@ function EpisodeContent({ id }: { id: string }) {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-white">Episode Not Found</h2>
           <p className="text-zinc-400 max-w-md">
-            We couldn't find the episode you're looking for. It may have been
-            removed or the URL is incorrect.
+            We couldn&apos;t find the episode you&apos;re looking for. It may
+            have been removed or the URL is incorrect.
           </p>
         </div>
         <Link

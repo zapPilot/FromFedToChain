@@ -8,6 +8,12 @@ import 'package:from_fed_to_chain_app/features/content/data/preferences_reposito
 /// Handles language, category, sort order, and other user-specific settings
 class UserPreferencesService extends ChangeNotifier
     implements PreferencesRepository {
+  static const List<String> _validSortOrders = [
+    'newest',
+    'oldest',
+    'alphabetical',
+  ];
+
   String _selectedLanguage = ApiConfig.defaultLanguage;
   String _selectedCategory = 'all';
   String _searchQuery = '';
@@ -114,7 +120,7 @@ class UserPreferencesService extends ChangeNotifier
       }
 
       // Validate sort order
-      if (!['newest', 'oldest', 'alphabetical'].contains(_sortOrder)) {
+      if (!_isValidSortOrder(_sortOrder)) {
         _sortOrder = 'newest';
       }
 
@@ -134,14 +140,9 @@ class UserPreferencesService extends ChangeNotifier
       }
 
       notifyListeners();
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Loaded preferences successfully');
-      }
+      _debugLog('UserPreferencesService: Loaded preferences successfully');
     } catch (e) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Failed to load preferences: $e');
-      }
+      _debugLog('UserPreferencesService: Failed to load preferences: $e');
     }
   }
 
@@ -176,13 +177,9 @@ class UserPreferencesService extends ChangeNotifier
       await prefs.setBool('high_contrast_mode', _highContrastMode);
       await prefs.setBool('reduced_motion', _reducedMotion);
 
-      if (kDebugMode) {
-        print('UserPreferencesService: Saved preferences successfully');
-      }
+      _debugLog('UserPreferencesService: Saved preferences successfully');
     } catch (e) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Failed to save preferences: $e');
-      }
+      _debugLog('UserPreferencesService: Failed to save preferences: $e');
     }
   }
 
@@ -192,24 +189,16 @@ class UserPreferencesService extends ChangeNotifier
     if (_disposed) return;
 
     if (!ApiConfig.isValidLanguage(language)) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Unsupported language: $language');
-      }
+      _debugLog('UserPreferencesService: Unsupported language: $language');
       return;
     }
 
-    if (_selectedLanguage != language) {
-      _selectedLanguage = language;
-      await _savePreferences();
-
-      if (!_disposed) {
-        notifyListeners();
-      }
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Language changed to $language');
-      }
-    }
+    await _setAndPersistValueWithDisposeGuard<String>(
+      currentValue: _selectedLanguage,
+      newValue: language,
+      assign: (value) => _selectedLanguage = value,
+      successMessage: 'UserPreferencesService: Language changed to $language',
+    );
   }
 
   /// Set selected category filter
@@ -218,24 +207,16 @@ class UserPreferencesService extends ChangeNotifier
     if (_disposed) return;
 
     if (category != 'all' && !ApiConfig.isValidCategory(category)) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Unsupported category: $category');
-      }
+      _debugLog('UserPreferencesService: Unsupported category: $category');
       return;
     }
 
-    if (_selectedCategory != category) {
-      _selectedCategory = category;
-      await _savePreferences();
-
-      if (!_disposed) {
-        notifyListeners();
-      }
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Category changed to $category');
-      }
-    }
+    await _setAndPersistValueWithDisposeGuard<String>(
+      currentValue: _selectedCategory,
+      newValue: category,
+      assign: (value) => _selectedCategory = value,
+      successMessage: 'UserPreferencesService: Category changed to $category',
+    );
   }
 
   /// Set search query (not persisted)
@@ -254,209 +235,165 @@ class UserPreferencesService extends ChangeNotifier
   Future<void> setSortOrder(String sortOrder) async {
     if (_disposed) return;
 
-    if (!['newest', 'oldest', 'alphabetical'].contains(sortOrder)) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Invalid sort order: $sortOrder');
-      }
+    if (!_isValidSortOrder(sortOrder)) {
+      _debugLog('UserPreferencesService: Invalid sort order: $sortOrder');
       return;
     }
 
-    if (_sortOrder != sortOrder) {
-      _sortOrder = sortOrder;
-      await _savePreferences();
-
-      if (!_disposed) {
-        notifyListeners();
-      }
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Sort order changed to $sortOrder');
-      }
-    }
+    await _setAndPersistValueWithDisposeGuard<String>(
+      currentValue: _sortOrder,
+      newValue: sortOrder,
+      assign: (value) => _sortOrder = value,
+      successMessage:
+          'UserPreferencesService: Sort order changed to $sortOrder',
+    );
   }
 
   /// Set theme mode
   @override
   Future<void> setDarkMode(bool isDark) async {
-    if (_isDarkMode != isDark) {
-      _isDarkMode = isDark;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Dark mode ${isDark ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _isDarkMode,
+      newValue: isDark,
+      assign: (value) => _isDarkMode = value,
+      successMessage:
+          'UserPreferencesService: Dark mode ${isDark ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set playback speed
   @override
   Future<void> setPlaybackSpeed(double speed) async {
     if (speed < 0.5 || speed > 3.0) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Invalid playback speed: $speed');
-      }
+      _debugLog('UserPreferencesService: Invalid playback speed: $speed');
       return;
     }
 
-    if (_playbackSpeed != speed) {
-      _playbackSpeed = speed;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Playback speed changed to ${speed}x');
-      }
-    }
+    await _setAndPersistValue<double>(
+      currentValue: _playbackSpeed,
+      newValue: speed,
+      assign: (value) => _playbackSpeed = value,
+      successMessage:
+          'UserPreferencesService: Playback speed changed to ${speed}x',
+    );
   }
 
   /// Set autoplay enabled
   @override
   Future<void> setAutoplayEnabled(bool enabled) async {
-    if (_autoplayEnabled != enabled) {
-      _autoplayEnabled = enabled;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Autoplay ${enabled ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _autoplayEnabled,
+      newValue: enabled,
+      assign: (value) => _autoplayEnabled = value,
+      successMessage:
+          'UserPreferencesService: Autoplay ${enabled ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set download over WiFi only
   @override
   Future<void> setDownloadOverWifiOnly(bool wifiOnly) async {
-    if (_downloadOverWifiOnly != wifiOnly) {
-      _downloadOverWifiOnly = wifiOnly;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Download over WiFi only ${wifiOnly ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _downloadOverWifiOnly,
+      newValue: wifiOnly,
+      assign: (value) => _downloadOverWifiOnly = value,
+      successMessage:
+          'UserPreferencesService: Download over WiFi only ${wifiOnly ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set cache size
   @override
   Future<void> setCacheSize(int size) async {
     if (size < 10 || size > 500) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Invalid cache size: $size');
-      }
+      _debugLog('UserPreferencesService: Invalid cache size: $size');
       return;
     }
 
-    if (_cacheSize != size) {
-      _cacheSize = size;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Cache size changed to $size episodes');
-      }
-    }
+    await _setAndPersistValue<int>(
+      currentValue: _cacheSize,
+      newValue: size,
+      assign: (value) => _cacheSize = value,
+      successMessage:
+          'UserPreferencesService: Cache size changed to $size episodes',
+    );
   }
 
   /// Set notifications enabled
   @override
   Future<void> setNotificationsEnabled(bool enabled) async {
-    if (_notificationsEnabled != enabled) {
-      _notificationsEnabled = enabled;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Notifications ${enabled ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _notificationsEnabled,
+      newValue: enabled,
+      assign: (value) => _notificationsEnabled = value,
+      successMessage:
+          'UserPreferencesService: Notifications ${enabled ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set new episode notifications
   @override
   Future<void> setNewEpisodeNotifications(bool enabled) async {
-    if (_newEpisodeNotifications != enabled) {
-      _newEpisodeNotifications = enabled;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: New episode notifications ${enabled ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _newEpisodeNotifications,
+      newValue: enabled,
+      assign: (value) => _newEpisodeNotifications = value,
+      successMessage:
+          'UserPreferencesService: New episode notifications ${enabled ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set download complete notifications
   @override
   Future<void> setDownloadCompleteNotifications(bool enabled) async {
-    if (_downloadCompleteNotifications != enabled) {
-      _downloadCompleteNotifications = enabled;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Download complete notifications ${enabled ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _downloadCompleteNotifications,
+      newValue: enabled,
+      assign: (value) => _downloadCompleteNotifications = value,
+      successMessage:
+          'UserPreferencesService: Download complete notifications ${enabled ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set text scale factor
   @override
   Future<void> setTextScaleFactor(double factor) async {
     if (factor < 0.8 || factor > 2.0) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Invalid text scale factor: $factor');
-      }
+      _debugLog('UserPreferencesService: Invalid text scale factor: $factor');
       return;
     }
 
-    if (_textScaleFactor != factor) {
-      _textScaleFactor = factor;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Text scale factor changed to ${factor}x');
-      }
-    }
+    await _setAndPersistValue<double>(
+      currentValue: _textScaleFactor,
+      newValue: factor,
+      assign: (value) => _textScaleFactor = value,
+      successMessage:
+          'UserPreferencesService: Text scale factor changed to ${factor}x',
+    );
   }
 
   /// Set high contrast mode
   @override
   Future<void> setHighContrastMode(bool enabled) async {
-    if (_highContrastMode != enabled) {
-      _highContrastMode = enabled;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: High contrast mode ${enabled ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _highContrastMode,
+      newValue: enabled,
+      assign: (value) => _highContrastMode = value,
+      successMessage:
+          'UserPreferencesService: High contrast mode ${enabled ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Set reduced motion
   @override
   Future<void> setReducedMotion(bool enabled) async {
-    if (_reducedMotion != enabled) {
-      _reducedMotion = enabled;
-      await _savePreferences();
-      notifyListeners();
-
-      if (kDebugMode) {
-        print(
-            'UserPreferencesService: Reduced motion ${enabled ? 'enabled' : 'disabled'}');
-      }
-    }
+    await _setAndPersistValue<bool>(
+      currentValue: _reducedMotion,
+      newValue: enabled,
+      assign: (value) => _reducedMotion = value,
+      successMessage:
+          'UserPreferencesService: Reduced motion ${enabled ? 'enabled' : 'disabled'}',
+    );
   }
 
   /// Reset all preferences to defaults
@@ -480,10 +417,7 @@ class UserPreferencesService extends ChangeNotifier
 
     await _savePreferences();
     notifyListeners();
-
-    if (kDebugMode) {
-      print('UserPreferencesService: Reset all preferences to defaults');
-    }
+    _debugLog('UserPreferencesService: Reset all preferences to defaults');
   }
 
   /// Export preferences as Map
@@ -535,14 +469,51 @@ class UserPreferencesService extends ChangeNotifier
 
       await _savePreferences();
       notifyListeners();
-
-      if (kDebugMode) {
-        print('UserPreferencesService: Imported preferences successfully');
-      }
+      _debugLog('UserPreferencesService: Imported preferences successfully');
     } catch (e) {
-      if (kDebugMode) {
-        print('UserPreferencesService: Failed to import preferences: $e');
-      }
+      _debugLog('UserPreferencesService: Failed to import preferences: $e');
+    }
+  }
+
+  Future<void> _setAndPersistValue<T>({
+    required T currentValue,
+    required T newValue,
+    required void Function(T value) assign,
+    required String successMessage,
+  }) async {
+    if (currentValue == newValue) return;
+
+    assign(newValue);
+    await _savePreferences();
+    notifyListeners();
+    _debugLog(successMessage);
+  }
+
+  Future<void> _setAndPersistValueWithDisposeGuard<T>({
+    required T currentValue,
+    required T newValue,
+    required void Function(T value) assign,
+    required String successMessage,
+  }) async {
+    if (currentValue == newValue) return;
+
+    assign(newValue);
+    await _savePreferences();
+
+    if (!_disposed) {
+      notifyListeners();
+    }
+
+    _debugLog(successMessage);
+  }
+
+  bool _isValidSortOrder(String sortOrder) {
+    return _validSortOrders.contains(sortOrder);
+  }
+
+  void _debugLog(String message) {
+    if (kDebugMode) {
+      print(message);
     }
   }
 

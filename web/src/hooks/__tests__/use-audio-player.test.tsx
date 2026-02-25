@@ -1,7 +1,8 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { useAudioPlayer } from "../use-audio-player";
 import { useAudioPlayerStore } from "@/stores/audio-player-store";
 import { getAudioPlayerManager } from "@/lib/audio/audio-player-manager";
+import type { Episode } from "@/types/content";
 
 // Mock the dependencies
 jest.mock("@/stores/audio-player-store", () => ({
@@ -13,6 +14,13 @@ jest.mock("@/lib/audio/audio-player-manager", () => ({
 }));
 
 describe("useAudioPlayer", () => {
+  type MockedAudioPlayerStoreHook = jest.Mock & {
+    setState: jest.Mock;
+  };
+
+  const mockedUseAudioPlayerStore =
+    useAudioPlayerStore as unknown as MockedAudioPlayerStoreHook;
+
   const mockStore = {
     currentEpisode: null,
     playbackState: "stopped",
@@ -50,12 +58,9 @@ describe("useAudioPlayer", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAudioPlayerStore as unknown as jest.Mock).mockReturnValue(mockStore);
-    (useAudioPlayerStore as unknown as jest.Mock).mockImplementation(
-      () => mockStore,
-    );
-    // @ts-ignore
-    useAudioPlayerStore.setState = jest.fn();
+    mockedUseAudioPlayerStore.mockReturnValue(mockStore);
+    mockedUseAudioPlayerStore.mockImplementation(() => mockStore);
+    mockedUseAudioPlayerStore.setState = jest.fn();
     (getAudioPlayerManager as jest.Mock).mockReturnValue(mockAudioManager);
   });
 
@@ -78,9 +83,17 @@ describe("useAudioPlayer", () => {
   it("should override play action to use audio manager (with episode)", async () => {
     renderHook(() => useAudioPlayer());
 
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
-    const episode = { id: "1", title: "Test" } as any;
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
+    const episode: Episode = {
+      id: "1",
+      title: "Test",
+      status: "published",
+      category: "daily-news",
+      date: "2024-01-01",
+      language: "en-US",
+      content: "",
+      updated_at: "2024-01-01T00:00:00Z",
+    };
 
     await setStateCall.play(episode);
     expect(mockAudioManager.play).toHaveBeenCalledWith(episode);
@@ -89,8 +102,7 @@ describe("useAudioPlayer", () => {
   it("should override play action to use audio manager (no episode)", async () => {
     renderHook(() => useAudioPlayer());
 
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     await setStateCall.play();
     expect(mockAudioManager.play).toHaveBeenCalledWith();
@@ -98,8 +110,7 @@ describe("useAudioPlayer", () => {
 
   it("should override pause action to use audio manager", () => {
     renderHook(() => useAudioPlayer());
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     setStateCall.pause();
     expect(mockAudioManager.pause).toHaveBeenCalled();
@@ -107,8 +118,7 @@ describe("useAudioPlayer", () => {
 
   it("should override seek action to use audio manager", () => {
     renderHook(() => useAudioPlayer());
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     setStateCall.seek(100);
     expect(mockAudioManager.seek).toHaveBeenCalledWith(100);
@@ -116,8 +126,7 @@ describe("useAudioPlayer", () => {
 
   it("should override setSpeed action to use audio manager", () => {
     renderHook(() => useAudioPlayer());
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     setStateCall.setSpeed(1.5);
     expect(mockAudioManager.setSpeed).toHaveBeenCalledWith(1.5);
@@ -125,8 +134,7 @@ describe("useAudioPlayer", () => {
 
   it("should override skipForward action to use audio manager", () => {
     renderHook(() => useAudioPlayer());
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     setStateCall.skipForward(30);
     expect(mockAudioManager.skipForward).toHaveBeenCalledWith(30);
@@ -134,8 +142,7 @@ describe("useAudioPlayer", () => {
 
   it("should override skipBackward action to use audio manager", () => {
     renderHook(() => useAudioPlayer());
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     setStateCall.skipBackward(15);
     expect(mockAudioManager.skipBackward).toHaveBeenCalledWith(15);
@@ -143,8 +150,7 @@ describe("useAudioPlayer", () => {
 
   it("should override stop action to use audio manager", () => {
     renderHook(() => useAudioPlayer());
-    const setStateCall = (useAudioPlayerStore.setState as unknown as jest.Mock)
-      .mock.calls[0][0];
+    const setStateCall = mockedUseAudioPlayerStore.setState.mock.calls[0][0];
 
     setStateCall.stop();
     expect(mockAudioManager.stop).toHaveBeenCalled();

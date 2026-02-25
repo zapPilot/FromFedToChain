@@ -2,6 +2,52 @@ import { AudioPlayerManager } from "../audio-player-manager";
 import { useAudioPlayerStore } from "@/stores/audio-player-store";
 import { useProgressStore } from "@/stores/progress-store";
 import Hls from "hls.js";
+import type { Episode } from "@/types/content";
+
+type MockAudioElement = {
+  addEventListener: jest.Mock;
+  removeEventListener: jest.Mock;
+  play: jest.Mock<Promise<void>, []>;
+  pause: jest.Mock<void, []>;
+  canPlayType: jest.Mock<string, [string]>;
+  src: string;
+  currentTime: number;
+  duration: number;
+  playbackRate: number;
+  error: { code: number } | null;
+};
+
+type MockStore = {
+  updateDuration: jest.Mock;
+  updateState: jest.Mock;
+  updatePosition: jest.Mock;
+  updateSpeed: jest.Mock;
+  onPlaybackCompleted: jest.Mock;
+  setError: jest.Mock;
+  setCurrentEpisode: jest.Mock;
+  reset: jest.Mock;
+  playbackState: string;
+  playbackSpeed: number;
+};
+
+type MockProgressStore = {
+  updateProgress: jest.Mock;
+  getResumePosition: jest.Mock;
+};
+
+function createEpisode(): Episode {
+  return {
+    id: "1",
+    title: "Test Episode",
+    status: "published",
+    category: "daily-news",
+    date: "2024-01-01",
+    language: "en-US",
+    content: "",
+    updated_at: "2024-01-01T00:00:00Z",
+    streaming_urls: { m3u8: "test.m3u8" },
+  };
+}
 
 // Mock dependencies
 jest.mock("@/stores/audio-player-store", () => ({
@@ -27,13 +73,17 @@ jest.mock("hls.js", () => {
     startLoad: jest.fn(),
   };
 
-  const HlsMock = jest.fn(() => mockHlsInstance);
-  (HlsMock as any).Events = { ERROR: "hlsError" };
-  (HlsMock as any).ErrorTypes = {
-    NETWORK_ERROR: "networkError",
-    MEDIA_ERROR: "mediaError",
-  };
-  (HlsMock as any).isSupported = jest.fn().mockReturnValue(true);
+  const HlsMock = Object.assign(
+    jest.fn(() => mockHlsInstance),
+    {
+      Events: { ERROR: "hlsError" },
+      ErrorTypes: {
+        NETWORK_ERROR: "networkError",
+        MEDIA_ERROR: "mediaError",
+      },
+      isSupported: jest.fn().mockReturnValue(true),
+    },
+  );
 
   return {
     __esModule: true,
@@ -43,18 +93,33 @@ jest.mock("hls.js", () => {
 
 describe("AudioPlayerManager", () => {
   let manager: AudioPlayerManager;
-  let mockAudio: any;
-  let mockStore: any;
-  let mockProgressStore: any;
+  let mockAudio: MockAudioElement;
+  let mockStore: MockStore;
+  let mockProgressStore: MockProgressStore;
+
+  function getRegisteredHandler(eventName: string): () => void {
+    const handlerEntry = mockAudio.addEventListener.mock.calls.find(
+      (call: unknown[]) => call[0] === eventName,
+    );
+
+    if (!handlerEntry) {
+      throw new Error(`Expected handler for event: ${eventName}`);
+    }
+
+    return handlerEntry[1] as () => void;
+  }
 
   beforeAll(() => {
     if (typeof MediaError === "undefined") {
-      global.MediaError = {
-        MEDIA_ERR_ABORTED: 1,
-        MEDIA_ERR_NETWORK: 2,
-        MEDIA_ERR_DECODE: 3,
-        MEDIA_ERR_SRC_NOT_SUPPORTED: 4,
-      } as any;
+      Object.defineProperty(globalThis, "MediaError", {
+        configurable: true,
+        value: {
+          MEDIA_ERR_ABORTED: 1,
+          MEDIA_ERR_NETWORK: 2,
+          MEDIA_ERR_DECODE: 3,
+          MEDIA_ERR_SRC_NOT_SUPPORTED: 4,
+        },
+      });
     }
   });
 
@@ -75,7 +140,9 @@ describe("AudioPlayerManager", () => {
       playbackRate: 1,
       error: null,
     };
-    global.Audio = jest.fn().mockImplementation(() => mockAudio) as any;
+    global.Audio = jest
+      .fn()
+      .mockImplementation(() => mockAudio) as unknown as typeof Audio;
 
     // Mock stores
     mockStore = {
@@ -99,7 +166,11 @@ describe("AudioPlayerManager", () => {
     (useProgressStore.getState as jest.Mock).mockReturnValue(mockProgressStore);
 
     // Reset singleton instance
-    (AudioPlayerManager as any).instance = null;
+    (
+      AudioPlayerManager as unknown as {
+        instance: AudioPlayerManager | null;
+      }
+    ).instance = null;
 
     manager = AudioPlayerManager.getInstance();
   });
@@ -118,10 +189,10 @@ describe("AudioPlayerManager", () => {
   describe("play", () => {
     it("should use native HLS if supported", async () => {
       mockAudio.canPlayType.mockReturnValue("maybe");
-      const episode: any = { id: "1", streaming_urls: { m3u8: "test.m3u8" } };
+      const episode = createEpisode();
 
       mockAudio.addEventListener.mockImplementation(
-        (event: string, callback: any) => {
+        (event: string, callback: () => void) => {
           if (event === "canplay") {
             callback();
           }
@@ -136,12 +207,14 @@ describe("AudioPlayerManager", () => {
 
     it("should use hls.js if native HLS not supported", async () => {
       mockAudio.canPlayType.mockReturnValue("");
-      (Hls as any).isSupported.mockReturnValue(true);
+      (
+        Hls as unknown as { isSupported: jest.Mock }
+      ).isSupported.mockReturnValue(true);
 
-      const episode: any = { id: "1", streaming_urls: { m3u8: "test.m3u8" } };
+      const episode = createEpisode();
 
       mockAudio.addEventListener.mockImplementation(
-        (event: string, callback: any) => {
+        (event: string, callback: () => void) => {
           if (event === "canplay") {
             callback();
           }
@@ -151,17 +224,20 @@ describe("AudioPlayerManager", () => {
       await manager.play(episode);
 
       expect(Hls).toHaveBeenCalled();
-      const hlsInstance = (Hls as unknown as jest.Mock).mock.results[0].value;
+      const hlsInstance = (Hls as unknown as jest.Mock).mock.results[0]
+        .value as {
+        loadSource: jest.Mock;
+        attachMedia: jest.Mock;
+      };
       expect(hlsInstance.loadSource).toHaveBeenCalledWith("test.m3u8");
       expect(hlsInstance.attachMedia).toHaveBeenCalledWith(mockAudio);
     });
 
     it("should skip if same episode already loaded", async () => {
-      const episode: any = { id: "1", streaming_urls: { m3u8: "test.m3u8" } };
-      // Setup current episode logic
-      // We can't access private property directly easily, but we can play once then play again
+      const episode = createEpisode();
+
       mockAudio.addEventListener.mockImplementation(
-        (event: string, callback: any) => {
+        (event: string, callback: () => void) => {
           if (event === "canplay") {
             callback();
           }
@@ -170,26 +246,15 @@ describe("AudioPlayerManager", () => {
 
       await manager.play(episode);
       mockAudio.play.mockClear();
-      // Play same episode
       await manager.play(episode);
 
-      // Should load once (first play), but not second time
       expect(Hls).toHaveBeenCalledTimes(1);
-      // Wait, did the first play use Hls?
-      // Need to configure support. Default is empty canPlayType in beforeEach.
-      // So Hls used. Hls constructor called once.
-      // Second play: should NOT call Hls constructor again if skipped.
-
-      // Actually since we reset mocks in beforeEach, verify clean slate.
-      // But Hls mock history is cleared? Yes.
     });
   });
 
   describe("Audio logic", () => {
     it("should handle standard audio errors", () => {
-      const handler = mockAudio.addEventListener.mock.calls.find(
-        (call: any) => call[0] === "error",
-      )[1];
+      const handler = getRegisteredHandler("error");
 
       mockAudio.error = { code: 1 }; // MEDIA_ERR_ABORTED
       handler();
@@ -198,33 +263,27 @@ describe("AudioPlayerManager", () => {
   });
 
   describe("Progress Tracking", () => {
-    it("should start and stop tracking on play/pause", async () => {
-      // Setup current episode to allow progress update
-      const episode: any = { id: "1", streaming_urls: { m3u8: "test.m3u8" } };
-      (manager as any).currentEpisode = episode;
+    it("should start and stop tracking on play/pause", () => {
+      const episode = createEpisode();
+      (
+        manager as unknown as {
+          currentEpisode: Episode | null;
+        }
+      ).currentEpisode = episode;
 
-      // Play triggers tracking
-      const playHandler = mockAudio.addEventListener.mock.calls.find(
-        (call: any) => call[0] === "playing",
-      )[1];
+      const playHandler = getRegisteredHandler("playing");
       playHandler();
 
-      // Advance time
       jest.advanceTimersByTime(1000);
       expect(mockProgressStore.updateProgress).toHaveBeenCalled();
 
       mockProgressStore.updateProgress.mockClear();
 
-      // Pause triggers stop tracking AND immediate update
-      const pauseHandler = mockAudio.addEventListener.mock.calls.find(
-        (call: any) => call[0] === "pause",
-      )[1];
+      const pauseHandler = getRegisteredHandler("pause");
       pauseHandler();
 
-      // Immediate update happened
       expect(mockProgressStore.updateProgress).toHaveBeenCalledTimes(1);
 
-      // Advance time - should not call again
       jest.advanceTimersByTime(1000);
       expect(mockProgressStore.updateProgress).toHaveBeenCalledTimes(1);
     });

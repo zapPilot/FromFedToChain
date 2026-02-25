@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MiniPlayer } from "../MiniPlayer";
 import "@testing-library/jest-dom";
-import { Category } from "@/types/content";
+import type { Category, Episode } from "@/types/content";
 
 // Define mock functions
 const mockPlay = jest.fn();
@@ -11,12 +11,26 @@ const mockSkipForward = jest.fn();
 const mockSkipBackward = jest.fn();
 
 // Default values
-const defaultMockValues = {
+interface MiniPlayerMockValues {
+  currentEpisode: Episode | null;
+  isPlaying: boolean;
+  isLoading: boolean;
+  totalDuration: number;
+  progress: number;
+  formattedCurrentPosition: string;
+  formattedTotalDuration: string;
+}
+
+const defaultMockValues: MiniPlayerMockValues = {
   currentEpisode: {
     id: "player-test-1",
     title: "Player Test Title",
     category: "macro" as Category,
     language: "en-US",
+    status: "published",
+    date: "2024-01-01",
+    content: "",
+    updated_at: "2024-01-01T00:00:00Z",
   },
   isPlaying: true,
   isLoading: false,
@@ -27,7 +41,7 @@ const defaultMockValues = {
 };
 
 // Mutable mock state
-let mockValues = { ...defaultMockValues };
+let mockValues: MiniPlayerMockValues = { ...defaultMockValues };
 
 jest.mock("@/hooks/use-audio-player", () => ({
   useAudioPlayer: () => ({
@@ -51,7 +65,7 @@ describe("MiniPlayer", () => {
   });
 
   it("renders nothing if no episode", () => {
-    mockValues = { ...defaultMockValues, currentEpisode: null as any };
+    mockValues = { ...defaultMockValues, currentEpisode: null };
     const { container } = render(<MiniPlayer />);
     expect(container).toBeEmptyDOMElement();
   });

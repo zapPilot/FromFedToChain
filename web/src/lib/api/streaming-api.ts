@@ -78,6 +78,103 @@ export class StreamingApiService {
     return `${API_CONFIG.baseUrl}/proxy/${path}`;
   }
 
+  private static getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return "Unknown error";
+  }
+
+  private static normalizeEpisodeData(responseData: unknown): ApiEpisode[] {
+    // Handle both array and object responses
+    if (Array.isArray(responseData)) {
+      return responseData;
+    }
+
+    if (
+      typeof responseData === "object" &&
+      responseData !== null &&
+      "episodes" in responseData
+    ) {
+      return (responseData as { episodes: ApiEpisode[] }).episodes;
+    }
+
+    if (
+      typeof responseData === "object" &&
+      responseData !== null &&
+      "data" in responseData
+    ) {
+      return (responseData as { data: ApiEpisode[] }).data;
+    }
+
+    if (
+      typeof responseData === "object" &&
+      responseData !== null &&
+      "files" in responseData
+    ) {
+      return (responseData as { files: ApiEpisode[] }).files;
+    }
+
+    if (typeof responseData === "object" && responseData !== null) {
+      // Single episode object
+      return [responseData as ApiEpisode];
+    }
+
+    throw new Error(`Unexpected response format: ${typeof responseData}`);
+  }
+
+  private static parseEpisode(
+    episodeJson: ApiEpisode,
+    language: Language,
+    category: Category,
+  ): Episode | null {
+    try {
+      const path = episodeJson.path;
+      if (!path) {
+        console.warn("Skipping episode with missing path:", episodeJson);
+        return null;
+      }
+
+      // Build streaming URL
+      const streamingUrl = this.getStreamUrl(path);
+
+      // Extract ID from path (format: audio/language/category/id/audio.m3u8)
+      const pathParts = path.split("/");
+      const id = pathParts.length >= 4 ? pathParts[3] : episodeJson.id || path;
+
+      // Parse date from ID if it starts with YYYY-MM-DD
+      const dateMatch = id.match(/^(\d{4}-\d{2}-\d{2})/);
+      const date = dateMatch
+        ? dateMatch[1]
+        : episodeJson.lastModified || new Date().toISOString();
+
+      // Create Episode object
+      return {
+        id,
+        status: "published",
+        category,
+        date,
+        language,
+        title: episodeJson.title || id,
+        content: "",
+        streaming_urls: {
+          m3u8: streamingUrl,
+        },
+        updated_at: episodeJson.lastModified || new Date().toISOString(),
+      };
+    } catch (error) {
+      console.warn("Failed to parse episode:", episodeJson, error);
+      return null;
+    }
+  }
+
+  private static sortEpisodesByDateDesc(episodes: Episode[]): void {
+    episodes.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+  }
+
   /**
    * Fetch with timeout support
    */
@@ -106,7 +203,7 @@ export class StreamingApiService {
         throw new TimeoutError(`Request timed out after ${timeout}ms`);
       }
       throw new NetworkError(
-        `Network connection error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Network connection error: ${this.getErrorMessage(error)}`,
         error,
       );
     }
@@ -120,78 +217,14 @@ export class StreamingApiService {
     language: Language,
     category: Category,
   ): Episode[] {
-    let episodeData: ApiEpisode[];
-
-    // Handle both array and object responses
-    if (Array.isArray(responseData)) {
-      episodeData = responseData;
-    } else if (
-      typeof responseData === "object" &&
-      responseData !== null &&
-      "episodes" in responseData
-    ) {
-      episodeData = (responseData as { episodes: ApiEpisode[] }).episodes;
-    } else if (
-      typeof responseData === "object" &&
-      responseData !== null &&
-      "data" in responseData
-    ) {
-      episodeData = (responseData as { data: ApiEpisode[] }).data;
-    } else if (
-      typeof responseData === "object" &&
-      responseData !== null &&
-      "files" in responseData
-    ) {
-      episodeData = (responseData as { files: ApiEpisode[] }).files;
-    } else if (typeof responseData === "object" && responseData !== null) {
-      // Single episode object
-      episodeData = [responseData as ApiEpisode];
-    } else {
-      throw new Error(`Unexpected response format: ${typeof responseData}`);
-    }
+    const episodeData = this.normalizeEpisodeData(responseData);
 
     const episodes: Episode[] = [];
 
     for (const episodeJson of episodeData) {
-      try {
-        const path = episodeJson.path;
-        if (!path) {
-          console.warn("Skipping episode with missing path:", episodeJson);
-          continue;
-        }
-
-        // Build streaming URL
-        const streamingUrl = this.getStreamUrl(path);
-
-        // Extract ID from path (format: audio/language/category/id/audio.m3u8)
-        const pathParts = path.split("/");
-        const id =
-          pathParts.length >= 4 ? pathParts[3] : episodeJson.id || path;
-
-        // Parse date from ID if it starts with YYYY-MM-DD
-        const dateMatch = id.match(/^(\d{4}-\d{2}-\d{2})/);
-        const date = dateMatch
-          ? dateMatch[1]
-          : episodeJson.lastModified || new Date().toISOString();
-
-        // Create Episode object
-        const episode: Episode = {
-          id,
-          status: "published",
-          category,
-          date,
-          language,
-          title: episodeJson.title || id,
-          content: "",
-          streaming_urls: {
-            m3u8: streamingUrl,
-          },
-          updated_at: episodeJson.lastModified || new Date().toISOString(),
-        };
-
+      const episode = this.parseEpisode(episodeJson, language, category);
+      if (episode) {
         episodes.push(episode);
-      } catch (error) {
-        console.warn("Failed to parse episode:", episodeJson, error);
       }
     }
 
@@ -224,7 +257,7 @@ export class StreamingApiService {
         throw error;
       }
       throw new ApiError(
-        `Unexpected error fetching episodes: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Unexpected error fetching episodes: ${this.getErrorMessage(error)}`,
         undefined,
         error,
       );
@@ -249,9 +282,7 @@ export class StreamingApiService {
         );
         return episodes;
       } catch (error) {
-        errors.push(
-          `${category}: ${error instanceof Error ? error.message : "Unknown error"}`,
-        );
+        errors.push(`${category}: ${this.getErrorMessage(error)}`);
         return [] as Episode[];
       }
     });
@@ -270,9 +301,7 @@ export class StreamingApiService {
     }
 
     // Sort by date (newest first)
-    allEpisodes.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
+    this.sortEpisodesByDateDesc(allEpisodes);
 
     return allEpisodes;
   }
@@ -297,7 +326,7 @@ export class StreamingApiService {
           category as Category,
         ).catch((error) => {
           errors.push(
-            `${language}/${category}: ${error instanceof Error ? error.message : "Unknown error"}`,
+            `${language}/${category}: ${this.getErrorMessage(error)}`,
           );
           return [] as Episode[];
         });
@@ -320,9 +349,7 @@ export class StreamingApiService {
     }
 
     // Sort by date (newest first)
-    allEpisodes.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
+    this.sortEpisodesByDateDesc(allEpisodes);
 
     console.log(
       `Parallel loading completed, got ${allEpisodes.length} total episodes`,

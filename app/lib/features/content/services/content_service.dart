@@ -306,8 +306,7 @@ class ContentService extends ChangeNotifier {
   /// [sortOrder] can be 'newest', 'oldest', or 'alphabetical'.
   Future<void> setSortOrder(String sortOrder) async {
     await _preferencesRepository.setSortOrder(sortOrder);
-    _applyCurrentFilters();
-    notifyListeners();
+    _applyFiltersAndNotify();
   }
 
   /// Loads all available episodes from the repository.
@@ -361,8 +360,7 @@ class ContentService extends ChangeNotifier {
   /// and triggers episode reload for the new language.
   Future<void> setLanguage(String language) async {
     if (!ApiConfig.isValidLanguage(language)) {
-      _errorMessage = 'Unsupported language: $language';
-      notifyListeners();
+      _setUnsupportedValueError('Unsupported language: $language');
       return;
     }
 
@@ -375,15 +373,13 @@ class ContentService extends ChangeNotifier {
   /// Sets the active category filter and updates the view.
   Future<void> setCategory(String category) async {
     if (category != 'all' && !ApiConfig.isValidCategory(category)) {
-      _errorMessage = 'Unsupported category: $category';
-      notifyListeners();
+      _setUnsupportedValueError('Unsupported category: $category');
       return;
     }
 
     _clearError();
     await _preferencesRepository.setCategory(category);
-    _applyCurrentFilters();
-    notifyListeners();
+    _applyFiltersAndNotify();
   }
 
   /// Updates the search query and filters the episode list accordingly.
@@ -391,8 +387,7 @@ class ContentService extends ChangeNotifier {
     if (_disposed) return;
 
     _preferencesRepository.setSearchQuery(query);
-    _applyCurrentFilters();
-    notifyListeners();
+    _applyFiltersAndNotify();
   }
 
   // Data access methods
@@ -516,6 +511,16 @@ class ContentService extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _setUnsupportedValueError(String errorMessage) {
+    _errorMessage = errorMessage;
+    notifyListeners();
+  }
+
+  void _applyFiltersAndNotify() {
+    _applyCurrentFilters();
+    notifyListeners();
+  }
+
   /// Apply current filters
   void _applyCurrentFilters() {
     _filteredEpisodes = _applyFilters(
@@ -593,15 +598,13 @@ class ContentService extends ChangeNotifier {
   @visibleForTesting
   void setSelectedLanguage(String language) {
     _preferencesRepository.setLanguage(language);
-    _applyCurrentFilters();
-    notifyListeners();
+    _applyFiltersAndNotify();
   }
 
   @visibleForTesting
   void setSelectedCategory(String category) {
     _preferencesRepository.setCategory(category);
-    _applyCurrentFilters();
-    notifyListeners();
+    _applyFiltersAndNotify();
   }
 
   @override

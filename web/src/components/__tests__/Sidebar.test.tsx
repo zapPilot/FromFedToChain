@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Sidebar } from "../Sidebar";
+import type { Category, Language } from "@/types/content";
 import "@testing-library/jest-dom";
 
 // Define mock functions
@@ -8,12 +9,17 @@ const mockSetLanguage = jest.fn();
 const mockClearFilters = jest.fn();
 
 // Default mock values
-const defaultMockValues = {
+interface SidebarMockValues {
+  selectedCategory: Category | null;
+  selectedLanguage: Language;
+}
+
+const defaultMockValues: SidebarMockValues = {
   selectedCategory: null,
   selectedLanguage: "en-US",
 };
 
-let mockValues = { ...defaultMockValues };
+let mockValues: SidebarMockValues = { ...defaultMockValues };
 
 // Mock the hooks
 jest.mock("@/hooks/use-episodes", () => ({
@@ -68,7 +74,7 @@ describe("Sidebar", () => {
   });
 
   it("shows active state for selected category", () => {
-    mockValues = { ...defaultMockValues, selectedCategory: "macro" as any };
+    mockValues = { ...defaultMockValues, selectedCategory: "macro" };
     render(<Sidebar />);
 
     // Macro should have active styles (checking roughly by class or just that it renders)

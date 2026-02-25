@@ -77,18 +77,23 @@ export class AudioPlayerManager {
    * PAL Fix #1: Using bound handlers for proper cleanup
    */
   private setupAudioListeners(): void {
-    this.audio.addEventListener(
-      "loadedmetadata",
-      this.boundHandlers.loadedmetadata,
-    );
-    this.audio.addEventListener("playing", this.boundHandlers.playing);
-    this.audio.addEventListener("pause", this.boundHandlers.pause);
-    this.audio.addEventListener("waiting", this.boundHandlers.waiting);
-    this.audio.addEventListener("canplay", this.boundHandlers.canplay);
-    this.audio.addEventListener("ended", this.boundHandlers.ended);
-    this.audio.addEventListener("error", this.boundHandlers.error);
-    this.audio.addEventListener("timeupdate", this.boundHandlers.timeupdate);
-    this.audio.addEventListener("ratechange", this.boundHandlers.ratechange);
+    this.forEachBoundHandler((eventName, handler) => {
+      this.audio.addEventListener(eventName, handler);
+    });
+  }
+
+  private removeAudioListeners(): void {
+    this.forEachBoundHandler((eventName, handler) => {
+      this.audio.removeEventListener(eventName, handler);
+    });
+  }
+
+  private forEachBoundHandler(
+    callback: (eventName: string, handler: EventListener) => void,
+  ): void {
+    for (const [eventName, handler] of Object.entries(this.boundHandlers)) {
+      callback(eventName, handler as EventListener);
+    }
   }
 
   /**
@@ -207,6 +212,91 @@ export class AudioPlayerManager {
     );
   }
 
+  private cleanupHlsInstance(): void {
+    if (this.hls) {
+      this.hls.destroy();
+      this.hls = null;
+    }
+  }
+
+  private initializeHls(
+    streamingUrl: string,
+    store: { setError: (message: string) => void },
+  ): void {
+    this.hls = new Hls({
+      debug: false,
+      enableWorker: true,
+      lowLatencyMode: false,
+    });
+
+    this.setupHlsErrorHandling(store);
+    this.hls.loadSource(streamingUrl);
+    this.hls.attachMedia(this.audio);
+  }
+
+  private setupHlsErrorHandling(store: {
+    setError: (message: string) => void;
+  }): void {
+    if (!this.hls) {
+      return;
+    }
+
+    // PAL Fix #3: Network error recovery with exponential backoff
+    this.hls.on(Hls.Events.ERROR, (_event, data) => {
+      console.error("HLS error:", data);
+
+      if (!data.fatal) {
+        return;
+      }
+
+      this.handleFatalHlsError(data.type, store);
+    });
+  }
+
+  private handleFatalHlsError(
+    errorType: string,
+    store: { setError: (message: string) => void },
+  ): void {
+    switch (errorType) {
+      case Hls.ErrorTypes.NETWORK_ERROR:
+        this.handleNetworkHlsError(store);
+        break;
+      case Hls.ErrorTypes.MEDIA_ERROR:
+        // Try to recover from media error
+        console.log("Attempting to recover from media error");
+        this.hls?.recoverMediaError();
+        break;
+      default:
+        store.setError("Fatal streaming error");
+        break;
+    }
+  }
+
+  private handleNetworkHlsError(store: {
+    setError: (message: string) => void;
+  }): void {
+    if (this.networkRetryCount < this.MAX_NETWORK_RETRIES) {
+      this.networkRetryCount++;
+      const delay = Math.pow(2, this.networkRetryCount) * 1000; // 2s, 4s, 8s
+
+      console.log(
+        `Network error. Retry ${this.networkRetryCount}/${this.MAX_NETWORK_RETRIES} in ${delay}ms`,
+      );
+
+      setTimeout(() => {
+        console.log("Retrying network load...");
+        this.hls?.startLoad();
+      }, delay);
+      return;
+    }
+
+    console.error("Max network retries reached");
+    store.setError(
+      "Network error loading stream. Please check your connection.",
+    );
+    this.networkRetryCount = 0;
+  }
+
   /**
    * Load episode and prepare for playback
    * PAL Fix #2: Prevent race conditions with isLoading guard
@@ -241,10 +331,7 @@ export class AudioPlayerManager {
       }
 
       // Clean up previous HLS instance
-      if (this.hls) {
-        this.hls.destroy();
-        this.hls = null;
-      }
+      this.cleanupHlsInstance();
 
       // Check for native HLS support (Safari)
       if (this.supportsNativeHLS()) {
@@ -252,55 +339,7 @@ export class AudioPlayerManager {
         this.audio.src = streamingUrl;
       } else if (Hls.isSupported()) {
         console.log("Using hls.js");
-        this.hls = new Hls({
-          debug: false,
-          enableWorker: true,
-          lowLatencyMode: false,
-        });
-
-        // Setup HLS event listeners
-        // PAL Fix #3: Network error recovery with exponential backoff
-        this.hls.on(Hls.Events.ERROR, (event, data) => {
-          console.error("HLS error:", data);
-
-          if (data.fatal) {
-            switch (data.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR:
-                // Implement retry with exponential backoff
-                if (this.networkRetryCount < this.MAX_NETWORK_RETRIES) {
-                  this.networkRetryCount++;
-                  const delay = Math.pow(2, this.networkRetryCount) * 1000; // 2s, 4s, 8s
-
-                  console.log(
-                    `Network error. Retry ${this.networkRetryCount}/${this.MAX_NETWORK_RETRIES} in ${delay}ms`,
-                  );
-
-                  setTimeout(() => {
-                    console.log("Retrying network load...");
-                    this.hls?.startLoad();
-                  }, delay);
-                } else {
-                  console.error("Max network retries reached");
-                  store.setError(
-                    "Network error loading stream. Please check your connection.",
-                  );
-                  this.networkRetryCount = 0;
-                }
-                break;
-              case Hls.ErrorTypes.MEDIA_ERROR:
-                // Try to recover from media error
-                console.log("Attempting to recover from media error");
-                this.hls?.recoverMediaError();
-                break;
-              default:
-                store.setError("Fatal streaming error");
-                break;
-            }
-          }
-        });
-
-        this.hls.loadSource(streamingUrl);
-        this.hls.attachMedia(this.audio);
+        this.initializeHls(streamingUrl, store);
       } else {
         throw new Error(
           "HLS not supported in this browser. Please use Safari, Chrome, or Firefox.",
@@ -411,11 +450,7 @@ export class AudioPlayerManager {
     this.audio.pause();
     this.audio.currentTime = 0;
     this.stopProgressTracking();
-
-    if (this.hls) {
-      this.hls.destroy();
-      this.hls = null;
-    }
+    this.cleanupHlsInstance();
 
     this.currentEpisode = null;
     useAudioPlayerStore.getState().reset();
@@ -474,25 +509,8 @@ export class AudioPlayerManager {
    */
   destroy(): void {
     this.stop();
-
-    // Remove event listeners using bound handlers
-    this.audio.removeEventListener(
-      "loadedmetadata",
-      this.boundHandlers.loadedmetadata,
-    );
-    this.audio.removeEventListener("playing", this.boundHandlers.playing);
-    this.audio.removeEventListener("pause", this.boundHandlers.pause);
-    this.audio.removeEventListener("waiting", this.boundHandlers.waiting);
-    this.audio.removeEventListener("canplay", this.boundHandlers.canplay);
-    this.audio.removeEventListener("ended", this.boundHandlers.ended);
-    this.audio.removeEventListener("error", this.boundHandlers.error);
-    this.audio.removeEventListener("timeupdate", this.boundHandlers.timeupdate);
-    this.audio.removeEventListener("ratechange", this.boundHandlers.ratechange);
-
-    if (this.hls) {
-      this.hls.destroy();
-      this.hls = null;
-    }
+    this.removeAudioListeners();
+    this.cleanupHlsInstance();
 
     AudioPlayerManager.instance = null;
   }

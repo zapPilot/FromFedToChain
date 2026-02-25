@@ -55,15 +55,11 @@ class MiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Responsive spacing and sizing based on screen width
     final screenWidth = MediaQuery.of(context).size.width;
-    final isVerySmall = screenWidth < 360;
-    final margin = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
-    final padding = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
-    final spacing = isVerySmall ? AppTheme.spacingXS : AppTheme.spacingS;
+    final layoutValues = _resolveLayoutValues(screenWidth);
 
     return Container(
-      margin: EdgeInsets.all(margin),
+      margin: EdgeInsets.all(layoutValues.margin),
       decoration: AppTheme.glassMorphismDecoration,
       child: Material(
         color: Colors.transparent,
@@ -71,13 +67,13 @@ class MiniPlayer extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppTheme.radiusM),
           child: Padding(
-            padding: EdgeInsets.all(padding),
+            padding: EdgeInsets.all(layoutValues.padding),
             child: Row(
               children: [
                 // Album art / Icon
-                _buildAlbumArt(size: isVerySmall ? 36 : 44),
+                _buildAlbumArt(size: layoutValues.albumArtSize),
 
-                SizedBox(width: spacing),
+                SizedBox(width: layoutValues.spacing),
 
                 // Track info
                 Expanded(
@@ -235,17 +231,9 @@ class MiniPlayer extends StatelessWidget {
   /// Build control buttons
   Widget _buildControls() {
     return LayoutBuilder(
-      builder: (context, constraints) {
-        // Ensure minimum 48px tap targets for accessibility compliance
-        // while adapting to screen space and preventing overflow
+      builder: (context, _) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final isVerySmall = screenWidth < 360;
-        final isSmall = screenWidth < 480;
-
-        // Adjust sizes based on available space while maintaining minimum accessibility size
-        const secondarySize = 48.0; // Minimum accessibility size
-        final primarySize = isVerySmall ? 48.0 : (isSmall ? 50.0 : 52.0);
-        final spacing = isVerySmall ? 2.0 : AppTheme.spacingXS;
+        final controlsLayout = _resolveControlsLayout(screenWidth);
 
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -254,28 +242,28 @@ class MiniPlayer extends StatelessWidget {
             _buildControlButton(
               icon: Icons.skip_previous,
               onPressed: onPrevious,
-              size: secondarySize,
+              size: controlsLayout.secondarySize,
               semanticLabel: 'Previous track',
             ),
 
-            SizedBox(width: spacing),
+            SizedBox(width: controlsLayout.spacing),
 
             // Play/Pause button
             _buildControlButton(
               icon: _getPlayPauseIcon(),
               onPressed: onPlayPause,
-              size: primarySize,
+              size: controlsLayout.primarySize,
               isPrimary: true,
               semanticLabel: _getPlayPauseSemanticLabel(),
             ),
 
-            SizedBox(width: spacing),
+            SizedBox(width: controlsLayout.spacing),
 
             // Next button
             _buildControlButton(
               icon: Icons.skip_next,
               onPressed: onNext,
-              size: secondarySize,
+              size: controlsLayout.secondarySize,
               semanticLabel: 'Next track',
             ),
           ],
@@ -357,4 +345,74 @@ class MiniPlayer extends StatelessWidget {
       return 'Play'; // For paused, stopped states
     }
   }
+
+  _MiniPlayerLayoutValues _resolveLayoutValues(double screenWidth) {
+    final isVerySmall = screenWidth < 360;
+    if (isVerySmall) {
+      return const _MiniPlayerLayoutValues(
+        margin: AppTheme.spacingXS,
+        padding: AppTheme.spacingXS,
+        spacing: AppTheme.spacingXS,
+        albumArtSize: 36,
+      );
+    }
+
+    return const _MiniPlayerLayoutValues(
+      margin: AppTheme.spacingS,
+      padding: AppTheme.spacingS,
+      spacing: AppTheme.spacingS,
+      albumArtSize: 44,
+    );
+  }
+
+  _MiniPlayerControlsLayout _resolveControlsLayout(double screenWidth) {
+    const secondarySize = 48.0;
+    if (screenWidth < 360) {
+      return const _MiniPlayerControlsLayout(
+        secondarySize: secondarySize,
+        primarySize: 48.0,
+        spacing: 2.0,
+      );
+    }
+
+    if (screenWidth < 480) {
+      return const _MiniPlayerControlsLayout(
+        secondarySize: secondarySize,
+        primarySize: 50.0,
+        spacing: AppTheme.spacingXS,
+      );
+    }
+
+    return const _MiniPlayerControlsLayout(
+      secondarySize: secondarySize,
+      primarySize: 52.0,
+      spacing: AppTheme.spacingXS,
+    );
+  }
+}
+
+class _MiniPlayerLayoutValues {
+  final double margin;
+  final double padding;
+  final double spacing;
+  final double albumArtSize;
+
+  const _MiniPlayerLayoutValues({
+    required this.margin,
+    required this.padding,
+    required this.spacing,
+    required this.albumArtSize,
+  });
+}
+
+class _MiniPlayerControlsLayout {
+  final double secondarySize;
+  final double primarySize;
+  final double spacing;
+
+  const _MiniPlayerControlsLayout({
+    required this.secondarySize,
+    required this.primarySize,
+    required this.spacing,
+  });
 }

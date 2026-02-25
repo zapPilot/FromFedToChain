@@ -6,7 +6,8 @@ export default function NotFound() {
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-4xl font-bold mb-4">Episode Not Found</h1>
         <p className="text-zinc-400 mb-8">
-          The episode you're looking for doesn't exist or has been removed.
+          The episode you&apos;re looking for doesn&apos;t exist or has been
+          removed.
         </p>
         <Link
           href="/"

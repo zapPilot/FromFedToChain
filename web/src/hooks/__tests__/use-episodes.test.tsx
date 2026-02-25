@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { useEpisodes } from "../use-episodes";
 import { useEpisodesStore } from "@/stores/episodes-store";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -19,6 +19,13 @@ jest.mock("next/navigation", () => ({
 }));
 
 describe("useEpisodes", () => {
+  type MockedUseEpisodesStore = jest.Mock & {
+    getState: jest.Mock;
+  };
+
+  const mockedUseEpisodesStore =
+    useEpisodesStore as unknown as MockedUseEpisodesStore;
+
   const mockStore = {
     selectedLanguage: "",
     selectedCategory: "",
@@ -48,8 +55,8 @@ describe("useEpisodes", () => {
     mockStore.filteredEpisodes = [];
 
     // Setup mocks
-    (useEpisodesStore as unknown as jest.Mock).mockReturnValue(mockStore);
-    (useEpisodesStore as any).getState.mockReturnValue(mockStore);
+    mockedUseEpisodesStore.mockReturnValue(mockStore);
+    mockedUseEpisodesStore.getState.mockReturnValue(mockStore);
     (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     (usePathname as jest.Mock).mockReturnValue("/episodes");

@@ -1,5 +1,6 @@
 import { StreamingApiService } from "../streaming-api";
 import { ApiError } from "../streaming-api";
+import type { Episode } from "@/types/content";
 
 // Mock global fetch
 global.fetch = jest.fn();
@@ -95,32 +96,32 @@ describe("StreamingApiService", () => {
   });
 
   describe("filterEpisodesByQuery", () => {
-    const episodes = [
+    const episodes: Episode[] = [
       {
         id: "1",
         title: "Bitcoin Analysis",
+        status: "published",
         category: "daily-news",
         description: "Review of BTC",
         content: "Crypto content",
         language: "en-US",
         date: "2024-01-01",
-        status: "published",
         streaming_urls: { m3u8: "" },
         updated_at: "",
       },
       {
         id: "2",
         title: "Ethereum Update",
+        status: "published",
         category: "ethereum",
         description: "ETH merge",
         content: "Smart contracts",
         language: "en-US",
         date: "2024-01-02",
-        status: "published",
         streaming_urls: { m3u8: "" },
         updated_at: "",
       },
-    ] as any[];
+    ];
 
     it("should return all episodes if query is empty", () => {
       expect(StreamingApiService.filterEpisodesByQuery(episodes, "  ")).toBe(
@@ -161,7 +162,18 @@ describe("StreamingApiService", () => {
       // Mock fetchEpisodeList which checkConnectivity calls
       const fetchSpy = jest
         .spyOn(StreamingApiService, "fetchEpisodeList")
-        .mockResolvedValue([{ id: "1" } as any]);
+        .mockResolvedValue([
+          {
+            id: "1",
+            title: "Test Episode",
+            status: "published",
+            category: "startup",
+            date: "2024-01-01",
+            language: "zh-TW",
+            content: "",
+            updated_at: "2024-01-01T00:00:00Z",
+          },
+        ]);
 
       const result = await StreamingApiService.checkConnectivity();
       expect(result).toBe(true);

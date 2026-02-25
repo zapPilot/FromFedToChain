@@ -17,9 +17,15 @@ export function useEpisodeContent(episode: Episode | null) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const episodeId = episode?.id ?? null;
+  const episodeLanguage = episode?.language ?? null;
+  const episodeCategory = episode?.category ?? null;
+  const episodeContent = episode?.content ?? "";
+  const episodeReferences = episode?.references;
+
   useEffect(() => {
     // Skip if no episode
-    if (!episode) {
+    if (!episodeId || !episodeLanguage || !episodeCategory) {
       setContent(null);
       setReferences([]);
       setIsLoading(false);
@@ -28,16 +34,13 @@ export function useEpisodeContent(episode: Episode | null) {
     }
 
     // If episode already has content, use it directly
-    if (episode.content && episode.content.trim().length > 0) {
-      setContent(episode.content);
-      setReferences(episode.references || []);
+    if (episodeContent.trim().length > 0) {
+      setContent(episodeContent);
+      setReferences(episodeReferences ?? []);
       setIsLoading(false);
       setError(null);
       return;
     }
-
-    // Capture episode values for the fetch
-    const { language, category, id } = episode;
 
     // Fetch content from API
     let cancelled = false;
@@ -48,9 +51,9 @@ export function useEpisodeContent(episode: Episode | null) {
 
       try {
         const contentData = await StreamingApiService.fetchEpisodeContent(
-          language,
-          category,
-          id,
+          episodeLanguage,
+          episodeCategory,
+          episodeId,
         );
 
         if (cancelled) return;
@@ -81,7 +84,13 @@ export function useEpisodeContent(episode: Episode | null) {
     return () => {
       cancelled = true;
     };
-  }, [episode?.id, episode?.language, episode?.category, episode?.content]);
+  }, [
+    episodeCategory,
+    episodeContent,
+    episodeId,
+    episodeLanguage,
+    episodeReferences,
+  ]);
 
   return {
     /** Transcript/content text (markdown format) */

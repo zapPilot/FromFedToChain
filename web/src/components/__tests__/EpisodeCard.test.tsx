@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { EpisodeCard } from "../EpisodeCard";
+import type { Episode } from "@/types/content";
 import "@testing-library/jest-dom";
 
 // Define mock functions
@@ -7,12 +8,17 @@ const mockPlay = jest.fn();
 const mockPause = jest.fn();
 
 // Default mock values
-const defaultMockValues = {
+interface AudioPlayerMockValues {
+  isPlaying: boolean;
+  currentEpisode: Episode | null;
+}
+
+const defaultMockValues: AudioPlayerMockValues = {
   isPlaying: false,
-  currentEpisode: null as any,
+  currentEpisode: null,
 };
 
-let mockValues = { ...defaultMockValues };
+let mockValues: AudioPlayerMockValues = { ...defaultMockValues };
 
 jest.mock("@/hooks/use-audio-player", () => ({
   useAudioPlayer: () => ({
@@ -28,16 +34,19 @@ jest.mock("@/hooks/use-progress", () => ({
   }),
 }));
 
-const mockEpisode = {
+const mockEpisode: Episode = {
   id: "test-card-1",
   title: "Card Test Title",
   description: "Card Test Description",
   category: "ethereum",
   date: "2024-02-01",
   language: "en-US",
+  status: "published",
+  content: "",
+  updated_at: "2024-02-01T00:00:00Z",
   duration: 300,
-  audioUrl: "http://example.com/audio.mp3",
-} as any;
+  streaming_urls: { m3u8: "http://example.com/audio.m3u8" },
+};
 
 describe("EpisodeCard", () => {
   beforeEach(() => {

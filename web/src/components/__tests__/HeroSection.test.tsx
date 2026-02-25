@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { HeroSection } from "../HeroSection";
+import type { Episode } from "@/types/content";
 import "@testing-library/jest-dom";
 
 // Mock hooks
@@ -7,12 +8,17 @@ const mockPlay = jest.fn();
 const mockPause = jest.fn();
 
 // Default mock values
-const defaultMockValues = {
+interface AudioPlayerMockValues {
+  isPlaying: boolean;
+  currentEpisode: Episode | null;
+}
+
+const defaultMockValues: AudioPlayerMockValues = {
   isPlaying: false,
-  currentEpisode: null as any,
+  currentEpisode: null,
 };
 
-let mockValues = { ...defaultMockValues };
+let mockValues: AudioPlayerMockValues = { ...defaultMockValues };
 
 jest.mock("@/hooks/use-audio-player", () => ({
   useAudioPlayer: () => ({
@@ -22,16 +28,19 @@ jest.mock("@/hooks/use-audio-player", () => ({
   }),
 }));
 
-const mockEpisode = {
+const mockEpisode: Episode = {
   id: "test-episode-1",
   title: "Test Episode Title",
   description: "Test description",
   category: "daily-news",
   date: "2024-01-01",
   language: "en-US",
+  status: "published",
+  content: "",
+  updated_at: "2024-01-01T00:00:00Z",
   duration: 120,
-  audioUrl: "http://example.com/audio.mp3",
-} as any;
+  streaming_urls: { m3u8: "http://example.com/audio.m3u8" },
+};
 
 describe("HeroSection", () => {
   beforeEach(() => {
